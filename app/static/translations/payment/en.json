@@ -1,0 +1,10 @@
+{
+  "payment_page_title": "Payment Method",
+  "error_message": "{{ message }}",
+  "payment_method_label": "Payment Method",
+  "payment_method_card": "Card",
+  "payment_method_wallet": "Wallet",
+  "currency_label": "Currency",
+  "total_price_label": "Total Price",
+  "pay_now": "Pay Now"
+}

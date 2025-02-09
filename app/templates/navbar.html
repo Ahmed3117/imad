@@ -1,0 +1,114 @@
+{% load static %}
+
+
+<nav class="{% if request.path != '/' %} navbar {% endif %} navbar-expand-lg sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <img src="{{logo_url}}" alt="Logo" height="60">
+        </a>
+        <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item px-2">
+                    <a class="nav-link active" aria-current="page" href="/" data-translate="home">
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="nav-item px-2">
+                    <a class="nav-link active" aria-current="page" href="{% url 'about:about_us' %}" data-translate="aboutus">
+                        <span>About Us</span>
+                    </a>
+                </li>
+                <li class="nav-item px-2 dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-mdb-toggle="dropdown"
+                        aria-expanded="false" data-translate="go_to">
+                        <span>Go To</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        {% if request.path == '/' %}
+                            <li><a class="dropdown-item fw-bold" href="{% url 'courses:levels' %}" data-translate="levels"><span>Levels & Courses</span></a></li>
+                            {% if request.user.is_authenticated %}
+                            <li><a class="dropdown-item fw-bold" href="{% url 'courses:loved_items' %}" data-translate="loveditems"><span>Loved Items</span></a></li>
+                            
+                                {% if request.user.role == "parent" %}
+                                    <a class="dropdown-item fw-bold" href="{% url 'accounts:parent_dashboard' %}" data-translate="profile"><span>My Profile</span></a>
+                                {% else %}
+                                    <a class="dropdown-item fw-bold" href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a>
+                                {% endif %}
+                            {% endif %}
+                        <li><a class="dropdown-item" href="#offers" data-translate="features"><span>Offers & Discounts</span></a></li>
+                        <li><a class="dropdown-item" href="#whoarewe" data-translate="contact"><span>Who Are We</span></a></li>
+                        <li><a class="dropdown-item" href="#plans" data-translate="plans"><span>Our Plans</span></a></li>
+                        <li><a class="dropdown-item" href="#contact" data-translate="contacts"><span>Contact</span></a></li>
+                        {% else %}
+                        <li>
+                            {% if request.user.role == "parent" %}
+                                    <li><a class="dropdown-item fw-bold" href="{% url 'accounts:parent_dashboard' %}" data-translate="profile"><span>My Profile</span></a></li>
+                                {% else %}
+                                    <li><a class="dropdown-item fw-bold" href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a></li>
+                            {% endif %}
+
+                            <li><a class="dropdown-item fw-bold" href="{% url 'courses:levels' %}" data-translate="levels"><span>Levels & Courses</span></a></li>
+                            {% if request.user.is_authenticated %}
+                            <li><a class="dropdown-item fw-bold" href="{% url 'courses:loved_items' %}" data-translate="loveditems"><span>Loved Items</span></a></li>
+                            {% endif %}
+                        {% endif %}
+                    </ul>
+                </li>
+
+                <!-- Language Switcher -->
+                <li class="nav-item px-2 d-flex align-items-center mx-md-3">
+                    <div class="lang-switcher">
+                        <button class="lang-btn active" data-lang="en">EN</button>
+                        <button class="lang-btn" data-lang="ar">AR</button>
+                    </div>
+                </li>
+
+                <!-- Cart Icon with Dropdown -->
+                <!-- {% if request.user.is_authenticated %}
+                <a href="{% url 'courses:cart' %}" class="nav-link position-relative ">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count badge bg-danger">{{ cart_count }}</span>
+                </a>
+                {% endif %} -->
+
+                <!-- User Profile Dropdown -->
+                <li class="nav-item dropdown">
+                  {% if request.user.is_authenticated %}
+                  <a class="nav-link dropdown-toggle ms-md-5" href="#" id="userDropdown" role="button" data-mdb-toggle="dropdown"
+                      aria-expanded="false">
+                      {% if request.user.image %}
+                      <img src="{{request.user.image.url}}" alt="User" class="rounded-circle" height="40" />
+                      {% else %}
+                      <img src="{% static 'imgs/defaults/person.svg' %}" alt="User" class="" height="40" />
+                      {% endif %}
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                      <li>
+                        
+                        {% if request.user.role == "parent" %}
+                            <a class="dropdown-item " href="{% url 'accounts:parent_dashboard' %}" data-translate="profile"><span>My Profile</span></a>
+                        {% else %}
+                            <a class="dropdown-item " href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a>
+                        {% endif %}
+                    </li>
+                      <li><a class="dropdown-item" href="{% url 'accounts:logout' %}" data-translate="logout"><span>Logout</span></a></li>
+                  </ul>
+                  {% else %}
+                  <ul class="navbar-nav ms-auto align-items-center">
+                      <li class="nav-item px-2">
+                          <a class=" btn btn-primary " href="{% url 'accounts:login' %}?next={{ request.path }}" data-translate="login"><span>Login</span></a>
+                      </li>
+                      <li class="nav-item px-2">
+                          <a class="btn btn-primary " href="{% url 'accounts:register' %}?next={{ request.path }}" data-translate="register"><span>Register</span></a>
+                      </li>
+                  </ul>
+                  {% endif %}
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

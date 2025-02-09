@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block translationFolder %}data-translation-folder="payment"{% endblock %}
+{% block title %}Payment{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Page Title -->
+    <h3 class="text-center text-secondary mb-4" data-translate="payment_page_title">Payment Page</h3>
+
+    <!-- Messages Section -->
+    {% if messages %}
+    <div class="alert alert-danger mb-4">
+        {% for message in messages %}
+        <p data-translate="error_message">{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Payment Form -->
+    <form id="payment-form" method="POST" onsubmit="handlePayment(event)" class="bg-light p-4 rounded shadow-sm">
+        {% csrf_token %}
+
+        <!-- Payment Method -->
+        <div class="form-group mb-4">
+            <label for="payment_method" class="form-label" data-translate="payment_method_label">Payment Method</label>
+            <select class="form-control" id="payment_method" name="payment_method" required>
+                <option value="card" data-translate="payment_method_card">Card</option>
+                <option value="wallet" data-translate="payment_method_wallet">Wallet</option>
+            </select>
+        </div>
+
+        <!-- Currency -->
+        <div class="form-group mb-4" hidden>
+            <label for="currency" class="form-label" data-translate="currency_label">Currency</label>
+            <input type="text" class="form-control" id="currency" name="currency" value="EGP" readonly>
+        </div>
+
+        <!-- Total Price -->
+        <div class="form-group mb-4">
+            <label for="total_price" class="form-label" data-translate="total_price_label">Total Price</label>
+            <input type="text" class="form-control" id="total_price" name="total_price" value="{{ total_price }} {% if request.is_egypt %}EGP{% else %}${% endif %}" readonly>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-lg w-100" data-translate="pay_now">Pay Now</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function handlePayment(event) {
+        event.preventDefault(); // Prevent form submission
+
+        const form = event.target;
+        const formData = new FormData(form);
+
+        fetch("{% url 'payments:pay' order.order_id %}", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": formData.get("csrfmiddlewaretoken"),
+            },
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.checkout_url) {
+                // Open the iframe URL in a new tab
+                window.location.href = data.checkout_url;
+            } else if (data.error) {
+                alert("Error: " + data.error);
+            }
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            alert("An unexpected error occurred.");
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,334 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" {% block translationFolder %}{% endblock %}>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="HiCode Academy">
+  <meta property="og:description" content="HiCode is teaching Code , AI , Data Science and more to kids and teens from 6 to 18 years old in the best and most modern ways .">
+  <meta property="og:image" content="https://hicode.academy/static/imgs/hero/hero.png">
+  <meta property="og:url" content="https://hicode.academy/">
+  <meta property="og:type" content="website">
+    <title>{% block title %}{% endblock %}</title>
+
+    <!-- CSS Libraries -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700&display=swap" rel="stylesheet" />
+    <!-- fav icon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'imgs/bg/favicon2.svg' %}">
+
+    <link id="rtl-css" href="{% static 'css/mdb.rtl.min.css' %}" rel="stylesheet" disabled />
+    <link id="ltr-css" href="{% static 'css/mdb.min.css' %}" rel="stylesheet" />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+    <!-- Additional CSS -->
+    {% block extra_css %}{% endblock %}
+
+    
+</head>
+<body>
+{% if request.path != '/' %}
+  {% include 'navbar.html' %}
+{% endif %}
+
+<!-- Messages -->
+<div class="toast-wrapper position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+  {% if messages %}
+    {% for message in messages %}
+      {% if message.tags == 'success' %}
+          <div class="toast align-items-center bg-success text-white border-0 m-1" role="alert" aria-live="assertive" aria-atomic="true" style="max-width: 350px;">
+      {% elif message.tags == 'error' %}
+          <div class="toast align-items-center bg-danger text-white border-0 m-1" role="alert" aria-live="assertive" aria-atomic="true" style="max-width: 350px;">
+      {% elif message.tags == 'warning' %}
+          <div class="toast align-items-center bg-warning text-dark border-0 m-1" role="alert" aria-live="assertive" aria-atomic="true" style="max-width: 350px;">
+      {% else %}
+          <div class="toast align-items-center bg-secondary text-white border-0 m-1" role="alert" aria-live="assertive" aria-atomic="true" style="max-width: 350px;">
+      {% endif %}
+        <div class="d-flex">
+          <div class="toast-body">
+            {% if message.tags == 'warning' %}
+              <i class="fas fa-exclamation-triangle me-2"></i>
+            {% elif message.tags == 'error' %}
+              <i class="fas fa-exclamation-circle me-2"></i>
+            {% elif message.tags == 'success' %}
+              <i class="fas fa-check-circle me-2"></i>
+            {% endif %}
+            {{ message }}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-mdb-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<!-- Script for Messages -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all visible toasts
+    const toastElements = document.querySelectorAll('.toast');
+    toastElements.forEach(toastEl => {
+        // Initialize the MDB Toast instance
+        const toastInstance = new mdb.Toast(toastEl, {
+            autohide: true,  // Automatically hide after a delay
+            delay: 5000      // Delay before hiding (5 seconds)
+        });
+
+        toastInstance.show(); // Show the toast programmatically
+
+        // Remove the toast completely from the DOM after it's hidden
+        toastEl.addEventListener('hidden.mdb.toast', function () {
+            toastEl.remove();
+        });
+    });
+
+    // Handle close button clicks
+    const closeButtons = document.querySelectorAll('[data-mdb-dismiss="toast"]');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const toast = this.closest('.toast');
+            if (toast) {
+                const toastInstance = mdb.Toast.getInstance(toast);
+                if (toastInstance) {
+                    toastInstance.hide(); // Hide the toast programmatically
+                }
+            }
+        });
+    });
+});
+</script>
+
+<!-- Content -->
+<div class="">
+    {% block content %}{% endblock %}
+</div>
+
+<!-- WhatsApp Button -->
+<a href="https://wa.me/+2{{company_info.phone}}" target="_blank" class="whatsapp-float" title="Chat with us on WhatsApp">
+    <i class="fab fa-whatsapp whatsapp-icon"></i>
+</a>
+
+<!-- Free Meet Button -->
+<!-- {% if user.is_authenticated %}
+<button onclick="freemeet()" class="btn btn-primary free-meet-button"> <i class="fas fa-video"></i> <span class="px-2" data-translate="ask_for_meet">Ask for Free Guide Meet</span> </button>
+{% else %}
+<a href="https://wa.me/+2{{company_info.freemeet_phone}}" target="_blank" class="btn btn-primary free-meet-button" > <span class="px-2" data-translate="ask_for_meet" >Ask for Free Guide Meet</span>
+  <i class="fas fa-video"></i>
+</a>
+{% endif %} -->
+
+<!-- JavaScript Libraries -->
+<script type="text/javascript" src="{% static 'js/mdb.min.js' %}"></script>
+  <!-- Translations -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const langButtons = document.querySelectorAll('.lang-btn');
+      let currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
+      let translations = {};
+
+      function getTranslationFolder() {
+          return document.documentElement.getAttribute('data-translation-folder');
+      }
+
+      async function loadTranslations(lang, folder) {
+          const response = await fetch(`/static/translations/${folder}/${lang}.json`);
+          const pageTranslations = await response.json();
+
+          const navbarResponse = await fetch(`/static/translations/navbar/${lang}.json`);
+          const navbarTranslations = await navbarResponse.json();
+
+          translations = { ...translations, ...pageTranslations, ...navbarTranslations };
+          translatePage();
+      }
+
+      function translatePage() {
+          document.querySelectorAll('[data-translate]').forEach(el => {
+              const key = el.getAttribute('data-translate');
+              if (translations[key]) {
+                  el.textContent = translations[key];
+              }
+          });
+      }
+
+      function switchStylesheet() {
+          const rtlStylesheet = document.getElementById('rtl-css');
+          const ltrStylesheet = document.getElementById('ltr-css');
+
+          if (currentLanguage === 'ar') {
+              rtlStylesheet.removeAttribute('disabled');
+              ltrStylesheet.setAttribute('disabled', 'true');
+          } else {
+              ltrStylesheet.removeAttribute('disabled');
+              rtlStylesheet.setAttribute('disabled', 'true');
+          }
+      }
+
+      const translationFolder = getTranslationFolder();
+
+      loadTranslations(currentLanguage, translationFolder);
+      document.body.dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
+      switchStylesheet();
+
+      langButtons.forEach(button => {
+        if (button.getAttribute('data-lang') === currentLanguage) {
+            button.classList.add('active');
+        } else {
+            button.classList.remove('active');
+        }
+
+          button.addEventListener('click', function() {
+              currentLanguage = this.getAttribute('data-lang');
+              loadTranslations(currentLanguage, translationFolder);
+              document.body.dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
+              switchStylesheet();
+
+              localStorage.setItem('selectedLanguage', currentLanguage);
+              window.location.href = `${window.location.pathname}?lang=${currentLanguage}`;
+          });
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get current language from localStorage
+        const currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
+
+        // Function to add language parameter to URLs
+        function updateLinks() {
+            const links = document.getElementsByTagName('a');
+            for (let link of links) {
+                if (link.href && link.href.startsWith(window.location.origin)) {
+                    const url = new URL(link.href);
+                    if (!url.searchParams.has('lang')) {
+                        url.searchParams.set('lang', currentLanguage);
+                        link.href = url.toString();
+                    }
+                }
+            }
+        }
+
+        // Update links on page load
+        updateLinks();
+
+        // Update links when new content is loaded dynamically
+        const observer = new MutationObserver(updateLinks);
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+  </script>
+<!-- Script to handle messages in the JS scripts in pages -->
+<script>
+  function showToastMessage(message, type) {
+    // Create a new toast element
+    const toastEl = document.createElement('div');
+    toastEl.classList.add('toast', 'align-items-center', 'border-0', 'm-1');
+    toastEl.setAttribute('role', 'alert');
+    toastEl.setAttribute('aria-live', 'assertive');
+    toastEl.setAttribute('aria-atomic', 'true');
+    toastEl.style.maxWidth = '350px';
+
+    // Set the toast background color based on the type
+    if (type === 'success') {
+      toastEl.classList.add('bg-success', 'text-white');
+      toastEl.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body">
+            <i class="fas fa-check-circle me-2"></i>
+            ${message}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-mdb-dismiss="toast" aria-label="Close"></button>
+        </div>
+      `;
+    } else if (type === 'error') {
+      toastEl.classList.add('bg-danger', 'text-white');
+      toastEl.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            ${message}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-mdb-dismiss="toast" aria-label="Close"></button>
+        </div>
+      `;
+    } else if (type === 'warning') {
+      toastEl.classList.add('bg-warning', 'text-dark');
+      toastEl.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            ${message}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-mdb-dismiss="toast" aria-label="Close"></button>
+        </div>
+      `;
+    } else {
+      toastEl.classList.add('bg-secondary', 'text-white');
+      toastEl.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body">
+            ${message}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-mdb-dismiss="toast" aria-label="Close"></button>
+        </div>
+      `;
+    }
+
+    // Append the toast to the toast wrapper
+    const toastWrapper = document.querySelector('.toast-wrapper');
+    toastWrapper.appendChild(toastEl);
+
+    // Initialize the MDB Toast instance
+    const toastInstance = new mdb.Toast(toastEl, {
+      autohide: true,  // Automatically hide after a delay
+      delay: 5000      // Delay before hiding (5 seconds)
+    });
+
+    toastInstance.show(); // Show the toast programmatically
+
+    // Remove the toast completely from the DOM after it's hidden
+    toastEl.addEventListener('hidden.mdb.toast', function () {
+      toastEl.remove();
+    });
+  }
+</script>
+
+<!-- Free Meet Script -->
+<script>
+  function freemeet() {
+    event.preventDefault();
+    fetch("{% url 'freemeet:request_free_meet' %}", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showToastMessage(data.message, 'success');
+        } else {
+            if (data.freemeet && data.freemeet.respond_status === 'scheduled') {
+                showToastMessage(`Your meet is scheduled. Meet URL: ${data.freemeet.meet_url}`, 'success');
+            } else {
+                showToastMessage(data.message, 'error');
+            }
+        }
+        window.location.href="https://wa.me/+2{{company_info.freemeet_phone}}"
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToastMessage('An unexpected error occurred.', 'error');
+        window.location.href="https://wa.me/+2{{company_info.freemeet_phone}}"
+    });
+};
+
+</script>
+
+<!-- Additional JS -->
+{% block extra_js %}{% endblock %}
+</body>
+</html>

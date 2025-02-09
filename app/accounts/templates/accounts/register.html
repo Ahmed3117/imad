@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block translationFolder %}data-translation-folder="register"{% endblock %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<section class="auth-container">
+    <div class="form-container fade-in" id="register-form">
+        <div class="form-header text-center">
+            <h3 class="styled-title">
+                <span class="line"></span>
+                <span class="text">
+                    <span class="icon"><i class="fas fa-user-plus me-2"></i></span>
+                    <span data-translate="register">Register</span>
+                </span>
+                <span class="line"></span>
+            </h3>
+        </div>
+        <div class="form-header text-center mb-4">
+            <img id="imagePreview" src="{% static 'imgs/defaults/person.svg' %}" alt="Preview" class="image-preview rounded-circle">
+        </div>
+
+        <!-- Step 1: User Registration -->
+        <div id="step-1">
+            <form id="step-1-form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <!-- Hidden input to capture the next URL -->
+                <input type="hidden" name="next" value="{{ request.GET.next }}">
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <div class="form-outline">
+                            <input type="text" class="form-control" name="name" required />
+                            <label class="form-label" data-translate="full_name">Full Name</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="form-outline">
+                            <input type="text" class="form-control" name="username" required />
+                            <label class="form-label" data-translate="username">Username</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="form-outline">
+                            <input type="password" class="form-control" name="password" required />
+                            <label class="form-label" data-translate="password">Password</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="form-outline">
+                            <input type="email" class="form-control" name="email" required />
+                            <label class="form-label" data-translate="email">Email</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="form-outline">
+                            <input type="text" class="form-control" name="phone" />
+                            <label class="form-label" data-translate="phone">Phone</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label for="image" class="form-label" data-translate="profile_image">Profile Image</label>
+                        <input type="file" class="form-control" name="image" accept="image/*" id="image">
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label" for="role" data-translate="role">Role</label>
+                        <select name="role" id="role" class="form-select" required>
+                            <option value="student" data-translate="student">Student</option>
+                            <option value="parent" data-translate="parent">Parent</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-grid">
+                    <button type="button" class="btn btn-gradient btn-block" data-translate="next" onclick="submitStep1()">Next</button>
+                </div>
+                <div class="text-center mt-5">
+                    <span class="text-primary  my-3" data-translate="privacy_agree">Agree to Privacy</span>
+                    <ul class="list-inline">
+                        <li class="list-inline-item"><a data-translate="terms" href="{% url 'about:terms_and_conditions' %}">Terms and Conditions</a></li>
+                        <li class="list-inline-item"><a data-translate="refund" href="{% url 'about:refund_policy' %}">Refund Policy</a></li>
+                        <li class="list-inline-item"><a data-translate="exchange" href="{% url 'about:exchange_policy' %}">Exchange Policy</a></li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <!-- Email Verification Step -->
+        <div id="verification-step" style="display: none;">
+            <form id="verification-form">
+                <div class="col-12 mb-4">
+                    <div class="form-outline">
+                        <input type="text" class="form-control" name="otp" required />
+                        <label class="form-label" data-translate="enter_otp">Enter OTP Code</label>
+                    </div>
+                    <small class="text-muted" data-translate="otp_sent">An OTP code has been sent to your email</small>
+                </div>
+                <div class="d-grid">
+                    <button type="button" class="btn btn-gradient btn-block" data-translate="verify" onclick="verifyOTP()">Verify</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Step 2: Profile Completion -->
+        <div id="step-2" style="display: none;">
+            <!-- Parent Profile -->
+            <form id="parent-form" style="display: none;">
+                <div class="col-12 mb-4">
+                    <label class="form-label" data-translate="type">Type:</label>
+                    <select name="account_type" class="form-select">
+                        <option value="mom" data-translate="mom">Mom</option>
+                        <option value="dad" data-translate="dad">Dad</option>
+                    </select>
+                </div>
+                <div class="d-grid">
+                    <button type="button" class="btn btn-gradient btn-block" data-translate="complete_registration" onclick="submitStep2()">Complete Registration</button>
+                </div>
+            </form>
+
+            <!-- Student Profile -->
+            <form id="student-form" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label" data-translate="parent_phone">Parent Phone:</label>
+                        <input type="text" name="parent_phone" class="form-control">
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label" data-translate="age">Age:</label>
+                        <input type="number" name="age" required class="form-control">
+                    </div>
+                </div>
+                <div class="d-grid">
+                    <button type="button" class="btn btn-gradient btn-block" data-translate="complete_registration" onclick="submitStep2()">Complete Registration</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+    let userRole = '';
+    let registrationData = null;
+
+    // Image preview functionality
+    document.getElementById("image").addEventListener("change", function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            document.getElementById("imagePreview").src = URL.createObjectURL(file);
+        }
+    });
+
+    // Function to handle the first step of registration
+    function submitStep1() {
+        const form = document.getElementById('step-1-form');
+        const formData = new FormData(form);
+        formData.append('step', '1');
+    
+        // Store the form data for later use
+        registrationData = new FormData(form);
+    
+        fetch("{% url 'accounts:register_user' %}", {
+        method: 'POST',
+        body: formData,
+        headers: {'X-CSRFToken': '{{ csrf_token }}'}
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(result => {
+            if (result.success) {
+                // Show OTP verification step
+                document.getElementById('step-1').style.display = 'none';
+                document.getElementById('verification-step').style.display = 'block';
+                showToastMessage(result.message, 'success');
+            } else {
+                showToastMessage(result.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToastMessage('Something went wrong. Please try again.', 'error');
+        });
+    }
+
+    function verifyOTP() {
+    const otpData = new FormData(document.getElementById('verification-form'));
+    otpData.append('step', 'verify_otp');
+
+    // Add all the registration data to the OTP verification request
+    for(let pair of registrationData.entries()) {
+        otpData.append(pair[0], pair[1]);
+    }
+
+    fetch("{% url 'accounts:register_user' %}", {
+        method: 'POST',
+        body: otpData,
+        headers: {'X-CSRFToken': '{{ csrf_token }}'}
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(result => {
+        if (result.success) {
+            userRole = result.role;
+            // Hide verification step and show step 2
+            document.getElementById('verification-step').style.display = 'none';
+            document.getElementById('step-2').style.display = 'block';
+
+            if (userRole === 'parent') {
+                document.getElementById('parent-form').style.display = 'block';
+            } else if (userRole === 'student') {
+                document.getElementById('student-form').style.display = 'block';
+            }
+        } else {
+            showToastMessage(result.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToastMessage('Something went wrong. Please try again.', 'error');
+    });
+}
+
+
+
+    function submitStep2() {
+        const formId = userRole === 'parent' ? 'parent-form' : 'student-form';
+        const formData = new FormData(document.getElementById(formId));
+        formData.append('step', '2');
+
+        // Add the next URL to the form data
+        const nextUrl = document.querySelector('input[name="next"]').value;
+
+        fetch("{% url 'accounts:register_user' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {'X-CSRFToken': '{{ csrf_token }}'}
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                // Redirect based on the next URL or role
+                if (nextUrl) {
+                    window.location.href = nextUrl;
+                } else if (userRole === 'parent') {
+                    window.location.href = '/accounts/parent_dashboard/';
+                } else if (userRole === 'student') {
+                    window.location.href = `/accounts/profile/`;
+                }
+            } else {
+                showToastMessage(result.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToastMessage('Something went wrong. Please try again.', 'error');
+    });
+}
+</script>
+{% endblock %}

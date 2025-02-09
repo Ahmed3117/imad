@@ -1,0 +1,9 @@
+{
+  "exam_title": "عنوان الاختبار",
+  "time_remaining": "الوقت المتبقي: {{ exam.duration }}:00",
+  "exam_already_taken": "لقد أجريت هذا الاختبار بالفعل.",
+  "your_score": "درجتك:",
+  "previous": "السابق",
+  "next": "التالي",
+  "submit_exam": "إرسال الاختبار"
+}

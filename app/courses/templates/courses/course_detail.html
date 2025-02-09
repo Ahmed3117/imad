@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+
+{% block translationFolder %}data-translation-folder="levelsandcourses"{% endblock %}
+{% block title %}Courses{% endblock %}
+{% load custom_filters %}
+{% block content %}
+
+
+<section class="container py-5">
+    <!-- Course Header -->
+    <div class="card profile-header p-4 mb-4 shadow text-start">
+        <div class="row align-items-center">
+            <div class="col-lg-3 text-center">
+                <img src="{{ course.image.url }}" alt="{{ course.name }}" class="course-image img-fluid rounded">
+            </div>
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="level-badge">{{ course.level.name }}</span>
+                    <span>
+                        {% if course.preview_video %}
+                        <a href="{{ course.preview_video }}" title="{% trans 'view_video' %}" target="_blank">
+                            <i class='fas fa-video text-primary mx-2'></i>
+                        </a>
+                        {% endif %}
+                        <a href="#" title="{% trans 'show_details' %}">
+                            <i class='fas fa-info-circle text-secondary mx-2'></i>
+                        </a>
+                    </span>
+                </div>
+                <h5 class="course-title">{{ course.name }}</h5>
+                <p class="course-details mb-2" data-translate="age_level">Age Level: {{ course.level.year_limit }}</p>
+                <p class="price-info">
+                    {% if discount %}
+                    <span class="old-price">${{ course.price }}</span>
+                    <span class="discount">-{{ discount.discount_percent }}%</span>
+                    <span class="final-price">${{ course.price|multiply:discount.discount_percent|divide:100 }}</span>
+                    {% else %}
+                    <span class="final-price">${{ course.price }}</span>
+                    {% endif %}
+                </p>
+                <div class="progress mt-3" style="height: 20px;">
+                    <div class="progress-bar" role="progressbar" 
+                         style="width: {{ subscription.progress }}%;" 
+                         aria-valuenow="{{ subscription.progress }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                        {{ subscription.progress|floatformat:0 }}%
+                    </div>
+                </div>
+                <p class="mb-0 mt-2">
+                    <small>
+                        <span data-translate="completed_sessions">Completed {{ completed_sessions }} of {{ total_sessions }} sessions</span>
+                    </small>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Curriculum Section -->
+    <h3 class="mb-4" data-translate="sessions">Sessions</h3>
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        {% for session in sessions %}
+        <div class="col">
+            <div class="card session-card shadow-sm p-2 {% if session.is_completed %}finished{% endif %}">
+                <div class="card-header bg-ternary d-flex justify-content-between align-items-center" 
+                     data-mdb-toggle="collapse" 
+                     data-mdb-target="#session{{ session.id }}" 
+                     aria-expanded="false" 
+                     aria-controls="session{{ session.id }}">
+                    <h5 class="session-title">Session {{ forloop.counter }}: {{ session.title }}</h5>
+                    {% if not session.is_completed %}
+                    <button type="button" 
+                            class="btn btn-outline-success mark-finished-btn p-2" 
+                            data-mdb-toggle="modal" 
+                            data-mdb-target="#confirmFinishModal{{ session.id }}">
+                        {% trans "mark_as_finished" %} 
+                    </button>
+                    {% else %}
+                    <span class="badge bg-success" data-translate="finished">Finished</span>
+                    {% endif %}
+                </div>
+                <div id="session{{ session.id }}" class="collapse">
+                    <div class="card-body">
+                        <!-- URL Section -->
+                        <form method="POST" class="url-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_url">
+                            <input type="hidden" name="session_id" value="{{ session.id }}">
+                            
+                            <div class="mb-3">
+                                <label class="form-label" data-translate="session_url">Session URL:</label>
+                                <input type="url" 
+                                       name="session_url" 
+                                       class="form-control" 
+                                       placeholder="{% trans 'add_session_url' %}"
+                                       value="{{ session.session_url|default:'' }}">
+                                <button type="submit" class="btn btn-primary btn-sm mt-2">
+                                    {% if session.session_url %}{% trans 'update' %}{% else %}{% trans 'add' %}{% endif %} URL
+                                </button>
+                            </div>
+                        </form>
+                        
+                        {% if session.session_url %}
+                        <div class="session-url p-2 bg-light rounded d-flex justify-content-between">
+                            <span>{{ session.session_url }}</span>
+                            <div>
+                                <a href="{{ session.session_url }}" target="_blank" class="btn btn-info btn-sm ms-2" data-translate="go">Go</a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <hr>
+                        
+                        <!-- Content Section -->
+                        <h6 data-translate="content">Content:</h6>
+                        {% if session.content %}
+                        <ul class="list-unstyled">
+                            {% for item in session.content|split:"," %}
+                            <li><i class="fas fa-check-circle text-primary me-2"></i>{{ item|trim }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        
+                        <!-- Start Exam Button -->
+                        <div class="text-center mt-4">
+                            <button class="btn btn-success" 
+                                    data-mdb-toggle="modal" 
+                                    data-mdb-target="#examModal{{ session.id }}">
+                                {% trans 'start_exam' %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Exam Start Confirmation Modal -->
+                <div class="modal fade" 
+                     id="examModal{{ session.id }}" 
+                     tabindex="-1" 
+                     aria-labelledby="examModalLabel{{ session.id }}" 
+                     aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="examModalLabel{{ session.id }}">
+                                    {% trans 'start_session_exam' %}
+                                </h5>
+                                <button type="button" 
+                                        class="btn-close" 
+                                        data-mdb-dismiss="modal" 
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>{% trans 'ready_to_start_exam' %}</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" 
+                                        class="btn btn-secondary" 
+                                        data-mdb-dismiss="modal">
+                                    {% trans 'cancel' %}
+                                </button>
+                                <a href="{% url 'exams:session_exam' session.id %}" class="btn btn-primary">
+                                    {% trans 'start_exam' %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mark as Finished Modal -->
+                <div class="modal fade" 
+                     id="confirmFinishModal{{ session.id }}" 
+                     tabindex="-1" 
+                     aria-labelledby="confirmFinishModalLabel{{ session.id }}" 
+                     aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmFinishModalLabel{{ session.id }}">
+                                    {% trans 'confirm_completion' %}
+                                </h5>
+                                <button type="button" 
+                                        class="btn-close" 
+                                        data-mdb-dismiss="modal" 
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                {% trans 'sure_mark_finished' %}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" 
+                                        class="btn btn-secondary" 
+                                        data-mdb-dismiss="modal">
+                                    {% trans 'cancel' %}
+                                </button>
+                                <form method="POST" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="mark_completed">
+                                    <input type="hidden" name="session_id" value="{{ session.id }}">
+                                    <button type="submit" class="btn btn-success" id="confirmFinishBtn">
+                                        {% trans 'yes_mark_finished' %}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Handle URL input
+    const urlForms = document.querySelectorAll('.url-form');
+    urlForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetch(window.location.href, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

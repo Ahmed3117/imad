@@ -1,0 +1,18 @@
+{
+  "parent_dashboard": "Parent Dashboard",
+  "age_active_level": "Age: {age} | Active Level: {active_level}",
+  "go_with_profile": "Go with this profile",
+  "add_new_student": "Add New Student",
+  "add_new_student_profile": "Add New Student Profile",
+  "student_name": "Student Name",
+  "student_username": "Student Username",
+  "password": "Password",
+  "age": "Age :",
+  "profile_image": "Profile Image",
+  "add_student": "Add Student",
+  "login_to_student_profile": "Login to Student Profile",
+  "username": "Username",
+  "login": "Login",
+  "parent_phone": "Parent Phone:",
+  "complete_registration": "Complete Registration"
+}

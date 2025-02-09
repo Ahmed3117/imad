@@ -1,0 +1,15 @@
+{
+  "your_cart": "Your Shopping Cart",
+  "review_items": "Review your items before checking out",
+  "empty_cart": "Your cart is currently empty.",
+  "browse_courses": "Browse Courses",
+  "product": "Product",
+  "price": "Price",
+  "actions": "Actions",
+  "remove_item": "Remove",
+  "order_summary": "Order Summary",
+  "total": "Total",
+  "pending_orders": "Pending Orders",
+  "create_order": "Create Order",
+  "proceed_checkout": "Proceed to Checkout"
+}

@@ -1,0 +1,13 @@
+{
+  "level": "Level",
+  "get_level_better_price": "Get it in a better price!",
+  "added": "Added",
+  "description": "Description",
+  "add_level_to_cart": "Add Level to Cart",
+  "individual_courses": "Individual Courses",
+  "full_tracks": "Full Tracks",
+  "add_track_to_cart": "Add Track to Cart",
+    "add_course_to_cart": "Add Course to Cart",
+    "login_to_add": "Login To Add to card",
+    "age_level": "Age Level:"
+}

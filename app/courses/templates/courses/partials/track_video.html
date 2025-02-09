@@ -1,0 +1,50 @@
+
+
+{% if preview_video %}
+    <a href="#" title="Show Details"
+    data-mdb-toggle="modal"
+    data-mdb-target="#track-details-modal-{{ track.id }}"
+    onclick="event.stopPropagation();">
+    <i class='fas fa-video text-primary mx-2'></i>
+    </a>
+{% endif %}
+
+{% if preview_video %}
+
+<div class="modal fade" id="track-details-modal-{{ track.id }}" tabindex="-1" aria-labelledby="trackDetailsLabel-{{ track.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-light shadow-lg rounded-4">
+            <!-- Modal Header -->
+            <div class="modal-header bg-primary text-white rounded-top">
+                
+                <button type="button" class="btn-close btn-close-white" data-mdb-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+
+
+                <div class="video-container my-3">
+                    <div class="ratio ratio-16x9">
+                        <iframe
+                            src="https://www.youtube.com/embed/{{ track.preview_video }}"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                            class="rounded">
+                        </iframe>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer justify-content-between bg-light border-top rounded-bottom">
+                <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+
+            </div>
+        </div>
+    </div>
+</div> 
+
+{% endif %}

@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+
+{% block translationFolder %}data-translation-folder="cart"{% endblock %}
+{% block title %}Cart{% endblock %}
+
+{% block content %}
+<!-- Cart Container -->
+<div class="container cart-container bg-white shadow-lg rounded my-5 py-5">
+    <!-- Cart Header -->
+    <div class="cart-header text-center mb-4">
+        <h4 class="text-secondary" data-translate="your_cart">Your Shopping Cart</h4>
+        <p class="text-muted" data-translate="review_items">Review your items before checking out</p>
+    </div>
+
+    <!-- Check if cart is empty -->
+    {% if not cart_courses and not cart_tracks and not cart_levels %}
+    <div class="text-center my-5">
+        <h4 data-translate="empty_cart">Your cart is currently empty.</h4>
+        <a href="{% url 'courses:levels' %}" class="btn btn-primary mt-3" data-translate="browse_courses">Browse Courses</a>
+    </div>
+    {% else %}
+
+    <!-- Cart Items Table -->
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col" data-translate="product">Product</th>
+                    <th scope="col" data-translate="price">Price</th>
+                    <th scope="col" data-translate="actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Courses in Cart -->
+                {% for cart_item in cart_courses %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="{{ cart_item.image.url }}" alt="{{ cart_item.name }}" class="product-image me-3" style="width: 60px; height: 60px;">
+                            <div>
+                                <p class="fw-bold mb-1">{{ cart_item.name }}</p>
+                                <p class="text-muted mb-0">{{ cart_item.description }}</p>
+                            </div>
+                        </div>
+                    </td>
+                   <td class="total-price">{% if request.is_egypt %}EGP{% else %}${% endif %}{{ cart_item.final_price_after_discound }}</td>
+                    <td>
+                        <a href="#" class="btn-fav-remove" data-id="{{ cart_item.id }}" data-type="course" data-translate="remove_item">
+                            <i class="fas fa-heart-broken me-1"></i>Remove
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+
+                <!-- Tracks in Cart -->
+                {% for cart_item in cart_tracks %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="{{ cart_item.image.url }}" alt="{{ cart_item.name }}" class="product-image me-3" style="width: 60px; height: 60px;">
+                            <div>
+                                <p class="fw-bold mb-1">{{ cart_item.name }}</p>
+                                <p class="text-muted mb-0">{{ cart_item.description }}</p>
+                            </div>
+                        </div>
+                    </td>
+                   <td class="total-price">{% if request.is_egypt %}EGP{% else %}${% endif %}{{ cart_item.final_price_after_discound }}</td>
+                    <td>
+                        <a href="#" class="text-danger" data-id="{{ cart_item.id }}" data-type="track" data-translate="remove_item">
+                            <i class="fas fa-heart-broken me-1"></i>Remove
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+
+                <!-- Levels in Cart -->
+                {% for cart_item in cart_levels %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="{{ cart_item.image.url }}" alt="{{ cart_item.name }}" class="product-image me-3" style="width: 60px; height: 60px;">
+                            <div>
+                                <p class="fw-bold mb-1">{{ cart_item.name }}</p>
+                                <p class="text-muted mb-0">{{ cart_item.description }}</p>
+                            </div>
+                        </div>
+                    </td>
+                   <td class="total-price">{% if request.is_egypt %}EGP{% else %}${% endif %}{{ cart_item.final_price_after_discound }}</td>
+                    <td>
+                        <a href="#" data-id="{{ cart_item.id }}" data-type="level" data-translate="remove_item">
+                            <i class="fas fa-heart-broken me-1"></i>Remove
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Cart Summary Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card summary-card p-4">
+                <h5 data-translate="order_summary">Order Summary</h5>
+                <ul class="list-unstyled">
+                    <li class="d-flex justify-content-between py-2 border-top pt-3">
+                        <strong data-translate="total">Total</strong>
+                        <strong class="total-price">{% if request.is_egypt %}EGP{% else %}${% endif %}{{ total_price }}</strong>
+                    </li>
+                </ul>
+                <a href="#" onclick="createOrder()" class="btn btn-primary text-secondary checkout-btn w-100 mt-3" data-translate="create_order">Create Order</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- Pending Orders Section -->
+<div class="container rounded my-5">
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card pending-orders-card p-4">
+                <h5 data-translate="pending_orders">Pending Orders</h5>
+                <div id="pending-orders-list">
+                    {% for order in pending_orders %}
+                    <div class="order-item mb-3 p-3 bg-light rounded">
+                    <span class="text-secondary fw-bold">Order #</span>
+                    <span>{{ order.order_id }}</span>
+                    <ul class="list-unstyled">
+                    {% for item in order.items.all %}
+                    {% if item.content_object %}
+                    <li class="d-flex justify-content-between py-2">
+                    <span>{{ item.content_object }}</span>
+                    <span>{% if request.is_egypt %}EGP{% else %}${% endif %}{{ item.content_object.final_price_after_discound }}</span>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    </ul>
+                    <div class="d-flex justify-content-between mt-2">
+                    <strong data-translate="total">Total</strong>
+                    <strong>{% if request.is_egypt %}EGP{% else %}${% endif %}{{ order.total_price }}</strong>
+                    </div>
+                    <a type="button" href="{% url 'payments:pay' order.order_id %}" class="btn btn-success mt-3 w-100" data-translate="proceed_checkout">Checkout</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle remove from cart
+        const removeButtons = document.querySelectorAll('.btn-fav-remove');
+        removeButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const itemId = button.dataset.id;
+                const itemType = button.dataset.type;
+                const rowElement = button.closest('tr');
+
+                // Determine the URL based on item type
+                let url = '';
+                if (itemType === 'course') {
+                    url = '/courses/remove-from-cart-course/';
+                } else if (itemType === 'track') {
+                    url = '/courses/remove-from-cart-track/';
+                } else if (itemType === 'level') {
+                    url = '/courses/remove-from-cart-level/';
+                }
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': getCSRFToken(),
+                    },
+                    body: `item_id=${itemId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Remove the item row from the table
+                        rowElement.remove();
+                        alert(data.message);
+                        updateTotalPrice();
+                    } else {
+                        alert(data.message);
+                    }
+                });
+            });
+        });
+    });
+
+    // Function to get CSRF token
+    function getCSRFToken() {
+        const csrfToken = document.cookie.match(/csrftoken=([^;]+)/);
+        return csrfToken ? csrfToken[1] : '';
+    }
+
+    // Function to update the total price
+        function updateTotalPrice() {
+        const prices = document.querySelectorAll('.total-price');
+        let total = 0;
+        const isCourseEgyptSite = document.querySelector('body').classList.contains('egypt-site');
+        
+        prices.forEach(priceElement => {
+            const priceText = priceElement.textContent;
+            const price = parseFloat(priceText.replace('EGP', '').replace('$', ''));
+            total += price;
+        });
+        
+        document.querySelector('.summary-card .total-price').textContent = 
+            `${isCourseEgyptSite ? 'EGP' : '$'}${total.toFixed(2)}`;
+        }
+
+    // Function to create order
+    function createOrder() {
+        fetch('/courses/create-order/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({
+                cart_courses: {{ cart_courses|length }},
+                cart_tracks: {{ cart_tracks|length }},
+                cart_levels: {{ cart_levels|length }},
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Your order has been created successfully. Please go to checkout now.');
+
+                // Reload the page to reflect the updated state
+                window.location.reload();
+            } else {
+                alert('Failed to create order.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+
+{% endblock %}
+

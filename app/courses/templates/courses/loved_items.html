@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block translationFolder %}data-translation-folder="loved_items"{% endblock %}
+{% block title %}Loved Items{% endblock %}
+{% load custom_filters %}
+{% block content %}
+<div class="container loved-container">
+    <div class="text-center mb-4">
+        <h4 class="text-primary" data-translate="your_loved_courses_and_tracks">Your Loved Courses and Tracks</h4>
+        <p class="text-muted" data-translate="browse_favorite_courses">Browse your favorite courses and tracks and add them to your cart</p>
+    </div>
+
+    <!-- Loved Courses List -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for loved_course in loved_courses %}
+        <div class="col">
+            <div class="card course-card bg-light shadow-sm rounded">
+                <div class="course-image-container text-center p-3">
+                    <img src="{{ loved_course.image.url }}" alt="{{ loved_course.name }}" class="course-image rounded-circle" style="width: 150px; height: 150px;">
+                </div>
+                <div class="card-body">
+                    <!-- Title and Info Button -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="course-title text-primary fw-bold mb-0">{{ loved_course.name }}</h4>
+                        {% if loved_course.preview_video %}
+                            {% include "courses/partials/course_video.html" with preview_video=loved_course.preview_video %}
+                        {% endif %}
+                    </div>
+                    <!-- Age Level -->
+                    <p>
+                        <span class="fw-bold text-info" data-translate="age_level">Age Level:</span>
+                        <span class="text-dark">{{ loved_course.level.year_limit }}</span>
+                    </p>
+                    <!-- Pricing -->
+                    <p class="price-info">
+                        {% if loved_course.has_discount %}
+                        <span class="old-price text-muted text-decoration-line-through">
+                            EGP{{ loved_course.price_without_any_discount }}
+                        </span>
+                        <span class="final-price text-danger fw-bold">
+                            EGP{{ loved_course.final_price_after_discount }}
+                        </span>
+                        {% else %}
+                        <span class="final-price text-success fw-bold">EGP{{ loved_course.price_without_any_discount }}</span>
+                        {% endif %}
+                    </p>
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="#"
+                        class="btn btn-danger btn-sm remove-love"
+                        data-type="course"
+                        data-id="{{ loved_course.id }}">
+                        <i class="fas fa-heart-broken me-1"></i> Remove
+                        </a>
+                        <a href="#"
+                        class="btn btn-primary btn-sm add-to-cart-btn {% if loved_course.id in cart_course_ids %}disabled{% endif %}"
+                        data-id="{{ loved_course.id }}"
+                        data-type="course">
+                            {% if loved_course.id in cart_course_ids %}
+                            <i class="fas fa-check"></i> Added
+                            {% else %}
+                            <i class="fas fa-cart-plus"></i> Add to Cart
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% empty %}
+        <p class="text-center" data-translate="no_loved_courses">No loved courses found.</p>
+        {% endfor %}
+    </div>
+
+    <hr class="my-5">
+
+    <!-- Loved Tracks List -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for loved_track in loved_tracks %}
+        <!-- Loved Track Card -->
+        <div class="col">
+            <div class="card course-card h-100 shadow-sm rounded-4">
+                <!-- Track Image -->
+                <div class="course-image-container position-relative">
+                    <img src="{{ loved_track.image.url }}" alt="{{ loved_track.name }}" class="course-image rounded-top-4">
+                    <!-- Level Badge -->
+                    <span class="level-badge position-absolute top-0 end-0 m-2 p-2 bg-primary text-white rounded">
+                        {{ loved_track.level.name }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <!-- Track Details -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="course-title m-0">{{ loved_track.name }}</h5>
+                        <div>
+                            <!-- Preview Video Icon -->
+                            
+                            {% if loved_track.preview_video %}
+                                {% include "courses/partials/track_video.html" with preview_video=loved_track.preview_video %}
+                            {% endif %}
+                            
+
+
+
+                            <!-- Remove Loved Track Icon -->
+                            <a href="#" class="remove-love" data-type="track" data-id="{{ loved_track.id }}" title="Remove from Loved">
+                                <i class="fas fa-heart-broken text-danger mx-2"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Track Price -->
+                    <p class="price-info mb-3">
+                        {% if loved_track.has_discount %}
+                        <span class="old-price">EGP{{ loved_track.price_without_any_discount }}</span>
+                        <span class="final-price">EGP{{ loved_track.final_price_after_discount }}</span>
+                        {% else %}
+                        <span class="final-price">EGP{{ loved_track.price_without_any_discount }}</span>
+                        {% endif %}
+                    </p>
+
+                    <!-- Actions -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <!-- Remove Button -->
+                        <a href="#" class="btn btn-outline-danger btn-fav-remove remove-love" data-type="track" data-id="{{ loved_track.id }}">
+                            <i class="fas fa-heart-broken me-1"></i> <span data-translate="remove">Remove</span>
+                        </a>
+                        <!-- Add to Cart Button -->
+                        <a href="#" class="btn btn-primary add-to-cart-btn {% if loved_track.id in cart_track_ids %}disabled{% endif %}"
+                        data-id="{{ loved_track.id }}" data-type="track">
+                        {% if loved_track.id in cart_track_ids %}
+                        <i class="fas fa-check"></i> <span data-translate="added">Added</span>
+                        {% else %}
+                        <i class="fas fa-cart-plus"></i> <span data-translate="add_to_cart">Add to Cart</span>
+                        {% endif %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center" data-translate="no_loved_tracks">No loved tracks found.</p>
+        {% endfor %}
+    </div>
+
+</div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle "Add to Cart" functionality
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const itemType = button.dataset.type;
+                const itemId = button.dataset.id;
+
+                if (button.classList.contains('disabled')) return;
+
+                fetch('/courses/add-to-cart/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': getCSRFToken(),
+                    },
+                    body: `item_type=${itemType}&item_id=${itemId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showToast('success', data.message); // Replace alert with custom toast
+                        button.innerHTML = '<i class="fas fa-check"></i> Added';
+                        button.classList.add('disabled');
+                        updateCartIcon();
+                    } else {
+                        showToast('error', data.message); // Replace alert with custom toast
+                    }
+                });
+            });
+        });
+
+        // Handle "Remove from Love" functionality
+        document.querySelectorAll('.remove-love').forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const itemType = button.dataset.type;
+                const itemId = button.dataset.id;
+
+                fetch('/courses/remove-from-love/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': getCSRFToken(),
+                    },
+                    body: `item_type=${itemType}&item_id=${itemId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showToast('success', 'item removed correctly .'); // Replace alert with custom toast
+                        button.closest('.col').remove(); // Remove the course card
+                    } else {
+                        showToast('error', data.message); // Replace alert with custom toast
+                    }
+                });
+            });
+        });
+
+        // Function to add and display toast messages
+        function showToast(type, message) {
+            const toastContainer = document.createElement('div');
+            toastContainer.classList.add('toast', 'align-items-center', 'fade', 'show', 'm-1', `bg-${type}`);
+            toastContainer.setAttribute('role', 'alert');
+            toastContainer.setAttribute('aria-live', 'assertive');
+            toastContainer.setAttribute('aria-atomic', 'true');
+            toastContainer.style.maxWidth = '350px';
+
+            // Toast content
+            const toastContent = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${getToastIcon(type)} ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+
+            toastContainer.innerHTML = toastContent;
+
+            // Append toast to the page
+            const toastWrapper = document.querySelector('.toast-wrapper') || createToastWrapper();
+            toastWrapper.appendChild(toastContainer);
+
+            // Automatically remove the toast after 5 seconds
+            setTimeout(() => {
+                toastContainer.classList.remove('show');
+                setTimeout(() => toastContainer.remove(), 300); // Allow fade-out animation
+            }, 5000);
+        }
+
+        // Function to get the appropriate icon for the toast message type
+        function getToastIcon(type) {
+            if (type === 'success') {
+                return '<i class="fas fa-check-circle me-2"></i>';
+            } else if (type === 'error') {
+                return '<i class="fas fa-exclamation-circle me-2"></i>';
+            } else if (type === 'warning') {
+                return '<i class="fas fa-exclamation-triangle me-2"></i>';
+            }
+            return ''; // Default: no icon
+        }
+
+        // Create a wrapper for toasts if it doesn't exist
+        function createToastWrapper() {
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('toast-wrapper', 'position-fixed', 'top-0', 'end-0', 'p-3');
+            wrapper.style.zIndex = '1055'; // Ensure it appears above other elements
+            document.body.appendChild(wrapper);
+            return wrapper;
+        }
+
+        // Function to update the cart icon count
+        function updateCartIcon() {
+            fetch('/courses/cart-count/')
+                .then(response => response.json())
+                .then(data => {
+                    const cartCountElement = document.querySelector('.cart-count');
+                    if (cartCountElement) {
+                        cartCountElement.textContent = data.cart_count;
+                    }
+                });
+        }
+
+        // Function to get CSRF token
+        function getCSRFToken() {
+            const csrfToken = document.cookie.match(/csrftoken=([^;]+)/);
+            return csrfToken ? csrfToken[1] : '';
+        }
+    });
+</script>
+
+
+{% endblock %}

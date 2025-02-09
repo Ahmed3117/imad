@@ -1,0 +1,1582 @@
+/* Define the font faces */
+@font-face {
+  font-family: 'SomarRounded';
+  src: url('/static/fonts/SomarRoundedRegular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SomarRounded';
+  src: url('/static/fonts/SomarRoundedBold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+:root {
+  /* Colors */
+  --main-color: #ff6f61;
+  --second-main-color: #253b8d;
+  --third-main-color: #dee5ff;
+  --sub-color: #e4a11b;
+  --card-bg-color: #F2FDFA;
+  --card-title-color: #fa6355;
+  --description-color: #666666;
+  --black-color: #333333;
+  --white-color: #ffffff;
+  --main-color-rgb: 255, 111, 97, 0.2; /* Updated to match --main-color */
+}
+
+/* Apply fonts to specific elements */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'DG-Trika', sans-serif;
+}
+
+p, span, strong {
+  font-family: 'SomarRounded', 'DG-Trika';
+}
+
+/* Override MDB display classes to use the custom font sizes */
+.display-1 {
+  font-size: 6rem;
+}
+
+.display-2 {
+  font-size: 5.5rem;
+  font-family: 'DG-Trika', sans-serif;
+  color: var(--second-main-color);
+}
+
+.display-3 {
+  font-size: 4.5rem;
+}
+
+.display-4 {
+  font-size: 3.5rem;
+}
+
+.display-5 {
+  font-size: 2rem;
+}
+
+.display-6 {
+  font-size: 1.3rem;
+}
+
+.display-7 {
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .display-4 {
+    font-size: 5.1rem; /* Smaller font size for medium and smaller screens */
+  }
+}
+
+@media (min-width: 992px) {
+  .display-4 {
+    font-size: 7.2rem; /* Even smaller font size for large screens */
+  }
+}
+
+img, svg {
+  vertical-align: baseline;
+}
+
+/* ----------------------------Global Styles-----------------------------------*/
+
+/* Basic Body and Navbar Styles */
+body {
+  font-family: 'SomarRounded', sans-serif; /* Default font for body */
+  background-color: var(--card-bg-color); /* Light background */
+  color: var(--description-color); /* Default text color */
+}
+
+.navbar {
+  --mdb-navbar-box-shadow: 0; /* Remove shadow */
+  padding: 0rem 0rem; /* Add padding for better spacing */
+}
+
+.navbar-brand img {
+  height: 40px; /* Logo height */
+}
+
+.navbar-nav .nav-link {
+  font-family: 'SomarRounded', sans-serif; /* Font for nav links */
+  font-weight: bold; /* Bold text for better visibility */
+  font-size: 17px;
+  padding: 10px;
+  border: none;
+}
+
+.navbar-nav .dropdown-menu {
+  font-family: 'SomarRounded', sans-serif; /* Font for dropdown items */
+  background-color: var(--card-bg-color); /* Dropdown background */
+  border: none; /* Remove border */
+}
+
+.navbar-nav .dropdown-item {
+  color: var(--second-main-color); /* Dark blue color */
+}
+
+.navbar-nav .dropdown-item:hover {
+  background-color: var(--main-color); /* Highlight on hover */
+  color: var(--white-color); /* White text on hover */
+}
+
+/* Language switcher */
+.lang-switcher {
+  display: inline-flex; /* Use inline-flex for better alignment */
+  border: 1px solid var(--main-color); /* Border color */
+  border-radius: 50px; /* Make the border more curvy */
+  overflow: hidden; /* Ensure buttons are contained within the border */
+}
+
+.lang-btn {
+  border: none;
+  background-color: transparent;
+  color: var(--sub-color); /* Dark blue color */
+  cursor: pointer;
+  transition: background-color .3s ease, color .3s ease;
+  border-radius: 50px; /* Make buttons curvy */
+  font-weight: bold; /* Make text bolder for better visibility */
+}
+
+.lang-btn.active { /* Selected language styling */
+  background-color: var(--main-color); /* Dark blue background */
+  color: var(--white-color); /* White text */
+}
+
+.lang-btn:hover {
+  background-color: var(--main-color); /* Highlight on hover */
+  color: var(--white-color); /* White text on hover */
+}
+
+/* Cart Icon */
+.cart-count {
+  background-color: var(--sub-color) !important; /* Orange badge */
+  color: var(--white-color); /* White text */
+  font-family: 'SomarRounded', sans-serif; /* Font for cart count */
+}
+
+/* User Profile Dropdown */
+.navbar-nav .dropdown-menu-end {
+  font-family: 'SomarRounded', sans-serif; /* Font for dropdown items */
+  background-color: var(--card-bg-color); /* Dropdown background */
+}
+
+.navbar-nav .dropdown-item span {
+  color: var(--second-main-color); /* Dark blue color */
+}
+
+.navbar-nav .dropdown-item:hover span {
+  color: var(--white-color); /* White text on hover */
+}
+
+/* Hero Section Styles */
+.main-title {
+  font-family: 'DG-Trika', sans-serif;
+  color: var(--main-color);
+}
+
+.hero-button-card {
+  background: linear-gradient(to bottom right, var(--white-color), var(--card-bg-color));
+}
+
+.text-primary {
+  color: var(--main-color) !important;
+}
+
+.text-secondary {
+  color: var(--second-main-color) !important;
+}
+
+.bg-primary {
+  background-color: var(--main-color) !important;
+}
+
+.text-white {
+  color: var(--white-color) !important;
+}
+
+.text-warning {
+  color: var(--sub-color) !important;
+}
+
+.btn-primary {
+  background-color: var(--main-color) !important;
+  border-color: var(--main-color);
+}
+
+.btn-primary:hover {
+  background-color: var(--sub-color) !important;
+  border-color: var(--sub-color);
+}
+
+.btn-secondary {
+  background-color: var(--second-main-color) !important;
+  border-color: var(--second-main-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--sub-color) !important;
+  border-color: var(--sub-color);
+}
+
+.btn-rounded {
+  border-radius: 9999px;
+}
+
+.btn-lg {
+  padding: 0.8rem 2rem;
+  font-size: 1.25rem;
+}
+
+.btn {
+  font-family: 'SomarRounded', sans-serif;
+  font-weight: 600;
+  transition: all 0.3s;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.2);
+}
+
+.btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.2);
+}
+
+/* hero */
+/* Background Image for Navbar and Hero */
+.hero-section {
+  position: relative;
+  background-image: url('/static/imgs/bg/a9.webp'); /* Replace with your image path */
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  color: #fff;
+  text-align: center;
+}
+
+.hero-section::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Overlay for better text readability */
+  z-index: 0;
+}
+
+/* Navbar Styling */
+.navbar {
+  padding: 20px 0;
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.navbar .navbar-brand {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.navbar .nav-link {
+  margin-left: 15px;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.navbar .nav-link:hover {
+  color: var(--main-color);
+}
+
+/* Hero Content Styling */
+.hero-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  max-width: 800px;
+  padding: 20px;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  animation: fadeInDown 1s ease-out;
+}
+
+.hero-description {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  animation: fadeInUp 1s ease-out;
+}
+
+.hero-button {
+  padding: 15px 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  background-color: var(--main-color);
+  color: #fff;
+  transition: background-color 0.3s ease;
+  animation: fadeIn 1s ease-out;
+}
+
+.hero-button:hover {
+  background-color: var(--sub-color);
+  cursor: pointer;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive Navbar */
+@media (max-width: 768px) {
+  .navbar .navbar-nav {
+    padding: 10px 0;
+  }
+
+  .navbar .nav-link {
+    margin: 10px 0;
+  }
+}
+
+.navbar-dark {
+  background-color: #1e1e1ea8; /* Navbar background */
+}
+
+/* Features Section Styles */
+.bg-feature {
+  background-color: var(--card-bg-color);
+  position: relative;
+  width: 100%;
+}
+
+/* Cards */
+.tech-card {
+  border: none;
+  border-radius: 1.5rem;
+  height: 210px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.2);
+}
+
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 15px;
+  flex: 1;
+}
+
+/* Card Image */
+.card-img-top {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  margin-top: 10px;
+}
+
+/* Tech Name Card */
+.tech-name-card {
+  width: 100%;
+  background-color: white;
+  margin-top: auto;
+  height: 75px; /* Fixed height for the name card */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.name-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Marquee Container */
+#marquee-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Cards Container */
+.animate-marquee {
+  display: flex;
+  will-change: transform;
+}
+
+/* Individual Card */
+.tech-card {
+  flex-shrink: 0;
+  /* Your existing styles */
+}
+
+/* Marquee Animation */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* Apply Animation */
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+
+/* Font Styles */
+h2 {
+  font-family: 'DG-Trika', sans-serif;
+  color: var(--second-main-color);
+  font-size: 2.5rem;
+}
+
+.card-body {
+  font-family: 'SomarRounded', sans-serif;
+  color: var(--description-color);
+}
+
+.card-body h5 {
+  font-family: 'DG-Trika', sans-serif;
+  color: var(--second-main-color);
+  margin: 0;
+  padding: 0.5rem;
+}
+
+/* If text overflows, it will be truncated with ellipsis */
+.tech-name-card h5 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90%; /* Prevents text from touching the edges */
+}
+
+/* Video Section Styles */
+
+/* Section Background */
+.video-section {
+  background-color: var(--second-main-color); /* Dark blue background */
+  padding: 60px 0; /* Add padding for better spacing */
+}
+
+.bg-footer {
+  background-color: var(--third-main-color); /* Dark blue background */
+}
+
+/* Heading Styles */
+h2, h6 {
+  font-family: 'DG-Trika', sans-serif; /* Custom font for headings */
+}
+
+h2 {
+  color: var(--white-color); /* White text for main heading */
+  font-size: 3rem; /* Larger font size for better visibility */
+}
+
+h6 {
+  color: var(--main-color); /* Green text for subheadings */
+  font-size: 1.5rem; /* Adjusted font size for subheadings */
+}
+
+/* Paragraph Styles */
+p {
+  font-family: 'SomarRounded', sans-serif; /* Custom font for paragraphs */
+}
+
+/* Button Styles */
+.btn-outline-primary {
+  font-family: 'SomarRounded', sans-serif; /* Custom font for buttons */
+  color: var(--main-color); /* Green text for button */
+  border-color: var(--main-color); /* Green border for button */
+  font-weight: bold; /* Bold text for better visibility */
+  transition: all 0.3s ease; /* Smooth hover effect */
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--main-color); /* Green background on hover */
+  color: var(--white-color); /* White text on hover */
+}
+
+/* Video Container */
+.video-container {
+  background-color: var(--sub-color); /* Light background for video container */
+  border: 4px solid var(--main-color); /* Green border for video container */
+  border-radius: 15px; /* Fully rounded corners */
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.2); /* Subtle shadow */
+  min-height: 300px;
+}
+
+/* Play Icon */
+.popup-youtube {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px; /* Fixed width for the play icon */
+  height: 80px; /* Fixed height for the play icon */
+  background-color: var(--white-color); /* White background for the play icon */
+  border-radius: 50%; /* Fully rounded play icon */
+  transition: all 0.3s ease; /* Smooth hover effect */
+}
+
+.popup-youtube:hover {
+  background-color: var(--main-color); /* Green background on hover */
+  color: var(--white-color); /* White text on hover */
+}
+
+.popup-youtube i {
+  font-size: 3rem; /* Larger font size for the play icon */
+  color: var(--sub-color); /* Orange color for the play icon */
+}
+
+.popup-youtube:hover i {
+  color: var(--white-color); /* White text on hover */
+}
+
+/* Price Info Styles */
+.price-info .price {
+  font-size: var(--font-size-large);
+}
+
+.price-info .discount {
+  font-size: var(--font-size-small);
+}
+
+/* Contact Section */
+
+/* Gradient Background for Contact Info */
+.gradient-brand-color {
+  background-image: linear-gradient(0deg, var(--second-main-color) 0%, var(--main-color) 100%); /* Dark blue to green gradient */
+  border-radius: 15px 0 0 15px; /* Rounded corners for the left column */
+}
+
+/* Contact Info Styles */
+.contact__wrapper h3 {
+  font-family: 'DG-Trika', sans-serif; /* Custom font for headings */
+  color: var(--white-color); /* White text */
+  font-size: 2rem; /* Larger font size for better visibility */
+}
+
+.contact__wrapper ul {
+  list-style: none;
+  padding: 0;
+}
+
+.contact__wrapper ul li {
+  color: var(--white-color); /* White text */
+  font-size: 1rem; /* Adjusted font size for better readability */
+  align-items: center;
+}
+
+.email-image {
+  max-width: 200px; /* Adjusted image size */
+  height: auto;
+  margin: 0 auto; /* Center the image */
+}
+
+.contact-form__wrapper button:hover {
+  background-color: var(--sub-color); /* Orange background on hover */
+}
+
+/* WhatsApp Button Styles */
+.whatsapp-float {
+  position: fixed;
+  width: 60px;
+  height: 60px;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--main-color); /* Green background */
+  color: var(--white-color); /* White text */
+  border-radius: 50%; /* Fully rounded button */
+  text-align: center;
+  font-size: 30px;
+  z-index: 1000;
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.2); /* Subtle shadow */
+  transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+.whatsapp-float:hover {
+  background-color: var(--sub-color); /* Orange background on hover */
+  color: var(--white-color); /* White text on hover */
+  text-decoration: none;
+}
+
+.whatsapp-icon {
+  margin-top: 14px; /* Center the icon */
+}
+
+/* ----------------------------Free Meet Button-----------------------------------*/
+
+/* Free Meet Button Styles */
+.free-meet-button {
+  position: fixed;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: var(--main-color); /* Green background */
+  color: var(--white-color); /* White text */
+  border-radius: 50px; /* Fully rounded button */
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.2); /* Subtle shadow */
+  transition: all 0.3s ease; /* Smooth hover effect */
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0 20px;
+  font-family: 'SomarRounded', sans-serif; /* Custom font for the button */
+}
+
+.free-meet-button span {
+  display: none;
+  font-size: 16px;
+  margin-left: 10px;
+  font-weight: bold; /* Bold text for better visibility */
+}
+
+.free-meet-button:hover {
+  width: auto;
+  transform: translateY(-10%) scale(1.05); /* Lift and scale on hover */
+  background-color: var(--sub-color); /* Orange background on hover */
+  padding-right: 10px;
+}
+
+.free-meet-button:hover span {
+  display: inline; /* Show the text on hover */
+}
+
+.free-meet-button i {
+  animation: pulse 2s infinite; /* Pulsing animation for the icon */
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ----------------------------why hi code ?-----------------------------------*/
+/* Why HiCode? Section */
+.mw-90 {
+  max-width: 90% !important;
+}
+
+.section {
+  background-color: var(--card-bg-color);
+  padding: 60px 0;
+  border-radius: 10px;
+}
+
+.custom-card {
+  margin-top: -12px;
+  background: linear-gradient(to bottom right, var(--white-color), var(--card-bg-color));
+  border-radius: 15px;
+  padding: 30px 10px 10px 10px;
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.subscriptio-card {
+  margin-top: -12px;
+  background: linear-gradient(to bottom right, var(--white-color), var(--card-bg-color));
+  border-radius: 15px;
+  padding: 30px 10px 10px 10px;
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.5);
+}
+
+.number-circle {
+  position: absolute;
+  top: -20px;
+  width: 50px;
+  height: 50px;
+  background-color: var(--main-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--second-main-color);
+  z-index: 1;
+  overflow: hidden;
+}
+
+[dir="ltr"] .number-circle {
+  left: -20px;
+}
+
+[dir="rtl"] .number-circle {
+  right: -20px;
+}
+
+.number-circle::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(to bottom right, var(--white-color), var(--card-bg-color));
+  z-index: -1;
+}
+
+.card-text {
+  margin-left: 40px;
+  font-family: 'SomarRounded', sans-serif;
+  z-index: 2;
+}
+
+[dir="ltr"] .card-text {
+  margin-left: 40px;
+  margin-right: 0;
+}
+
+[dir="rtl"] .card-text {
+  margin-right: 40px;
+  margin-left: 0;
+}
+
+.card-title {
+  font-family: 'SomarRounded', sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--main-color);
+}
+
+.card-description {
+  font-family: 'SomarRounded', sans-serif;
+  font-size: 14px;
+  color: var(--description-color);
+}
+
+.custom-shape {
+  width: 10px;
+  height: 10px;
+  background-color: var(--main-color);
+  border-radius: 50%;
+  position: relative;
+}
+
+.custom-shape:first-child {
+  margin-right: auto;
+}
+
+.middle-column h1 {
+  font-family: 'DG-Trika', sans-serif;
+}
+
+.text-success {
+  color: var(--sub-color) !important;
+}
+
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
+.rounded-circle {
+  border-radius: 50%;
+}
+
+.shadow-4-strong {
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.2);
+}
+
+/* ----------------------------our teachers-----------------------------------*/
+
+/* Teachers Section */
+.teachers-section {
+  background: var(--card-bg-color);
+  padding: 60px 0;
+  border-radius: 10px;
+}
+
+.section-title {
+  font-family: 'DG-Trika', sans-serif;
+  color: var(--main-color);
+}
+
+.section-subtitle {
+  font-family: 'SomarRounded', sans-serif;
+  color: var(--description-color);
+}
+
+.teacher-slider {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 10px;
+}
+
+.slider-item {
+  scroll-snap-align: start;
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.2);
+}
+
+.teacher-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.card {
+  border: none;
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.2);
+  background-color: var(--white-color);
+}
+
+.card-body {
+  padding: 1.25rem;
+  font-family: 'SomarRounded', sans-serif;
+  color: var(--description-color);
+}
+
+.card-footer {
+  background-color: var(--card-bg-color);
+  border-top: 1px solid var(--card-bg-color);
+}
+
+.btn-floating {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+.btn-outline-primary {
+  border-color: var(--main-color);
+  color: var(--main-color);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--main-color);
+  color: var(--white-color);
+}
+
+.text-muted {
+  color: var(--description-color) !important;
+}
+
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
+.rounded {
+  border-radius: 50%;
+}
+
+/* ----------------------------Cart-----------------------------------*/
+
+/* Order Summary Styles */
+.summary-card {
+  background-color: var(--background-color);
+  border: none;
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.summary-card h5 {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-color);
+}
+
+.summary-item {
+  font-size: var(--font-size-small);
+  color: var(--light-text-color);
+}
+
+.checkout-btn {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  font-weight: var(--font-weight-semibold);
+}
+
+.checkout-btn:hover {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+/* Level Summary Section */
+.level-summary {
+  text-align: center;
+  position: sticky;
+  top: 1rem;
+  border-radius: 10px;
+  padding: 30px;
+  background: linear-gradient(135deg, var(--card-bg-color) 0%, var(--card-bg-color) 100%);
+}
+
+/* Icon Styling */
+.level-summary img {
+  width: 70px;
+  height: 70px;
+  margin-bottom: 15px;
+}
+
+/* Tabs Navigation */
+.nav-tabs .nav-link {
+  font-family: 'SomarRounded', sans-serif;
+  font-size: 17px;
+  padding: 12px;
+  font-weight: bold;
+  border: none;
+  color: var(--main-color);
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--white-color);
+  background-color: var(--main-color);
+  border-radius: 30px;
+}
+
+.nav-tabs .nav-link:hover {
+  color: var(--sub-color);
+  background-color: var(--card-bg-color);
+  border-radius: 30px;
+}
+
+.circle-nav {
+  border-radius: 50%;
+  padding: 10px 20px;
+}
+
+/* Scrollable Section */
+.scrollable-section {
+  overflow-y: auto;
+  max-height: 600px;
+  padding: 20px;
+  background-color: var(--card-bg-color);
+  border-radius: 10px;
+}
+
+/* Course Card Styling */
+.course-card {
+  border-radius: 10px;
+  border: 1px solid #bcfdeb;
+}
+
+.course-card img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.course-card .description {
+  color: var(--description-color);
+  font-size: var(--font-size-small);
+}
+
+.course-description {
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.15);
+}
+
+.stars i {
+  color: var(--sub-color);
+}
+
+.btn-outline-primary:hover, .btn-primary:hover {
+  background-color: var(--sub-color);
+  border-color: var(--sub-color);
+}
+
+.gift-card {
+  position: relative;
+  overflow: hidden;
+  border: 2px dashed var(--sub-color); /* Dashed border for a gift effect */
+  background-color: var(--card-bg-color); /* Light background */
+}
+
+.gift-card::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 7.5%;
+  width: 85%;
+  height: 88%;
+  background-color: rgba(108, 99, 255, 0.1); /* Soft overlay using primary color */
+  border-radius: 15px;
+  z-index: 0;
+}
+
+.gift-price-card {
+  position: relative;
+  z-index: 1; /* Ensure it's above the overlay */
+}
+
+.old-price {
+  text-decoration: line-through;
+}
+
+.discount {
+  color: var(--sub-color); /* Green for discount */
+  font-weight: bold;
+}
+
+.final-price {
+  font-size: 1.5rem;
+  color: var(--main-color) !important; /* Use primary color for final price */
+}
+
+/* ----------------------------student_profile------------------------------ */
+
+/* Profile Header */
+.profile-header {
+  background: linear-gradient(135deg, var(--card-bg-color) 0%, var(--white-color) 100%); /* Light gradient background */
+  border-radius: 10px; /* Fully rounded corners */
+  text-align: center;
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.2); /* Subtle shadow */
+}
+
+.profile-header img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%; /* Fully rounded image */
+  border: 4px solid var(--main-color); /* Green border */
+  margin-bottom: 15px;
+}
+
+.profile-info {
+  font-size: 1rem; /* Adjusted font size */
+  color: var(--description-color); /* Gray text */
+}
+
+.info-title {
+  font-family: 'DG-Trika', sans-serif; /* Custom font for titles */
+  font-weight: bold;
+  color: var(--second-main-color); /* Dark blue color */
+}
+
+/* Scheduling System */
+.schedule-system {
+  background-color: var(--white-color); /* White background */
+  padding: 20px;
+  border-radius: 10px; /* Fully rounded corners */
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.2); /* Subtle shadow */
+  margin-top: 30px;
+}
+
+.schedule-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.schedule-option {
+  font-family: 'SomarRounded', sans-serif; /* Custom font for schedule options */
+  padding: 5px 10px;
+  border-radius: 20px; /* Fully rounded options */
+  border: 1px solid var(--main-color); /* Green border */
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+.schedule-option.selected {
+  background-color: var(--main-color); /* Green background */
+  color: var(--white-color); /* White text */
+}
+
+.schedule-option.disabled {
+  background-color: var(--description-color); /* Gray background */
+  color: var(--white-color); /* White text */
+  cursor: not-allowed;
+}
+
+.info-tip {
+  font-family: 'SomarRounded', sans-serif; /* Custom font for info tip */
+  font-size: 0.9rem; /* Smaller font size */
+  color: var(--sub-color); /* Orange text */
+  display: none;
+}
+
+/* Modal Styles */
+.modal-content {
+  border-radius: 15px; /* Fully rounded modal corners */
+}
+
+.modal-header {
+  background-color: var(--card-bg-color); /* Light background */
+  border-bottom: none; /* Remove default border */
+  border-radius: 15px 15px 0 0; /* Fully rounded top corners */
+}
+
+.modal-header h5 {
+  font-family: 'DG-Trika', sans-serif; /* Custom font for modal title */
+  color: var(--second-main-color); /* Dark blue color */
+}
+
+.modal-footer {
+  border-top: none; /* Remove default border */
+  border-radius: 0 0 15px 15px; /* Fully rounded bottom corners */
+}
+
+.btn-secondary {
+  background-color: var(--description-color); /* Gray background */
+  color: var(--white-color); /* White text */
+  border: none;
+  font-family: 'SomarRounded', sans-serif; /* Custom font for buttons */
+}
+
+/* ---------------------------------------------Register/Login ---------------------------------*/
+
+/* Background and typography */
+.auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  background-color: var(--card-bg-color); /* Light background */
+  padding: 50px 0; /* Add padding for better spacing */
+}
+
+/* Container */
+.form-container {
+  width: 100%;
+  max-width: 700px;
+  padding: 40px;
+  border-radius: 15px; /* Fully rounded corners */
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.2); /* Subtle shadow */
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease; /* Smooth transition */
+}
+
+/* Header */
+.form-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.form-header h3 {
+  font-weight: bold;
+  color: var(--second-main-color); /* Dark blue color */
+}
+
+/* Button with gradient */
+.btn-gradient {
+  background: var(--main-color); /* Green to orange gradient */
+  border: none;
+  color: var(--white-color); /* White text */
+  font-family: 'SomarRounded', sans-serif; /* Custom font for buttons */
+  font-weight: bold;
+  padding: 10px 0;
+  border-radius: 30px; /* Fully rounded button */
+  transition: background 0.3s ease; /* Smooth hover effect */
+}
+
+.btn-gradient:hover {
+  background: var(--sub-color); /* Orange to green gradient on hover */
+}
+
+/* Default profile image */
+.image-preview {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%; /* Fully rounded image */
+  border: 3px solid var(--main-color); /* Green border */
+  object-fit: cover;
+  transition: transform 0.3s ease; /* Smooth hover effect */
+}
+
+.image-preview:hover {
+  transform: scale(1.1); /* Slightly enlarge on hover */
+}
+
+/* Fancy link */
+.toggle-link {
+  text-align: center;
+  font-family: 'SomarRounded', sans-serif; /* Custom font for links */
+  font-weight: bold;
+  color: var(--main-color); /* Green text */
+  cursor: pointer;
+  font-size: 0.9rem; /* Smaller font size for links */
+  transition: color 0.3s ease; /* Smooth hover effect */
+}
+
+.toggle-link:hover {
+  color: var(--sub-color); /* Orange text on hover */
+}
+
+/* Form animations */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Select Dropdown */
+.form-select {
+  border: 1px solid var(--description-color); /* Gray border */
+  border-radius: 5px; /* Rounded corners */
+  font-family: 'SomarRounded', sans-serif; /* Custom font for dropdown */
+  color: var(--black-color); /* Black text */
+}
+
+.form-select:focus {
+  border-color: var(--main-color); /* Green border on focus */
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.2); /* Subtle shadow on focus */
+}
+
+/* ---------------------------------------------Exam ---------------------------------*/
+/* Exam Section */
+.exam-container {
+  font-family: 'SomarRounded', sans-serif;
+}
+
+.timer {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--sub-color);
+}
+
+.question h5 {
+  font-size: 1.25rem;
+  color: var(--main-color);
+}
+
+.answer-option {
+  background-color: var(--card-bg-color);
+  padding: 1rem;
+  border-radius: 12px;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.answer-option:hover {
+  background-color: var(--light-text-color);
+}
+
+.active-answer {
+  background-color: var(--main-color);
+}
+
+.btn-success {
+  background-color: var(--sub-color);
+  border-color: var(--sub-color);
+  font-family: 'SomarRounded', sans-serif;
+}
+
+.btn-success:hover {
+  background-color: var(--main-color);
+  border-color: var(--main-color);
+}
+
+.alert-info {
+  background-color: var(--card-bg-color);
+  border-color: var(--main-color);
+  color: var(--main-color);
+}
+
+.alert-info h5 {
+  font-family: 'DG-Trika', sans-serif;
+}
+
+.alert-info span {
+  font-family: 'SomarRounded', sans-serif;
+}
+
+/* ------------parent profiles------------------------------------ */
+
+/* Custom Styles */
+.profile-card {
+  transition: transform 0.3s ease;
+}
+
+.profile-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.2);
+}
+
+.add-profile {
+  border: 2px dashed var(--primary-color);
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--primary-color);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-profile:hover {
+  background-color: var(--background-color);
+}
+
+.profile-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+}
+
+.profile-name {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.profile-details {
+  font-size: 0.9rem;
+  color: var(--light-text-color);
+}
+
+/* Tree Section Background */
+.bg-plans {
+  background-color: var(--card-bg-color); /* Light background for the section */
+}
+
+/* Scrollable Horizontal Container */
+.tree-container {
+  overflow-x: auto; /* Enables horizontal scrolling */
+  padding: 0px;
+}
+
+.tree {
+  display: inline-block; /* Ensures the tree behaves as one horizontal block */
+  min-width: 8000px; /* Ensures the tree spans enough width to scroll horizontally */
+}
+
+/* Tree Structure Styling */
+.tree ul {
+  padding-top: 20px;
+  position: relative;
+  transition: all 0.5s;
+}
+
+.tree li {
+  float: left;
+  text-align: center;
+  list-style-type: none;
+  position: relative;
+  padding: 20px 5px 0 5px;
+  transition: all 0.5s;
+}
+
+.tree li::before,
+.tree li::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 50%;
+  border-top: 1px solid var(--description-color); /* Gray connecting lines */
+  width: 50%;
+  height: 20px;
+}
+
+.tree li::after {
+  right: auto;
+  left: 50%;
+  border-left: 1px solid var(--description-color); /* Gray connecting lines */
+}
+
+/* No lines for single child */
+.tree li:only-child::after,
+.tree li:only-child::before {
+  display: none;
+}
+
+.tree li:only-child {
+  padding-top: 0;
+}
+
+.tree li:first-child::before,
+.tree li:last-child::after {
+  border: 0 none;
+}
+
+.tree li:last-child::before {
+  border-right: 1px solid var(--description-color); /* Gray connecting lines */
+  border-radius: 0 5px 0 0;
+}
+
+.tree li:first-child::after {
+  border-radius: 5px 0 0 0;
+}
+
+.tree ul ul::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  border-left: 1px solid var(--description-color); /* Gray connecting lines */
+  width: 0;
+  height: 20px;
+}
+
+/* Tree Nodes (Links) Styling */
+.tree li a {
+  border: 1px solid var(--description-color); /* Gray border */
+  padding: 5px 10px;
+  text-decoration: none;
+  color: var(--second-main-color); /* Dark blue text */
+  font-family: 'SomarRounded', sans-serif; /* Custom font for tree nodes */
+  font-size: 14px; /* Adjusted font size for better readability */
+  display: inline-block;
+  border-radius: 5px; /* Rounded corners */
+  transition: all 0.5s; /* Smooth hover effect */
+}
+
+/* Hover Behavior */
+.tree li a:hover,
+.tree li a:hover+ul li a {
+  background: var(--main-color); /* Green background on hover */
+  color: var(--white-color); /* White text on hover */
+  border: 1px solid var(--main-color); /* Green border on hover */
+}
+
+/* Highlighting Lines When Hovered */
+.tree li a:hover+ul li::after,
+.tree li a:hover+ul li::before,
+.tree li a:hover+ul::before,
+.tree li a:hover+ul ul::before {
+  border-color: var(--main-color); /* Green connecting lines on hover */
+}
+
+/* Full Screen and Zoom Controls */
+.btn-outline-primary {
+  font-family: 'SomarRounded', sans-serif; /* Custom font for buttons */
+  color: var(--main-color); /* Green text */
+  border-color: var(--main-color); /* Green border */
+  transition: all 0.3s ease; /* Smooth hover effect */
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--main-color); /* Green background on hover */
+  color: var(--white-color); /* White text on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tree li {
+    padding: 10px 0; /* Adjust padding for smaller screens */
+  }
+
+  .tree li::before,
+  .tree li::after {
+    height: 10px; /* Shorter connecting lines */
+  }
+
+  .tree li a {
+    font-size: 12px; /* Smaller font for better readability */
+  }
+
+  .tree-container {
+    padding: 5px; /* Reduce padding for smaller screens */
+  }
+}
+
+/* -----------------------Titles------------------------------------ */
+
+/* General styles for the title */
+.styled-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--second-main-color);
+  margin: 20px 0;
+}
+
+/* Line styles */
+.styled-title .line {
+  flex-grow: 1;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--main-color), transparent); /* Gradient line */
+}
+
+/* Text container styles */
+.styled-title .text {
+  display: flex;
+  align-items: center;
+  background: var(--main-color); /* White background to make the text pop */
+  padding: 10px 20px;
+  position: relative;
+  z-index: 1; /* Ensure the text is above the lines */
+  border-radius: 20px;
+}
+
+/* Icon styles */
+.styled-title .icon i {
+  font-size: 24px;
+  color: var(--white-color); /* Blue color for the icon */
+}
+
+/* Add a subtle shadow to the text */
+.styled-title .text span {
+  box-shadow: 0px 0px 15px rgba(var(--main-color-rgb), 0.2);
+  color: var(--white-color);
+}
+
+/* Optional: Add a hover effect */
+.styled-title:hover .text {
+  transform: scale(1.1);
+  transition: transform 0.3s ease;
+}
+
+.list-group-item.active {
+  background-color: var(--main-color);
+  border-color: var(--main-color);
+}

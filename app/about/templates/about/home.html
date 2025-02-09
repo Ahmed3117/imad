@@ -1,0 +1,417 @@
+{% extends 'base.html' %} 
+{% load static %}
+{% block translationFolder %}data-translation-folder="home"{% endblock %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+</head>
+
+<body>
+
+<style>
+    .hero-content{
+        background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+    }
+</style>
+<!-- Hero Section with Navbar -->
+<div class="hero-section">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="z-index: 1000;">
+    <div class="container">
+    <a class="navbar-brand" href="/">
+        <img src="{{logo_url}}" alt="Logo" height="60">
+    </a>
+    <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item px-2">
+            <a class="nav-link active" aria-current="page" href="/" data-translate="home">
+            <span>Home</span>
+            </a>
+        </li>
+        <li class="nav-item px-2">
+            <a class="nav-link" href="{% url 'about:about_us' %}" data-translate="aboutus">
+            <span>About Us</span>
+            </a>
+        </li>
+        <li class="nav-item px-2 dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-mdb-toggle="dropdown" aria-expanded="false" data-translate="go_to">
+            <span>Go To</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+            {% if request.path == '/' %}
+                <li><a class="dropdown-item fw-bold" href="{% url 'courses:levels' %}" data-translate="levels"><span>Levels & Courses</span></a></li>
+                {% if request.user.is_authenticated %}
+                <li><a class="dropdown-item fw-bold" href="{% url 'courses:loved_items' %}" data-translate="loveditems"><span>Loved Items</span></a></li>
+                {% if request.user.role == "parent" %}
+                    <li><a class="dropdown-item fw-bold" href="{% url 'accounts:parent_dashboard' %}" data-translate="profile"><span>My Profile</span></a></li>
+                {% else %}
+                    <li><a class="dropdown-item fw-bold" href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a></li>
+                {% endif %}
+                {% endif %}
+            <li><a class="dropdown-item" href="#offers" data-translate="offers"><span>Offers & Discounts</span></a></li>
+            <li><a class="dropdown-item" href="#whoarewe" data-translate="contact"><span>Who Are We</span></a></li>
+            <li><a class="dropdown-item" href="#plans" data-translate="plans"><span>Our Plans</span></a></li>
+            <li><a class="dropdown-item" href="#contact" data-translate="contacts"><span>Contact</span></a></li>
+            {% else %}
+                {% if request.user.role == "parent" %}
+                <li><a class="dropdown-item fw-bold" href="{% url 'accounts:parent_dashboard' %}" data-translate="profile"><span>My Profile</span></a></li>
+                {% else %}
+                <li><a class="dropdown-item fw-bold" href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a></li>
+                {% endif %}
+                <li><a class="dropdown-item fw-bold" href="{% url 'courses:levels' %}" data-translate="levels"><span>Levels & Courses</span></a></li>
+                {% if request.user.is_authenticated %}
+                <li><a class="dropdown-item fw-bold" href="{% url 'courses:loved_items' %}" data-translate="loveditems"><span>Loved Items</span></a></li>
+                {% endif %}
+            {% endif %}
+            </ul>
+        </li>
+
+        <!-- Language Switcher -->
+        <li class="nav-item px-2 d-flex align-items-center mx-md-3">
+            <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="ar">AR</button>
+            </div>
+        </li>
+
+        <!-- Cart Icon with Dropdown -->
+        <!-- {% if request.user.is_authenticated %}
+        <a href="{% url 'courses:cart' %}" class="nav-link position-relative">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-count badge bg-danger">{{ cart_count }}</span>
+        </a>
+        {% endif %} -->
+
+        <!-- User Profile Dropdown -->
+        <li class="nav-item dropdown">
+            {% if request.user.is_authenticated %}
+            <a class="nav-link dropdown-toggle ms-md-5" href="#" id="userDropdown" role="button" data-mdb-toggle="dropdown" aria-expanded="false">
+            {% if request.user.image %}
+            <img src="{{request.user.image.url}}" alt="User" class="rounded-circle" height="40" />
+            {% else %}
+            <img src="{% static 'imgs/defaults/person.svg' %}" alt="User" class="" height="40" />
+            {% endif %}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li>
+                {% if request.user.role == "parent" %}
+                <a class="dropdown-item" href="{% url 'accounts:parent_dashboard' %}" data-translate="profile"><span>My Profile</span></a>
+                {% else %}
+                <a class="dropdown-item" href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a>
+                {% endif %}
+            </li>
+            <li><a class="dropdown-item" href="{% url 'accounts:logout' %}" data-translate="logout"><span>Logout</span></a></li>
+            </ul>
+            {% else %}
+            <ul class="navbar-nav ms-auto align-items-center">
+            <li class="nav-item px-2">
+                <a class="btn btn-primary" href="{% url 'accounts:login' %}?next={{ request.path }}" data-translate="login"><span>Login</span></a>
+            </li>
+            <li class="nav-item px-2">
+                <a class="btn btn-primary" href="{% url 'accounts:register' %}?next={{ request.path }}" data-translate="register"><span>Register</span></a>
+            </li>
+            </ul>
+            {% endif %}
+        </li>
+        </ul>
+    </div>
+    </div>
+</nav>
+
+<!-- Hero Content -->
+<div class="hero-content">
+    <h1 class="hero-title" data-translate="hero_title">Unlock Your Potential with Our E-Learning Platform</h1>
+    <p class="hero-description" data-translate="hero_description">Join thousands of learners worldwide and start your journey to success with our comprehensive courses and expert instructors.</p>
+    <a href="{% url 'courses:levels' %}" class="hero-button" data-translate="hero_button">Get Started Today</a>
+</div>
+</div>
+<!-- features -->
+
+
+<section class="py-6 my-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-xl-6 col-md-8 text-center mb-5">
+          <h2 class="h1 fw-bold mb-3" data-translate="learning_journey">Start Your Learning Journey</h2>
+          <p class="lead" data-translate="platform_features">Discover the key features that make our e-learning platform stand out</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 col-lg-3 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body d-flex flex-column align-items-center text-center">
+              <svg xmlns="" width="40" height="40" fill="var(--gk-primary)" class="bi bi-trophy mb-3" viewBox="0 0 16 16">
+                <path d="M2.5.5A.5.5 0 0 1 3 0h10a.5.5 0 0 1 .5.5c0 .538-.012 1.05-.034 1.536a3 3 0 1 1-1.133 5.89c-.79 1.865-1.878 2.777-2.833 3.011v2.173l1.425.356c.194.048.377.135.537.255L13.3 15.1a.5.5 0 0 1-.3.9H3a.5.5 0 0 1-.3-.9l1.838-1.379c.16-.12.343-.207.537-.255L6.5 13.11v-2.173c-.955-.234-2.043-1.146-2.833-3.012a3 3 0 1 1-1.132-5.89A33.076 33.076 0 0 1 2.5.5zm.099 2.54a2 2 0 0 0 .72 3.935c-.333-1.05-.588-2.346-.72-3.935zm10.083 3.935a2 2 0 0 0 .72-3.935c-.133 1.59-.388 2.885-.72 3.935zM3.504 1c.007.517.026 1.006.056 1.469.13 2.028.457 3.546.87 4.667C5.294 9.48 6.484 10 7 10a.5.5 0 0 1 .5.5v2.61a1 1 0 0 1-.757.97l-1.426.356a.5.5 0 0 0-.179.085L4.5 15h7l-.638-.479a.501.501 0 0 0-.18-.085l-1.425-.356a1 1 0 0 1-.757-.97V10.5A.5.5 0 0 1 9 10c.516 0 1.706-.52 2.57-2.864.413-1.12.74-2.64.87-4.667.03-.463.049-.952.056-1.469H3.504z"/>
+              </svg>
+              <h4 class="fw-bold mb-2" data-translate="expert_teachers">Expert Teachers</h4>
+              <p data-translate="expert_teachers_desc">Learn from certified professionals with years of teaching experience</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body d-flex flex-column align-items-center text-center">
+              <svg xmlns="" width="40" height="40" fill="var(--gk-primary)" class="bi bi-star mb-3" viewBox="0 0 16 16">
+                <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
+              </svg>
+              <h4 class="fw-bold mb-2" data-translate="learning_resources">Rich Resources</h4>
+              <p data-translate="learning_resources_desc">Access comprehensive study materials, videos, and practice exercises</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body d-flex flex-column align-items-center text-center">
+              <svg xmlns="" width="40" height="40" fill="var(--gk-primary)" class="bi bi-shield-lock mb-3" viewBox="0 0 16 16">
+                <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
+              </svg>
+              <h4 class="fw-bold mb-2" data-translate="flexible_learning">Flexible Learning</h4>
+              <p data-translate="flexible_learning_desc">Study at your own pace with 24/7 access to course materials</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body d-flex flex-column align-items-center text-center">
+              <svg xmlns="" width="40" height="40" fill="var(--gk-primary)" class="bi bi-nut mb-3" viewBox="0 0 16 16">
+                <path d="m11.42 2 3.428 6-3.428 6H4.58L1.152 8 4.58 2h6.84zM4.58 1a1 1 0 0 0-.868.504l-3.428 6a1 1 0 0 0 0 .992l3.428 6A1 1 0 0 0 4.58 15h6.84a1 1 0 0 0 .868-.504l3.429-6a1 1 0 0 0 0-.992l-3.429-6A1 1 0 0 0 11.42 1H4.58z"/>
+              </svg>
+              <h4 class="fw-bold mb-2" data-translate="practical_skills">Practical Skills</h4>
+              <p data-translate="practical_skills_desc">Gain hands-on experience through interactive exercises and projects</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+
+    <!-- Our Teachers -->
+<!-- Our Teachers -->
+<section class="container teachers-section" id="teachers" style="padding: 60px 0;">
+    <div class="form-header text-center">
+        <h3 class="styled-title">
+            <span class="line"></span>
+            <span class="text">
+                <span class="icon"><i class="me-2 fas fa-chalkboard-user"></i></span>
+                <span data-translate="our_teachers">Our Teachers</span>
+            </span>
+            <span class="line"></span>
+        </h3>
+    </div>
+    <p class="fw-bold section-subtitle text-center mb-5" data-translate="meet_our_teachers" style="font-family: 'SomarRounded', sans-serif; color: var(--description-color); font-size: 1.25rem;">Meet our exceptional teachers who inspire and guide learners:</p>
+    <div class="teacher-slider d-flex overflow-auto position-relative" style="padding-bottom: 20px;">
+        {% for teacher in teachers %}
+        <div class="slider-item flex-shrink-0 me-3" style="width: 300px; transition: transform 0.3s ease-in-out;">
+            <div class="card h-100 shadow-sm" style="border-radius: 15px; box-shadow: 0px 0px 20px rgba(var(--main-color-rgb), 0.2); transition: box-shadow 0.3s ease-in-out;">
+                <!-- Teacher Image -->
+                <div class="text-center p-3">
+                    {% if teacher.teacher.image %}
+                    <img src="{{ teacher.teacher.image.url }}" alt="{{ teacher.teacher.name }}" class="img-fluid rounded-circle" style="width: 120px; height: 120px; border: 4px solid var(--main-color);">
+                    {% endif %}
+                </div>
+
+                <!-- Teacher Name -->
+                <div class="text-center mt-3">
+                    <h5 class="text-dark mb-0" style="font-family: 'DG-Trika', sans-serif; color: var(--main-color); font-size: 1.5rem;">{{ teacher.teacher.name }}</h5>
+                </div>
+
+                <!-- Teacher Title -->
+                <div class="text-center mt-2">
+                    <span class="text-primary fw-bold" style="font-family: 'SomarRounded', sans-serif; color: var(--sub-color); font-size: 1.25rem;">{{ teacher.specialization }}</span>
+                </div>
+
+                <!-- Card Body (Description) -->
+                <div class="card-body text-center">
+                    <p class="fw-bold text-muted small" style="font-family: 'SomarRounded', sans-serif; color: var(--description-color);">{{ teacher.bio }}</p>
+                </div>
+
+                <!-- Card Footer (View Profile Button) -->
+                {% if teacher.profile_link %}
+                <div class="card-footer bg-light border-top d-flex justify-content-center">
+                    <a href="{{ teacher.profile_link }}" class="btn btn-primary btn-sm" data-translate="view_profile" style="background-color: var(--main-color); border-color: var(--main-color); transition: background-color 0.3s ease-in-out;">View Profile</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <!-- Arrows -->
+    <div class="d-flex justify-content-between mt-4">
+        <button id="teacherprevArrow" class="btn btn-outline-primary btn-floating" style="border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: background-color 0.3s ease-in-out;">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button id="teachernextArrow" class="btn btn-outline-primary btn-floating" style="border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: background-color 0.3s ease-in-out;">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</section>
+
+
+    <!-- Contact Section -->
+    <section class="pt-5" id='contact'>
+        <div class="container">
+            <div class="card">
+                <div class="row no-gutters">
+                    <!-- Left Column (Contact Info) -->
+                    <div class="col-lg-5 card gradient-brand-color pt-5 px-5 order-lg-2">
+                        <h3 class="text-white mb-5" data-translate="get_in_touch">Get in Touch</h3>
+                        <ul class="list-unstyled position-relative z-index-101" dir="ltr">
+                            <li class="mb-4 text-white fw-bold">
+                                <i class="fas fa-envelope mx-3"></i>
+                                <span class="position-absolute">{{company_info.email}}</span>
+                            </li>
+                            <li class="mb-4 text-white fw-bold">
+                                <i class="fas fa-phone mx-3"></i>
+                                <span class="position-absolute">{{company_info.phone}}</span>
+                            </li>
+                            <li class="mb-4 text-center pt-5">
+                                <img src="{% static 'imgs/mail11.png' %}" alt="Suit Image" class="img-fluid email-image">
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Right Column (Contact Form) -->
+                    <div class="col-lg-7 contact-form__wrapper p-5 order-lg-1">
+                        <form id="contactForm" class="contact-form form-validate" novalidate>
+                            <div class="row">
+                                <div class="col-sm-12 mb-3">
+                                    <div class="form-outline mb-4">
+                                        <input type="text" id="name" class="form-control" name="name" required>
+                                        <label class="form-label" for="name" data-translate="your_name">Your Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <div class="form-outline mb-4">
+                                        <input type="email" id="email" class="form-control" name="email" required>
+                                        <label class="form-label" for="email" data-translate="your_email">Your Email</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <div class="form-outline mb-4">
+                                        <input type="tel" id="phone" class="form-control" name="phone">
+                                        <label class="form-label" for="phone" data-translate="your_phone">Your Phone Number</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 mb-3">
+                                    <div class="form-outline mb-4">
+                                        <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+                                        <label class="form-label" for="message" data-translate="how_can_we_help">How can we help?</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 mb-3 mt-5">
+                                    <button type="submit" class="btn btn-primary btn-block" data-translate="send_button">Send</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="pt-5 pb-5 mt-5 text-center text-md-start bg-footer " id="contact">
+        <div class="container">
+            <div class="row pt-5 d-flex">
+                <!-- Left Column -->
+                <div class="col-md-4 mb-4 mb-lg-0">
+                    <div class="mb-4">
+                        <a class="navbar-brand mb-4" href="#">
+                            <img src="{% static 'imgs/footer/logo1.png' %}" alt="Logo" height="40">
+                        </a>
+                        <p class="fw-bold mb-4" data-translate="footer_description">{{company_info.description}}</p>
+                        
+                        <div>
+                            <span data-translate="created_by">Created By BlueBook Team</span>
+                            <div data-translate="copyright" >© 2024 - BlueBook (01095163117)</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Middle Column -->
+                <div class="col-md-4 mb-4 px-lg-5 text-start justify-content-start">
+                    <img src="{% static 'imgs/footer/footer.png' %}" alt="Footer Image" class="img-fluid rounded">
+                </div>
+                <!-- Right Column -->
+                <div class="col-md-4">
+                    <div class="mb-4">
+                        <h5 data-translate="contact_us" class="text-primary">Contact Us</h5>
+                        <p class="fw-bold lh-lg mt-3 mb-3" data-translate="contact_us_description">We’d love to hear from you! Reach out via email or phone, and we'll get back to you soon.</p>
+                        <p>
+                            <span data-translate="phone_label">Phone:</span> 
+                            <span>{{company_info.phone}}</span>
+                        </p>
+                        <a class="btn btn-primary rounded-pill w-100" href="https://mail.google.com/mail/?view=cm&fs=1&to={{company_info.email}}" target="_blank" rel="noopener noreferrer">
+                            <span>{{company_info.email}}</span>
+                        </a>
+                        <ul class="list-unstyled d-flex justify-content-center justify-content-lg-start mt-5 gap-3">
+                            <li>
+                                <a href="{{ company_info.facebook }}" target="_blank" rel="noopener noreferrer">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ company_info.twitter }}" target="_blank" rel="noopener noreferrer">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ company_info.instagram }}" target="_blank" rel="noopener noreferrer">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ company_info.linkedin }}" target="_blank" rel="noopener noreferrer">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="col-md-12 text-center">
+            
+            <ul class="list-inline">
+                <li class="list-inline-item"><a data-translate="terms" href="{% url 'about:terms_and_conditions' %}">Terms and Conditions</a></li>
+                <li class="list-inline-item"><a data-translate="privacy" href="{% url 'about:privacy_policy' %}">Privacy Policy</a></li>
+                <li class="list-inline-item"><a data-translate="refund" href="{% url 'about:refund_policy' %}">Refund Policy</a></li>
+                <li class="list-inline-item"><a data-translate="exchange" href="{% url 'about:exchange_policy' %}">Exchange Policy</a></li>
+            </ul>
+        </div>
+
+    </footer>
+    
+
+    <script>
+
+        // our teachers
+        document.addEventListener("DOMContentLoaded", () => {
+            const slider = document.querySelector(".teacher-slider");
+            const teacherprevArrow = document.getElementById("teacherprevArrow");
+            const teachernextArrow = document.getElementById("teachernextArrow");
+          
+            teacherprevArrow.addEventListener("click", () => {
+              slider.scrollBy({ left: -250, behavior: "smooth" });
+            });
+          
+            teachernextArrow.addEventListener("click", () => {
+              slider.scrollBy({ left: 250, behavior: "smooth" });
+            });
+          });
+        
+    </script>
+
+{% endblock content %}
+
+
+
+
+

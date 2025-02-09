@@ -1,0 +1,10 @@
+{
+  "payment_page_title": " طريقة الدفع",
+  "error_message": "{{ message }}",
+  "payment_method_label": "طريقة الدفع",
+  "payment_method_card": "بطاقة",
+  "payment_method_wallet": "محفظة",
+  "currency_label": "العملة",
+  "total_price_label": "السعر الإجمالي",
+  "pay_now": "ادفع الآن"
+}

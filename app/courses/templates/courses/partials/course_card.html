@@ -1,0 +1,181 @@
+{% load custom_filters %}
+
+<div class="card card-bg mt-4 course-card shadow-sm hover-shadow transition-all position-relative">
+    {% if course.preview_video %}
+        <a href="#"
+           title="Show Details"
+           data-mdb-toggle="modal"
+           data-mdb-target="#course-details-modal-{{ course.id }}"
+           onclick="event.stopPropagation();"
+           class="btn btn-sm btn-link text-primary position-absolute"
+           style="top: 10px; right: 10px; z-index: 1;">
+            <i class="fas fa-video"></i>
+        </a>
+    {% endif %}
+    
+    <div class="d-flex flex-column align-items-center p-1">
+        <!-- Course Image -->
+        <div class="text-center">
+            <img src="{{ course.image.url }}" alt="{{ course.name }} Icon" class="img-fluid rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+        </div>
+
+        <!-- Course Title -->
+        <h3 class="card-title text-center mb-3 fw-bold">{{ course.name }}</h3>
+
+        <!-- Love Button -->
+        <!-- <div class="d-flex justify-content-center align-items-center mb-3">
+            {% if request.user.is_authenticated %}
+                <a href="#"
+                   class="btn btn-sm btn-link add-to-love {% if course.id in loved_course_ids %}disabled{% endif %}"
+                   data-type="course"
+                   data-id="{{ course.id }}">
+                    {% if course.id in loved_course_ids %}
+                        <i class="fas fa-heart text-danger"></i>
+                    {% else %}
+                        <i class="fas fa-heart text-muted"></i>
+                    {% endif %}
+                </a>
+            {% endif %}
+        </div> -->
+
+        <!-- Course Description -->
+        <div class="card card-bg px-3 mb-3 w-100">
+            <!-- <p class="text-secondary fw-bold mb-2" data-translate="description">Description</p> -->
+            <p class="text-muted mb-0">{{ course.description }}</p>
+        </div>
+
+        <!-- Pricing Section -->
+        <div class="text-center mb-3">
+            {% if course.has_discount %}
+                <span class="text-muted text-decoration-line-through me-2">{% if request.is_egypt %}EGP{% else %}${% endif %}{{ course.price_without_any_discount }}</span>
+                <span class="badge bg-danger me-2">-{{ course.discount_percent }}%</span>
+                <span class="fw-bold text-success">{% if request.is_egypt %}EGP{% else %}${% endif %}{{ course.final_price_after_discound }}</span>
+            {% else %}
+                <span class="fw-bold text-success">{% if request.is_egypt %}EGP{% else %}${% endif %}{{ course.price_without_any_discount }}</span>
+            {% endif %}
+        </div>
+
+        <!-- Add to Cart / Login Button -->
+        <div class="w-100 text-center">
+            {% if request.user.is_authenticated %}
+                <a href="#"
+                   class="btn btn-outline-primary btn-sm w-100 add-to-cart {% if course.id in cart_course_ids %}disabled{% endif %}"
+                   data-type="course"
+                   data-name="{{ course.name }}"
+                   data-id="{{ course.id }}">
+                    {% if course.id in cart_course_ids %}
+                        <i class="fas fa-check me-2"></i> <span data-translate="added">Added</span>
+                    {% else %}
+                        <i class="fas fa-cart-plus me-2"></i> <span data-translate="add_course_to_cart">Add to Cart</span>
+                    {% endif %}
+                </a>
+            {% else %}
+                <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-outline-primary btn-sm w-100">
+                    <i class="fas fa-sign-in-alt me-2"></i> <span data-translate="login_to_add">Login to Add</span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+{% if course.preview_video %}
+
+<div class="modal fade" id="course-details-modal-{{ course.id }}" tabindex="-1" aria-labelledby="courseDetailsLabel-{{ course.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-light shadow-lg rounded-4">
+            <!-- Modal Header -->
+            <div class="modal-header bg-primary text-white rounded-top">
+                <h3 class="modal-title fw-bold" id="courseDetailsLabel-{{ course.id }}">
+                    🌟 {{ course.name }} - Preview
+                </h3>
+                <button type="button" class="btn-close btn-close-white" data-mdb-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+
+
+                <div class="video-container my-3">
+                    <div class="ratio ratio-16x9">
+                        <iframe
+                            src="https://www.youtube.com/embed/{{ course.preview_video }}"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                            class="rounded">
+                        </iframe>
+
+                    </div>
+                </div>
+
+
+                {% comment %} <!-- Course Image -->
+                <div class="text-center mb-4">
+                    <img src="{{ course.image.url }}" alt="{{ course.name }}" class="img-fluid rounded-circle shadow-sm" style="width: 150px; height: 150px;">
+                </div>
+
+                <!-- Course Info -->
+                <div class="px-3">
+                    <p class="text-info fw-bold">
+                        💡 Description: <span class="text-dark">{{ course.description }}</span>
+                    </p>
+                    <p class="text-warning fw-bold">
+                        💰 Price:
+                    </p>
+                    <p class='price-info mb-1'>
+                        {% if course.has_discount %}
+                        <span class='old-price'>EGP{{ course.price_without_any_discount }}</span>
+                        <span class='discount'>-{{ course.discount_percent }}%</span>
+                        <span class='final-price fw-bold'>
+                            EGP{{ course.final_price_after_discound }}
+                        </span>
+                        {% else %}
+                        <span class='final-price fw-bold'>EGP{{ course.price_without_any_discount }}</span>
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Sessions Section -->
+                <div class="mt-4">
+                    <h5 class="text-center text-primary fw-bold mb-3">🚀 Course Sessions</h5>
+                    <div class="list-group">
+                        {% for session in course.coursesessions.all %}
+                        <div class="list-group-item d-flex align-items-start rounded shadow-sm mb-2">
+                            <div class="px-2">
+                                <h6 class="text-primary fw-bold mb-1">
+                                    {{ session.order }}. {{ session.title }}
+                                </h6>
+                                <p class="text-muted small">{{ session.content }}</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="alert alert-danger text-center">
+                            No sessions available for this course yet!
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div> {% endcomment %}
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer justify-content-between bg-light border-top rounded-bottom">
+                <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+                {% comment %} {% if request.user.is_authenticated %}
+                    <a href="#"
+                    class="btn btn-primary btn-sm add-to-cart {% if course.id in cart_course_ids %}disabled{% endif %}"
+                    data-type="course"
+                    data-name="{{ course.name }}"
+                    data-id="{{ course.id }}">
+                    {% if course.id in cart_course_ids %}
+                        <i class="fas fa-check"></i> Added
+                    {% else %}
+                        <i class="fas fa-cart-plus"></i> Add to Cart
+                    {% endif %}
+                    </a>
+                {% endif %} {% endcomment %}
+            </div>
+        </div>
+    </div>
+</div> 
+
+{% endif %}

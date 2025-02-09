@@ -1,0 +1,137 @@
+{% extends 'base.html' %} 
+{% load static %}
+{% block translationFolder %}data-translation-folder="aboutus"{% endblock %}
+{% block title %}About Us - HiCode{% endblock %}
+{% block content %}
+
+<!-- Custom CSS (Add this in your static CSS file or in a <style> tag) -->
+<style>
+    .about-us-section {
+        padding: 20px 0;
+    }
+    .about-us-section h1 {
+        font-size: 3rem;
+        font-weight: bold;
+        margin-bottom: 30px;
+        color: #2c3e50;
+    }
+    .about-us-section h2 {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-top: 40px;
+        margin-bottom: 20px;
+        color: #34495e;
+    }
+    .about-us-section p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #555;
+    }
+    .about-us-section ul {
+        list-style-type: disc;
+        padding-left: 20px;
+    }
+    .about-us-section ul li {
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+        color: #555;
+    }
+    .btn-primary {
+        background-color: #3498db;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1.1rem;
+        transition: background-color 0.3s ease;
+    }
+    .btn-primary:hover {
+        background-color: #2980b9;
+    }
+</style>
+
+<!-- About Us Section -->
+<div class="container about-us-section">
+
+
+<div class="form-header text-center pt-0 mt-0">
+            <h3 class="styled-title">
+                <span class="line"></span>
+                <span class="text">
+                    <span class="icon"><i class="me-2 fas fa-sitemap"></i></span>
+                    <span data-translate="aboutus_title">About Us</span>
+                </span>
+                <span class="line"></span>
+            </h3>
+        </div>
+
+    <!-- Our Story -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <h2 data-translate="aboutus_story_title">Our Story</h2>
+            <p data-translate="aboutus_story_description">
+                HiCode was founded with a simple goal: to make coding accessible and fun for kids and teens. 
+                As parents and educators ourselves, we saw the need for a platform that not only teaches programming but also 
+                inspires creativity and problem-solving skills in young minds.
+            </p>
+        </div>
+    </div>
+
+    <!-- Our Team -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <h2 data-translate="aboutus_team_title">Our Team</h2>
+            <p data-translate="aboutus_team_description">
+                Our team is made up of experienced educators, software engineers, and designers who are passionate about 
+                empowering the next generation of coders. 
+            </p>
+            <!-- Add team member cards or profiles here if needed -->
+        </div>
+    </div>
+
+    <!-- Our Teaching Methodology -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <h2 data-translate="aboutus_methodology_title">Our Teaching Methodology</h2>
+            <p data-translate="aboutus_methodology_description">
+                At HiCode, we believe in a hands-on, project-based approach to learning. Our courses are designed to:
+            </p>
+            <ul>
+                <li data-translate="aboutus_methodology_list1">Encourage creativity and problem-solving through real-world projects.</li>
+                <li data-translate="aboutus_methodology_list2">Adapt to each student’s learning pace with personalized feedback.</li>
+                <li data-translate="aboutus_methodology_list3">Make learning fun with interactive lessons, games, and challenges.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Our Values -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <h2 data-translate="aboutus_values_title">Our Values</h2>
+            <p data-translate="aboutus_values_description">
+                At HiCode, we are guided by the following principles:
+            </p>
+            <ul>
+                <li><strong data-translate="aboutus_values_list1_title">Inclusivity:</strong> <span data-translate="aboutus_values_list1_description">We believe every child, regardless of background, should have access to quality coding education.</span></li>
+                <li><strong data-translate="aboutus_values_list2_title">Safety:</strong> <span data-translate="aboutus_values_list2_description">We prioritize the safety and privacy of our students and their data.</span></li>
+                <li><strong data-translate="aboutus_values_list3_title">Innovation:</strong> <span data-translate="aboutus_values_list3_description">We constantly update our curriculum to reflect the latest trends and technologies.</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Join Our Community -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center">
+            <h2 data-translate="aboutus_join_title">Join Our Community</h2>
+            <p data-translate="aboutus_join_description">
+                Ready to start your child’s coding journey? Sign up today and become part of a growing community of young coders, 
+                parents, and educators who are shaping the future.
+            </p>
+            <a class="btn btn-primary" href="{% url 'accounts:register' %}?next={{ request.path }}" data-translate="aboutus_join_button">
+                <span>Register</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+

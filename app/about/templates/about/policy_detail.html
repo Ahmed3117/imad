@@ -1,0 +1,31 @@
+{% extends 'base.html' %} 
+{% load static %}
+{% block translationFolder %}data-translation-folder="privacy"{% endblock %}
+{% block title %}Privacy{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="privacy-page">
+        <!-- Header with Styled Title -->
+        <div class="form-header text-center">
+            <h3 class="styled-title">
+                <span class="line"></span>
+                <span class="text">
+                    <span class="icon"><i class="me-2 fas fa-chalkboard-user"></i></span>
+                    <span data-translate="{{ policy.policy_type }}">{{ policy.get_policy_type_display }}</span>
+                </span>
+                <span class="line"></span>
+            </h3>
+        </div>
+
+        <!-- Policy Content -->
+        <div class="card mb-4 p-3">
+            <div class="policy-content">
+                <!-- Translated "Last updated" text -->
+                <span class="fw-bold" data-translate="last_updated">Last updated</span>: {{ policy.last_updated|date:"F j, Y" }}
+                <!-- Translated policy content -->
+                {{ content|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

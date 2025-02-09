@@ -1,0 +1,23 @@
+{
+  "aboutus_title": "About Us",
+  "aboutus_story_title": "Our Story",
+  "aboutus_story_description": "HiCode was founded with a simple goal: to make coding accessible and fun for kids and teens. As parents and educators ourselves, we saw the need for a platform that not only teaches programming but also inspires creativity and problem-solving skills in young minds.",
+  "aboutus_team_title": "Our Team",
+  "aboutus_team_description": "Our team is made up of experienced educators, software engineers, and designers who are passionate about empowering the next generation of coders.",
+  "aboutus_methodology_title": "Our Teaching Methodology",
+  "aboutus_methodology_description": "At HiCode, we believe in a hands-on, project-based approach to learning. Our courses are designed to:",
+  "aboutus_methodology_list1": "Encourage creativity and problem-solving through real-world projects.",
+  "aboutus_methodology_list2": "Adapt to each student’s learning pace with personalized feedback.",
+  "aboutus_methodology_list3": "Make learning fun with interactive lessons, games, and challenges.",
+  "aboutus_values_title": "Our Values",
+  "aboutus_values_description": "At HiCode, we are guided by the following principles:",
+  "aboutus_values_list1_title": "Inclusivity:",
+  "aboutus_values_list1_description": "We believe every child, regardless of background, should have access to quality coding education.",
+  "aboutus_values_list2_title": "Safety:",
+  "aboutus_values_list2_description": "We prioritize the safety and privacy of our students and their data.",
+  "aboutus_values_list3_title": "Innovation:",
+  "aboutus_values_list3_description": "We constantly update our curriculum to reflect the latest trends and technologies.",
+  "aboutus_join_title": "Join Our Community",
+  "aboutus_join_description": "Ready to start your child’s coding journey? Sign up today and become part of a growing community of young coders, parents, and educators who are shaping the future.",
+  "aboutus_join_button": "Register"
+}

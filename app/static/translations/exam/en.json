@@ -1,0 +1,9 @@
+{
+  "exam_title": "Exam Title",
+  "time_remaining": "Time Remaining: {{ exam.duration }}:00",
+  "exam_already_taken": "You have already taken this exam.",
+  "your_score": "Your score: ",
+  "previous": "Previous",
+  "next": "Next",
+  "submit_exam": "Submit Exam"
+}

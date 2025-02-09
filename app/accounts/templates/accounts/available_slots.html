@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Available Appointment Slots</h2>
+    <h4>Course: {{ subscription.course.name }}</h4>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if available_slots %}
+    <form method="POST" action="{% url 'accounts:book_appointment' subscription.id %}">
+        {% csrf_token %}
+        <div class="row">
+            {% for slot in available_slots %}
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-check">
+                            <input type="radio" 
+                                   class="form-check-input" 
+                                   name="selected_slot" 
+                                   value="{{ slot.teacher.id }}_{{ slot.day }}_{{ slot.start_time|time:'H:i' }}"
+                                   id="slot-{{ forloop.counter }}">
+                            <label class="form-check-label" for="slot-{{ forloop.counter }}">
+                                <strong>Teacher:</strong> {{ slot.teacher.name }}<br>
+                                <strong>Day:</strong> {{ slot.day|title }}<br>
+                                <strong>Time:</strong> {{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <button type="submit" class="btn btn-primary mt-3">Book Appointment</button>
+        <a href="{% url 'accounts:profile' %}" class="btn btn-secondary mt-3">Back to Profile</a>
+    </form>
+    {% else %}
+    <div class="alert alert-info">
+        No available slots at the moment. Please check back later.
+    </div>
+    <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">Back to Profile</a>
+    {% endif %}
+</div>
+{% endblock %}

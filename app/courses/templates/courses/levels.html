@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+{% block translationFolder %}data-translation-folder="levels"{% endblock %}
+{% block title %}Courses{% endblock %}
+{% load custom_filters %}
+{% block content %}
+
+<style>
+    
+</style>
+
+<section class="container py-4 card px-4 mt-4">
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs mb-3" id="levelTabs" role="tablist">
+        {% for level in levels %}
+        <li class="nav-item" role="presentation">
+            <button class="nav-link circle-nav {% if forloop.first %}active{% endif %}"
+                    id="level-{{ level.id }}-tab"
+                    data-mdb-toggle="tab"
+                    data-mdb-target="#level-{{ level.id }}"
+                    type="button"
+                    role="tab"
+                    aria-controls="level-{{ level.id }}"
+                    aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+                {{ level.name }}
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
+    
+    <!-- Tab Contents -->
+    <div class="tab-content" id="levelTabsContent">
+        {% for level in levels %}
+        <div class="tab-pane fade {% if forloop.first %}show active{% endif %}"
+             id="level-{{ level.id }}"
+             role="tabpanel"
+             aria-labelledby="level-{{ level.id }}-tab">
+            <div class="row d-flex align-items-start">
+                
+                <!-- Courses and Tracks Section -->
+                <div class="col-lg-12 col-md-6 mt-sm-3">
+                    <!-- Main Tabs -->
+                    <ul class="nav nav-pills mb-2" id="mainTab-{{ level.id }}" role="tablist">
+                        {% if level.individual_courses %}
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active px-2 fw-bold"
+                               id="individual-{{ level.id }}-tab"
+                               data-mdb-toggle="pill"
+                               href="#individual-{{ level.id }}"
+                               role="tab"
+                               aria-selected="true"><span data-translate="individual_courses">Individual Courses</span></a>
+                        </li>
+                        {% endif %}
+                        {% if level.tracks %}
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link  px-2 fw-bold"
+                               id="tracks-{{ level.id }}-tab"
+                               data-mdb-toggle="pill"
+                               href="#tracks-{{ level.id }}"
+                               role="tab"
+                               aria-selected="false"><span data-translate="full_tracks">Full Tracks</span></a>
+                        </li>
+                        {% endif %}
+                    </ul>
+
+                    <div class="tab-content" id="mainTabContent-{{ level.id }}">
+                        <!-- Individual Courses Tab -->
+                        <div class="tab-pane fade show active"
+                             id="individual-{{ level.id }}"
+                             role="tabpanel">
+                               <div class="row">
+                                {% for course in level.individual_courses %}
+                                    <div class="col-lg-3 col-md-6 mb-4">
+                                        {% include "courses/partials/course_card.html" with course=course %}
+                                    </div>
+                                {% endfor %}
+                                </div>
+
+                        </div>
+
+                        <!-- Tracks Tab -->
+                        {% if level.tracks %}
+                        <div class="tab-pane fade my-3"
+                             id="tracks-{{ level.id }}"
+                             role="tabpanel">
+                            <ul class="nav nav-tabs mb-2" id="trackTab-{{ level.id }}" role="tablist">
+                                {% for track in level.tracks %}
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link {% if forloop.first %}active{% endif %}"
+                                       id="track-{{ track.id }}-{{ level.id }}-tab"
+                                       data-mdb-toggle="tab"
+                                       href="#track-{{ track.id }}-{{ level.id }}"
+                                       role="tab"
+                                       aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+                                        {{ track.name }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+
+                            <div class="tab-content py-3" id="trackTabContent-{{ level.id }}">
+                                {% for track in level.tracks %}
+                                <div class="tab-pane fade {% if forloop.first %}show active{% endif %}"
+                                    id="track-{{ track.id }}-{{ level.id }}"
+                                    role="tabpanel">
+                                    
+
+
+                                    <div class="row">
+                                        {% for course in track.courses %}
+                                            <div class="col-lg-3 col-md-6 mb-4">
+                                                {% include "courses/partials/course_card.html" with course=course %}
+                                            </div>
+                                        {% endfor %}
+                                        </div>
+ 
+
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<script>
+    
+    document.addEventListener('DOMContentLoaded', function () {
+    
+        // Handle "Add to Cart" functionality
+        const cartButtons = document.querySelectorAll('.add-to-cart');
+        cartButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const itemType = button.dataset.type;
+                const itemId = button.dataset.id;
+    
+                if (button.classList.contains('disabled')) return;
+    
+                fetch('/courses/add-to-cart/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': getCSRFToken(),
+                    },
+                    body: `item_type=${itemType}&item_id=${itemId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showToast('success', data.message); // Use toast instead of alert
+                        button.innerHTML = '<i class="fas fa-check"></i> Added';
+                        button.classList.add('disabled');
+                        updateCartIcon();
+                    } else {
+                        showToast('error', data.message); // Use toast for error
+                    }
+                });
+            });
+        });
+    
+        // Handle "Add to Love" (or "Remove from Love") functionality
+        const loveButtons = document.querySelectorAll('.add-to-love');
+        loveButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const itemType = button.dataset.type;
+                const itemId = button.dataset.id;
+    
+                fetch('/courses/add-to-love/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': getCSRFToken(),
+                    },
+                    body: `item_type=${itemType}&item_id=${itemId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        button.innerHTML = '<i class="fas fa-heart"></i> Loved';
+                        button.classList.add('disabled');
+                        showToast('success', data.message); // Use toast for success
+                    } else if (data.status === 'removed') {
+                        button.innerHTML = '<i class="fas fa-heart"></i> Add to Love';
+                        button.classList.remove('disabled');
+                        showToast('warning', data.message); // Use toast for removal
+                    } else {
+                        showToast('error', data.message); // Use toast for error
+                    }
+                });
+            });
+        });
+    
+        // Function to update the cart icon
+        function updateCartIcon() {
+            fetch('/courses/cart-count/')
+                .then(response => response.json())
+                .then(data => {
+                    const cartCountElement = document.querySelector('.cart-count');
+                    if (cartCountElement) {
+                        cartCountElement.textContent = data.cart_count;
+                    }
+                });
+        }
+    
+        // Function to get CSRF token
+        function getCSRFToken() {
+            const csrfToken = document.cookie.match(/csrftoken=([^;]+)/);
+            return csrfToken ? csrfToken[1] : '';
+        }
+    
+        // Function to add and display toast messages
+        function showToast(type, message) {
+            const toastContainer = document.createElement('div');
+            toastContainer.classList.add('toast', 'align-items-center', 'fade', 'show', 'm-1', `bg-${type}`);
+            toastContainer.setAttribute('role', 'alert');
+            toastContainer.setAttribute('aria-live', 'assertive');
+            toastContainer.setAttribute('aria-atomic', 'true');
+            toastContainer.style.maxWidth = '350px';
+    
+            // Toast content
+            const toastContent = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${getToastIcon(type)} ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+    
+            toastContainer.innerHTML = toastContent;
+    
+            // Append toast to the page
+            const toastWrapper = document.querySelector('.toast-wrapper') || createToastWrapper();
+            toastWrapper.appendChild(toastContainer);
+    
+            // Automatically remove the toast after 5 seconds
+            setTimeout(() => {
+                toastContainer.classList.remove('show');
+                setTimeout(() => toastContainer.remove(), 300); // Allow fade-out animation
+            }, 5000);
+        }
+    
+        // Function to get the appropriate icon for the toast message type
+        function getToastIcon(type) {
+            if (type === 'success') {
+                return '<i class="fas fa-check-circle me-2"></i>';
+            } else if (type === 'error') {
+                return '<i class="fas fa-exclamation-circle me-2"></i>';
+            } else if (type === 'warning') {
+                return '<i class="fas fa-exclamation-triangle me-2"></i>';
+            }
+            return ''; // Default: no icon
+        }
+    
+        // Create a wrapper for toasts if it doesn't exist
+        function createToastWrapper() {
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('toast-wrapper', 'position-fixed', 'top-0', 'end-0', 'p-3');
+            wrapper.style.zIndex = '1055'; // Ensure it appears above other elements
+            document.body.appendChild(wrapper);
+            return wrapper;
+        }
+    });
+</script>
+<script src="{% static 'js/levels.js' %}"></script>
+{% endblock %}

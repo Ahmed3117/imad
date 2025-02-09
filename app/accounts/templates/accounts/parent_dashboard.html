@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block translationFolder %}data-translation-folder="dashboard"{% endblock %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="form-header text-center ">
+        <h3 class="styled-title">
+            <span class="line"></span>
+            <span class="text">
+                <span class="icon"><i class="me-2 fas fa-chalkboard-user"></i></i></span>
+                <span data-translate="parent_dashboard">Parent Dashboard</span>
+            </span>
+            <span class="line"></span>
+        </h3>
+    </div>
+    
+    <!-- Profiles Grid -->
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+        {% for student in parent_students %}
+        <div class="col">
+            <div class="card profile-card text-center shadow">
+                <div class="card-body">
+                    {% if student.student.image %}
+                    <img src="{{student.student.image.url}}" alt="User Image" class="profile-image mb-3">
+                    {% else %}
+                    <img src="{% static 'imgs/defaults/person.svg' %}" alt="User Image" class="profile-image mb-3">
+                    {% endif %}
+                    <h5 class="profile-name mb-1">{{ student.student.name }}</h5>
+                    <p><span class="profile-details mb-2" data-translate="age">Age: </span><span>{{ student.student.studentprofile.age }}</span></p>
+                    <button class="btn btn-primary btn-sm mt-2" data-mdb-toggle="modal" data-mdb-target="#loginModal" data-username="{{ student.student.username }}" data-translate="go_with_profile">Go with this profile</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Add New Profile Card -->
+        <div class="col">
+            <div class="card add-profile text-center shadow h-100 d-flex align-items-center justify-content-center" data-mdb-toggle="modal" data-mdb-target="#addProfileModal">
+                <div>
+                    <i class="fas fa-plus fa-2x"></i>
+                    <p class="mt-2 mb-0" data-translate="add_new_student">Add New Student</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Profile Modal -->
+    <div class="modal fade" id="addProfileModal" tabindex="-1" aria-labelledby="addProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addProfileModalLabel" data-translate="add_new_student_profile">Add New Student Profile</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addProfileForm" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <div class="form-outline">
+                                <input type="text" name="name" class="form-control" placeholder="" required />
+                                <label class="form-label" data-translate="student_name">Student Name</label>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="form-outline">
+                                <input type="text" name="username" class="form-control" placeholder="" required />
+                                <label class="form-label" data-translate="student_username">Student Username</label>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="form-outline">
+                                <input type="password" name="password" class="form-control" placeholder="" required />
+                                <label class="form-label" data-translate="password">Password</label>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="form-outline">
+                                <input type="number" name="age" class="form-control" placeholder="" required />
+                                <label class="form-label" data-translate="age">Age</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for='profileImage' class='form-label' data-translate='profile_image'>Profile Image</label>
+                            <input type='file' id='profileImage' name='profile_image' class='form-control' accept='image/*'>
+                        </div>
+                        <button type='submit' class='btn btn-primary' data-translate='add_student'>Add Student</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class='modal fade' id='loginModal' tabindex='-1' aria-labelledby='loginModalLabel' aria-hidden='true'>
+        <div class='modal-dialog modal-dialog-centered'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h5 class='modal-title' id='loginModalLabel' data-translate='login_to_student_profile'>Login to Student Profile</h5>
+                    <button type='button' class='btn-close' data-mdb-dismiss='modal' aria-label='Close'></button>
+                </div>
+                <div class='modal-body'>
+                    <form id='loginForm' method='post'>
+                        {% csrf_token %}
+                        <div class='mb-4'>
+                            <div class='form-outline'>
+                                <input type='text' name='username' class='form-control' placeholder='' required />
+                                <label class='form-label' data-translate='username'>Username</label>
+                            </div>
+                        </div>
+                        <div class='mb-4'>
+                            <div class='form-outline'>
+                                <input type='password' name='password' class='form-control' placeholder='' required />
+                                <label class='form-label' data-translate='password'>Password</label>
+                            </div>
+                        </div>
+                        <input type='hidden' name='student_username' id='student_username' value=''/>
+                        <button type='submit' class='btn btn-primary' data-translate='login'>Login</button>
+                    </form>
+                </div>
+            </div>
+        </div> 
+    </div>
+
+</div> 
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('loginModal').addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const username = button.getAttribute('data-username');
+            const studentUsernameInput = document.getElementById('student_username');
+            studentUsernameInput.value = username;
+        });
+    
+        document.getElementById('addProfileForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch("{% url 'accounts:add_student' %}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            });
+            const result = await response.json();
+            if (result.success) {
+                location.reload();
+            } else {
+                alert(result.error);
+            }
+        };
+    
+        document.getElementById('loginForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch("{% url 'accounts:login_student' %}", {
+                method: 'POST',
+                body: formData,
+                headers: {'X-CSRFToken': '{{ csrf_token }}'}
+            });
+            const result = await response.json();
+            if (result.success) {
+                window.location.href="{% url 'accounts:profile' %}";
+            } else {
+                alert(result.error);
+            }
+        };
+    });
+    
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

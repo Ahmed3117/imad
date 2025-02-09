@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block translationFolder %}data-translation-folder="exam"{% endblock %}
+{% block title %}Exam{% endblock %}
+
+{% block content %}
+
+<section class="container exam-container text-center py-4">
+    <!-- Exam Header -->
+    {% if not exam_result %}
+    <div class="mb-4">
+        <h2 class="text-primary" data-translate="exam_title">{{ exam.title }}</h2>
+        <div class="timer" id="timer" style="font-size: 2rem; color: #ff5733;" data-translate="time_remaining">Time Remaining: {{ exam.duration }}:00</div>
+    </div>
+    {% endif %}
+
+    {% if exam_result %}
+    <div class="alert alert-info">
+        <h5 data-translate="exam_already_taken">You have already taken this exam.</h5>
+        <span data-translate="your_score">Your score: </span><strong>{{ exam_result.score }}%</strong>
+    </div>
+    {% endif %}
+
+    <!-- Questions Section -->
+    <form method="post" action="{% url 'accounts:submit_exam' exam.id %}" id="examForm">
+        {% csrf_token %}
+
+        <!-- Single Question Container -->
+        <div id="question-container" class="p-3 bg-light rounded shadow-sm">
+            {% for question in questions %}
+            <div class="question mb-4 d-none" data-question-id="{{ question.id }}">
+                <h5 data-translate="question_number">{{ forloop.counter }}. {{ question.text }}</h5>
+                {% for option in question.option_set.all %}
+                <div class="form-check mb-2">
+                    <input type="radio" 
+                           class="form-check-input" 
+                           name="question_{{ question.id }}" 
+                           value="{{ option.id }}" 
+                           id="option_{{ question.id }}_{{ option.id }}">
+                    <label class="form-check-label" for="option_{{ question.id }}_{{ option.id }}">
+                        {{ option.text }}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="text-center mt-4">
+            <button type="button" id="prev-question" class="btn btn-secondary" disabled data-translate="previous">Previous</button>
+            <button type="button" id="next-question" class="btn btn-primary" data-translate="next">Next</button>
+            {% if not exam_result %}
+            <button type="submit" id="submit-exam" class="btn btn-success d-none" data-translate="submit_exam">Submit Exam</button>
+            {% endif %}
+        </div>
+    </form>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const questions = document.querySelectorAll('.question');
+        let currentQuestionIndex = 0;
+
+        // Show the first question
+        questions[currentQuestionIndex].classList.remove('d-none');
+
+        // Navigation Buttons
+        const prevButton = document.getElementById('prev-question');
+        const nextButton = document.getElementById('next-question');
+        const submitButton = document.getElementById('submit-exam');
+
+        prevButton.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                questions[currentQuestionIndex].classList.add('d-none');
+                currentQuestionIndex--;
+                questions[currentQuestionIndex].classList.remove('d-none');
+            }
+
+            updateButtons();
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (currentQuestionIndex < questions.length - 1) {
+                questions[currentQuestionIndex].classList.add('d-none');
+                currentQuestionIndex++;
+                questions[currentQuestionIndex].classList.remove('d-none');
+            }
+
+            updateButtons();
+        });
+
+        function updateButtons() {
+            prevButton.disabled = currentQuestionIndex === 0;
+            nextButton.classList.toggle('d-none', currentQuestionIndex === questions.length - 1);
+            if (submitButton) {
+                submitButton.classList.toggle('d-none', currentQuestionIndex !== questions.length - 1);
+            }
+        }
+
+        // Form submission logic
+        {% if not exam_result %}
+        document.getElementById('examForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    alert(`Exam submitted successfully!\nYour score: ${result.score}%\nCorrect answers: ${result.correct_answers}/${result.total_questions}`);
+                    const courseId = '{{ course_id }}';
+                    window.location.href = `/accounts/course/${courseId}/sessions/`;
+                } else {
+                    alert(result.message || 'An error occurred while submitting the exam.');
+                }
+            } catch (error) {
+                console.error('Error submitting exam:', error);
+                alert('An error occurred while submitting the exam. Please try again.');
+            }
+        });
+        {% endif %}
+
+        // Timer logic
+        {% if not exam_result %}
+        let timeLeft = {{ exam.duration }} * 60;
+        const timerDisplay = document.getElementById("timer");
+        const timerInterval = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                alert("Time's up! Your answers will be submitted.");
+                document.getElementById("examForm").submit();
+            } else {
+                const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                const seconds = (timeLeft % 60).toString().padStart(2, '0');
+                timerDisplay.textContent = `${minutes}:${seconds}`;
+                timeLeft--;
+            }
+        }, 1000);
+        {% endif %}
+    });
+</script>
+
+{% endblock %}
