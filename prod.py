@@ -33,16 +33,15 @@ INSTALLED_APPS = [
     'carts',
     'orders',
     'subscriptions',
-    'appointments',
-    'exams',
+    # 'appointments',
+    # 'exams',
     "crispy_forms",
     "crispy_bootstrap5",
     'rest_framework',
-    'payments',
-    'freemeet',
+    # 'payments',
+    # 'freemeet',
     'ckeditor',
 ]
-
 
 ASGI_APPLICATION = 'project.asgi.application'
 
@@ -157,18 +156,16 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 #SMTP Configuration
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'hicode.academy.contact@gmail.com'
-EMAIL_HOST_PASSWORD = 'vqsh bfak ohnu dsgt'
-# EMAIL_HOST_USER = 'platraincloud@gmail.com'
-# EMAIL_HOST_PASSWORD = 'meczfpooichwkudl'
+# EMAIL_HOST_USER = 'hicode.academy.contact@gmail.com'
+# EMAIL_HOST_PASSWORD = 'vqsh bfak ohnu dsgt'
+EMAIL_HOST_USER = 'platraincloud@gmail.com'
+EMAIL_HOST_PASSWORD = 'meczfpooichwkudl'
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
 
 # PlatRain010
 
@@ -178,8 +175,6 @@ from django.contrib import admin
 from django.contrib import admin
 from django.contrib.admin import AdminSite
 from django.utils.translation import gettext_lazy as _
-
-
 
 ADMIN_ORDERING = (
     ('about', (
@@ -200,11 +195,10 @@ ADMIN_ORDERING = (
         'Level', 'LevelTranslation',
         'Track', 'TrackTranslation',
         'Course', 'CourseTranslation',
-        'Session', 'SessionTranslation',
         # 'LevelContent', 'LevelContentTranslation'
     )),
-    ('subscriptions', ('Subscription',)),
-    ('appointments', ('TeacherAvailability', 'Appointment')),
+    ('subscriptions', ('StudyGroup','JoinRequest','Lecture')),
+    # ('appointments', ('TeacherAvailability', 'Appointment')),
     # ('exams', ('Exam', 'Question', 'Option', 'ExamResult')),
     # ('orders', ('Order', 'OrderItem')),
     # ('loves', ('LoveTrack', 'LoveCourse')),
@@ -212,6 +206,7 @@ ADMIN_ORDERING = (
     ('auth', ('Group',)),
     ('admin_interface', ('Theme',)),
 )
+
 def get_app_list(self, request, app_label=None):
     """Reorder the appearance of apps and models in the Django admin."""
     app_dict = self._build_app_dict(request, app_label)
