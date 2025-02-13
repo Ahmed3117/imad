@@ -1,7 +1,7 @@
 {% load static %}
 
 
-<nav class="{% if request.path != '/' %} navbar {% endif %} navbar-expand-lg sticky-top">
+<nav class="navbar navbar-expand-lg sticky-top">
     <div class="container">
         <a class="navbar-brand" href="/">
             <img src="{{logo_url}}" alt="Logo" height="60">
@@ -31,7 +31,7 @@
                         {% if request.path == '/' %}
                             <li><a class="dropdown-item fw-bold" href="{% url 'courses:levels' %}" data-translate="levels"><span>Levels & Courses</span></a></li>
                             {% if request.user.is_authenticated %}
-                            <li><a class="dropdown-item fw-bold" href="{% url 'courses:loved_items' %}" data-translate="loveditems"><span>Loved Items</span></a></li>
+                            
                             
                                 {% if request.user.role == "parent" %}
                                     <a class="dropdown-item fw-bold" href="{% url 'accounts:parent_dashboard' %}" data-translate="profile"><span>My Profile</span></a>
@@ -39,9 +39,7 @@
                                     <a class="dropdown-item fw-bold" href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a>
                                 {% endif %}
                             {% endif %}
-                        <li><a class="dropdown-item" href="#offers" data-translate="features"><span>Offers & Discounts</span></a></li>
-                        <li><a class="dropdown-item" href="#whoarewe" data-translate="contact"><span>Who Are We</span></a></li>
-                        <li><a class="dropdown-item" href="#plans" data-translate="plans"><span>Our Plans</span></a></li>
+
                         <li><a class="dropdown-item" href="#contact" data-translate="contacts"><span>Contact</span></a></li>
                         {% else %}
                         <li>
@@ -52,9 +50,7 @@
                             {% endif %}
 
                             <li><a class="dropdown-item fw-bold" href="{% url 'courses:levels' %}" data-translate="levels"><span>Levels & Courses</span></a></li>
-                            {% if request.user.is_authenticated %}
-                            <li><a class="dropdown-item fw-bold" href="{% url 'courses:loved_items' %}" data-translate="loveditems"><span>Loved Items</span></a></li>
-                            {% endif %}
+                            
                         {% endif %}
                     </ul>
                 </li>
@@ -67,14 +63,6 @@
                     </div>
                 </li>
 
-                <!-- Cart Icon with Dropdown -->
-                <!-- {% if request.user.is_authenticated %}
-                <a href="{% url 'courses:cart' %}" class="nav-link position-relative ">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-count badge bg-danger">{{ cart_count }}</span>
-                </a>
-                {% endif %} -->
-
                 <!-- User Profile Dropdown -->
                 <li class="nav-item dropdown">
                   {% if request.user.is_authenticated %}
@@ -83,7 +71,7 @@
                       {% if request.user.image %}
                       <img src="{{request.user.image.url}}" alt="User" class="rounded-circle" height="40" />
                       {% else %}
-                      <img src="{% static 'imgs/defaults/person.svg' %}" alt="User" class="" height="40" />
+                      <img src="{% static 'imgs/defaults/person.png' %}" alt="User" class="" height="40" />
                       {% endif %}
                   </a>
                   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">

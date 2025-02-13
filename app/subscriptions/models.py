@@ -1,38 +1,76 @@
 from django.db import models
 from accounts.models import User
-from courses.models import Course, Session
+from courses.models import Course
+from django.db import models
+from accounts.models import User
 
-class Subscription(models.Model):
-    student = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'student'})
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    date_added = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=20, default="active", choices=[('active', 'Active'), ('waiting', 'Waiting'), ('finished', 'Finished')])
-    completed_sessions = models.ManyToManyField(Session, blank=True, related_name='completed_by')
+class StudyGroup(models.Model):
+    CAPACITY_CHOICES = [
+        (1, '1'),
+        (3, '3'),
+        (5, '5'),
+        (10, '10'),
+        (20, '20'),
+    ]
 
-    @property
-    def progress(self):
-        total_sessions = self.course.coursesessions.count()
-        if total_sessions == 0:
-            return 0
-        completed = self.completed_sessions.count()
-        return round((completed / total_sessions) * 100, 2)
-
-    @property
-    def is_completed(self):
-        return self.status == 'finished'
-
-    def __str__(self):
-        return f"{self.student.username} - {self.course} ({self.status})"
-
-
-class SubscriptionSession(models.Model):
-    session = models.ForeignKey(Session, on_delete=models.CASCADE)
-    subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE)
-    session_url = models.CharField(max_length=500, blank=True, null=True)
-    is_completed = models.BooleanField(default=False)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='study_groups')
+    capacity = models.IntegerField(choices=CAPACITY_CHOICES, null=True, blank=True)
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'}, related_name='teaching_groups')
+    number_of_expected_lectures = models.PositiveIntegerField()
+    join_price = models.DecimalField(max_digits=8, decimal_places=2)
+    students = models.ManyToManyField(User, limit_choices_to={'role': 'student'}, related_name='study_groups' , blank=True, null=True)
 
     def __str__(self):
-        return f"{self.session.title} - {self.subscription.student.username}"
+        return f"{self.course.name} | {self.teacher.username} | {self.capacity}"
+
+class GroupTime(models.Model):
+    DAY_CHOICES = [
+        ('MON', 'Monday'),
+        ('TUE', 'Tuesday'),
+        ('WED', 'Wednesday'),
+        ('THU', 'Thursday'),
+        ('FRI', 'Friday'),
+        ('SAT', 'Saturday'),
+        ('SUN', 'Sunday'),
+    ]
+
+    group = models.ForeignKey(StudyGroup, on_delete=models.CASCADE, related_name='group_times')
+    day = models.CharField(max_length=3, choices=DAY_CHOICES)
+    time = models.TimeField()
+
+    def __str__(self):
+        return f"{self.group} on {self.get_day_display()} at {self.time}"
+
+class JoinRequest(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'student'}, related_name='join_requests')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='join_requests')
+    group = models.ForeignKey(StudyGroup, on_delete=models.CASCADE, related_name='join_requests', blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.group:
+            self.group.students.add(self.student)
+
+    def __str__(self):
+        return f"Join Request by {self.student.username} for {self.course.name} in {self.group}"
+
+class Lecture(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    group = models.ForeignKey(StudyGroup, on_delete=models.CASCADE, related_name='lectures')
+    live_link = models.URLField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Lecture: {self.title} for {self.group}"
+
+class LectureFile(models.Model):
+    lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE, related_name='files')
+    file = models.FileField(upload_to='lecture_files/')
+
+    def __str__(self):
+        return f"File for Lecture: {self.lecture.title}"
+
 
 
 

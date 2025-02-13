@@ -15,14 +15,14 @@ urlpatterns = [
 
     path('favicon.ico/', RedirectView.as_view(url=staticfiles_storage.url('imgs/logo.ico'))),
     path('', include('about.urls',namespace='about')),
-    path('appointments/', include('appointments.urls',namespace='appointments')),
+    # path('appointments/', include('appointments.urls',namespace='appointments')),
     path('carts/', include('carts.urls',namespace='carts')),
     path('courses/', include('courses.urls',namespace='courses')),
-    path('payments/', include('payments.urls',namespace='payments')),
-    path('exams/', include('exams.urls',namespace='exams')),
+    # path('payments/', include('payments.urls',namespace='payments')),
+    # path('exams/', include('exams.urls',namespace='exams')),
     path('loves/', include('loves.urls',namespace='loves')),
     path('subscriptions/', include('subscriptions.urls',namespace='subscriptions')),
-    path('freemeet/', include('freemeet.urls',namespace='freemeet')),
+    # path('freemeet/', include('freemeet.urls',namespace='freemeet')),
 ]
 urlpatterns+=static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns+=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -5,18 +5,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:title" content="HiCode Academy">
-  <meta property="og:description" content="HiCode is teaching Code , AI , Data Science and more to kids and teens from 6 to 18 years old in the best and most modern ways .">
-  <meta property="og:image" content="https://hicode.academy/static/imgs/hero/hero.png">
-  <meta property="og:url" content="https://hicode.academy/">
+    <meta property="og:title" content="nabbiuwny institution">
+  <meta property="og:description" content="">
+  <meta property="og:image" content="https://nabbiuwny.com/static/imgs/hero/hero.png">
+  <meta property="og:url" content="https://nabbiuwny.com/">
   <meta property="og:type" content="website">
+  <meta name="csrf-token" content="{{ csrf_token }}">
     <title>{% block title %}{% endblock %}</title>
 
     <!-- CSS Libraries -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700&display=swap" rel="stylesheet" />
     <!-- fav icon -->
-    <link rel="icon" type="image/x-icon" href="{% static 'imgs/bg/favicon2.svg' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'imgs/bg/l2.png' %}">
 
     <link id="rtl-css" href="{% static 'css/mdb.rtl.min.css' %}" rel="stylesheet" disabled />
     <link id="ltr-css" href="{% static 'css/mdb.min.css' %}" rel="stylesheet" />
@@ -111,14 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <i class="fab fa-whatsapp whatsapp-icon"></i>
 </a>
 
-<!-- Free Meet Button -->
-<!-- {% if user.is_authenticated %}
-<button onclick="freemeet()" class="btn btn-primary free-meet-button"> <i class="fas fa-video"></i> <span class="px-2" data-translate="ask_for_meet">Ask for Free Guide Meet</span> </button>
-{% else %}
-<a href="https://wa.me/+2{{company_info.freemeet_phone}}" target="_blank" class="btn btn-primary free-meet-button" > <span class="px-2" data-translate="ask_for_meet" >Ask for Free Guide Meet</span>
-  <i class="fas fa-video"></i>
-</a>
-{% endif %} -->
+
 
 <!-- JavaScript Libraries -->
 <script type="text/javascript" src="{% static 'js/mdb.min.js' %}"></script>
@@ -294,38 +288,6 @@ document.addEventListener('DOMContentLoaded', function() {
       toastEl.remove();
     });
   }
-</script>
-
-<!-- Free Meet Script -->
-<script>
-  function freemeet() {
-    event.preventDefault();
-    fetch("{% url 'freemeet:request_free_meet' %}", {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            showToastMessage(data.message, 'success');
-        } else {
-            if (data.freemeet && data.freemeet.respond_status === 'scheduled') {
-                showToastMessage(`Your meet is scheduled. Meet URL: ${data.freemeet.meet_url}`, 'success');
-            } else {
-                showToastMessage(data.message, 'error');
-            }
-        }
-        window.location.href="https://wa.me/+2{{company_info.freemeet_phone}}"
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToastMessage('An unexpected error occurred.', 'error');
-        window.location.href="https://wa.me/+2{{company_info.freemeet_phone}}"
-    });
-};
-
 </script>
 
 <!-- Additional JS -->

@@ -1,0 +1,73 @@
+<div class="card course-card h-100 overflow-hidden shadow-lg hover-lift" data-group-id="{{ group.id }}">
+
+    <!-- Course Header with Image -->
+    <div class="position-relative">
+        {% if group.course_image %}
+        <div class="text-center mt-4">
+            <img src="{{ group.course_image }}" alt="{{ group.course_name }} Icon" class="img-fluid rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #fff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        </div>
+        {% endif %}
+
+        <!-- Capacity Badge -->
+        <div class="course-overlay position-absolute top-0 end-0 m-3">
+            <span class="badge bg-primary rounded-pill shadow-sm">
+                <i class="fas fa-users me-1"></i> {{ group.capacity }}<span data-translate="seats"> seats</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Course Content -->
+    <div class="card-body pt-2">
+        <!-- Course Header -->
+        <h3 class="card-title text-center fw-bold text-gradient-primary" >{{ group.course_name }}</h3>
+
+        <!-- Course Description -->
+        <div class="card card-bg px-3 mb-1 w-100 text-center border-0 bg-light rounded-3">
+            <p class="text-muted mb-0 fs-6">{{ group.course_description }}</p>
+        </div>
+
+        <!-- Course Details -->
+        <div class="course-details bg-light rounded-3 px-3 mb-4 shadow-sm">
+            
+                <div class="">
+                   
+                        <i class="fas fa-chalkboard-teacher me-2 text-info"></i>
+                        <span class="fw-medium text-dark" >{{ group.teacher }}</span>
+                   
+                </div>
+                <div class="">
+                    
+                        <i class="fas fa-book text-info me-2"></i>
+                        <span class="fw-medium text-dark" data-translate="number-of-lectures">lectures</span>{{ group.number_of_expected_lectures }} 
+                    
+                </div>
+            
+        </div>
+
+        <!-- Group Times -->
+        <div class="group-times mb-4 px-3">
+            <h6 class="fw-bold" data-translate="schedule">Schedule:</h6>
+            <ul class="list-unstyled">
+                {% for group_time in group.group_times %}
+                <li>
+                    <i class="fas fa-calendar-day me-2 text-primary"></i>
+                    <span class="fw-medium text-dark" data-translate="{{ group_time.get_day_display }}">{{ group_time.get_day_display }}</span>
+                     at {{ group_time.time }}
+                </li>
+                {% empty %}
+                <li>No schedule available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Action Button -->
+        <div class="action-section">
+            <a class="btn btn-primary w-100 add-to-cart shadow-sm" data-group-id="{{ group.id }}" href="{% url 'accounts:lectures' group.id %}">
+                <i class="fas fa-user-plus me-2"></i>
+                <span data-translate="start">Start Learning</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+

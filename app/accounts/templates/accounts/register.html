@@ -17,7 +17,7 @@
             </h3>
         </div>
         <div class="form-header text-center mb-4">
-            <img id="imagePreview" src="{% static 'imgs/defaults/person.svg' %}" alt="Preview" class="image-preview rounded-circle">
+            <img id="imagePreview" src="{% static 'imgs/defaults/person.png' %}" alt="Preview" class="image-preview rounded-circle">
         </div>
 
         <!-- Step 1: User Registration -->
@@ -64,8 +64,8 @@
                     <div class="col-md-6 mb-4">
                         <label class="form-label" for="role" data-translate="role">Role</label>
                         <select name="role" id="role" class="form-select" required>
-                            <option value="student" data-translate="student">Student</option>
-                            <option value="parent" data-translate="parent">Parent</option>
+                            <option value="student" data-translate="student" selected>Student</option>
+                            <!-- <option value="parent" data-translate="parent">Parent</option> -->
                         </select>
                     </div>
                 </div>

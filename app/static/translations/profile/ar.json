@@ -17,7 +17,6 @@
   "thursday": "ألخميس",
   "friday": "الجمعة",
   "all_days": "كل الأيام",
-  "search_placeholder": "ابحث عن طريق الطالب أو الدورة",
         "apply_filter": "تطبيق",
         "student": "الطالب",
         "course": "الدورة",
@@ -45,6 +44,17 @@
   "save_appointment": "احفظ الموعد",
   "select_day_message": "ايام العمل المتاحة",
   "edit_profile": "تعديل الملف الشخصي",
+
+  "my_profile": "ملفي الشخصي",
+  "search_placeholder": "ابحث باسم الدورة أو اسم المعلم",
+  "search": "بحث",
+  "seats": " مقاعد",
+  "schedule": " المواعيد",
+    "course-name": "اسم الدورة",
+    "course-description": "وصف الدورة",
+    "teacher-username": "اسم المعلم",
+    "number-of-lectures": "عدد المحاضرات : ",
+    "start": "بداية",
   "select_dat_first_message": "من فضلك حدد اليوم اولا"
 
 }

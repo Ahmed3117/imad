@@ -17,13 +17,13 @@
   "my_learning_journey": "My Journey",
   "view_sessions": "View Sessions",
   "role": "Role",
-  "saturday": "Saturday",
-  "sunday": "Sunday",
-  "monday": "Monday",
-  "tuesday": "Tuesday",
-  "wednesday": "Wednesday",
-  "thursday": "thursday",
-  "friday": "friday",
+  "Saturday": "Saturday",
+  "Sunday": "Sunday",
+  "Monday": "Monday",
+  "Tuesday": "Tuesday",
+  "Wednesday": "Wednesday",
+  "Thursday": "thursday",
+  "Friday": "friday",
   "all_days": "All Days",
   "search_placeholder": "Search by Student or Course",
         "apply_filter": "Apply",
@@ -44,7 +44,16 @@
   "select_day_message": "Please select a day first.",
   "schedule_appointment": "Schedule Appointment",
   "edit_profile": "Edit Profile",
-  
+
+  "seats": " seats",
+  "schedule": " Schedule",
+  "course-name": "Course Name",
+  "course-description": "Course Description",
+  "teacher-username": "Teacher Username",
+  "number-of-lectures": "Number of Lectures : ",
+  "start": "Start",
+  "my_profile": "My Profile",
+  "search": "Search",
   "select_dat_first_message": "Please select a day first."
 
 }

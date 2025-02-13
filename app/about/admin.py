@@ -14,7 +14,7 @@ class CompanyInfoTranslationInline(admin.TabularInline):
 @admin.register(CompanyInfo)
 class CompanyInfoAdmin(admin.ModelAdmin):
     inlines = [CompanyInfoTranslationInline]
-    list_display = ['name', 'email', 'phone', 'freemeet_phone']
+    list_display = ['name', 'email', 'phone']
 
 class CompanyDescriptionTranslationInline(admin.TabularInline):
     model = CompanyDescriptionTranslation
