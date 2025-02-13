@@ -96,13 +96,17 @@ TEMPLATES = [
 WSGI_APPLICATION = 'project.wsgi.application'
 
 
-DATABASES = {
-   'default': {
-       'ENGINE': 'django.db.backends.sqlite3',
-       'NAME': BASE_DIR / 'db.sqlite3',
-   }
-}
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('DB_NAME'),  # Default to 'bluebook' if not set
+        'USER': os.getenv('DB_USER'),      # Default to 'root' if not set
+        'PASSWORD': os.getenv('DB_PASSWORD'),  # Default to 'haitham' if not set
+        'HOST': os.getenv('DB_HOST'),     # Default to 'mysql' if not set
+        'PORT': os.getenv('DB_PORT'),      # Default to '3306' if not set
+    }
+}
 
 
 
