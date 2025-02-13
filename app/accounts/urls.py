@@ -17,6 +17,18 @@ urlpatterns = [
     path('parent_dashboard/', views.parent_dashboard, name='parent_dashboard'),
     path('add_student/', views.add_student, name='add_student'),
     path('edit_profile/', views.edit_profile, name='edit_profile'),
+
+    path('profile/<int:study_group_id>/lectures/', views.study_group_lectures, name='lectures'),
+
+
+
+
+
+
+
+
+
+
     path('course/<int:course_id>/sessions/<str:student_username>/', views.session_details, name='session_details'),
     path('session/<int:session_id>/complete/', views.mark_session_completed, name='mark_session_completed'),
     path('exam/<int:exam_id>/start/', views.start_exam, name='start_exam'),

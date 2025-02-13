@@ -6,7 +6,7 @@ class CompanyInfo(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     phone = models.CharField(max_length=30)
-    freemeet_phone = models.CharField(max_length=30)
+    # freemeet_phone = models.CharField(max_length=30)
     email = models.EmailField()
     video = models.CharField(max_length=500)
     

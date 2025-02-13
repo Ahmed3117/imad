@@ -3,23 +3,26 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login,logout,authenticate
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.hashers import make_password
+
+from subscriptions.models import GroupTime, Lecture, LectureFile, StudyGroup
 from .models import ParentStudent, TeacherInfo, User, ParentProfile, StudentProfile
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect
-from django.db.models import Q, Sum, Prefetch
+from django.db.models import Q, Sum, Prefetch, F
 from courses.models import   Course, CourseTranslation, Level, LevelTranslation, TrackTranslation
-from exams.models import  Exam, ExamResult, Option, Question
-from subscriptions.models import  Subscription, SubscriptionSession
-from appointments.models import  Appointment,TeacherAvailability
-from courses.models import Session
 from .forms import SessionURLForm
 from django.core.mail import send_mail
 from django.conf import settings
 import random
 from django.views.decorators.cache import never_cache
+
+import logging
+
+# Set up logging
+logger = logging.getLogger(__name__)
 
 class EmailVerification:
     @staticmethod
@@ -41,11 +44,6 @@ class EmailVerification:
 def register(request):
     """Render the registration page (Step 1)."""
     return render(request, 'accounts/register.html')
-
-import logging
-
-# Set up logging
-logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def register_user(request):
@@ -178,7 +176,6 @@ def reset_password(request):
         return JsonResponse({'success': True, 'message': 'Password reset successfully'})
     return JsonResponse({'success': False, 'error': 'Invalid request'})
 
-
 @login_required
 def edit_profile(request):
     """Edit user profile."""
@@ -218,6 +215,8 @@ def user_login(request):
         # Check the user role and redirect accordingly
         if hasattr(request.user, 'role') and request.user.role == 'parent':
             return redirect('/accounts/parent_dashboard')
+        if hasattr(request.user, 'role') and request.user.role == 'teacher':
+            return redirect('/a_d_m_i_n/')
         return redirect('/')
 
     if request.method == 'GET':
@@ -251,6 +250,8 @@ def user_login(request):
             # Redirect based on role or next URL
             if hasattr(user, 'role') and user.role == 'parent':
                 return redirect('/accounts/parent_dashboard')
+            if hasattr(request.user, 'role') and request.user.role == 'teacher':
+                return redirect('/a_d_m_i_n/')
 
             next_url = request.session.get('next_url', '/')  # Default to '/' if no next_url
             return redirect(next_url)
@@ -263,7 +264,6 @@ def user_login(request):
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
     return response
-
 
 @csrf_exempt
 def login_student(request):
@@ -281,172 +281,68 @@ def login_student(request):
             return JsonResponse({'success': False, 'error': 'Invalid credentials.'})
     return JsonResponse({'success': False, 'error': 'Invalid request method.'})
 
+
+
 def profile(request):
     language = request.GET.get('lang', 'en')  # Default to 'en' if no language is specified
 
-    levels_data = []
     if not request.user.is_authenticated:
         return redirect('accounts:login')
 
     context = {}
+
+    # Fetch study groups based on user role
     if request.user.role == 'teacher':
-        # Get the teacher's appointments
-        teacher = request.user
-        appointments = Appointment.objects.filter(avialability__teacher=teacher).select_related(
-            'subscription__student',
-            'subscription__course',
-            'avialability'
-        )
-
-        # Add filtering by day
-        day_filter = request.GET.get('day')
-        if day_filter:
-            appointments = appointments.filter(avialability__day=day_filter)
-
-        # Add filtering by subscription status
-        status_filter = request.GET.get('status')
-        if status_filter:
-            appointments = appointments.filter(subscription__status=status_filter)
-
-        # Add search by student name or course name
-        search_query = request.GET.get('search')
-        if search_query:
-            appointments = appointments.filter(
-                subscription__student__name__icontains=search_query
-            ) | appointments.filter(
-                subscription__course__name__icontains=search_query
-            )
-
-        # Organize appointments by day and calculate progress
-        organized_appointments = {}
-        for appointment in appointments:
-            day = appointment.avialability.day
-            if day not in organized_appointments:
-                organized_appointments[day] = []
-
-            # Calculate progress for the subscription
-            subscription = appointment.subscription
-            total_sessions = subscription.course.coursesessions.count()
-            completed_sessions = subscription.completed_sessions.count()
-            progress = round((completed_sessions / total_sessions) * 100, 2) if total_sessions else 0
-
-            # Add progress to the appointment data
-            appointment.progress = progress
-            organized_appointments[day].append(appointment)
-
-        context['teacher'] = teacher
-        context['organized_appointments'] = organized_appointments
-        context['days_of_week'] = [day[0] for day in TeacherAvailability.DAYS_OF_WEEK]
-        context['status_choices'] = [('active', 'Active'), ('waiting', 'Waiting'), ('finished', 'Finished')]
+        study_groups = StudyGroup.objects.filter(teacher=request.user)
+    elif request.user.role == 'student':
+        study_groups = StudyGroup.objects.filter(students=request.user)
     else:
-        # Get all subscriptions for the logged-in student
-        subscriptions = Subscription.objects.filter(student=request.user).select_related('course')
+        study_groups = StudyGroup.objects.none()  # Empty queryset for non-teacher/student users
 
-        # Fetch all levels containing subscribed courses or tracks
-        levels = Level.objects.filter(
-            Q(courses__subscription__student=request.user) |
-            Q(tracks__courses__subscription__student=request.user)
-        ).distinct().prefetch_related(
-            'courses',
-            'tracks',
-            'tracks__courses',
-            'courses__subscription_set',
-            'tracks__courses__subscription_set'
+    # Handle filtering by course name or teacher name
+    search_query = request.GET.get('search', '')
+    if search_query:
+        study_groups = study_groups.filter(
+            Q(course__name__icontains=search_query) |
+            Q(teacher__username__icontains=search_query)
         )
 
-        levels_data = []
-        for level in levels:
-            # Translate level name
-            level_translation = LevelTranslation.objects.filter(level=level, language=language).first()
-            level_name = level_translation.translated_name if level_translation else level.name
+    # Fetch translations and group times for study groups
+    study_groups_data = []
+    for study_group in study_groups:
+        # Fetch translation for the course name and description
+        course_translation = CourseTranslation.objects.filter(
+            course=study_group.course, language=language
+        ).first()
 
-            # Get individual courses for this level (excluding those in any track)
-            individual_courses = []
-            for course in level.courses.filter(track__isnull=True):
-                subscription = subscriptions.filter(course=course).first()
-                if subscription:
-                    # Fetch sessions and their completion status
-                    sessions = subscription.subscriptionsession_set.all()
-                    total_sessions = sessions.count()
-                    completed_sessions = len(sessions.filter(is_completed=True))
-                    progress = (completed_sessions / total_sessions) * 100 if total_sessions else 0
+        # Fallback to default course name and description if translation is not available
+        course_name = course_translation.translated_name if course_translation else study_group.course.name
+        course_description = course_translation.translated_description if course_translation else study_group.course.description
 
-                    # Translate course name
-                    course_translation = CourseTranslation.objects.filter(course=course, language=language).first()
-                    course_name = course_translation.translated_name if course_translation else course.name
+        # Fetch group times for this study group
+        group_times = GroupTime.objects.filter(group=study_group)
 
-                    individual_courses.append({
-                        'course': {
-                            'id': course.id,
-                            'name': course_name,
-                            'image': course.image,
-                            'description': course.description,
-                        },
-                        'subscription': subscription,
-                        'progress': progress,
-                        'is_completed': subscription.status == 'finished',
-                        'is_started': subscription.status != 'waiting'
-                    })
+        study_groups_data.append({
+            'id': study_group.id,
+            'course_name': study_group.course.name,
+            'course_description': course_description,
+            'course_image': study_group.course.image.url if study_group.course.image else None,
+            'teacher': study_group.teacher.name,
+            'students': study_group.students.all(),
+            'capacity': study_group.capacity,
+            'number_of_expected_lectures': study_group.number_of_expected_lectures,
+            'join_price': study_group.join_price,
+            'group_times': group_times,
+        })
 
-            # Handle tracks and their courses
-            tracks = []
-            for track in level.tracks.all():
-                # Translate track name
-                track_translation = TrackTranslation.objects.filter(track=track, language=language).first()
-                track_name = track_translation.translated_name if track_translation else track.name
-
-                track_courses = []
-                for course in track.courses.all():
-                    subscription = subscriptions.filter(course=course).first()
-                    if subscription:
-                        # Fetch sessions and their completion status
-                        sessions_data = []
-                        sessions = course.coursesessions.all()
-                        for session in sessions:
-                            sub_session = SubscriptionSession.objects.filter(
-                                session=session, subscription=subscription
-                            ).first()
-                            sessions_data.append({
-                                'session': session,
-                                'is_completed': sub_session.is_completed if sub_session else False,
-                                'session_url': sub_session.session_url if sub_session else '',
-                            })
-
-                        total_sessions = sessions.count()
-                        completed_sessions = len([s for s in sessions_data if s['is_completed']])
-                        progress = (completed_sessions / total_sessions) * 100 if total_sessions else 0
-
-                        # Translate course name
-                        course_translation = CourseTranslation.objects.filter(course=course, language=language).first()
-                        course_name = course_translation.translated_name if course_translation else course.name
-
-                        track_courses.append({
-                            'course': {
-                                'id': course.id,
-                                'name': course_name,
-                                'image': course.image,
-                                'description': course.description,
-                            },
-                            'subscription': subscription,
-                            'sessions_data': sessions_data,
-                            'progress': progress,
-                            'is_completed': subscription.status == 'finished',
-                            'is_started': subscription.status != 'waiting'
-                        })
-
-                if track_courses:
-                    tracks.append({'name': track_name, 'courses': track_courses})
-
-            levels_data.append({
-                'name': level_name,
-                'id': level.name.lower().replace(" ", "_"),
-                'individual_courses': individual_courses,
-                'tracks': tracks,
-            })
-
-        context['levels'] = levels_data
+    context = {
+        'study_groups': study_groups_data,
+        'user_role': request.user.role,
+        'search_query': search_query,
+    }
 
     return render(request, 'accounts/profile.html', context)
+
 
 # Parent Dashboard
 def parent_dashboard(request):
@@ -495,6 +391,65 @@ def add_student(request):
         return JsonResponse({'success': True})
 
     return JsonResponse({'success': False, 'error': 'Unauthorized request'})
+
+
+def study_group_lectures(request, study_group_id):
+    # Fetch the StudyGroup object or return a 404 if not found
+    study_group = get_object_or_404(StudyGroup, id=study_group_id)
+    
+    # Fetch all lectures associated with the study group
+    lectures = Lecture.objects.filter(group=study_group)
+    
+    # For each lecture, fetch the associated files
+    lectures_with_files = []
+    for lecture in lectures:
+        files = LectureFile.objects.filter(lecture=lecture)
+        lectures_with_files.append({
+            'lecture': lecture,
+            'files': files
+        })
+    
+    # Render the data in the template
+    return render(request, 'accounts/lectures.html', {
+        'study_group': study_group,
+        'lectures_with_files': lectures_with_files
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @login_required

@@ -22,6 +22,7 @@
   --card-bg-color: #F2FDFA;
   --card-title-color: #fa6355;
   --description-color: #666666;
+  --second-description-color: #b6acac;
   --black-color: #333333;
   --white-color: #ffffff;
   --main-color-rgb: 255, 111, 97, 0.2; /* Updated to match --main-color */
@@ -95,6 +96,7 @@ body {
 .navbar {
   --mdb-navbar-box-shadow: 0; /* Remove shadow */
   padding: 0rem 0rem; /* Add padding for better spacing */
+  background-color: var(--card-bg-color)
 }
 
 .navbar-brand img {
@@ -330,6 +332,23 @@ body {
 
 .hero-button:hover {
   background-color: var(--sub-color);
+  cursor: pointer;
+}
+
+.profile-button {
+  padding: 15px 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  background-color: var(--sub-color);
+  color: #fff;
+  transition: background-color 0.3s ease;
+  animation: fadeIn 1s ease-out;
+}
+
+.profile-button:hover {
+  background-color: var(--main-color);
   cursor: pointer;
 }
 
@@ -1010,7 +1029,7 @@ p {
 /* Course Card Styling */
 .course-card {
   border-radius: 10px;
-  border: 1px solid #bcfdeb;
+  border: 1px solid #ff6f614a;
 }
 
 .course-card img {

@@ -7,7 +7,8 @@
   "individual_courses": "Individual Courses",
   "full_tracks": "Full Tracks",
   "add_track_to_cart": "Add Track to Cart",
-    "add_course_to_cart": "Add Course to Cart",
-    "login_to_add": "Login To Add to card",
+    "send_join_request": "Send Join Request",
+    "login_to_add": "Login To Join",
+    "request_sent": "Request Sent",
     "age_level": "Age Level:"
 }
