@@ -9,11 +9,60 @@
 <body>
 
 <style>
-    .hero-content{
-        background: rgba(0, 0, 0, 0.5);
-            padding: 20px;
-            border-radius: 10px;
+/* Base styles */
+.hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px; /* Add padding for better spacing */
+    border-radius: 10px;
+    max-width: 60%; /* Adjust max-width for responsiveness */
+    width: 100%; /* Ensure it takes full width on smaller screens */
+    box-sizing: border-box; /* Include padding in the element's total width */
+    text-align: center; /* Center-align text for consistency */
+}
+
+.hero-title {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    animation: fadeInDown 1s ease-out;
+}
+
+.hero-description {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    animation: fadeInUp 1s ease-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero-content {
+        max-width: 90%; /* Increase width for tablets */
+        padding: 15px; /* Reduce padding for better fit */
     }
+    .hero-title {
+        font-size: 2rem; /* Smaller font size for tablets */
+    }
+    .hero-description {
+        font-size: 1rem; /* Smaller font size for tablets */
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-content {
+        max-width: 100%; /* Full width for mobile devices */
+        padding: 10px; /* Minimal padding for mobile */
+    }
+    .hero-title {
+        font-size: 1.5rem; /* Smallest font size for mobile devices */
+    }
+    .hero-description {
+        font-size: 0.9rem; /* Smallest font size for mobile devices */
+    }
+}
 </style>
 <!-- Hero Section with Navbar -->
 <div class="hero-section">
@@ -113,8 +162,8 @@
 <div class="hero-content">
     <h1 class="hero-title" data-translate="hero_title">Unlock Your Potential with Our E-Learning Platform</h1>
     <p class="hero-description" data-translate="hero_description">Join thousands of learners worldwide and start your journey to success with our comprehensive courses and expert instructors.</p>
-    <a href="{% url 'courses:levels' %}" class="hero-button me-2" data-translate="hero_button">Get Started Today</a>
-    <a href="{% url 'accounts:profile' %}" class="profile-button " data-translate="profile">My Profile</a>
+    <a href="{% url 'courses:levels' %}" class="hero-button me-2 px-2 px-lg-4 " data-translate="hero_button">Get Started Today</a>
+    <a href="{% url 'accounts:profile' %}" class="profile-button px-2 px-lg-4" data-translate="profile">My Profile</a>
 </div>
 </div>
 <!-- features -->

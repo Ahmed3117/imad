@@ -295,28 +295,8 @@ body {
 }
 
 /* Hero Content Styling */
-.hero-content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-  max-width: 800px;
-  padding: 20px;
-}
 
-.hero-title {
-  font-size: 3.5rem;
-  font-weight: 700;
-  margin-bottom: 20px;
-  animation: fadeInDown 1s ease-out;
-}
 
-.hero-description {
-  font-size: 1.2rem;
-  margin-bottom: 30px;
-  animation: fadeInUp 1s ease-out;
-}
 
 .hero-button {
   padding: 15px 30px;
