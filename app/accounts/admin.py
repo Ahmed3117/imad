@@ -107,16 +107,7 @@ class TeacherInfoAdmin(admin.ModelAdmin):
     list_filter = ('specialization', 'is_active_to_be_shown_in_home')
     search_fields = ('teacher__name', 'specialization', 'bio')
     autocomplete_fields = ('teacher',)
-    filter_horizontal = ('courses',)
+    # filter_horizontal = ('courses',)
     
-    fieldsets = (
-        (None, {
-            'fields': ('teacher', 'bio', 'specialization', 'profile_link', 'is_active_to_be_shown_in_home')
-        }),
-        ('Courses', {
-            'fields': ('courses',),
-            'description': 'Select the courses taught by this teacher.'
-        }),
-    )
 
 

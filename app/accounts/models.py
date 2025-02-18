@@ -129,7 +129,6 @@ class TeacherInfo(models.Model):
     bio = models.TextField(max_length=500, blank=True, null=True, help_text="A short description about the teacher.")
     specialization = models.CharField(max_length=100, blank=True, null=True, help_text="The teacher's area of expertise.")
     profile_link = models.URLField(max_length=200, blank=True, null=True, help_text="Link to the teacher's full profile.")
-    courses = models.ManyToManyField(Course, related_name='teachers')
     is_active_to_be_shown_in_home = models.BooleanField(default=True)
 
     def __str__(self):

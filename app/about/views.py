@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render
-from about.models import CompanyInfo, CompanyInfoTranslation, Policy, PolicyTranslation, SocialAccount
+from about.models import CompanyInfo, CompanyInfoTranslation, Policy, PolicyTranslation
 from accounts.models import TeacherInfo, TeacherInfoTranslation
 from admin_interface.models import Theme
 from django.shortcuts import render
@@ -29,7 +29,7 @@ def home(request):
                 'bio': translation.translated_bio,
                 'specialization': translation.translated_specialization,
                 'profile_link': teacher.profile_link,
-                'courses': teacher.courses.all(),
+                
             })
         else:
             translated_teachers.append({
@@ -37,18 +37,18 @@ def home(request):
                 'bio': teacher.bio,
                 'specialization': teacher.specialization,
                 'profile_link': teacher.profile_link,
-                'courses': teacher.courses.all(),
+                
             })
 
     # Fetch social accounts and theme
-    social_accounts = SocialAccount.objects.all()
+    # social_accounts = SocialAccount.objects.all()
     theme = Theme.objects.filter(active=True).first()
     logo_url = theme.logo.url if theme and theme.logo else None
 
     context = {
         'logo_url': logo_url,
         'teachers': translated_teachers,
-        'social_accounts': social_accounts,
+        # 'social_accounts': social_accounts,
         'company_info': company_info
     }
     return render(request, 'about/home.html', context)
