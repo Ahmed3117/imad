@@ -14,13 +14,13 @@
 </div>
 
 <!-- Profile Header Section -->
-<div class="container profile-header p-4 mb-4 text-center" id="profileHeader">
+<div class="container profile-header p-4 mb-4 text-center shadow-sm rounded" id="profileHeader">
     <!-- User Image -->
     <div class="d-flex justify-content-center">
         {% if request.user.image %}
-            <img src="{{ request.user.image.url }}" alt="User" class="rounded-circle" style="width: 100px; height: 100px;" />
+            <img src="{{ request.user.image.url }}" alt="User" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
         {% else %}
-            <img src="{% static 'imgs/defaults/person.jpeg' %}" alt="User" class="rounded-circle" style="width: 100px; height: 100px;" />
+            <img src="{% static 'imgs/defaults/person.jpeg' %}" alt="User" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
         {% endif %}
     </div>
 
@@ -28,66 +28,66 @@
     <h4 class="text-primary fw-bold mt-3">{{ request.user.name|default:request.user.username }}</h4>
 
     <!-- Profile Info -->
-    <div class="profile-info row mt-3 justify-content-center">
+    <div class="profile-info row mt-4 justify-content-center">
         <div class="col-12 col-md-4">
-            <p><span class="info-title fw-bold" data-translate="email">Email:</span> {{ request.user.email|default:'N/A' }}</p>
+            <p class="mb-2"><span class="info-title fw-bold" data-translate="email">Email:</span> {{ request.user.email|default:'N/A' }}</p>
         </div>
         <div class="col-12 col-md-4">
-            <p><span class="info-title fw-bold" data-translate="role">Role:</span> {{ request.user.get_role_display }}</p>
+            <p class="mb-2"><span class="info-title fw-bold" data-translate="role">Role:</span> {{ request.user.get_role_display }}</p>
         </div>
         {% if request.user.role == 'student' %}
             <div class="col-12 col-md-4">
-                <p><span class="info-title fw-bold" data-translate="age">Age:</span> {{ request.user.studentprofile.age }}</p>
+                <p class="mb-2"><span class="info-title fw-bold" data-translate="age">Age:</span> {{ request.user.studentprofile.age }}</p>
             </div>
             <div class="col-12 col-md-4">
-                <p><span class="info-title fw-bold" data-translate="parent_phone">Parent Phone:</span> {{ request.user.studentprofile.parent_phone|default:'N/A' }}</p>
+                <p class="mb-2"><span class="info-title fw-bold" data-translate="parent_phone">Parent Phone:</span> {{ request.user.studentprofile.parent_phone|default:'N/A' }}</p>
             </div>
         {% elif request.user.role == 'teacher' %}
             <div class="col-12 col-md-4">
-                <p><span class="info-title fw-bold" data-translate="phone">Phone:</span> {{ request.user.phone|default:'N/A' }}</p>
+                <p class="mb-2"><span class="info-title fw-bold" data-translate="phone">Phone:</span> {{ request.user.phone|default:'N/A' }}</p>
             </div>
         {% endif %}
         <div class="col-12 text-center mt-3">
             <button class="btn btn-primary" data-mdb-toggle="modal" data-mdb-target="#editProfileModal" data-translate="edit_profile">Edit Profile</button>
         </div>
     </div>
+</div>
 
-    <!-- Edit Profile Modal -->
-    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editProfileModalLabel" data-translate="edit_profile">Edit Profile</h5>
-                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editProfileForm" method="post" action="{% url 'accounts:edit_profile' %}">
-                        {% csrf_token %}
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProfileModalLabel" data-translate="edit_profile">Edit Profile</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProfileForm" method="post" action="{% url 'accounts:edit_profile' %}">
+                    {% csrf_token %}
+                    <div class="mb-3 form-outline">
+                        <input type="email" class="form-control" id="email" name="email" value="{{ request.user.email }}" required>
+                        <label for="email" class="form-label" data-translate="email">Email</label>
+                    </div>
+                    {% if request.user.role == 'student' %}
                         <div class="mb-3 form-outline">
-                            <input type="email" class="form-control" id="email" name="email" value="{{ request.user.email }}" required>
-                            <label for="email" class="form-label" data-translate="email">Email</label>
+                            <input type="number" class="form-control" id="age" name="age" value="{{ request.user.studentprofile.age }}" required>
+                            <label for="age" class="form-label" data-translate="age">Age</label>
                         </div>
-                        {% if request.user.role == 'student' %}
-                            <div class="mb-3 form-outline">
-                                <input type="number" class="form-control" id="age" name="age" value="{{ request.user.studentprofile.age }}" required>
-                                <label for="age" class="form-label" data-translate="age">Age</label>
-                            </div>
-                            <div class="mb-3 form-outline">
-                                <input type="text" class="form-control" id="parent_phone" name="parent_phone" value="{{ request.user.studentprofile.parent_phone }}" required>
-                                <label for="parent_phone" class="form-label" data-translate="parent_phone">Parent Phone</label>
-                            </div>
-                        {% elif request.user.role == 'teacher' %}
-                            <div class="mb-3 form-outline">
-                                <input type="text" class="form-control" id="phone" name="phone" value="{{ request.user.phone }}" required>
-                                <label for="phone" class="form-label" data-translate="phone">Phone</label>
-                            </div>
-                        {% endif %}
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary" data-translate="save_changes">Save changes</button>
+                        <div class="mb-3 form-outline">
+                            <input type="text" class="form-control" id="parent_phone" name="parent_phone" value="{{ request.user.studentprofile.parent_phone }}" required>
+                            <label for="parent_phone" class="form-label" data-translate="parent_phone">Parent Phone</label>
                         </div>
-                    </form>
-                </div>
+                    {% elif request.user.role == 'teacher' %}
+                        <div class="mb-3 form-outline">
+                            <input type="text" class="form-control" id="phone" name="phone" value="{{ request.user.phone }}" required>
+                            <label for="phone" class="form-label" data-translate="phone">Phone</label>
+                        </div>
+                    {% endif %}
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" data-translate="save_changes">Save changes</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -97,16 +97,20 @@
     <div class="row mb-4">
         <div class="col-md-12">
             <div class="profile-header">
-                <div class="form-header text-center">
-                    <h3 class="styled-title">
-                        <span class="line"></span>
-                        <span class="text">
-                            <span class="icon"><i class="me-2 fas fa-chalkboard-user"></i></span>
-                            <span data-translate="my_profile"> My Profile </span>
-                        </span>
-                        <span class="line"></span>
-                    </h3>
+                <!-- Form Header -->
+        <div class="form-header text-center mb-4">
+            <div class="header-container">
+                <div class="diagonal-layer"></div>
+                <div class="floating-icon">
+                    <i class="fas fa-address-card"></i>
                 </div>
+                <div class="header-content">
+                    <h3 class="header-title" data-translate="my_profile"> My Profile </h3>
+                    
+                </div>
+            </div>
+        </div>
+                
             </div>
             <div class="card card-bg mt-4 shadow-sm hover-shadow transition-all position-relative">
                 <div class="card-body">
@@ -125,12 +129,12 @@
     {% if study_groups %}
         <div class="row">
             {% for group in study_groups %}
-            <div class="col-lg-4 col-md-6 mb-0">
+            <div class="col-lg-4 col-md-6 mb-4">
                 {% include "accounts/partials/group_card.html" with group=group %}
             </div>
             {% endfor %}
         </div>
-        {% endif %}
+    {% endif %}
 </div>
 
 <script>
@@ -138,25 +142,24 @@
         const toggleBtn = document.getElementById('toggleProfileHeader');
         const profileHeader = document.getElementById('profileHeader');
         const toggleIcon = document.getElementById('toggleIcon');
-        
+
         // Get saved state from localStorage
         const isVisible = localStorage.getItem('profileHeaderVisible') !== 'false';
-        
+
         // Set initial state
         profileHeader.style.display = isVisible ? 'block' : 'none';
         toggleIcon.className = isVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
-        
+
         toggleBtn.addEventListener('click', function() {
             const isCurrentlyVisible = profileHeader.style.display !== 'none';
             profileHeader.style.display = isCurrentlyVisible ? 'none' : 'block';
             toggleIcon.className = isCurrentlyVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
-            
+
             // Save state to localStorage
             localStorage.setItem('profileHeaderVisible', !isCurrentlyVisible);
         });
     });
 </script>
 
-
-
 {% endblock %}
+

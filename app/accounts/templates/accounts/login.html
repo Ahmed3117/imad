@@ -4,52 +4,144 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<section class="auth-container">
-    <div class="form-container">
-        <div class="form-header text-center">
-            <h3 class="styled-title">
-                <span class="line"></span>
-                <span class="text">
-                    <span class="icon"><i class="fas fa-sign-in-alt me-2"></i></span>
-                    <span data-translate="login">Login</span>
-                </span>
-                <span class="line"></span>
-            </h3>
+<section class="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div class="card shadow-lg p-4" style="max-width: 500px; width: 100%; border-radius: 15px;">
+        <!-- Form Header -->
+        <div class="form-header text-center mb-4">
+            <div class="header-container">
+                <div class="diagonal-layer"></div>
+                <div class="floating-icon">
+                    <i class="fas fa-unlock-alt"></i>
+                </div>
+                <div class="header-content">
+                    <h3 class="header-title" data-translate="login">Access Portal</h3>
+                    
+                </div>
+            </div>
         </div>
-        <div class="image-container mb-3">
-            <img src="{% static 'imgs/bg/a1.png' %}" style="width:200px;height:200px" alt="">
-        </div>
+
+        <!-- Image Container -->
+        <!-- <div class="text-center mb-4">
+            <img src="{% static 'imgs/bg/a1.png' %}" style="width: 200px; height: 200px;" alt="Login Image" class="img-fluid">
+        </div> -->
+
+        <!-- Login Form -->
         <form method="post">
             {% csrf_token %}
             <!-- Hidden input to capture the next URL -->
             <input type="hidden" name="next" value="{{ request.GET.next }}">
-            <div class="row">
-                <div class="col-md-6 mb-4">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" name="username" required />
-                        <label class="form-label" data-translate="username">Username or Email</label>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <div class="form-floating">
-                        <input type="password" class="form-control" name="password" required />
-                        <label class="form-label" data-translate="password">Password</label>
-                    </div>
-                </div>
+
+            <!-- Username/Email Field -->
+            <div class="form-floating mb-4">
+                <input type="text" class="form-control" id="username" name="username" required>
+                <label for="username" data-translate="username">Username or Email</label>
             </div>
+
+            <!-- Password Field -->
+            <div class="form-floating mb-4">
+                <input type="password" class="form-control" id="password" name="password" required>
+                <label for="password" data-translate="password">Password</label>
+            </div>
+
+            <!-- Submit Button -->
             <div class="d-grid">
-                <button type="submit" class="btn btn-gradient btn-block" data-translate="login">Login</button>
+                <button type="submit" class="btn btn-primary btn-block" data-translate="login">Login</button>
             </div>
         </form>
-        
-        <div class="mt-4 toggle-link text-center">
-            <a href="{% url 'accounts:register' %}?next={{ request.GET.next }}" class="text-primary" data-translate="no_account"></a>
+
+        <!-- Additional Links -->
+        <div class="mt-4 text-center">
+            <a href="{% url 'accounts:register' %}?next={{ request.GET.next }}" class="text-primary" data-translate="no_account">
+                Don't have an account? Register here.
+            </a>
         </div>
-        <div class="mt-4 toggle-link text-center">
+        <div class="mt-2 text-center">
             <a href="{% url 'accounts:forgot_password' %}" class="text-primary" data-translate="forgotpassword">
                 Forgot Password?
             </a>
         </div>
+
     </div>
 </section>
+
+<style>
+    /* Modern layered header design */
+    .header-container {
+        position: relative;
+        margin: -2rem -2rem 2rem -2rem;
+        padding: 4rem 2rem 2rem;
+        background: linear-gradient(45deg, var(--main-color), var(--second-main-color));
+        clip-path: polygon(0 0, 100% 0, 100% 80%, 0 100%);
+        overflow: hidden;
+    }
+
+    .diagonal-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        clip-path: polygon(0 0, 100% 0, 100% 30%, 0 50%);
+    }
+
+    .floating-icon {
+        position: absolute;
+        top: -25px;
+        right: -25px;
+        background: rgba(255, 255, 255, 0.15);
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+    }
+
+    .floating-icon i {
+        font-size: 2rem;
+        color: var(--white-color);
+        transform: rotate(-45deg);
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .header-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--white-color);
+        letter-spacing: 1px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .header-subtitle {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.9rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    /* Hover effects */
+    .floating-icon:hover {
+        transform: scale(1.1) rotate(15deg);
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    @media (max-width: 576px) {
+        .header-container {
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0 95%);
+        }
+        .floating-icon {
+            width: 60px;
+            height: 60px;
+            top: -15px;
+            right: -15px;
+        }
+    }
+</style>
 {% endblock %}

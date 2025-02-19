@@ -5,14 +5,12 @@
 {% block title %}Courses{% endblock %}
 {% load custom_filters %}
 {% block content %}
-
-
-<section class="container py-4 card px-4 mt-4">
+<section class="container my-5">
     <!-- Tabs Navigation -->
-    <ul class="nav nav-tabs mb-3" id="levelTabs" role="tablist">
+    <ul class="nav nav-pills mb-4 justify-content-center" id="levelTabs" role="tablist">
         {% for level in levels %}
         <li class="nav-item" role="presentation">
-            <button class="nav-link circle-nav {% if forloop.first %}active{% endif %}"
+            <button class="nav-link {% if forloop.first %}active{% endif %}"
                     id="level-{{ level.id }}-tab"
                     data-mdb-toggle="tab"
                     data-mdb-target="#level-{{ level.id }}"
@@ -20,7 +18,7 @@
                     role="tab"
                     aria-controls="level-{{ level.id }}"
                     aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
-                {{ level.name }}
+                <i class="fas fa-layer-group me-2"></i>{{ level.name }}
             </button>
         </li>
         {% endfor %}
@@ -33,30 +31,33 @@
              id="level-{{ level.id }}"
              role="tabpanel"
              aria-labelledby="level-{{ level.id }}-tab">
-            <div class="row d-flex align-items-start">
-
+            <div class="row">
                 <!-- Courses and Tracks Section -->
-                <div class="col-lg-12 col-md-6 mt-sm-3">
+                <div class="col-12">
                     <!-- Main Tabs -->
-                    <ul class="nav nav-pills mb-2" id="mainTab-{{ level.id }}" role="tablist">
+                    <ul class="nav nav-pills mb-4" id="mainTab-{{ level.id }}" role="tablist">
                         {% if level.individual_courses %}
                         <li class="nav-item" role="presentation">
-                            <a class="nav-link {% if level.individual_courses %}active{% endif %} px-2 fw-bold"
+                            <a class="nav-link {% if level.individual_courses %}active{% endif %}"
                                id="individual-{{ level.id }}-tab"
                                data-mdb-toggle="pill"
                                href="#individual-{{ level.id }}"
                                role="tab"
-                               aria-selected="{% if level.individual_courses %}true{% else %}false{% endif %}"><span data-translate="individual_courses">Individual Courses</span></a>
+                               aria-selected="{% if level.individual_courses %}true{% else %}false{% endif %}">
+                                <i class="fas fa-book me-2"></i><span data-translate="individual_courses">Individual Courses</span>
+                            </a>
                         </li>
                         {% endif %}
                         {% if level.tracks %}
                         <li class="nav-item" role="presentation">
-                            <a class="nav-link {% if not level.individual_courses %}active{% endif %} px-2 fw-bold"
+                            <a class="nav-link {% if not level.individual_courses %}active{% endif %}"
                                id="tracks-{{ level.id }}-tab"
                                data-mdb-toggle="pill"
                                href="#tracks-{{ level.id }}"
                                role="tab"
-                               aria-selected="{% if not level.individual_courses %}true{% else %}false{% endif %}"><span data-translate="full_tracks">Full Tracks</span></a>
+                               aria-selected="{% if not level.individual_courses %}true{% else %}false{% endif %}">
+                                <i class="fas fa-project-diagram me-2"></i><span data-translate="full_tracks">Full Tracks</span>
+                            </a>
                         </li>
                         {% endif %}
                     </ul>
@@ -69,9 +70,9 @@
                              role="tabpanel">
                             <div class="row">
                                 {% for course in level.individual_courses %}
-                                    <div class="col-lg-3 col-md-6 mb-4">
-                                        {% include "courses/partials/course_card.html" with course=course %}
-                                    </div>
+                                <div class="col-lg-3 col-md-6 mb-4">
+                                    {% include "courses/partials/course_card.html" with course=course %}
+                                </div>
                                 {% endfor %}
                             </div>
                         </div>
@@ -79,10 +80,10 @@
 
                         <!-- Tracks Tab -->
                         {% if level.tracks %}
-                        <div class="tab-pane fade {% if not level.individual_courses %}show active{% endif %} my-3"
+                        <div class="tab-pane fade {% if not level.individual_courses %}show active{% endif %}"
                              id="tracks-{{ level.id }}"
                              role="tabpanel">
-                            <ul class="nav nav-tabs mb-2" id="trackTab-{{ level.id }}" role="tablist">
+                            <ul class="nav nav-pills mb-4" id="trackTab-{{ level.id }}" role="tablist">
                                 {% for track in level.tracks %}
                                 <li class="nav-item" role="presentation">
                                     <a class="nav-link {% if forloop.first %}active{% endif %}"
@@ -91,22 +92,22 @@
                                        href="#track-{{ track.id }}-{{ level.id }}"
                                        role="tab"
                                        aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
-                                        {{ track.name }}
+                                        <i class="fas fa-stream me-2"></i>{{ track.name }}
                                     </a>
                                 </li>
                                 {% endfor %}
                             </ul>
 
-                            <div class="tab-content py-3" id="trackTabContent-{{ level.id }}">
+                            <div class="tab-content" id="trackTabContent-{{ level.id }}">
                                 {% for track in level.tracks %}
                                 <div class="tab-pane fade {% if forloop.first %}show active{% endif %}"
                                     id="track-{{ track.id }}-{{ level.id }}"
                                     role="tabpanel">
                                     <div class="row">
                                         {% for course in track.courses %}
-                                            <div class="col-lg-3 col-md-6 mb-4">
-                                                {% include "courses/partials/course_card.html" with course=course %}
-                                            </div>
+                                        <div class="col-lg-3 col-md-6 mb-4">
+                                            {% include "courses/partials/course_card.html" with course=course %}
+                                        </div>
                                         {% endfor %}
                                     </div>
                                 </div>
@@ -122,7 +123,53 @@
     </div>
 </section>
 
+<style>
+    /* Custom Styles for Tabs */
+    .nav-pills .nav-link {
+        font-family: 'SomarRounded', sans-serif;
+        font-weight: bold;
+        color: var(--main-color);
+        border-radius: 50px;
+        padding: 10px 20px;
+        margin: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .nav-pills .nav-link.active {
+        background-color: var(--main-color);
+        color: var(--white-color);
+    }
+
+    .nav-pills .nav-link:hover:not(.active) {
+        background-color: rgba(var(--main-color-rgb), 0.1);
+    }
+
+    /* Course Card Hover Effect */
+    .course-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .nav-pills .nav-link {
+            font-size: 14px;
+            padding: 8px 15px;
+        }
+
+        .course-card {
+            margin: 0 auto;
+            max-width: 300px;
+        }
+    }
+</style>
+
 <script>
+    // Slider Functionality for Tracks
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.add-to-cart').forEach(function(button) {
             button.addEventListener('click', function(event) {
@@ -140,7 +187,6 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data.success)
                     if (data.success) {
                         button.outerHTML = `
                             <button class="btn btn-outline-primary btn-sm w-100" disabled>
@@ -162,8 +208,4 @@
         });
     });
 </script>
-
-
-
-<script src="{% static 'js/levels.js' %}"></script>
 {% endblock %}
