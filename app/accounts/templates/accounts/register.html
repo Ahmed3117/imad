@@ -5,16 +5,19 @@
 
 {% block content %}
 <section class="auth-container">
-    <div class="form-container fade-in" id="register-form">
-        <div class="form-header text-center">
-            <h3 class="styled-title">
-                <span class="line"></span>
-                <span class="text">
-                    <span class="icon"><i class="fas fa-user-plus me-2"></i></span>
-                    <span data-translate="register">Register</span>
-                </span>
-                <span class="line"></span>
-            </h3>
+    <div class="card shadow-lg p-4" style="max-width: 700px; width: 100%; border-radius: 15px;">
+        <!-- Form Header -->
+        <div class="form-header text-center mb-4">
+            <div class="header-container">
+                <div class="diagonal-layer"></div>
+                <div class="floating-icon">
+                    <i class="fas fa-unlock-alt"></i>
+                </div>
+                <div class="header-content">
+                    <h3 class="header-title" data-translate="register">Access Portal</h3>
+                    
+                </div>
+            </div>
         </div>
         <div class="form-header text-center mb-4">
             <img id="imagePreview" src="{% static 'imgs/defaults/person.png' %}" alt="Preview" class="image-preview rounded-circle">
@@ -28,31 +31,31 @@
                 <input type="hidden" name="next" value="{{ request.GET.next }}">
                 <div class="row">
                     <div class="col-12 mb-4">
-                        <div class="form-outline">
+                        <div class="form-floating">
                             <input type="text" class="form-control" name="name" required />
                             <label class="form-label" data-translate="full_name">Full Name</label>
                         </div>
                     </div>
                     <div class="col-md-6 mb-4">
-                        <div class="form-outline">
+                        <div class="form-floating">
                             <input type="text" class="form-control" name="username" required />
                             <label class="form-label" data-translate="username">Username</label>
                         </div>
                     </div>
                     <div class="col-md-6 mb-4">
-                        <div class="form-outline">
+                        <div class="form-floating">
                             <input type="password" class="form-control" name="password" required />
                             <label class="form-label" data-translate="password">Password</label>
                         </div>
                     </div>
                     <div class="col-md-6 mb-4">
-                        <div class="form-outline">
+                        <div class="form-floating">
                             <input type="email" class="form-control" name="email" required />
                             <label class="form-label" data-translate="email">Email</label>
                         </div>
                     </div>
                     <div class="col-md-6 mb-4">
-                        <div class="form-outline">
+                        <div class="form-floating">
                             <input type="text" class="form-control" name="phone" />
                             <label class="form-label" data-translate="phone">Phone</label>
                         </div>
@@ -72,14 +75,7 @@
                 <div class="d-grid">
                     <button type="button" class="btn btn-gradient btn-block" data-translate="next" onclick="submitStep1()">Next</button>
                 </div>
-                <div class="text-center mt-5">
-                    <span class="text-primary  my-3" data-translate="privacy_agree">Agree to Privacy</span>
-                    <ul class="list-inline">
-                        <li class="list-inline-item"><a data-translate="terms" href="{% url 'about:terms_and_conditions' %}">Terms and Conditions</a></li>
-                        <li class="list-inline-item"><a data-translate="refund" href="{% url 'about:refund_policy' %}">Refund Policy</a></li>
-                        <li class="list-inline-item"><a data-translate="exchange" href="{% url 'about:exchange_policy' %}">Exchange Policy</a></li>
-                    </ul>
-                </div>
+                
             </form>
         </div>
 
@@ -87,7 +83,7 @@
         <div id="verification-step" style="display: none;">
             <form id="verification-form">
                 <div class="col-12 mb-4">
-                    <div class="form-outline">
+                    <div class="form-floating">
                         <input type="text" class="form-control" name="otp" required />
                         <label class="form-label" data-translate="enter_otp">Enter OTP Code</label>
                     </div>
@@ -261,4 +257,5 @@
     });
 }
 </script>
+
 {% endblock %}

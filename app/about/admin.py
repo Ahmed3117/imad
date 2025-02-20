@@ -1,10 +1,7 @@
 from django.contrib import admin
+
 from .models import (
-    CompanyInfo, CompanyInfoTranslation,
-    CompanyDescription, CompanyDescriptionTranslation, FinalProject, FinalProjectTranslation, PolicyTranslation,
-    SocialAccount, Tech, TechTranslation,
-    TechUsage, TechUsageTranslation,
-    Policy
+    CompanyInfo, CompanyInfoTranslation
 )
 
 class CompanyInfoTranslationInline(admin.TabularInline):
@@ -16,58 +13,37 @@ class CompanyInfoAdmin(admin.ModelAdmin):
     inlines = [CompanyInfoTranslationInline]
     list_display = ['name', 'email', 'phone']
 
-class CompanyDescriptionTranslationInline(admin.TabularInline):
-    model = CompanyDescriptionTranslation
-    extra = 1
+# class PolicyTranslationInline(admin.TabularInline):
+#     model = PolicyTranslation
+#     extra = 1
 
-@admin.register(CompanyDescription)
-class CompanyDescriptionAdmin(admin.ModelAdmin):
-    inlines = [CompanyDescriptionTranslationInline]
-    list_display = ['title', 'order']
-    ordering = ['order']
-
-@admin.register(SocialAccount)
-class SocialAccountAdmin(admin.ModelAdmin):
-    list_display = ['platform_name', 'country_code', 'url']
-
-class TechTranslationInline(admin.TabularInline):
-    model = TechTranslation
-    extra = 1
-
-@admin.register(Tech)
-class TechAdmin(admin.ModelAdmin):
-    inlines = [TechTranslationInline]
-    list_display = ['name', 'color']
-
-class TechUsageTranslationInline(admin.TabularInline):
-    model = TechUsageTranslation
-    extra = 1
-
-@admin.register(TechUsage)
-class TechUsageAdmin(admin.ModelAdmin):
-    inlines = [TechUsageTranslationInline]
-    list_display = ['name', 'tech']
-
-class PolicyTranslationInline(admin.TabularInline):
-    model = PolicyTranslation
-    extra = 1
-
-@admin.register(Policy)
-class PolicyAdmin(admin.ModelAdmin):
-    inlines = [PolicyTranslationInline]
-    list_display = ['policy_type', 'last_updated']
-    list_filter = ['policy_type']
-    readonly_fields = ['last_updated']
+# @admin.register(Policy)
+# class PolicyAdmin(admin.ModelAdmin):
+#     inlines = [PolicyTranslationInline]
+#     list_display = ['policy_type', 'last_updated']
+#     list_filter = ['policy_type']
+#     readonly_fields = ['last_updated']
 
 
-class FinalProjectTranslationInline(admin.TabularInline):
-        model = FinalProjectTranslation
-        extra = 1
 
-@admin.register(FinalProject)
-class FinalProjectAdmin(admin.ModelAdmin):
-    inlines = [FinalProjectTranslationInline]
-    list_display = ['title', 'is_active']
-    list_filter = ['is_active']
-    search_fields = ['title']
+
+from django.db.models.signals import post_migrate
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
+from django.dispatch import receiver
+
+@receiver(post_migrate)
+def remove_unwanted_permissions(sender, **kwargs):
+    models_to_remove = [
+        "session", "group", "logentry", "theme", "contenttype", "permission",
+        "parentprofile", "studentprofile", "parentstudent",
+        "teacherinfotranslation", "leveltranslation", "tracktranslation", "coursetranslation"
+    ]
+
+    # Delete permissions related to these models
+    Permission.objects.filter(content_type__model__in=models_to_remove).delete()
+
+    # Delete content types to fully remove them from admin permissions
+    ContentType.objects.filter(model__in=models_to_remove).delete()
+
 

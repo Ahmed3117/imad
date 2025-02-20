@@ -8,62 +8,6 @@
 
 <body>
 
-<style>
-/* Base styles */
-.hero-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 20px; /* Add padding for better spacing */
-    border-radius: 10px;
-    max-width: 60%; /* Adjust max-width for responsiveness */
-    width: 100%; /* Ensure it takes full width on smaller screens */
-    box-sizing: border-box; /* Include padding in the element's total width */
-    text-align: center; /* Center-align text for consistency */
-}
-
-.hero-title {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-    animation: fadeInDown 1s ease-out;
-}
-
-.hero-description {
-    font-size: 1.2rem;
-    margin-bottom: 30px;
-    animation: fadeInUp 1s ease-out;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .hero-content {
-        max-width: 90%; /* Increase width for tablets */
-        padding: 15px; /* Reduce padding for better fit */
-    }
-    .hero-title {
-        font-size: 2rem; /* Smaller font size for tablets */
-    }
-    .hero-description {
-        font-size: 1rem; /* Smaller font size for tablets */
-    }
-}
-
-@media (max-width: 576px) {
-    .hero-content {
-        max-width: 100%; /* Full width for mobile devices */
-        padding: 10px; /* Minimal padding for mobile */
-    }
-    .hero-title {
-        font-size: 1.5rem; /* Smallest font size for mobile devices */
-    }
-    .hero-description {
-        font-size: 0.9rem; /* Smallest font size for mobile devices */
-    }
-}
-</style>
 <!-- Hero Section with Navbar -->
 <div class="hero-section">
 <!-- Navbar -->
@@ -82,11 +26,11 @@
             <span>Home</span>
             </a>
         </li>
-        <li class="nav-item px-2">
+        <!-- <li class="nav-item px-2">
             <a class="nav-link" href="{% url 'about:about_us' %}" data-translate="aboutus">
             <span>About Us</span>
             </a>
-        </li>
+        </li> -->
         <li class="nav-item px-2 dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-mdb-toggle="dropdown" aria-expanded="false" data-translate="go_to">
             <span>Go To</span>
@@ -166,9 +110,8 @@
     <a href="{% url 'accounts:profile' %}" class="profile-button px-2 px-lg-4" data-translate="profile">My Profile</a>
 </div>
 </div>
+
 <!-- features -->
-
-
 <section class="features-section py-6 my-5">
     <div class="container">
         <div class="row justify-content-center"></div>
@@ -270,7 +213,7 @@
 </section>
 
 <!-- Video Section -->
-<section class="video-section py-5 my-4" id='whoarewe'>
+<section class="video-section pt-5 mt-4" id='whoarewe'>
     <div class="container">
         <div class="row align-items-center">
             <!-- Left Column (Text) -->
@@ -306,202 +249,213 @@
 
 
 <!-- Our Teachers -->
-<section class="container teachers-section" id="teachers" style="padding: 60px 0;">
-    <div class="form-header text-center">
-        <h3 class="styled-title">
-            <span class="line"></span>
-            <span class="text">
-                <span class="icon"><i class="me-2 fas fa-chalkboard-user"></i></span>
-                <span data-translate="our_teachers">Our Teachers</span>
-            </span>
-            <span class="line"></span>
-        </h3>
-    </div>
-    <p class="fw-bold section-subtitle text-center mb-5" data-translate="meet_our_teachers" style="font-family: 'SomarRounded', sans-serif; color: var(--description-color); font-size: 1.25rem;">Meet our exceptional teachers who inspire and guide learners:</p>
-    <div class="teacher-slider d-flex overflow-auto position-relative" style="padding-bottom: 20px;">
-        {% for teacher in teachers %}
-        <div class="slider-item flex-shrink-0 me-3" style="width: 300px; transition: transform 0.3s ease-in-out;">
-            <div class="card h-100 shadow-sm" style="border-radius: 15px; box-shadow: 0px 0px 20px rgba(var(--main-color-rgb), 0.2); transition: box-shadow 0.3s ease-in-out;">
-                <!-- Teacher Image -->
-                <div class="text-center p-3">
-                    {% if teacher.teacher.image %}
-                    <img src="{{ teacher.teacher.image.url }}" alt="{{ teacher.teacher.name }}" class="img-fluid rounded-circle" style="width: 120px; height: 120px; border: 4px solid var(--main-color);">
-                    {% endif %}
+ <section class="container teachers-section" id="teachers">
+    <div class="card p-3"  style="width: 100%; border-radius: 15px;">
+        <!-- Form Header -->
+        <div class="form-header text-center mb-4">
+            <div class="header-container">
+                <div class="diagonal-layer"></div>
+                <div class="floating-icon">
+                    <i class="fas fa-users"></i>
                 </div>
-
-                <!-- Teacher Name -->
-                <div class="text-center mt-3">
-                    <h5 class="text-dark mb-0" style="font-family: 'DG-Trika', sans-serif; color: var(--main-color); font-size: 1.5rem;">{{ teacher.teacher.name }}</h5>
+                <div class="header-content">
+                    <h3 class="header-title" data-translate="our_teachers">OUR Team</h3>
+                    
                 </div>
-
-                <!-- Teacher Title -->
-                <div class="text-center mt-2">
-                    <span class="text-primary fw-bold" style="font-family: 'SomarRounded', sans-serif; color: var(--sub-color); font-size: 1.25rem;">{{ teacher.specialization }}</span>
-                </div>
-
-                <!-- Card Body (Description) -->
-                <div class="card-body text-center">
-                    <p class="fw-bold text-muted small" style="font-family: 'SomarRounded', sans-serif; color: var(--description-color);">{{ teacher.bio }}</p>
-                </div>
-
-                <!-- Card Footer (View Profile Button) -->
-                {% if teacher.profile_link %}
-                <div class="card-footer bg-light border-top d-flex justify-content-center">
-                    <a href="{{ teacher.profile_link }}" class="btn btn-primary btn-sm" data-translate="view_profile" style="background-color: var(--main-color); border-color: var(--main-color); transition: background-color 0.3s ease-in-out;">View Profile</a>
-                </div>
-                {% endif %}
             </div>
         </div>
-        {% endfor %}
-    </div>
-    <!-- Arrows -->
-    <div class="d-flex justify-content-between mt-4">
-        <button id="teacherprevArrow" class="btn btn-outline-primary btn-floating" style="border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: background-color 0.3s ease-in-out;">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <button id="teachernextArrow" class="btn btn-outline-primary btn-floating" style="border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: background-color 0.3s ease-in-out;">
-            <i class="fas fa-chevron-right"></i>
-        </button>
+        <p class="fw-bold section-subtitle text-center mb-5" data-translate="meet_our_teachers" style="font-family: 'SomarRounded', sans-serif; color: var(--description-color); font-size: 1.25rem;">Meet our exceptional teachers who inspire and guide learners:</p>
+        <div class="teacher-slider d-flex overflow-auto position-relative" style="padding-bottom: 20px;">
+            {% for teacher in teachers %}
+            <div class="slider-item flex-shrink-0 me-3" style="width: 300px; transition: transform 0.3s ease-in-out;">
+                <div class="card h-100 shadow-sm" style="border-radius: 15px; box-shadow: 0px 0px 20px rgba(var(--main-color-rgb), 0.2); transition: box-shadow 0.3s ease-in-out;">
+                    <!-- Teacher Image -->
+                    <div class="text-center p-3">
+                        {% if teacher.teacher.image %}
+                        <img src="{{ teacher.teacher.image.url }}" alt="{{ teacher.teacher.name }}" class="img-fluid rounded-circle" style="width: 120px; height: 120px; border: 4px solid var(--main-color);">
+                        {% endif %}
+                    </div>
+
+                    <!-- Teacher Name -->
+                    <div class="text-center mt-3">
+                        <h5 class="text-dark mb-0" style="font-family: 'DG-Trika', sans-serif; color: var(--main-color); font-size: 1.5rem;">{{ teacher.teacher.name }}</h5>
+                    </div>
+
+                    <!-- Teacher Title -->
+                    <div class="text-center mt-2">
+                        <span class="text-primary fw-bold" style="font-family: 'SomarRounded', sans-serif; color: var(--sub-color); font-size: 1.25rem;">{{ teacher.specialization }}</span>
+                    </div>
+
+                    <!-- Card Body (Description) -->
+                    <div class="card-body text-center">
+                        <p class="fw-bold text-muted small" style="font-family: 'SomarRounded', sans-serif; color: var(--description-color);">{{ teacher.bio }}</p>
+                    </div>
+
+                    <!-- Card Footer (View Profile Button) -->
+                    {% if teacher.profile_link %}
+                    <div class="card-footer bg-light border-top d-flex justify-content-center">
+                        <a href="{{ teacher.profile_link }}" class="btn btn-primary btn-sm" data-translate="view_profile" style="background-color: var(--main-color); border-color: var(--main-color); transition: background-color 0.3s ease-in-out;">View Profile</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- Arrows -->
+        <div class="d-flex justify-content-between mt-4">
+            <button id="teacherprevArrow" class="btn btn-outline-primary btn-floating" style="border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: background-color 0.3s ease-in-out;">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button id="teachernextArrow" class="btn btn-outline-primary btn-floating" style="border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: background-color 0.3s ease-in-out;">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
     </div>
 </section>
 
 
-    <!-- Contact Section -->
-    <section class="pt-5" id='contact'>
-        <div class="container">
-            <div class="card">
-                <div class="row no-gutters">
-                    <!-- Left Column (Contact Info) -->
-                    <div class="col-lg-5 card gradient-brand-color pt-5 px-5 order-lg-2">
-                        <h3 class="text-white mb-5" data-translate="get_in_touch">Get in Touch</h3>
-                        <ul class="list-unstyled position-relative z-index-101" dir="ltr">
-                            <li class="mb-4 text-white fw-bold">
-                                <i class="fas fa-envelope mx-3"></i>
-                                <span class="position-absolute">{{company_info.email}}</span>
-                            </li>
-                            <li class="mb-4 text-white fw-bold">
-                                <i class="fas fa-phone mx-3"></i>
-                                <span class="position-absolute">{{company_info.phone}}</span>
-                            </li>
-                            <li class="mb-4 text-center pt-5">
-                                <img src="{% static 'imgs/mail11.png' %}" alt="Suit Image" class="img-fluid email-image">
-                            </li>
-                        </ul>
+<!-- Contact Section -->
+<section class="container pt-5" id="contact">
+    
+       
+        <div class="card p-4 shadow-lg"  style="width: 100%; border-radius: 15px;">
+            <!-- Form Header -->
+            <div class="form-header text-center mb-4">
+                <div class="header-container">
+                    <div class="diagonal-layer"></div>
+                    <div class="floating-icon">
+                        <i class="fas fa-envelope"></i>
                     </div>
+                    <div class="header-content">
+                        <h3 class="header-title" data-translate="get_in_touch">Get in Touch</h3>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="row no-gutters">
+                <!-- Left Column (Contact Info) -->
+                <div class="col-lg-5 d-flex flex-column justify-content-center align-items-center bg-gradient-brand-color text-warning p-5 order-lg-2">
+                    
+                    <ul class="list-unstyled">
+                        <!-- <li class="mb-4 d-flex align-items-center">
+                            <i class="fas fa-envelope fa-2x me-3"></i>
+                            <span class="fw-bold">{{company_info.email}}</span>
+                        </li>
+                        <li class="mb-4 d-flex align-items-center">
+                            <i class="fas fa-phone fa-2x me-3"></i>
+                            <span class="fw-bold">{{company_info.phone}}</span>
+                        </li> -->
+                        <li class="mb-4 text-center">
+                            <img src="{% static 'imgs/mail.png' %}" alt="Contact Image" class="img-fluid email-image ">
+                        </li>
+                    </ul>
+                </div>
 
-                    <!-- Right Column (Contact Form) -->
-                    <div class="col-lg-7 contact-form__wrapper p-5 order-lg-1">
-                        <form id="contactForm" class="contact-form form-validate" novalidate>
-                            <div class="row">
-                                <div class="col-sm-12 mb-3">
-                                    <div class="form-outline mb-4">
-                                        <input type="text" id="name" class="form-control" name="name" required>
-                                        <label class="form-label" for="name" data-translate="your_name">Your Name</label>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 mb-3">
-                                    <div class="form-outline mb-4">
-                                        <input type="email" id="email" class="form-control" name="email" required>
-                                        <label class="form-label" for="email" data-translate="your_email">Your Email</label>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 mb-3">
-                                    <div class="form-outline mb-4">
-                                        <input type="tel" id="phone" class="form-control" name="phone">
-                                        <label class="form-label" for="phone" data-translate="your_phone">Your Phone Number</label>
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 mb-3">
-                                    <div class="form-outline mb-4">
-                                        <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
-                                        <label class="form-label" for="message" data-translate="how_can_we_help">How can we help?</label>
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 mb-3 mt-5">
-                                    <button type="submit" class="btn btn-primary btn-block" data-translate="send_button">Send</button>
+                <!-- Right Column (Contact Form) -->
+                <div class="col-lg-7 d-flex flex-column justify-content-center p-5 order-lg-1">
+                    
+                    <form id="contactForm" class="contact-form form-validate" novalidate>
+                        <div class="row">
+                            <div class="col-sm-12 mb-3">
+                                <div class="form-floating mb-4">
+                                    <input type="text" id="name" class="form-control" name="name" required>
+                                    <label class="form-label" for="name" data-translate="your_name">Your Name</label>
                                 </div>
                             </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="pt-5 pb-5 mt-5 text-center text-md-start bg-footer " id="contact">
-        <div class="container">
-            <div class="row pt-5 d-flex">
-                <!-- Left Column -->
-                <div class="col-md-4 mb-4 mb-lg-0">
-                    <div class="mb-4">
-                        <a class="navbar-brand mb-4" href="#">
-                            <img src="{% static 'imgs/footer/logo1.png' %}" alt="Logo" height="40">
-                        </a>
-                        <p class="fw-bold mb-4" data-translate="footer_description">{{company_info.description}}</p>
-                        
-                        <div>
-                            <span data-translate="created_by">Created By BlueBook Team</span>
-                            <div data-translate="copyright" >© 2024 - BlueBook (01095163117)</div>
+                            <div class="col-sm-6 mb-3">
+                                <div class="form-floating mb-4">
+                                    <input type="email" id="email" class="form-control" name="email" required>
+                                    <label class="form-label" for="email" data-translate="your_email">Your Email</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <div class="form-floating mb-4">
+                                    <input type="tel" id="phone" class="form-control" name="phone">
+                                    <label class="form-label" for="phone" data-translate="your_phone">Your Phone Number</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 mb-3">
+                                <div class="form-floating mb-4">
+                                    <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+                                    <label class="form-label" for="message" data-translate="how_can_we_help">How can we help?</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 mb-3 mt-5">
+                                <button type="submit" class="btn btn-primary btn-block py-3" data-translate="send_button">Send</button>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
-                <!-- Middle Column -->
-                <div class="col-md-4 mb-4 px-lg-5 text-start justify-content-start">
-                    <img src="{% static 'imgs/footer/footer.png' %}" alt="Footer Image" class="img-fluid rounded">
-                </div>
-                <!-- Right Column -->
-                <div class="col-md-4">
-                    <div class="mb-4">
-                        <h5 data-translate="contact_us" class="text-primary">Contact Us</h5>
-                        <p class="fw-bold lh-lg mt-3 mb-3" data-translate="contact_us_description">We’d love to hear from you! Reach out via email or phone, and we'll get back to you soon.</p>
-                        <p>
-                            <span data-translate="phone_label">Phone:</span> 
-                            <span>{{company_info.phone}}</span>
-                        </p>
-                        <a class="btn btn-primary rounded-pill w-100" href="https://mail.google.com/mail/?view=cm&fs=1&to={{company_info.email}}" target="_blank" rel="noopener noreferrer">
-                            <span>{{company_info.email}}</span>
-                        </a>
-                        <ul class="list-unstyled d-flex justify-content-center justify-content-lg-start mt-5 gap-3">
-                            <li>
-                                <a href="{{ company_info.facebook }}" target="_blank" rel="noopener noreferrer">
-                                    <i class="fab fa-facebook-f"></i>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ company_info.twitter }}" target="_blank" rel="noopener noreferrer">
-                                    <i class="fab fa-twitter"></i>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ company_info.instagram }}" target="_blank" rel="noopener noreferrer">
-                                    <i class="fab fa-instagram"></i>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ company_info.linkedin }}" target="_blank" rel="noopener noreferrer">
-                                    <i class="fab fa-linkedin-in"></i>
-                                </a>
-                            </li>
-                        </ul>
+            </div>
+        </div>
+    
+</section>
+
+<!-- Footer -->
+<footer class="pt-5 pb-5 mt-5 text-center text-md-start bg-footer " id="contact">
+    <div class="container">
+        <div class="row pt-5 d-flex">
+            <!-- Left Column -->
+            <div class="col-md-4 mb-4 mb-lg-0">
+                <div class="mb-4">
+                    <a class="navbar-brand mb-4" href="#">
+                        <img src="{% static 'imgs/footer/logo1.png' %}" alt="Logo" height="40">
+                    </a>
+                    <p class="fw-bold mb-4" data-translate="footer_description">{{company_info.description}}</p>
+                    
+                    <div>
+                        <span data-translate="created_by">Created By BlueBook Team</span>
+                        <div data-translate="copyright" >© 2024 - BlueBook (01095163117)</div>
                     </div>
                 </div>
             </div>
-            
+            <!-- Middle Column -->
+            <div class="col-md-4 mb-4 px-lg-5 text-start justify-content-start">
+                <img src="{% static 'imgs/footer/footer.png' %}" alt="Footer Image" class="img-fluid rounded">
+            </div>
+            <!-- Right Column -->
+            <div class="col-md-4">
+                <div class="mb-4">
+                    <h5 data-translate="contact_us" class="text-primary">Contact Us</h5>
+                    <p class="fw-bold lh-lg mt-3 mb-3" data-translate="contact_us_description">We’d love to hear from you! Reach out via email or phone, and we'll get back to you soon.</p>
+                    <p>
+                        <span data-translate="phone_label">Phone:</span> 
+                        <span>{{company_info.phone}}</span>
+                    </p>
+                    <a class="btn btn-primary rounded-pill w-100" href="https://mail.google.com/mail/?view=cm&fs=1&to={{company_info.email}}" target="_blank" rel="noopener noreferrer">
+                        <span>{{company_info.email}}</span>
+                    </a>
+                    <ul class="list-unstyled d-flex justify-content-center justify-content-lg-start mt-5 gap-3">
+                        <li>
+                            <a href="https://www.facebook.com/share/15ossJyDXe/" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ company_info.twitter }}" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ company_info.instagram }}" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ company_info.linkedin }}" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
+        
+    </div>
 
-        <div class="col-md-12 text-center">
-            
-            <ul class="list-inline">
-                <li class="list-inline-item"><a data-translate="terms" href="{% url 'about:terms_and_conditions' %}">Terms and Conditions</a></li>
-                <li class="list-inline-item"><a data-translate="privacy" href="{% url 'about:privacy_policy' %}">Privacy Policy</a></li>
-                <li class="list-inline-item"><a data-translate="refund" href="{% url 'about:refund_policy' %}">Refund Policy</a></li>
-                <li class="list-inline-item"><a data-translate="exchange" href="{% url 'about:exchange_policy' %}">Exchange Policy</a></li>
-            </ul>
-        </div>
 
-    </footer>
-    
+</footer>
+
 
     <script>
 

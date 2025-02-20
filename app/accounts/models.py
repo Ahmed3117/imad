@@ -66,46 +66,16 @@ class User(AbstractUser):
                     return None
         return None  # Return None if no email is found
 
-class ParentProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    TYPE_CHOICES = [
-        ('mom', 'Mom'),
-        ('dad', 'Dad'),
-    ]
-    type = models.CharField(max_length=5, choices=TYPE_CHOICES,default='dad')
+# class ParentProfile(models.Model):
+#     user = models.OneToOneField(User, on_delete=models.CASCADE)
+#     TYPE_CHOICES = [
+#         ('mom', 'Mom'),
+#         ('dad', 'Dad'),
+#     ]
+#     type = models.CharField(max_length=5, choices=TYPE_CHOICES,default='dad')
 
-    def __str__(self):
-        return f"{self.user.name}'s {self.type} profile"
-
-class StudentProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    parent_phone = models.CharField(max_length=15, blank=True, null=True)
-    age = models.IntegerField()
-
-    def __str__(self):
-        return f"{self.user.name}'s profile"
-
-class ParentStudent(models.Model):
-    parent = models.ForeignKey(User, on_delete=models.CASCADE, related_name='parent_students',
-                               limit_choices_to={'role': 'parent'})
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student_parents',
-                                limit_choices_to={'role': 'student'})
-
-    def __str__(self):
-        return f"Parent: {self.parent.name} - Student: {self.student.name}"
-
-
-class ParentProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    TYPE_CHOICES = [
-        ('mom', 'Mom'),
-        ('dad', 'Dad'),
-    ]
-    type = models.CharField(max_length=5, choices=TYPE_CHOICES)
-
-    def __str__(self):
-        return f"{self.user.name}'s {self.type} profile"
-
+#     def __str__(self):
+#         return f"{self.user.name}'s {self.type} profile"
 
 class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -115,13 +85,23 @@ class StudentProfile(models.Model):
     def __str__(self):
         return f"{self.user.name}'s profile"
 
+# class ParentStudent(models.Model):
+#     parent = models.ForeignKey(User, on_delete=models.CASCADE, related_name='parent_students',
+#                                limit_choices_to={'role': 'parent'})
+#     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student_parents',
+#                                 limit_choices_to={'role': 'student'})
 
-class ParentStudent(models.Model):
-    parent = models.ForeignKey(User, on_delete=models.CASCADE, related_name='parent_students')
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student_parents')
+#     def __str__(self):
+#         return f"Parent: {self.parent.name} - Student: {self.student.name}"
+
+class StudentProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    parent_phone = models.CharField(max_length=15, blank=True, null=True)
+    age = models.IntegerField()
 
     def __str__(self):
-        return f"Parent: {self.parent.name} - Student: {self.student.name}"
+        return f"{self.user.name}'s profile"
+
 
 
 class TeacherInfo(models.Model):
@@ -129,7 +109,6 @@ class TeacherInfo(models.Model):
     bio = models.TextField(max_length=500, blank=True, null=True, help_text="A short description about the teacher.")
     specialization = models.CharField(max_length=100, blank=True, null=True, help_text="The teacher's area of expertise.")
     profile_link = models.URLField(max_length=200, blank=True, null=True, help_text="Link to the teacher's full profile.")
-    courses = models.ManyToManyField(Course, related_name='teachers')
     is_active_to_be_shown_in_home = models.BooleanField(default=True)
 
     def __str__(self):
