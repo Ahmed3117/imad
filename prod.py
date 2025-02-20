@@ -29,9 +29,9 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'about.apps.AboutConfig',
     'courses.apps.CoursesConfig',
-    'loves',
-    'carts',
-    'orders',
+    #'loves',
+    #'carts',
+    #'orders',
     'subscriptions',
     # 'appointments',
     # 'exams',
@@ -85,7 +85,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'courses.context_processors.cart_content',
                 'about.context_processors.get_logo_url',
             ],
         },
@@ -131,7 +130,7 @@ STATIC_URL  = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Define STATIC_ROOT for collectstatic to gather files
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
@@ -183,7 +182,7 @@ ADMIN_ORDERING = (
         # 'SocialAccount',
         # 'Tech', 'TechTranslation',
         # 'TechUsage', 'TechUsageTranslation',
-        'Policy', 'PolicyTranslation',
+        # 'Policy', 'PolicyTranslation',
         # 'FinalProject'
     )),
     ('accounts', (
@@ -206,6 +205,7 @@ ADMIN_ORDERING = (
     ('auth', ('Group',)),
     ('admin_interface', ('Theme',)),
 )
+
 
 def get_app_list(self, request, app_label=None):
     """Reorder the appearance of apps and models in the Django admin."""
@@ -244,4 +244,5 @@ admin.AdminSite.get_app_list = get_app_list
 
 
 
-
+CSRF_TRUSTED_ORIGINS = ['https://nabbiuwny.com']
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
