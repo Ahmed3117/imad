@@ -5,7 +5,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.hashers import make_password
 
 from subscriptions.models import GroupTime, Lecture, LectureFile, StudyGroup
-from .models import ParentStudent, TeacherInfo, User, ParentProfile, StudentProfile
+from .models import TeacherInfo, User, StudentProfile
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required

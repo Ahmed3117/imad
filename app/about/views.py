@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render
-from about.models import CompanyInfo, CompanyInfoTranslation, Policy, PolicyTranslation
+from about.models import CompanyInfo, CompanyInfoTranslation
 from accounts.models import TeacherInfo, TeacherInfoTranslation
 from admin_interface.models import Theme
 from django.shortcuts import render
@@ -79,24 +79,24 @@ def send_email(request):
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
-def policy_detail(request, policy_type):
-    language = request.GET.get('lang', 'en')  # Default to 'en' if no language is specified
+# def policy_detail(request, policy_type):
+#     language = request.GET.get('lang', 'en')  # Default to 'en' if no language is specified
 
-    # Fetch the policy
-    policy = get_object_or_404(Policy, policy_type=policy_type)
-    print(policy)
+#     # Fetch the policy
+#     policy = get_object_or_404(Policy, policy_type=policy_type)
+#     print(policy)
 
-    # Fetch the translation for the selected language
-    policy_translation = PolicyTranslation.objects.filter(policy=policy, language=language).first()
-    print(policy_translation)
-    # Use translated content if available, otherwise use the default content
-    content = policy_translation.translated_content if policy_translation else policy.content
-    print(content)
-    context = {
-        'policy': policy,
-        'content': content,
-    }
-    return render(request, 'about/policy_detail.html', context)
+#     # Fetch the translation for the selected language
+#     policy_translation = PolicyTranslation.objects.filter(policy=policy, language=language).first()
+#     print(policy_translation)
+#     # Use translated content if available, otherwise use the default content
+#     content = policy_translation.translated_content if policy_translation else policy.content
+#     print(content)
+#     context = {
+#         'policy': policy,
+#         'content': content,
+#     }
+#     return render(request, 'about/policy_detail.html', context)
 
 
 

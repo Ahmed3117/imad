@@ -184,7 +184,7 @@ ADMIN_ORDERING = (
         # 'SocialAccount',
         # 'Tech', 'TechTranslation',
         # 'TechUsage', 'TechUsageTranslation',
-        'Policy', 'PolicyTranslation',
+        # 'Policy', 'PolicyTranslation',
         # 'FinalProject'
     )),
     ('accounts', (
