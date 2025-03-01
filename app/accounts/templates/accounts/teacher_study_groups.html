@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block translationFolder %}data-translation-folder="sessions"{% endblock %}
+{% block title %}Sessions{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h1 class="mb-4">My Study Groups</h1>
+
+    <!-- Filter and Search Form -->
+    <form method="GET" class="row g-3 mb-4">
+        <!-- Course Filter -->
+        <div class="col-md-3">
+            <select name="course" class="form-select" onchange="this.form.submit()">
+                <option value="">All Courses</option>
+                {% for course in courses %}
+                    <option value="{{ course.id }}" {% if selected_course == course.id|stringformat:"s" %}selected{% endif %}>
+                        {{ course }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Level Filter -->
+        <div class="col-md-3">
+            <select name="level" class="form-select" onchange="this.form.submit()">
+                <option value="">All Levels</option>
+                {% for level in levels %}
+                    <option value="{{ level.id }}" {% if selected_level == level.id|stringformat:"s" %}selected{% endif %}>
+                        {{ level }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Track Filter -->
+        <div class="col-md-3">
+            <select name="track" class="form-select" onchange="this.form.submit()">
+                <option value="">All Tracks</option>
+                {% for track in tracks %}
+                    <option value="{{ track.id }}" {% if selected_track == track.id|stringformat:"s" %}selected{% endif %}>
+                        {{ track }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="col-md-3">
+            <div class="input-group">
+                <input type="text" name="search" class="form-control" placeholder="Search by course name" value="{{ search_query }}">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Study Groups Table -->
+    {% if study_groups %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Course</th>
+                        <th>Capacity</th>
+                        <th>Lectures</th>
+                        <th>Price</th>
+                        <th>Students Enrolled</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for group in study_groups %}
+                        <tr>
+                            <td>{{ group.course }}</td>
+                            <td>{{ group.capacity|default:"N/A" }}</td>
+                            <td>{{ group.number_of_expected_lectures }}</td>
+                            <td>${{ group.join_price }}</td>
+                            <td>{{ group.students.count }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-muted">No study groups found matching your criteria.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

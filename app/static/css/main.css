@@ -96,11 +96,15 @@ body {
 
 .navbar {
   --mdb-navbar-box-shadow: 0; /* Remove shadow */
-  padding: 20px 0;
+  /* padding: 20px 0; */
   background-color: var(--card-bg-color); 
 }
 .nav-link {
   color: var(--white-color);
+}
+
+.navbar-brand img {
+  height: 60px;
 }
 .navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
   color: var(--main-color);
@@ -135,7 +139,7 @@ body {
 /* Language Switcher */
 .lang-switcher {
   display: inline-flex;
-  border: 1px solid var(--main-color);
+  border: solid var(--main-color);
   border-radius: 50px;
   overflow: hidden;
 }
@@ -145,7 +149,7 @@ body {
   background-color: transparent;
   color: var(--sub-color);
   cursor: pointer;
-  padding: 6px 12px;
+  /* padding: 6px 12px; */
   transition: all 0.3s ease;
 }
 

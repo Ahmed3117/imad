@@ -17,6 +17,26 @@ CSRF_TRUSTED_ORIGINS = [
     # Add any other ngrok URLs here if you're using multiple
 ]
 
+
+from pathlib import Path
+import os
+import dotenv
+
+# Load environment variables from .env file
+dotenv.load_dotenv()
+
+# Hardcoded Zoom API credentials (use environment variables in production)
+ACCOUNT_ID = os.environ.get('ACCOUNT_ID')
+CLIENT_ID = os.environ.get('CLIENT_ID')
+CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
+
+# Zoom API URLs
+TOKEN_URL = "https://zoom.us/oauth/token"
+MEETING_URL = "https://api.zoom.us/v2/users/me/meetings"
+BASE_URL = "http://127.0.0.1:8800"
+
+
+
 INSTALLED_APPS = [
     'admin_interface',
     'colorfield',
@@ -198,7 +218,7 @@ ADMIN_ORDERING = (
         'Course', 'CourseTranslation',
         # 'LevelContent', 'LevelContentTranslation'
     )),
-    ('subscriptions', ('StudyGroup','JoinRequest','Lecture')),
+    ('subscriptions', ('StudyGroup','JoinRequest')),
     # ('appointments', ('TeacherAvailability', 'Appointment')),
     # ('exams', ('Exam', 'Question', 'Option', 'ExamResult')),
     # ('orders', ('Order', 'OrderItem')),

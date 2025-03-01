@@ -14,29 +14,16 @@ urlpatterns = [
     path('login_student/', views.login_student, name='login_student'),
     path('logout/', views.user_logout, name='logout'),
     path('profile/', views.profile, name='profile'),
-    path('parent_dashboard/', views.parent_dashboard, name='parent_dashboard'),
-    path('add_student/', views.add_student, name='add_student'),
     path('edit_profile/', views.edit_profile, name='edit_profile'),
-
     path('profile/<int:study_group_id>/lectures/', views.study_group_lectures, name='lectures'),
+    path('study-group/<int:study_group_id>/add-lecture/', views.add_lecture, name='add_lecture'),
+    path('lecture/<int:lecture_id>/update/', views.update_lecture, name='update_lecture'),
+    path('lecture/<int:lecture_id>/delete/', views.delete_lecture, name='delete_lecture'),
+    path('lecture/<int:lecture_id>/reschedule/', views.reschedule_lecture, name='reschedule_lecture'),
+    path('lecture/<int:lecture_id>/add-files/', views.add_lecture_files, name='add_lecture_files'),
+    path('lecture-file/<int:file_id>/delete/', views.delete_lecture_file, name='delete_lecture_file'),
 
 
-
-
-
-
-
-
-
-
-    path('course/<int:course_id>/sessions/<str:student_username>/', views.session_details, name='session_details'),
-    path('session/<int:session_id>/complete/', views.mark_session_completed, name='mark_session_completed'),
-    path('exam/<int:exam_id>/start/', views.start_exam, name='start_exam'),
-    path('exam/submit/<int:exam_id>/', views.submit_exam, name='submit_exam'),
-    
-    
-    path('get-available-slots/', views.get_available_slots, name='get_available_slots'),
-    path('create-appointment/', views.create_appointment, name='create_appointment'),
 
 ]
 

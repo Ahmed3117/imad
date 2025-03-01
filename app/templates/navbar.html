@@ -69,16 +69,16 @@
                   <a class="nav-link dropdown-toggle ms-md-5" href="#" id="userDropdown" role="button" data-mdb-toggle="dropdown"
                       aria-expanded="false">
                       {% if request.user.image %}
-                      <img src="{{request.user.image.url}}" alt="User" class="rounded-circle" height="40" />
+                      <img src="{{request.user.image.url}}" alt="User" class="rounded-circle" height="55" />
                       {% else %}
-                      <img src="{% static 'imgs/defaults/person.png' %}" alt="User" class="" height="40" />
+                      <img src="{% static 'imgs/defaults/person.png' %}" alt="User" class="" height="55" />
                       {% endif %}
                   </a>
                   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                       <li>
                         
-                        {% if request.user.role == "parent" %}
-                            <a class="dropdown-item " href="{% url 'accounts:parent_dashboard' %}" data-translate="profile"><span>My Profile</span></a>
+                        {% if request.user.role == "teacher" %}
+                            <a class="dropdown-item " href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a>
                         {% else %}
                             <a class="dropdown-item " href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a>
                         {% endif %}
