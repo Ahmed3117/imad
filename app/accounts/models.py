@@ -17,8 +17,8 @@ class User(AbstractUser):
     image = models.ImageField(upload_to='profiles/', blank=True, null=True)
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if self.role == 'parent' and not hasattr(self, 'parentprofile'):
-            ParentProfile.objects.create(user=self,type='dad')
+        # if self.role == 'parent' and not hasattr(self, 'parentprofile'):
+        #     ParentProfile.objects.create(user=self,type='dad')
 
     def __str__(self):
         return self.name if self.name else self.username

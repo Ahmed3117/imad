@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect
 from django.db.models import Q, Sum, Prefetch, F
-from courses.models import   Course, CourseTranslation, Level, LevelTranslation, TrackTranslation
+from courses.models import   Course, CourseTranslation, Level, LevelTranslation, Track, TrackTranslation
 from .forms import SessionURLForm
 from django.core.mail import send_mail
 from django.conf import settings
@@ -115,13 +115,7 @@ def register_user(request):
         elif step == '2':
             # Handle Step 2: Profile creation based on role
             user = request.user
-            if user.role == 'parent':
-                account_type = request.POST.get('account_type')
-                parent_profile, created = ParentProfile.objects.update_or_create(
-                    user=user,
-                    defaults={'type': account_type}
-                )
-            elif user.role == 'student':
+            if user.role == 'student':
                 parent_phone = request.POST.get('parent_phone')
                 age = request.POST.get('age')
                 StudentProfile.objects.create(user=user, parent_phone=parent_phone, age=age)
@@ -213,10 +207,8 @@ def user_login(request):
 
     if request.user.is_authenticated:
         # Check the user role and redirect accordingly
-        if hasattr(request.user, 'role') and request.user.role == 'parent':
-            return redirect('/accounts/parent_dashboard')
         if hasattr(request.user, 'role') and request.user.role == 'teacher':
-            return redirect('/a_d_m_i_n/')
+            return redirect('/accounts/profile')
         return redirect('/')
 
     if request.method == 'GET':
@@ -247,11 +239,8 @@ def user_login(request):
 
         if user is not None:
             login(request, user)
-            # Redirect based on role or next URL
-            if hasattr(user, 'role') and user.role == 'parent':
-                return redirect('/accounts/parent_dashboard')
             if hasattr(request.user, 'role') and request.user.role == 'teacher':
-                return redirect('/a_d_m_i_n/')
+                return redirect('/accounts/profile')
 
             next_url = request.session.get('next_url', '/')  # Default to '/' if no next_url
             return redirect(next_url)
@@ -289,8 +278,6 @@ def profile(request):
     if not request.user.is_authenticated:
         return redirect('accounts:login')
 
-    context = {}
-
     # Fetch study groups based on user role
     if request.user.role == 'teacher':
         study_groups = StudyGroup.objects.filter(teacher=request.user)
@@ -299,15 +286,35 @@ def profile(request):
     else:
         study_groups = StudyGroup.objects.none()  # Empty queryset for non-teacher/student users
 
-    # Handle filtering by course name or teacher name
+    # Get filter and search parameters from GET request
     search_query = request.GET.get('search', '')
+    course_id = request.GET.get('course', '')
+    level_id = request.GET.get('level', '')
+    track_id = request.GET.get('track', '')
+    day = request.GET.get('day', '')
+
+    # Apply filters
     if search_query:
         study_groups = study_groups.filter(
             Q(course__name__icontains=search_query) |
             Q(teacher__username__icontains=search_query)
         )
+    if course_id:
+        study_groups = study_groups.filter(course__id=course_id)
+    if level_id:
+        study_groups = study_groups.filter(course__level__id=level_id)
+    if track_id:
+        study_groups = study_groups.filter(course__track__id=track_id)
+    if day:
+        study_groups = study_groups.filter(group_times__day=day)
 
-    # Fetch translations and group times for study groups
+    # Fetch all courses, levels, tracks, and days for filter dropdowns (only for teachers)
+    courses = Course.objects.all() if request.user.role == 'teacher' else []
+    levels = Level.objects.all() if request.user.role == 'teacher' else []
+    tracks = Track.objects.all() if request.user.role == 'teacher' else []
+    days = GroupTime.DAY_CHOICES  # Use the DAY_CHOICES from the GroupTime model
+
+    # Prepare study groups data
     study_groups_data = []
     for study_group in study_groups:
         # Fetch translation for the course name and description
@@ -324,10 +331,10 @@ def profile(request):
 
         study_groups_data.append({
             'id': study_group.id,
-            'course_name': study_group.course.name,
+            'course_name': course_name,
             'course_description': course_description,
             'course_image': study_group.course.image.url if study_group.course.image else None,
-            'teacher': study_group.teacher.name,
+            'teacher': study_group.teacher.username,
             'students': study_group.students.all(),
             'capacity': study_group.capacity,
             'number_of_expected_lectures': study_group.number_of_expected_lectures,
@@ -339,20 +346,19 @@ def profile(request):
         'study_groups': study_groups_data,
         'user_role': request.user.role,
         'search_query': search_query,
+        'courses': courses,
+        'levels': levels,
+        'tracks': tracks,
+        'days': days,
+        'selected_course': course_id,
+        'selected_level': level_id,
+        'selected_track': track_id,
+        'selected_day': day,
     }
 
     return render(request, 'accounts/profile.html', context)
 
 
-# Parent Dashboard
-def parent_dashboard(request):
-    if request.user.role != 'parent':
-        return HttpResponse("Unauthorized", status=403)
-    
-    parent_profile = get_object_or_404(ParentProfile, user=request.user)
-    parent_students = ParentStudent.objects.filter(parent=request.user)
-    print(parent_students)
-    return render(request, 'accounts/parent_dashboard.html', {'parent_students': parent_students})
 
 # User Logout
 def user_logout(request):
@@ -360,363 +366,239 @@ def user_logout(request):
     return redirect('accounts:login')
 
 
-# Add Student under Parent
-@csrf_exempt
-def add_student(request):
-    if request.method == 'POST' and request.user.role == 'parent':
-        student_name = request.POST.get('name')
-        student_username = request.POST.get('username')
-        student_password = request.POST.get('password')
-        student_age = request.POST.get('age')
-        profile_image = request.FILES.get('profile_image')
 
-        # Create student user
-        student_user = User.objects.create(
-            username=student_username,
-            password=make_password(student_password),
-            name=student_name,
-            image=profile_image,
-            role='student'
+
+from django.utils import timezone
+from django.contrib import messages
+import requests
+from django import forms
+# Forms
+class LectureForm(forms.ModelForm):
+    SCHEDULE_CHOICES = [
+        ('NOW', 'Now'),
+    ]
+    schedule = forms.ChoiceField(choices=SCHEDULE_CHOICES, label="Schedule", required=True)
+
+    class Meta:
+        model = Lecture
+        fields = ['title', 'description', 'duration']
+
+    def __init__(self, *args, **kwargs):
+        study_group = kwargs.pop('study_group', None)
+        super().__init__(*args, **kwargs)
+        if study_group:
+            group_times = [(str(gt.id), str(gt)) for gt in GroupTime.objects.filter(group=study_group)]
+            self.fields['schedule'].choices = self.SCHEDULE_CHOICES + group_times
+
+    def clean(self):
+        cleaned_data = super().clean()
+        schedule = cleaned_data.get('schedule')
+        if not schedule:
+            raise forms.ValidationError("Schedule is required.")
+        return cleaned_data
+
+
+class LectureFileForm(forms.ModelForm):
+    class Meta:
+        model = LectureFile
+        fields = ['file']
+
+# Helper function to check access
+def check_study_group_access(request, study_group):
+    if request.user.role == 'teacher' and study_group.teacher != request.user:
+        return False
+    elif request.user.role == 'student' and request.user not in study_group.students.all():
+        return False
+    return True
+
+# Helper function to create Zoom meeting
+def create_zoom_meeting(title, description, duration, date, time, timezone='Africa/Cairo'):
+    zoom_data = {
+        'topic': title,
+        'agenda': description,
+        'duration': duration,
+        'date': date.strftime('%Y-%m-%d'),
+        'time': time.strftime('%H:%M'),
+        'timezone': timezone,
+    }
+    try:
+        response = requests.post(
+            'http://127.0.0.1:8800/subscriptions/create-meeting/',
+            data=zoom_data
         )
-        print(student_user)
-        # Get the parent's phone number
-        parent_phone = request.user.phone
+        if response.status_code == 200:
+            return response.json().get('meeting_url')
+        return None
+    except Exception as e:
+        print(f"Error creating Zoom meeting: {str(e)}")
+        return None
 
-        # Create student profile
-        StudentProfile.objects.create(user=student_user, age=student_age, parent_phone=parent_phone)
-
-        # Link parent and student
-        ParentStudent.objects.create(parent=request.user, student=student_user)
-
-        return JsonResponse({'success': True})
-
-    return JsonResponse({'success': False, 'error': 'Unauthorized request'})
-
-
+# Main view to display lectures
+@login_required
 def study_group_lectures(request, study_group_id):
-    # Fetch the StudyGroup object or return a 404 if not found
     study_group = get_object_or_404(StudyGroup, id=study_group_id)
-    
-    # Fetch all lectures associated with the study group
+    if not check_study_group_access(request, study_group):
+        return render(request, '403.html', status=403)
+
     lectures = Lecture.objects.filter(group=study_group)
-    
-    # For each lecture, fetch the associated files
-    lectures_with_files = []
-    for lecture in lectures:
-        files = LectureFile.objects.filter(lecture=lecture)
-        lectures_with_files.append({
-            'lecture': lecture,
-            'files': files
-        })
-    
-    # Render the data in the template
+    lectures_with_files = [
+        {'lecture': lecture, 'files': LectureFile.objects.filter(lecture=lecture)}
+        for lecture in lectures
+    ]
+
+    lecture_form = LectureForm(study_group=study_group) if request.user.role == 'teacher' else None
+    file_form = LectureFileForm() if request.user.role == 'teacher' else None
+
     return render(request, 'accounts/lectures.html', {
         'study_group': study_group,
-        'lectures_with_files': lectures_with_files
+        'lectures_with_files': lectures_with_files,
+        'lecture_form': lecture_form,
+        'file_form': file_form,
+        'user_role': request.user.role,
     })
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Add a new lecture
 @login_required
-def session_details(request, course_id, student_username):
-    # Fetch the subscription for the specific student and course
-    student = get_object_or_404(User, username=student_username)
-    subscription = Subscription.objects.filter(student=student, course_id=course_id).first()
-    if not subscription:
-        return redirect('accounts:profile')
+def add_lecture(request, study_group_id):
+    study_group = get_object_or_404(StudyGroup, id=study_group_id)
+    if request.user.role != 'teacher' or study_group.teacher != request.user:
+        return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
 
-    # Get all SubscriptionSession objects related to the student's subscription
-    course_sessions = SubscriptionSession.objects.filter(subscription=subscription).select_related('session')
-
-    # Preprocess exams and results for each session
-    sessions_data = []
-    for session_data in course_sessions:
-        session = session_data.session
-        exam = Exam.objects.filter(session=session).first()
-        exam_result = None
-        if exam:
-            exam_result = ExamResult.objects.filter(student=request.user, exam=exam).first()
-        
-        sessions_data.append({
-            'session_data': session_data,
-            'exam': exam,
-            'exam_result': exam_result
-        })
-
-    # Handle session creation/update for teachers
-    next_session = None
-    if request.user.role == 'teacher':
-        # Find the next session in order that hasn't been added to the subscription
-        completed_session_ids = subscription.completed_sessions.values_list('id', flat=True)
-        next_session = Session.objects.filter(course=subscription.course).exclude(id__in=completed_session_ids).order_by('order').first()
-
-        if request.method == 'POST':
-            form = SessionURLForm(request.POST)
-            if form.is_valid() and next_session:
-                # Update or create the SubscriptionSession
-                subscription_session, created = SubscriptionSession.objects.get_or_create(
-                    session=next_session,
-                    subscription=subscription,
-                    defaults={
-                        'session_url': form.cleaned_data['session_url'],
-                        'is_completed': False
-                    }
-                )
-                if not created:
-                    # If the SubscriptionSession already exists, update it
-                    subscription_session.session_url = form.cleaned_data['session_url']
-                    subscription_session.save()
-                return redirect('accounts:session_details', course_id=course_id, student_username=student_username)
-        else:
-            form = SessionURLForm()
-
-    context = {
-        'subscription': subscription,
-        'sessions_data': sessions_data,
-        'next_session': next_session,
-        'form': form if request.user.role == 'teacher' else None,
-    }
-    return render(request, 'accounts/session_details.html', context)
-
-
-@login_required
-def mark_session_completed(request, session_id):
-    session = get_object_or_404(SubscriptionSession, id=session_id)
-    session.is_completed = True
-    session.save()
-    session.subscription.completed_sessions.add(session.session)
-    return redirect(request.META.get('HTTP_REFERER', 'accounts:session_details'))
-
-@login_required
-def start_exam(request, exam_id):
-    # Fetch the exam and ensure it belongs to a session the student is subscribed to
-    exam = get_object_or_404(Exam, id=exam_id)
-    course_id = exam.session.course.id
-    # Check if the student has already taken the exam
-    exam_result = ExamResult.objects.filter(student=request.user, exam=exam).first()
-
-    # Render the exam page
-    return render(request, 'accounts/exam.html', {
-        'exam': exam,
-        'questions': exam.question_set.all(),
-        'exam_result': exam_result,
-        'course_id': course_id,
-    })
-
-# @csrf_exempt
-@login_required
-def submit_exam(request, exam_id):
     if request.method == 'POST':
-        exam = get_object_or_404(Exam, id=exam_id)
-        student = request.user
+        form = LectureForm(request.POST, study_group=study_group)
+        if form.is_valid():
+            lecture = form.save(commit=False)
+            lecture.group = study_group
+            lecture.save()
 
-        # Check if the student has already taken the exam
-        existing_result = ExamResult.objects.filter(student=student, exam=exam).first()
-        if existing_result:
-            return JsonResponse({'status': 'error', 'message': 'Exam already taken'}, status=400)
+            schedule = form.cleaned_data['schedule']
+            if schedule == 'NOW':
+                live_link = create_zoom_meeting(
+                    lecture.title, lecture.description, lecture.duration,
+                    timezone.now(), timezone.now()
+                )
+            else:
+                group_time = GroupTime.objects.get(id=int(schedule))
+                live_link = create_zoom_meeting(
+                    lecture.title, lecture.description, lecture.duration,
+                    timezone.now(), group_time.time  # Assuming current date for simplicity
+                )
 
-        data = request.POST
+            if live_link:
+                lecture.live_link = live_link
+                lecture.live_link_date = timezone.now()
+                lecture.save()
+                return JsonResponse({'success': True, 'message': 'Lecture added successfully'})
+            return JsonResponse({'success': False, 'message': 'Failed to create Zoom meeting'})
+        return JsonResponse({'success': False, 'message': 'Invalid form data: ' + str(form.errors)})
+    return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
 
-        questions = Question.objects.filter(exam=exam)
-        score = 0
-        total_questions = questions.count()
+# Update an existing lecture
+import logging
 
-        # Calculate score
-        for question in questions:
-            question_key = f'question_{question.id}'
-            selected_option_id = data.get(question_key)
-            print(selected_option_id)
-            if selected_option_id:
-                try:
-                    selected_option = Option.objects.get(
-                        id=selected_option_id,
-                        question=question  # Ensure the option belongs to this question
-                    )
-                    if selected_option.is_correct:
-                        score += 1
-                except Option.DoesNotExist:
-                    continue
+logger = logging.getLogger(__name__)
 
-        # Calculate percentage score
-        final_score = round((score / total_questions) * 100, 2)
+@login_required
+def update_lecture(request, lecture_id):
+    lecture = get_object_or_404(Lecture, id=lecture_id)
+    if request.user.role != 'teacher' or lecture.group.teacher != request.user:
+        return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
 
-        # Save the exam result
-        ExamResult.objects.create(
-            student=student,
-            exam=exam,
-            score=final_score,
-            is_completed=True
+    if request.method == 'POST':
+        # Log the incoming POST data for debugging
+        logger.info(f"Received POST data for lecture {lecture_id}: {request.POST}")
+
+        # Try full form validation (optional, for reference)
+        form = LectureForm(request.POST, study_group=lecture.group, instance=lecture)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'success': True, 'message': 'Lecture updated successfully'})
+        
+        # Simplified partial update
+        updated = False
+        if 'title' in request.POST and request.POST['title'].strip():
+            lecture.title = request.POST['title']
+            updated = True
+        if 'description' in request.POST:
+            lecture.description = request.POST['description']
+            updated = True
+        
+        if updated:
+            lecture.save()
+            return JsonResponse({'success': True, 'message': 'Lecture updated successfully'})
+        else:
+            return JsonResponse({'success': False, 'message': 'No valid fields provided to update'})
+
+        # Log form errors if we reach here (shouldn’t with the above logic)
+        return JsonResponse({'success': False, 'message': f'Invalid form data: {str(form.errors)}'})
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
+
+# Reschedule a lecture to "now"
+@login_required
+def reschedule_lecture(request, lecture_id):
+    lecture = get_object_or_404(Lecture, id=lecture_id)
+    if request.user.role != 'teacher' or lecture.group.teacher != request.user:
+        return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
+
+    if request.method == 'POST':
+        live_link = create_zoom_meeting(
+            lecture.title, lecture.description, lecture.duration,
+            timezone.now(), timezone.now()
         )
+        if live_link:
+            lecture.live_link = live_link
+            lecture.live_link_date = timezone.now()
+            lecture.save()
+            return JsonResponse({'success': True, 'message': 'Lecture rescheduled successfully', 'live_link': live_link})
+        return JsonResponse({'success': False, 'message': 'Failed to reschedule Zoom meeting'})
+    return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
 
-        return JsonResponse({
-            'status': 'success',
-            'score': final_score,
-            'correct_answers': score,
-            'total_questions': total_questions
-        })
+# Delete a lecture
+@login_required
+def delete_lecture(request, lecture_id):
+    lecture = get_object_or_404(Lecture, id=lecture_id)
+    if request.user.role != 'teacher' or lecture.group.teacher != request.user:
+        return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
 
-    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+    if request.method == 'POST':
+        lecture.delete()
+        return JsonResponse({'success': True, 'message': 'Lecture deleted successfully'})
+    return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
 
-import json
+# Add files to a lecture
+@login_required
+def add_lecture_files(request, lecture_id):
+    lecture = get_object_or_404(Lecture, id=lecture_id)
+    if request.user.role != 'teacher' or lecture.group.teacher != request.user:
+        return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
 
-def get_available_slots(request):
-    day = request.GET.get('day')
-    subscription_id = request.GET.get('subscription_id')
-    
-    # Get the subscription and its course
-    subscription = get_object_or_404(Subscription, id=subscription_id)
-    course = subscription.course
-    print(course)
-    # Get all teachers who teach the course
-    teachers = TeacherInfo.objects.filter(courses=course).values_list('teacher', flat=True)
-    print(teachers)
-    # Get all availability slots for these teachers on the selected day
-    available_slots = TeacherAvailability.objects.filter(
-        day=day,
-        teacher__in=teachers,
-        is_available=True
-    )
-    print(available_slots)
-    # Prepare the available times
-    available_times = []
-    for slot in available_slots:
-        available_times.append({
-            'start': slot.start_time.strftime('%H:%M'),
-            'end': slot.end_time.strftime('%H:%M')
-        })
-    
-    # Remove duplicates while preserving order
-    unique_available_times = []
-    for time in available_times:
-        if time not in unique_available_times:
-            unique_available_times.append(time)
-    
-    return JsonResponse({'available_times': unique_available_times})
-
-@csrf_exempt  
-@require_POST
-def create_appointment(request):
-    try:
-        # Parse JSON data from the request
-        data = json.loads(request.body)
-        subscription_id = data.get('subscription_id')
-        day = data.get('day')
-        start_time = data.get('start_time')
-        end_time = data.get('end_time')
-
-        # Validate input
-        if not all([subscription_id, day, start_time, end_time]):
-            return JsonResponse({
-                'success': False, 
-                'error': 'Missing required fields'
-            }, status=400)
-
-        # Get the subscription and course
-        subscription = Subscription.objects.get(id=subscription_id)
-        course = subscription.course
-
-        # Get the teacher IDs who teach the course
-        teacher_ids = TeacherInfo.objects.filter(courses=course).values_list('teacher_id', flat=True)
-
-        # Find an available teacher
-        available_teacher = (
-            TeacherAvailability.objects.filter(
-                day=day,
-                start_time=start_time,
-                end_time=end_time,
-                is_available=True,
-                teacher_id__in=teacher_ids
-            )
-            .first()
-        )
-
-        if not available_teacher:
-            return JsonResponse({
-                'success': False, 
-                'error': 'No available teacher found'
-            }, status=400)
-
-        # Create the Appointment
-        appointment = Appointment.objects.filter(subscription=subscription).first()
-        if appointment:
-            return JsonResponse({
-                'success': True,
-                'appointment_id': appointment.id,
-                'message': 'this subscription already has a scuedual.'
+    if request.method == 'POST':
+        files = request.FILES.getlist('file')
+        uploaded_files = []
+        for file in files:
+            lecture_file = LectureFile(lecture=lecture, file=file)
+            lecture_file.save()
+            uploaded_files.append({
+                'name': lecture_file.file.name.split('/')[-1],
+                'url': lecture_file.file.url,
+                'size': lecture_file.file.size,
             })
-
-        appointment = Appointment.objects.create(
-            subscription=subscription,
-            avialability=available_teacher,
-            is_active=True,
-        )
-
-        # Update the teacher's availability
-        available_teacher.is_available = False
-        available_teacher.save()
-
         return JsonResponse({
             'success': True,
-            'appointment_id': appointment.id,
-            'message': 'Appointment successfully created'
+            'message': 'Files uploaded successfully',
+            'files': uploaded_files
         })
+    return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
 
-    except json.JSONDecodeError:
-        return JsonResponse({
-            'success': False, 
-            'error': 'Invalid JSON'
-        }, status=400)
-    except Subscription.DoesNotExist:
-        return JsonResponse({
-            'success': False, 
-            'error': 'Invalid subscription ID'
-        }, status=404)
-    except Exception as e:
-        print(f"Error creating appointment: {str(e)}")  # For debugging
-        return JsonResponse({
-            'success': False, 
-            'error': str(e)
-        }, status=500)
+# Delete a file
+@login_required
+def delete_lecture_file(request, file_id):
+    lecture_file = get_object_or_404(LectureFile, id=file_id)
+    if request.user.role != 'teacher' or lecture_file.lecture.group.teacher != request.user:
+        return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
 
-
-
-
-
-
-
-
+    if request.method == 'POST':
+        lecture_file.delete()
+        return JsonResponse({'success': True, 'message': 'File deleted successfully'})
+    return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)

@@ -3,6 +3,11 @@ from accounts.models import User
 from courses.models import Course
 from django.db import models
 from accounts.models import User
+import requests
+from django.utils import timezone
+from django.conf import settings
+from datetime import timedelta
+from django.core.validators import MaxValueValidator
 
 class StudyGroup(models.Model):
     CAPACITY_CHOICES = [
@@ -18,11 +23,18 @@ class StudyGroup(models.Model):
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'}, related_name='teaching_groups')
     number_of_expected_lectures = models.PositiveIntegerField()
     join_price = models.DecimalField(max_digits=8, decimal_places=2)
-    students = models.ManyToManyField(User, limit_choices_to={'role': 'student'}, related_name='study_groups' , blank=True, null=True)
+    students = models.ManyToManyField(User, limit_choices_to={'role': 'student'}, related_name='study_groups', blank=True, null=True)
 
     def __str__(self):
-        return f"{self.course.name} | {self.teacher.username} | {self.capacity}"
-
+        # Safely get level name (should always exist due to CASCADE)
+        level_name = self.course.level.name if self.course and self.course.level else "No Level"
+        
+        # Safely get track name (could be null)
+        track_name = self.course.track.name if self.course and self.course.track else "No Track"
+        
+        # Construct the string with fallbacks
+        return f"{level_name} | {track_name} | {self.course.name} | {self.teacher.username} | {self.capacity}"
+    
 class GroupTime(models.Model):
     DAY_CHOICES = [
         ('MON', 'Monday'),
@@ -39,7 +51,7 @@ class GroupTime(models.Model):
     time = models.TimeField()
 
     def __str__(self):
-        return f"{self.group} on {self.get_day_display()} at {self.time}"
+        return f"{self.get_day_display()} | {self.time}"
 
 class JoinRequest(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'student'}, related_name='join_requests')
@@ -54,12 +66,16 @@ class JoinRequest(models.Model):
     def __str__(self):
         return f"Join Request by {self.student.username} for {self.course.name} in {self.group}"
 
+# models.py
+
 class Lecture(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     group = models.ForeignKey(StudyGroup, on_delete=models.CASCADE, related_name='lectures')
     live_link = models.URLField(blank=True, null=True)
+    live_link_date = models.DateTimeField(blank=True, null=True)
+    duration = models.IntegerField(default=40, validators=[MaxValueValidator(40)])
 
     def __str__(self):
         return f"Lecture: {self.title} for {self.group}"
@@ -70,9 +86,5 @@ class LectureFile(models.Model):
 
     def __str__(self):
         return f"File for Lecture: {self.lecture.title}"
-
-
-
-
 
 
