@@ -4,8 +4,8 @@
 {% block translationFolder %}data-translation-folder="profile"{% endblock %}
 {% block title %}Profile{% endblock %}
 
-{% block content %}
 
+{% block content %}
 <!-- Toggle Button -->
 <div class="container text-end mt-3">
     <button class="btn btn-link" id="toggleProfileHeader">
@@ -96,44 +96,131 @@
 <div class="container mb-5">
     <div class="row mb-4">
         <div class="col-md-12">
-            <div class="profile-header">
-                <!-- Form Header -->
-        <div class="form-header text-center mb-4">
-            <div class="header-container">
-                <div class="diagonal-layer"></div>
-                <div class="floating-icon">
-                    <i class="fas fa-address-card"></i>
-                </div>
-                <div class="header-content">
-                    <h3 class="header-title" data-translate="my_profile"> My Profile </h3>
-                    
-                </div>
-            </div>
-        </div>
-                
-            </div>
             <div class="card card-bg mt-4 shadow-sm hover-shadow transition-all position-relative">
                 <div class="card-body">
-                    <form method="GET" action="" class="d-flex align-items-center">
-                        <div class="form-outline flex-fill">
-                            <input type="text" name="search" id="search" class="form-control" value="{{ search_query }}">
-                            <label class="form-label" for="search" data-translate="search_placeholder">Search by Course Name or Teacher Name</label>
-                        </div>
-                        <button type="submit" class="btn btn-primary ms-2" data-translate="search">Search</button>
-                    </form>
+                    <!-- Filter and Search Form (only for teachers) -->
+                    {% if user_role == 'teacher' %}
+                        <form method="GET" class="row g-3 align-items-center">
+                            <!-- Course Filter -->
+                            <div class="col-md-2">
+                                <select name="course" class="form-select" onchange="this.form.submit()">
+                                    <option value="">All Courses</option>
+                                    {% for course in courses %}
+                                        <option value="{{ course.id }}" {% if selected_course == course.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ course }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Level Filter -->
+                            <div class="col-md-2">
+                                <select name="level" class="form-select" onchange="this.form.submit()">
+                                    <option value="">All Levels</option>
+                                    {% for level in levels %}
+                                        <option value="{{ level.id }}" {% if selected_level == level.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ level }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Track Filter -->
+                            <div class="col-md-2">
+                                <select name="track" class="form-select" onchange="this.form.submit()">
+                                    <option value="">All Tracks</option>
+                                    {% for track in tracks %}
+                                        <option value="{{ track.id }}" {% if selected_track == track.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ track }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Day Filter -->
+                            <div class="col-md-2">
+                                <select name="day" class="form-select" onchange="this.form.submit()">
+                                    <option value="">All Days</option>
+                                    {% for day_code, day_name in days %}
+                                        <option value="{{ day_code }}" {% if selected_day == day_code %}selected{% endif %}>
+                                            {{ day_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Search Bar -->
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <input type="text" name="search" class="form-control" placeholder="Search by course or teacher" value="{{ search_query }}">
+                                    <button class="btn btn-primary" type="submit">Search</button>
+                                </div>
+                            </div>
+                        </form>
+                    {% else %}
+                        <!-- Search only for students -->
+                        <form method="GET" class="d-flex align-items-center">
+                            <div class="form-outline flex-fill">
+                                <input type="text" name="search" id="search" class="form-control" value="{{ search_query }}">
+                                <label class="form-label" for="search" data-translate="search_placeholder">Search by Course Name or Teacher Name</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary ms-2" data-translate="search">Search</button>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 
     {% if study_groups %}
-        <div class="row">
-            {% for group in study_groups %}
-            <div class="col-lg-4 col-md-6 mb-4">
-                {% include "accounts/partials/group_card.html" with group=group %}
+        {% if user_role == 'teacher' %}
+            <!-- Table View for Teachers -->
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Course</th>
+                            <th>Capacity</th>
+                            <th>Lectures</th>
+                            <th>Price</th>
+                            <th>Students Enrolled</th>
+                            <th>Schedule</th>
+                            <th>Start</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for group in study_groups %}
+                            <tr>
+                                <td>{{ group.course_name }}</td>
+                                <td>{{ group.capacity|default:"N/A" }}</td>
+                                <td>{{ group.number_of_expected_lectures }}</td>
+                                <td>${{ group.join_price }}</td>
+                                <td>{{ group.students|length }}</td>
+                                <td>
+                                    {% for time in group.group_times %}
+                                    {{ time.get_day_display }} at {{ time.time }}<br>
+                                    {% empty %}
+                                    No schedule set
+                                    {% endfor %}
+                                </td>
+                                <td> <a href="{% url 'accounts:lectures' group.id %}" class="btn btn-primary btn-sm" data-translate="start"> Start</a> </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            {% endfor %}
-        </div>
+        {% else %}
+            <!-- Card View for Students -->
+            <div class="row">
+                {% for group in study_groups %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        {% include "accounts/partials/group_card.html" with group=group %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% else %}
+        <p class="text-muted text-center">No study groups found.</p>
     {% endif %}
 </div>
 
@@ -160,6 +247,5 @@
         });
     });
 </script>
-
 {% endblock %}
 

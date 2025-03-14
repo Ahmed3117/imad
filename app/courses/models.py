@@ -19,7 +19,7 @@ class Track(models.Model):
     level = models.ForeignKey(Level, on_delete=models.CASCADE, related_name='tracks')
 
     def __str__(self):
-        return self.name
+        return f"{self.level.name} | {self.name}"
 
 
 class Course(models.Model):
@@ -31,7 +31,14 @@ class Course(models.Model):
     track = models.ForeignKey(Track, on_delete=models.SET_NULL, null=True, blank=True, related_name='courses')
 
     def __str__(self):
-        return self.name
+        # Level is required, so it should always be accessible
+        level_name = self.level.name if self.level else "No Level"
+        
+        # Track is optional, so check if it exists
+        track_name = self.track.name if self.track else "No Track"
+        
+        # Return a string with level, track, and name
+        return f"{level_name} | {track_name} | {self.name}"
 
 
 #-----------------------translation models-----------------------------#
