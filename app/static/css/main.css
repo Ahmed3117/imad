@@ -295,7 +295,8 @@ body {
 }
 
 .hero-title {
-  font-size: 2.5rem;
+  font-size: 2.5rem ;
+  font-weight: 600;
   margin-bottom: 30px;
   animation: fadeInDown 1s ease-out;
 }
@@ -310,11 +311,12 @@ body {
 @media (max-width: 768px) {
   .hero-content {
       max-width: 80%; /* Increase width for tablets */
-      padding: 30px; /* Reduce padding for better fit */
+      padding: 10px; /* Reduce padding for better fit */
+      top: 60%;
       
   }
   .hero-title {
-      font-size: 2rem; /* Smaller font size for tablets */
+      font-size: 2.5rem; /* Smaller font size for tablets */
   }
   .hero-description {
       font-size: 1rem; /* Smaller font size for tablets */
@@ -324,10 +326,11 @@ body {
 @media (max-width: 576px) {
   .hero-content {
       max-width: 90%; /* Full width for mobile devices */
-      padding: 30px; /* Minimal padding for mobile */
+      padding: 10px; /* Reduce padding for better fit */
+      top: 60%;
   }
   .hero-title {
-      font-size: 1.5rem; /* Smallest font size for mobile devices */
+      font-size: 2.5rem; /* Smallest font size for mobile devices */
   }
   .hero-description {
       font-size: 0.9rem; /* Smallest font size for mobile devices */
@@ -335,10 +338,7 @@ body {
 }
 
 
-
 /* Hero Content Styling */
-
-
 
 .hero-button {
   padding: 15px 30px;
@@ -407,9 +407,6 @@ body {
 }
 
 
-
-
-
 /* Features Section Styles */
 .bg-feature {
   background-color: var(--card-bg-color);
@@ -443,7 +440,6 @@ body {
   margin-top: 10px;
 }
 
-
 /* Font Styles */
 h2 {
   font-family: 'DG-Trika', sans-serif;
@@ -470,8 +466,6 @@ h2 {
   text-overflow: ellipsis;
   max-width: 90%; /* Prevents text from touching the edges */
 }
-
-/* Video Section Styles */
 
 /* Section Background */
 .video-section {
@@ -560,8 +554,6 @@ p {
 .price-info .discount {
   font-size: var(--font-size-small);
 }
-
-/* Contact Section */
 
 /* Gradient Background for Contact Info */
 .gradient-brand-color {

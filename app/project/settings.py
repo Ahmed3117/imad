@@ -36,7 +36,6 @@ MEETING_URL = "https://api.zoom.us/v2/users/me/meetings"
 BASE_URL = "http://127.0.0.1:8800"
 
 
-
 INSTALLED_APPS = [
     'admin_interface',
     'colorfield',
@@ -68,8 +67,6 @@ ASGI_APPLICATION = 'project.asgi.application'
 
 AUTH_USER_MODEL ='accounts.User'
 
-
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -82,6 +79,7 @@ MIDDLEWARE = [
     'courses.middleware.RequestMiddleware',
     'courses.middleware.LocationMiddleware',
 ]
+
 ROOT_URLCONF = 'project.urls'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
@@ -92,8 +90,6 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
-
-
 
 TEMPLATES = [
     {
@@ -116,13 +112,24 @@ TEMPLATES = [
 WSGI_APPLICATION = 'project.wsgi.application'
 
 
-DATABASES = {
-   'default': {
-       'ENGINE': 'django.db.backends.sqlite3',
-       'NAME': BASE_DIR / 'db.sqlite3',
-   }
-}
+# DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': BASE_DIR / 'db.sqlite3',
+#    }
+# }
 
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'imadProd',
+        'USER': 'root', 
+        'PASSWORD': 'haitham', 
+        'HOST': '86.48.3.99',
+        'PORT': '3366',
+    }
+}
 
 
 
