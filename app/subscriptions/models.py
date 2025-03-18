@@ -88,3 +88,7 @@ class LectureFile(models.Model):
         return f"File for Lecture: {self.lecture.title}"
 
 
+
+
+
+

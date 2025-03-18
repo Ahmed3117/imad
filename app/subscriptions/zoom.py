@@ -20,6 +20,7 @@ MEETING_URL = settings.MEETING_URL
 logger = logging.getLogger(__name__)
 
 def get_access_token():
+    print(f"{CLIENT_ID}:{CLIENT_SECRET}")
     auth = f"{CLIENT_ID}:{CLIENT_SECRET}"
     encoded_auth = base64.b64encode(auth.encode()).decode()
     headers = {
