@@ -4,6 +4,7 @@ from django.contrib.auth import login,logout,authenticate
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.hashers import make_password
 
+from project.settings import BASE_URL
 from subscriptions.models import GroupTime, Lecture, LectureFile, StudyGroup
 from .models import TeacherInfo, User, StudentProfile
 from django.views.decorators.csrf import csrf_exempt
@@ -423,7 +424,7 @@ def create_zoom_meeting(title, description, duration, date, time, timezone='Afri
     }
     try:
         response = requests.post(
-            'http://127.0.0.1:8800/subscriptions/create-meeting/',
+            f'{BASE_URL}/subscriptions/create-meeting/',
             data=zoom_data
         )
         if response.status_code == 200:
