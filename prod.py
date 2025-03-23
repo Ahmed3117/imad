@@ -1,7 +1,6 @@
 from pathlib import Path
 import os
-# import pymysql
-
+import dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 # GEOIP_PATH = os.path.join(BASE_DIR, 'geoip')
@@ -16,6 +15,24 @@ CSRF_TRUSTED_ORIGINS = [
     'https://2a1e-45-100-68-117.ngrok-free.app',
     # Add any other ngrok URLs here if you're using multiple
 ]
+
+
+# Load environment variables from .env file
+dotenv.load_dotenv()
+
+# Hardcoded Zoom API credentials (use environment variables in production)
+ACCOUNT_ID = "qq6ef7OPSCeQP-8HBnSKNg"
+CLIENT_ID = "yDF5YazQgWwXX0bNiNTbA"
+CLIENT_SECRET = "5XJk5gY0YtMzzlZh4NoWNtXuPqXA8vyf" 
+
+#ACCOUNT_ID = os.environ.get('ACCOUNT_ID')
+#CLIENT_ID = os.environ.get('CLIENT_ID')
+#CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
+
+# Zoom API URLs
+TOKEN_URL = "https://zoom.us/oauth/token"
+MEETING_URL = "https://api.zoom.us/v2/users/me/meetings"
+BASE_URL = "https://nabbiuwny.com"
 
 INSTALLED_APPS = [
     'admin_interface',
