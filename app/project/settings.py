@@ -30,10 +30,11 @@ ACCOUNT_ID = os.environ.get('ACCOUNT_ID')
 CLIENT_ID = os.environ.get('CLIENT_ID')
 CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
 
+
 # Zoom API URLs
 TOKEN_URL = "https://zoom.us/oauth/token"
 MEETING_URL = "https://api.zoom.us/v2/users/me/meetings"
-BASE_URL = "https://nabbiuwny.com"
+BASE_URL = "http://127.0.0.1:8899"
 
 
 INSTALLED_APPS = [
@@ -112,24 +113,24 @@ TEMPLATES = [
 WSGI_APPLICATION = 'project.wsgi.application'
 
 
-# DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': BASE_DIR / 'db.sqlite3',
-#    }
-# }
-
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'imadProd',
-        'USER': 'root', 
-        'PASSWORD': 'haitham', 
-        'HOST': '86.48.3.99',
-        'PORT': '3366',
-    }
+   'default': {
+       'ENGINE': 'django.db.backends.sqlite3',
+       'NAME': BASE_DIR / 'db.sqlite3',
+   }
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'imadProd',
+#         'USER': 'root', 
+#         'PASSWORD': 'haitham', 
+#         'HOST': '86.48.3.99',
+#         'PORT': '3366',
+#     }
+# }
 
 
 

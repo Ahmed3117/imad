@@ -1,0 +1,536 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% block translationFolder %}data-translation-folder="track_lectures"{% endblock %}
+{% block title %}Track Lectures{% endblock %}
+
+{% block content %}
+
+<!-- Minimal custom CSS only for specific needs -->
+<style>
+  .join-meeting-link.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  #return-button {
+    display: none;
+  }
+  
+  .meeting-status-badge {
+    min-width: 80px;
+    display: inline-block;
+    text-align: center;
+  }
+
+  .datepicker {
+    position: relative;
+  }
+  .input-prefix {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #4f4f4f;
+    z-index: 2;
+  }
+  .suffix {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #4f4f4f;
+    pointer-events: none;
+  }
+  .date-quick-btn {
+    transition: all 0.3s ease;
+    min-width: 110px;
+    text-align: center;
+  }
+  .date-quick-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  .card {
+    background-color: #f8f9fa;
+    border-radius: 12px !important;
+  }
+</style>
+
+<div class="container-fluid py-4">
+  <!-- Filter Card -->
+  <!-- Date Selection Card -->
+<div class="card mb-4 shadow-sm border-0">
+  <div class="card-body p-4">
+
+    <!-- Main Row: Controls layout shift at 'lg' breakpoint -->
+    <div class="row g-3 align-items-center">
+
+      <!-- Column 1: Date Picker -->
+      <!-- Takes full width below lg, auto width at lg+ -->
+      <!-- Adds margin bottom ONLY below lg breakpoint -->
+      <div class="col-12 col-lg-auto mb-3 mb-lg-0">
+         <label for="lecture-date" class="visually-hidden">Select Lecture Date</label> <!-- Accessibility -->
+         <div class="input-group">
+            <span class="input-group-text bg-white border-end-0" id="date-icon-addon">
+              <i class="fas fa-calendar-alt text-secondary"></i>
+            </span>
+            <input
+              type="date"
+              id="lecture-date"
+              class="form-control" 
+              placeholder="Select date"
+              aria-label="Select Lecture Date"
+              aria-describedby="date-icon-addon">
+         </div>
+      </div>
+
+      <!-- Column 2: Buttons Container -->
+      <!-- Takes full width below lg, remaining width at lg+ -->
+      <div class="col-12 col-lg">
+          <!-- Button Group: Uses flexbox for alignment & wrapping -->
+          <!-- Centered below lg, aligned end (right) at lg+ -->
+          <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-end gap-2">
+
+              <!-- Quick Button: Today -->
+              <button
+                  class="btn btn-sm btn-outline-primary rounded-pill date-quick-btn px-0"
+                  data-days="0">
+                  <i class="far fa-sun me-1"></i>Today
+              </button>
+
+              <!-- Quick Button: Yesterday -->
+              <button
+                  class="btn btn-sm btn-outline-primary rounded-pill date-quick-btn px-0"
+                  data-days="1">
+                  <i class="far fa-moon "></i>Yesterday
+              </button>
+              <!-- Reset Button -->
+              <button
+                  id="reset-date"
+                  class="btn btn-outline-secondary rounded-pill px-3"
+                  style="font-weight: 500;">
+                  <i class="fas fa-sync-alt me-1"></i>Reset
+              </button>
+
+          </div><!-- /.button-group -->
+      </div><!-- /.col-12 .col-lg (buttons container) -->
+
+    </div> <!-- /.row -->
+
+  </div><!-- /.card-body -->
+</div><!-- /.card -->
+  
+
+
+
+  <!-- Lectures Table Card -->
+  <div class="card">
+    <div class="card-header py-3">
+      <h5 class="mb-0"><i class="fas fa-chalkboard-teacher me-2"></i>Lecture Tracking</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="primary-color text-white">
+            <tr>
+              <th>Title</th>
+              <th>Live Link</th>
+              <th>Created</th>
+              <th>Duration</th>
+              <th>Status</th>
+              <th>Zoom Status</th>
+              <th>Teacher</th>
+              <th>Course</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for lecture in lectures %}
+            <tr>
+              <td class="font-weight-bold">{{ lecture.title }}</td>
+              <td>
+                {% if lecture.get_meeting_id %}
+                  <a href="#" 
+                     class="btn btn-sm btn-primary btn-rounded join-meeting-link {% if lecture.is_finished %}disabled{% endif %}" 
+                     data-meeting-id="{{ lecture.get_meeting_id }}" 
+                     data-meeting-url="{{ lecture.live_link }}"
+                     {% if lecture.is_finished %}aria-disabled="true"{% endif %}>
+                    <i class="fas fa-video me-1"></i> Join
+                  </a>
+                {% else %}
+                  <span class="text-muted">N/A</span>
+                {% endif %}
+              </td>
+            
+              <td>{{ lecture.created|date:"Y-m-d H:i" }}</td>
+              <td>{{ lecture.duration }} min</td>
+              <td>
+                {% if lecture.is_finished %}
+                  <span class="badge badge-success meeting-status-badge">
+                    <i class="fas fa-check-circle me-1"></i> Finished
+                  </span>
+                {% else %}
+                  <span class="badge badge-warning meeting-status-badge">
+                    <i class="fas fa-spinner me-1"></i> Ongoing
+                  </span>
+                {% endif %}
+              </td>
+              <td id="meeting-status-{{ lecture.get_meeting_id }}">
+                <span class="badge badge-secondary">
+                  <i class="fas fa-spinner fa-pulse me-1"></i> Loading...
+                </span>
+              </td>
+              <td>
+                <div class="d-flex flex-column">
+                  <span>{{ lecture.group.teacher.username }}</span>
+                  <small class="text-muted">{{ lecture.group.teacher.name }}</small>
+                </div>
+              </td>
+              <td>{{ lecture.group.course.name }}</td>
+              
+              <td>
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-info btn-rounded track-btn" 
+                  data-meeting-id="{{ lecture.get_meeting_id }}"
+                >
+                  <i class="fas fa-chart-line me-1"></i> Track
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tracking Modal -->
+<div class="modal fade" id="trackingModal" tabindex="-1" aria-labelledby="trackingModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header primary-color text-white">
+        <h5 class="modal-title" id="trackingModalLabel">
+          <i class="fas fa-users me-2"></i>Participant Tracking
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-mdb-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="trackingContent">
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <p class="mt-3">Loading participants data...</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" data-mdb-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Return Button -->
+<button id="return-button" class="btn btn-primary btn-floating btn-lg" style="position: fixed; bottom: 20px; right: 20px;">
+  <i class="fas fa-arrow-left"></i>
+</button>
+
+<script>
+  // Function to get CSRF token (needed for Django)
+  function getCsrfToken() {
+    return document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || '';
+  }
+
+  // Function to open Zoom meeting in a popup window
+  function openZoomMeeting(evt, linkElement) {
+    if (evt && evt.preventDefault) {
+      evt.preventDefault();
+    } else if (linkElement === undefined && evt instanceof Element) {
+      linkElement = evt;
+    }
+
+    if (!linkElement) {
+      console.error("No link element provided to openZoomMeeting");
+      return;
+    }
+
+    // Check if the link is disabled (lecture or Zoom meeting is finished)
+    if (linkElement.classList.contains('disabled')) {
+      console.log("Meeting is finished, cannot join.");
+      return;
+    }
+
+    const meetingUrl = linkElement.dataset.meetingUrl;
+    const meetingId = linkElement.dataset.meetingId;
+
+    if (!meetingId || meetingId === 'None' || !meetingUrl) {
+      alert("Invalid Zoom meeting link.");
+      return;
+    }
+
+    const popupWidth = Math.min(1000, window.screen.width - 40);
+    const popupHeight = Math.min(700, window.screen.height - 40);
+    const left = (window.screen.width - popupWidth) / 2;
+    const top = (window.screen.height - popupHeight) / 2;
+    const zoomWindow = window.open(
+      meetingUrl,
+      'ZoomMeeting',
+      `width=${popupWidth},height=${popupHeight},top=${top},left=${left},resizable=yes,scrollbars=yes`
+    );
+
+    if (!zoomWindow) {
+      alert("Popup blocked! Please allow popups for this site and try again.");
+      return;
+    }
+
+    const returnButton = document.getElementById('return-button');
+    returnButton.style.display = 'block';
+
+    fetch(`/accounts/mark-visited/${meetingId}/`, {
+      method: "POST",
+      headers: { 
+        "X-CSRFToken": getCsrfToken(),
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({})
+    }).catch(error => console.error("Error marking visited:", error));
+
+    const checkPopupClosed = setInterval(() => {
+      if (zoomWindow.closed) {
+        returnButton.style.display = 'none';
+        clearInterval(checkPopupClosed);
+      }
+    }, 500);
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    // Initialize MDB components
+    if (typeof mdb !== 'undefined') {
+      // Initialize tooltips if needed
+      // new mdb.Tooltip(document.querySelectorAll('[data-mdb-toggle="tooltip"]'));
+    }
+
+    // Add event listeners to "Join Meeting" links
+    document.querySelectorAll('.join-meeting-link').forEach(link => {
+      link.removeAttribute('onclick');
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        openZoomMeeting(e, this);
+      });
+    });
+
+    // Return to main page (reload or redirect)
+    document.getElementById('return-button').addEventListener('click', function() {
+      window.location.reload();
+    });
+
+    // Track participants when clicking "Track" button
+    document.querySelectorAll('.track-btn').forEach(btn => {
+      btn.addEventListener('click', async function() {
+        const meetingId = this.dataset.meetingId;
+        if (!meetingId || meetingId === 'None') {
+          alert("Meeting ID not found!");
+          return;
+        }
+
+        const trackingModal = new mdb.Modal(document.getElementById('trackingModal'));
+        trackingModal.show();
+        
+        document.getElementById('trackingContent').innerHTML = `
+          <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+            <p class="mt-3">Loading participants data...</p>
+          </div>
+        `;
+
+        try {
+          const response = await fetch(`/accounts/meeting-participants/${meetingId}/`);
+          if (!response.ok) throw new Error(`Failed to fetch data: ${response.status}`);
+
+          const data = await response.json();
+          let meetingStatus = data.meeting_status || "Unknown";
+
+          let html = `
+            <div class="mb-4">
+              <h5 class="mb-3"><i class="fas fa-info-circle text-primary me-2"></i>Meeting Information</h5>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <p class="mb-1"><strong>Status:</strong></p>
+                  <span class="badge ${meetingStatus === 'in_meeting' ? 'badge-success' : 'badge-danger'} meeting-status-badge">
+                    ${meetingStatus === 'in_meeting' ? 'Ongoing' : 'Finished'}
+                  </span>
+                </div>
+                <div class="col-md-6">
+                  <p class="mb-1"><strong>Total Participants:</strong></p>
+                  <p>${data.participants?.length || 0}</p>
+                </div>
+              </div>
+            </div>
+          `;
+
+          if (!data.participants || !data.participants.length) {
+            html += `
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>No participants found for this meeting.
+              </div>
+            `;
+            document.getElementById('trackingContent').innerHTML = html;
+            return;
+          }
+
+          html += `
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="primary-color text-white">
+                  <tr>
+                    <th><i class="fas fa-user me-2"></i>Name</th>
+                    <th><i class="fas fa-sign-in-alt me-2"></i>Join Time</th>
+                    <th><i class="fas fa-sign-out-alt me-2"></i>Leave Time</th>
+                    <th><i class="fas fa-clock me-2"></i>Duration</th>
+                  </tr>
+                </thead>
+                <tbody>
+          `;
+
+          data.participants.forEach(participant => {
+            html += `
+              <tr>
+                <td>${participant.name || 'N/A'}</td>
+                <td>${participant.join_time ? new Date(participant.join_time).toLocaleString() : 'N/A'}</td>
+                <td>${participant.leave_time ? new Date(participant.leave_time).toLocaleString() : 'N/A'}</td>
+                <td>${participant.duration ? Math.floor(participant.duration / 60) + ' min' : 'N/A'}</td>
+              </tr>
+            `;
+          });
+
+          html += `
+                </tbody>
+              </table>
+            </div>
+          `;
+          document.getElementById('trackingContent').innerHTML = html;
+
+        } catch (error) {
+          document.getElementById('trackingContent').innerHTML = `
+            <div class="alert alert-danger">
+              <i class="fas fa-exclamation-triangle me-2"></i>Error loading participants: ${error.message}
+            </div>
+          `;
+          console.error("Error fetching participants:", error);
+        }
+      });
+    });
+
+    // Fetch Zoom meeting statuses on page load and update button states
+    document.querySelectorAll('[id^="meeting-status-"]').forEach(async (element) => {
+      const meetingId = element.id.replace("meeting-status-", "");
+    
+      if (!meetingId || meetingId === 'None') {
+        element.innerHTML = '<span class="badge badge-secondary">N/A</span>';
+        const link = document.querySelector(`.join-meeting-link[data-meeting-id="${meetingId}"]`);
+        if (link) {
+          link.classList.add('disabled');
+          link.setAttribute('aria-disabled', 'true');
+        }
+        return;
+      }
+    
+      try {
+        const response = await fetch(`/subscriptions/meeting-status/${meetingId}/`);
+        if (!response.ok) throw new Error("Failed to fetch meeting status");
+    
+        const data = await response.json();
+        let status = data.status || "unknown";
+    
+        let badgeClass = 'badge-secondary';
+        let badgeText = 'Unknown';
+        let disableLink = true;
+    
+        switch (status) {
+          case 'waiting':
+            badgeClass = 'badge-warning';
+            badgeText = 'Waiting';
+            disableLink = false;
+            break;
+          case 'in_meeting':
+            badgeClass = 'badge-success';
+            badgeText = 'Ongoing';
+            disableLink = false;
+            break;
+          case 'ended':
+            badgeClass = 'badge-danger';
+            badgeText = 'Finished';
+            disableLink = true;
+            break;
+        }
+    
+        element.innerHTML = `<span class="badge ${badgeClass} meeting-status-badge">${badgeText}</span>`;
+    
+        const link = document.querySelector(`.join-meeting-link[data-meeting-id="${meetingId}"]`);
+        if (link) {
+          if (disableLink) {
+            link.classList.add('disabled');
+            link.setAttribute('aria-disabled', 'true');
+          } else {
+            link.classList.remove('disabled');
+            link.removeAttribute('aria-disabled');
+          }
+        }
+    
+      } catch (error) {
+        element.innerHTML = '<span class="badge badge-secondary">Error</span>';
+        const link = document.querySelector(`.join-meeting-link[data-meeting-id="${meetingId}"]`);
+        if (link) {
+          link.classList.add('disabled');
+          link.setAttribute('aria-disabled', 'true');
+        }
+        console.error("Error fetching meeting status:", error);
+      }
+    });
+    
+
+    // Filter lectures by date
+    document.getElementById("lecture-date").addEventListener("change", function() {
+      const selectedDate = this.value;
+      if (!selectedDate) return;
+      window.location.href = `/accounts/track-lectures/?date=${selectedDate}`;
+    });
+
+    // Reset date filter
+    document.getElementById("reset-date").addEventListener("click", function() {
+      window.location.href = `/accounts/track-lectures/`;
+    });
+  });
+
+
+  // Quick date functionality
+  document.querySelectorAll('.date-quick-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const days = parseInt(this.dataset.days);
+      const date = new Date();
+      date.setDate(date.getDate() - days);
+      const formattedDate = date.toISOString().split('T')[0];
+      
+      document.getElementById('lecture-date').value = formattedDate;
+      document.getElementById('lecture-date').dispatchEvent(new Event('change'));
+      
+      // Add visual feedback
+      this.classList.add('btn-primary');
+      this.classList.remove('btn-outline-primary');
+      setTimeout(() => {
+        this.classList.remove('btn-primary');
+        this.classList.add('btn-outline-primary');
+      }, 300);
+    });
+  });
+
+</script>
+
+
+
+{% endblock %}

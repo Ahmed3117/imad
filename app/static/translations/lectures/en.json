@@ -1,8 +1,20 @@
 {
-  "lectures": "MY Lectures",
+  "title": "Title",
+  "duration": "Duration (minutes)",
+  "schedule": "Schedule",
+  "description": "Description",
+  "add_lecture": "Add Lecture",
+  "loading": "Loading...",
+  "finished": "Finished",
+  "lecture_description": "Description",
   "created_on": "Created on:",
   "join_live_session": "Join Live Session",
   "files": "Files:",
-  "no_files": "No files attached to this lecture.",
+  "file_size": "File Size",
+  "delete": "Delete",
+  "upload_files": "Upload Files",
+  "edit": "Edit",
+  "reschedule": "Reschedule",
+  "mark_as_finished": "Mark as Finished",
   "no_lectures": "No lectures available for this study group yet."
 }

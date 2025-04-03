@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% block translationFolder %}data-translation-folder="track_lectures"{% endblock %}
+{% block title %}Track Lectures{% endblock %}
+
+{% block content %}
+
+<style>
+  .visited {
+      color: red !important;
+      font-weight: bold;
+  }
+</style>
+
+
+<div class="d-flex justify-content-between mb-3">
+  <input type="date" id="lecture-date" class="form-control w-25">
+  <button id="reset-date" class="btn btn-warning">Reset</button>
+</div>
+
+
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Live Link</th>
+      <th>Created</th>
+      <th>Duration</th>
+      <th>Lecture Status</th>
+      <th>Zoom Meeting Status</th>
+      <th>Teacher</th>
+      <th>Course</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for lecture in lectures %}
+    <tr>
+      <td>{{ lecture.title }}</td>
+      <td>
+        <a href="#" class="join-meeting-link" 
+           data-meeting-id="{{ lecture.get_meeting_id }}" 
+           data-meeting-url="{{ lecture.live_link }}">Join Meeting</a>
+      </td>
+    
+      <td>{{ lecture.created|date:"Y-m-d H:i" }}</td>
+      <td>{{ lecture.duration }} min</td>
+      <td>
+        {% if lecture.is_finished %}
+          <span class="badge bg-success">Finished {{ lecture.finished_date|date:"Y-m-d" }}</span>
+        {% else %}
+          <span class="badge bg-warning">Ongoing</span>
+        {% endif %}
+      </td>
+      <td id="meeting-status-{{ lecture.get_meeting_id }}">Loading...</td>
+      <td>{{ lecture.group.teacher.username }} / ({{ lecture.group.teacher.name }}) </td>
+      <td>{{ lecture.group.course.name }} </td>
+      
+      <td>
+        <button 
+          type="button" 
+          class="btn btn-sm btn-info track-btn" 
+          data-bs-toggle="modal" 
+          data-bs-target="#trackingModal"
+          data-meeting-id="{{ lecture.get_meeting_id }}"
+        >
+          Track
+        </button>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  
+</table>
+
+<!-- Tracking Modal -->
+<div class="modal fade" id="trackingModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Participant Tracking</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="trackingContent">
+        <p>Loading participants...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="zoomModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Zoom Meeting</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <iframe id="zoomIframe" src="" width="100%" height="600px" style="border: none;"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<script>
+  // Function to get CSRF token (needed for Django) - moved outside to make it globally available
+  function getCsrfToken() {
+    return document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || '';
+  }
+
+  // 🔹 Open Zoom meeting inside modal iframe - moved outside to make it globally available
+  function openZoomModal(element) {
+    event.preventDefault();
+    
+    // Use element parameter instead of 'this'
+    const meetingUrl = element.dataset.meetingUrl;
+    const meetingId = element.dataset.meetingId;
+    
+    if (!meetingUrl || !meetingId) {
+      alert("Invalid Zoom meeting link.");
+      return;
+    }
+    
+    // Convert to embeddable Zoom URL
+    const urlParams = new URLSearchParams(meetingUrl.split('?')[1] || '');
+    const password = urlParams.get('pwd') || "";
+    
+    const zoomEmbedUrl = `https://app.zoom.us/wc/${meetingId}/join?fromPWA=1&pwd=${password}`;
+    
+    // Update iframe source
+    document.getElementById('zoomIframe').src = zoomEmbedUrl;
+    
+    // Show the modal
+    const zoomModal = new bootstrap.Modal(document.getElementById('zoomModal'));
+    zoomModal.show();
+    
+    // 🔹 Call mark-visited API to track the visit
+    fetch(`/accounts/mark-visited/${meetingId}/`, {
+      method: "POST",
+      headers: { 
+        "X-CSRFToken": getCsrfToken(),
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({})
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Server responded with ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => console.log("Marked as visited:", data))
+    .catch(error => console.error("Error marking as visited:", error));
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Add event listeners to all Join Meeting links
+    document.querySelectorAll('.join-meeting-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        openZoomModal(this);
+      });
+    });
+  
+    // 🔹 Track participants when clicking "Track" button
+    document.querySelectorAll('.track-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const meetingId = btn.dataset.meetingId;
+        if (!meetingId) {
+          alert("Meeting ID not found!");
+          return;
+        }
+    
+        const trackingModal = new bootstrap.Modal(document.getElementById('trackingModal'));
+        trackingModal.show();
+    
+        document.getElementById('trackingContent').innerHTML = "<p>Loading participants...</p>";
+    
+        try {
+          const response = await fetch(`/accounts/meeting-participants/${meetingId}/`);
+          if (!response.ok) throw new Error("Failed to fetch data");
+    
+          const data = await response.json();
+          let meetingStatus = data.meeting_status || "Unknown";
+    
+          let html = `<p><strong>Meeting Status:</strong> 
+            <span class="badge ${meetingStatus === 'in_meeting' ? 'bg-success' : 'bg-danger'}">
+              ${meetingStatus === 'in_meeting' ? 'Ongoing' : 'Finished'}
+            </span></p>`;
+    
+          if (!data.participants.length) {
+            document.getElementById('trackingContent').innerHTML = html + "<p>No participants found.</p>";
+            return;
+          }
+    
+          html += '<table class="table table-bordered">';
+          html += '<thead><tr><th>Name</th><th>Join Time</th><th>Leave Time</th><th>Duration</th></tr></thead><tbody>';
+    
+          data.participants.forEach(participant => {
+            html += `
+              <tr>
+                <td>${participant.name || 'N/A'}</td>
+                <td>${participant.join_time ? new Date(participant.join_time).toLocaleString() : 'N/A'}</td>
+                <td>${participant.leave_time ? new Date(participant.leave_time).toLocaleString() : 'N/A'}</td>
+                <td>${participant.duration ? Math.floor(participant.duration / 60) + ' min' : 'N/A'}</td>
+              </tr>
+            `;
+          });
+    
+          html += '</tbody></table>';
+          document.getElementById('trackingContent').innerHTML = html;
+    
+        } catch (error) {
+          document.getElementById('trackingContent').innerHTML = "<p>Error loading participants.</p>";
+          console.error("Error fetching participants:", error);
+        }
+      });
+    });
+    
+    // 🔹 Fetch Zoom meeting statuses on page load
+    document.querySelectorAll('[id^="meeting-status-"]').forEach(async (element) => {
+      const meetingId = element.id.replace("meeting-status-", "");
+    
+      try {
+        const response = await fetch(`/subscriptions/meeting-status/${meetingId}/`);
+        if (!response.ok) throw new Error("Failed to fetch meeting status");
+    
+        const data = await response.json();
+        let status = data.status || "Unknown";
+    
+        element.innerHTML = `<span class="badge ${status === 'in_meeting' ? 'bg-success' : 'bg-danger'}">
+          ${status === 'in_meeting' ? 'Ongoing' : 'Finished'}
+        </span>`;
+    
+      } catch (error) {
+        element.innerHTML = '<span class="badge bg-secondary">Error</span>';
+        console.error("Error fetching meeting status:", error);
+      }
+    });
+    
+    // 🔹 Filter lectures by date
+    document.getElementById("lecture-date").addEventListener("change", function() {
+      const selectedDate = this.value;
+      if (!selectedDate) return;
+      window.location.href = `/accounts/track-lectures/?date=${selectedDate}`;
+    });
+    
+    // 🔹 Reset date filter
+    document.getElementById("reset-date").addEventListener("click", function() {
+      window.location.href = `/accounts/track-lectures/`;
+    });
+  });
+</script>
+
+{% endblock %}

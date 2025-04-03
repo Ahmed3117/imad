@@ -18,10 +18,14 @@ urlpatterns = [
     path('profile/<int:study_group_id>/lectures/', views.study_group_lectures, name='lectures'),
     path('study-group/<int:study_group_id>/add-lecture/', views.add_lecture, name='add_lecture'),
     path('lecture/<int:lecture_id>/update/', views.update_lecture, name='update_lecture'),
+    path('lecture/<int:lecture_id>/mark-as-finished/', views.mark_lecture_as_finished, name='mark_lecture_as_finished'),
     path('lecture/<int:lecture_id>/delete/', views.delete_lecture, name='delete_lecture'),
     path('lecture/<int:lecture_id>/reschedule/', views.reschedule_lecture, name='reschedule_lecture'),
     path('lecture/<int:lecture_id>/add-files/', views.add_lecture_files, name='add_lecture_files'),
     path('lecture-file/<int:file_id>/delete/', views.delete_lecture_file, name='delete_lecture_file'),
+    path('track-lectures/', views.track_lectures, name='track_lectures'),
+    path('meeting-participants/<int:meeting_id>/', views.meeting_participants, name='meeting_participants'),
+    path('mark-visited/<int:lecture_id>/', views.mark_lecture_visited, name='mark_lecture_visited'),
 
 
 

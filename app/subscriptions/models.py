@@ -1,13 +1,11 @@
 from django.db import models
 from accounts.models import User
 from courses.models import Course
-from django.db import models
-from accounts.models import User
 import requests
 from django.utils import timezone
 from django.conf import settings
 from datetime import timedelta
-from django.core.validators import MaxValueValidator
+from django.core.validators import MaxValueValidator,MinValueValidator
 
 class StudyGroup(models.Model):
     CAPACITY_CHOICES = [
@@ -66,16 +64,27 @@ class JoinRequest(models.Model):
     def __str__(self):
         return f"Join Request by {self.student.username} for {self.course.name} in {self.group}"
 
-# models.py
-
 class Lecture(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     group = models.ForeignKey(StudyGroup, on_delete=models.CASCADE, related_name='lectures')
-    live_link = models.URLField(blank=True, null=True)
+    live_link = models.URLField(blank=True, null=True) # created zoom link
     live_link_date = models.DateTimeField(blank=True, null=True)
-    duration = models.IntegerField(default=40, validators=[MaxValueValidator(40)])
+    duration = models.IntegerField(default=60, validators=[MaxValueValidator(300), MinValueValidator(10)])
+    is_finished = models.BooleanField(default=False)
+    is_visited = models.BooleanField(default=False)
+    finished_date = models.DateTimeField(blank=True, null=True)
+
+    # method to get the meeting id 
+    def get_meeting_id(self):
+        if not self.live_link:
+            return ""
+        # Split by '/' and get the last segment
+        last_segment = self.live_link.split('/')[-1]
+        # Split by '?' to remove query parameters and take the first part
+        meeting_id = last_segment.split('?')[0]
+        return meeting_id
 
     def __str__(self):
         return f"Lecture: {self.title} for {self.group}"

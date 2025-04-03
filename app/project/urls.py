@@ -6,12 +6,13 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.views.generic.base import RedirectView
 from django.conf import settings
 import debug_toolbar
-
+from django.conf.urls.i18n import i18n_patterns
 
 urlpatterns = [
     path('__debug__/', include(debug_toolbar.urls)),
     path('accounts/', include('accounts.urls',namespace='accounts')),
     path('a_d_m_i_n/', admin.site.urls),
+    path("i18n/", include("django.conf.urls.i18n")),
 
     path('favicon.ico/', RedirectView.as_view(url=staticfiles_storage.url('imgs/logo.ico'))),
     path('', include('about.urls',namespace='about')),

@@ -8,84 +8,106 @@
 
 
 {% block content %}
+
+<style>
+    .active-lecture{
+        background-color: #fff0f0; /* light red background */
+        border-left: 4px solid #28a745; /* red border */
+    }
+    
+    .active-lecture .accordion-button {
+        color: #28a745; /* red text */
+    }
+
+
+    .finished-lecture {
+        background-color: #f0fff0; /* light green background */
+        border-left: 4px solid #dc3545; /* green border */
+    }
+    
+    .finished-lecture .accordion-button {
+        color: #dc3545; /* green text */
+    }
+</style>
+
+
+
+
+
+
+
 <div class="container mt-5">
-
-    <div class="form-header text-center mb-4">
-        <div class="header-container">
-            <div class="diagonal-layer"></div>
-            <div class="floating-icon">
-                <i class="fas fa-chalkboard-teacher"></i>
-            </div>
-            <div class="header-content">
-                <h3 class="header-title">{{ study_group }} </h3>
-                
-            </div>
-        </div>
-    </div>
-
     <!-- Add Lecture Form (Teacher Only) -->
     {% if user_role == 'teacher' %}
-        <div class="card mb-4 shadow-sm" style="background-color: #ffd0d1;">
-            <div class="card-body">
-                <form id="add-lecture-form" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <input type="hidden" name="add_lecture" value="1">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <div class="form-floating">
-                                <input type="text" id="{{ lecture_form.title.id_for_label }}" name="title" class="form-control" value="{{ lecture_form.title.value|default:'' }}" required>
-                                <label class="form-label" for="{{ lecture_form.title.id_for_label }}">Title</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-floating">
-                                <input type="number" id="{{ lecture_form.duration.id_for_label }}" name="duration" class="form-control" value="{{ lecture_form.duration.value|default:40 }}" max="40" required>
-                                <label class="form-label" for="{{ lecture_form.duration.id_for_label }}">Duration (minutes)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-floating">
-                                <select id="{{ lecture_form.schedule.id_for_label }}" name="schedule" class="form-select" required>
-                                    {% for value, label in lecture_form.schedule.field.choices %}
-                                        <option value="{{ value }}" {% if lecture_form.schedule.value == value %}selected{% endif %}>{{ label }}</option>
-                                    {% endfor %}
-                                </select>
-                                <label class="form-label" for="{{ lecture_form.schedule.id_for_label }}">Schedule</label>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-floating">
-                                <textarea id="{{ lecture_form.description.id_for_label }}" name="description" class="form-control" rows="3" required>{{ lecture_form.description.value|default:'' }}</textarea>
-                                <label class="form-label" for="{{ lecture_form.description.id_for_label }}">Description</label>
-                            </div>
-                        </div>
-                        <div class="col-12 text-end">
-                            <button type="submit" class="btn btn-primary btn-block btn-rounded">Add Lecture</button>
+    <div class="card mb-4 shadow-sm" style="background-color: #f2fdfa;">
+        <div class="card-body">
+            <form id="add-lecture-form" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="add_lecture" value="1">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <div class="form-floating">
+                            <input type="text" id="{{ lecture_form.title.id_for_label }}" name="title" class="form-control" value="{{ lecture_form.title.value|default:'' }}" required>
+                            <label class="form-label" for="{{ lecture_form.title.id_for_label }}" data-translate="title">Title</label>
                         </div>
                     </div>
-                </form>
-            </div>
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <input type="number" id="{{ lecture_form.duration.id_for_label }}" name="duration" class="form-control" value="{{ lecture_form.duration.value|default:60 }}" max="300" min="10" required>
+                            <label class="form-label" for="{{ lecture_form.duration.id_for_label }}" data-translate="duration">Duration (minutes)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <select id="{{ lecture_form.schedule.id_for_label }}" name="schedule" class="form-select" required>
+                                {% for value, label in lecture_form.schedule.field.choices %}
+                                    <option value="{{ value }}" {% if lecture_form.schedule.value == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            <label class="form-label" for="{{ lecture_form.schedule.id_for_label }}" data-translate="schedule">Schedule</label>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-floating">
+                            <textarea id="{{ lecture_form.description.id_for_label }}" name="description" class="form-control" rows="3" required>{{ lecture_form.description.value|default:'' }}</textarea>
+                            <label class="form-label" for="{{ lecture_form.description.id_for_label }}" data-translate="description">Description</label>
+                        </div>
+                    </div>
+                    <div class="col-12 text-end">
+                        <button type="submit" id="add-lecture-button" class="btn btn-primary btn-block btn-rounded">
+                            <span id="button-text" data-translate="add_lecture">Add Lecture</span>
+                            <div id="loading-spinner" class="spinner-border spinner-border-sm d-none" role="status">
+                                <span class="visually-hidden" data-translate="loading">Loading...</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
+    </div>
     {% endif %}
 
     <!-- Lectures List with MDB Accordion -->
     {% if lectures_with_files %}
         <div class="accordion" id="lecturesAccordion">
             {% for lecture_data in lectures_with_files %}
-                <div class="accordion-item lecture-item" data-lecture-id="{{ lecture_data.lecture.id }}">
-                    <h2 class="accordion-header" id="heading{{ forloop.counter }}">
-                        <button
-                            data-mdb-collapse-init
-                            class="accordion-button collapsed"
-                            type="button"
-                            data-mdb-toggle="collapse"
-                            data-mdb-target="#collapse{{ forloop.counter }}"
-                            aria-expanded="false"
-                            aria-controls="collapse{{ forloop.counter }}"
-                        >
-                            <i class="fas fa-book-open me-2"></i> {{ lecture_data.lecture.title }}
-                        </button>
-                    </h2>
+            <div class="accordion-item lecture-item" data-lecture-id="{{ lecture_data.lecture.id }}">
+                <h2 class="accordion-header {% if lecture_data.lecture.is_finished %}finished-lecture {% else %} active-lecture {% endif %}" id="heading{{ forloop.counter }}">
+                    <button
+                        data-mdb-collapse-init
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-mdb-toggle="collapse"
+                        data-mdb-target="#collapse{{ forloop.counter }}"
+                        aria-expanded="false"
+                        aria-controls="collapse{{ forloop.counter }}"
+                    >
+                        <i class="fas fa-book-open me-2"></i> {{ lecture_data.lecture.title }}
+                        {% if lecture_data.lecture.is_finished %}
+                            <span class="badge bg-danger ms-2" data-translate="finished">Finished</span>
+                        {% endif %}
+                    </button>
+                </h2>
                     <div
                         id="collapse{{ forloop.counter }}"
                         class="accordion-collapse collapse"
@@ -93,24 +115,25 @@
                         data-mdb-parent="#lecturesAccordion"
                     >
                         <div class="accordion-body">
-                            <p class="text-muted mb-4 lecture-description">{{ lecture_data.lecture.description }}</p>
+                            <p class="text-muted mb-4 lecture-description" data-translate="lecture_description">{{ lecture_data.lecture.description }}</p>
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <div class="date-info">
                                     <i class="far fa-calendar-alt me-1 text-muted"></i>
-                                    <small class="text-muted">Created on:</small>
+                                    <small class="text-muted" data-translate="created_on">Created on:</small>
                                     {{ lecture_data.lecture.created|date:"m/d/Y" }}
                                 </div>
                                 {% if lecture_data.lecture.live_link %}
-                                    <div class="live-session">
-                                        <i class="fas fa-video me-1 text-primary"></i>
-                                        <a href="{{ lecture_data.lecture.live_link }}" class="btn btn-sm btn-primary px-3 ripple-surface live-link">Join Live Session</a>
-                                    </div>
+                                <div class="live-session">
+                                    <i class="fas fa-video me-1 text-primary"></i>
+                                    <a href="{% if user.role == 'teacher' %}start_url {% else %} lecture_data.lecture.live_link {% endif %}" class="btn btn-sm btn-primary px-3 ripple-surface live-link" data-translate="join_live_session">Join Live Session</a>
+                                </div>
+                                
                                 {% endif %}
                             </div>
 
                             <!-- Files Section -->
                             <div class="lecture-files">
-                                <h5 class="mb-3 text-secondary"><i class="fas fa-paperclip me-2"></i> Files:</h5>
+                                <h5 class="mb-3 text-secondary"><i class="fas fa-paperclip me-2"></i> <span data-translate="files">Files:</span></h5>
                                 <ul class="list-unstyled" id="file-list-{{ lecture_data.lecture.id }}">
                                     {% for file in lecture_data.files %}
                                         <li class="d-flex align-items-center mb-3 file-item" data-file-id="{{ file.id }}">
@@ -121,10 +144,10 @@
                                                 <a href="{{ file.file.url }}" class="text-decoration-none text-primary fw-bold">
                                                     {{ file.file.name|split:"/"|last }}
                                                 </a>
-                                                <div class="file-size text-muted small">{{ file.file.size|filesizeformat }}</div>
+                                                <div class="file-size text-muted small" data-translate="file_size">{{ file.file.size|filesizeformat }}</div>
                                             </div>
                                             {% if user_role == 'teacher' %}
-                                                <button class="btn btn-sm btn-danger delete-file-btn" data-file-id="{{ file.id }}">Delete</button>
+                                                <button class="btn btn-sm btn-danger delete-file-btn" data-file-id="{{ file.id }}" data-translate="delete">Delete</button>
                                             {% endif %}
                                         </li>
                                     {% endfor %}
@@ -136,13 +159,16 @@
                                         {% csrf_token %}
                                         <div class="input-group">
                                             <input type="file" name="file" class="form-control" multiple>
-                                            <button type="submit" class="btn btn-outline-primary">Upload Files</button>
+                                            <button type="submit" class="btn btn-outline-primary" data-translate="upload_files">Upload Files</button>
                                         </div>
                                     </form>
                                     <div class="mt-3 lecture-actions">
-                                        <button class="btn btn-warning edit-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}">Edit</button>
-                                        <button class="btn btn-info reschedule-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}">Reschedule</button>
-                                        <button class="btn btn-danger delete-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}">Delete</button>
+                                        <button class="btn btn-warning edit-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="edit">Edit</button>
+                                        <button class="btn btn-info reschedule-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="reschedule">Reschedule</button>
+                                        {% if not lecture_data.lecture.is_finished %}
+                                        <button class="btn btn-success mark-finished-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="mark_as_finished">Mark as Finished</button>
+                                        {% endif %}
+                                        <button class="btn btn-danger delete-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="delete">Delete</button>
                                     </div>
                                 {% endif %}
                             </div>
@@ -154,11 +180,12 @@
     {% else %}
         <div class="alert alert-light alert-dismissible fade show text-center mt-4">
             <i class="fas fa-info-circle me-2"></i>
-            <p class="mb-0">No lectures available for this study group yet.</p>
+            <p class="mb-0" data-translate="no_lectures">No lectures available for this study group yet.</p>
             <button type="button" class="btn-close" data-mdb-dismiss="alert" aria-label="Close"></button>
         </div>
     {% endif %}
 </div>
+
 
 <!-- Toast Container -->
 <div class="toast-wrapper position-fixed top-0 end-0 p-3" style="z-index: 1055;" id="toast-container"></div>
@@ -178,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const toastContainer = document.getElementById('toast-container');
         const toastClass = type === 'success' ? 'bg-success text-white' : 'bg-danger text-white';
         const iconClass = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
-        
+
         const toastHtml = `
             <div class="toast align-items-center ${toastClass} border-0 m-1" role="alert" aria-live="assertive" aria-atomic="true" style="max-width: 350px;">
                 <div class="d-flex">
@@ -188,12 +215,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-mdb-dismiss="toast" aria-label="Close"></button>
                 </div>
             </div>`;
-        
+
         toastContainer.insertAdjacentHTML('beforeend', toastHtml);
         const toastEl = toastContainer.lastElementChild;
         const toastInstance = new mdb.Toast(toastEl, { autohide: true, delay: 5000 });
         toastInstance.show();
-        
+
         toastEl.addEventListener('hidden.mdb.toast', function () {
             toastEl.remove();
         });
@@ -201,10 +228,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Add Lecture
     const addLectureForm = document.getElementById('add-lecture-form');
+    const addLectureButton = document.getElementById('add-lecture-button');
+    const buttonText = document.getElementById('button-text');
+    const loadingSpinner = document.getElementById('loading-spinner');
+
     if (addLectureForm) {
         addLectureForm.addEventListener('submit', function (e) {
             e.preventDefault();
             const formData = new FormData(this);
+
+            // Disable the button and show the spinner
+            addLectureButton.disabled = true;
+            buttonText.classList.add('d-none');
+            loadingSpinner.classList.remove('d-none');
 
             fetch(`{% url 'accounts:add_lecture' study_group_id=study_group.id %}`, {
                 method: 'POST',
@@ -214,16 +250,27 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    
+                    // Clear the form or update the UI as needed
+                    addLectureForm.reset();
                     showToast(data.message, 'success');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
                 } else {
                     showToast('Error: ' + data.message, 'error');
                 }
             })
-            .catch(error => showToast('Error adding lecture: ' + error, 'error'));
+            .catch(error => showToast('Error adding lecture: ' + error, 'error'))
+            .finally(() => {
+                // Re-enable the button and hide the spinner
+                addLectureButton.disabled = false;
+                buttonText.classList.remove('d-none');
+                loadingSpinner.classList.add('d-none');
+            });
         });
     }
-
+    
     // File Upload
     document.querySelectorAll('.file-upload-form').forEach(form => {
         form.addEventListener('submit', function (e) {
@@ -406,6 +453,43 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             })
             .catch(error => showToast('Error deleting file: ' + error, 'error'));
+        });
+    });
+
+    // Mark Lecture as Finished
+    document.querySelectorAll('.mark-finished-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const lectureId = this.getAttribute('data-lecture-id');
+            fetch(`{% url 'accounts:mark_lecture_as_finished' lecture_id=0 %}`.replace('0', lectureId), {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const accordionHeader = this.closest('.accordion-item').querySelector('.accordion-header');
+                    const accordionButton = accordionHeader.querySelector('.accordion-button');
+                    
+                    // Add the finished class to the header
+                    accordionHeader.classList.add('finished-lecture');
+                    
+                    // Add the finished badge if it doesn't exist
+                    if (!accordionButton.querySelector('.badge')) {
+                        const badge = document.createElement('span');
+                        badge.className = 'badge bg-danger ms-2';
+                        badge.textContent = 'Finished';
+                        accordionButton.appendChild(badge);
+                    }
+                    
+                    showToast(data.message, 'success');
+                } else {
+                    showToast('Error: ' + data.message, 'error');
+                }
+            })
+            .catch(error => showToast('Error marking lecture as finished: ' + error, 'error'));
         });
     });
 

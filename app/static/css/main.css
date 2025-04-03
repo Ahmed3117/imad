@@ -99,19 +99,16 @@ body {
   /* padding: 20px 0; */
   background-color: var(--card-bg-color); 
 }
-.nav-link {
-  color: var(--white-color);
-}
+
 
 .navbar-brand img {
-  height: 60px;
+  height: 70px;
+  width: 100px; 
 }
 .navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
   color: var(--main-color);
 }
-.navbar-brand img {
-  height: 40px; /* Logo height */
-}
+
 
 .navbar-nav .nav-link {
   font-family: 'SomarRounded', sans-serif; /* Font for nav links */
@@ -474,7 +471,7 @@ h2 {
 }
 
 .bg-footer {
-  background-color: var(--third-main-color); /* Dark blue background */
+  background-color: #071443; /* Dark blue background */
 }
 
 /* Heading Styles */

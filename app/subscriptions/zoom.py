@@ -13,14 +13,17 @@ from django.views.decorators.csrf import csrf_exempt
 ACCOUNT_ID = settings.ACCOUNT_ID
 CLIENT_ID = settings.CLIENT_ID
 CLIENT_SECRET = settings.CLIENT_SECRET
-
 TOKEN_URL = settings.TOKEN_URL
 MEETING_URL = settings.MEETING_URL
+
+
 
 logger = logging.getLogger(__name__)
 
 def get_access_token():
+    print("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
     print(f"{CLIENT_ID}:{CLIENT_SECRET}")
+    print("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
     auth = f"{CLIENT_ID}:{CLIENT_SECRET}"
     encoded_auth = base64.b64encode(auth.encode()).decode()
     headers = {
@@ -36,11 +39,6 @@ def get_access_token():
     else:
         raise Exception(f"Error fetching access token: {response.text}")
 
-# def generate_secure_password(length=8):
-#     import random
-#     import string
-#     characters = string.ascii_letters + string.digits + string.punctuation
-#     return ''.join(random.choice(characters) for _ in range(length))
 
 def validate_inputs(topic, agenda, duration, date_str, time_str, timezone):
     errors = []
@@ -60,6 +58,7 @@ def validate_inputs(topic, agenda, duration, date_str, time_str, timezone):
 
 @csrf_exempt
 def create_zoom_meeting(request):
+    print("kkkkkkkkkkkkkkkkkkkkkkkk")
     if request.method == 'POST':
         try:
             
@@ -157,5 +156,65 @@ def create_zoom_meeting(request):
             return JsonResponse({'error': str(e)}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+def get_meeting_status(request, meeting_id):
+    """
+    Fetches the current status of a Zoom meeting (waiting, in_meeting, ended).
+    """
+    access_token = get_access_token()
+    headers = {"Authorization": f"Bearer {access_token}"}
+    url = f"https://api.zoom.us/v2/meetings/{meeting_id}"
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        data = response.json()
+        # Assuming 'status' is provided in the response and can be 'waiting', 'in_meeting', or 'ended'
+        status = data.get("status", "unknown")
+        return JsonResponse({"status": status})
+
+    return JsonResponse({"error": "Meeting not found"}, status=404)
+
+# get_meeting_participants
+def get_meeting_participants(meeting_id):
+    print("ccccccccccc")
+    print(meeting_id)
+    print("ccccccccccc")
+    access_token = get_access_token()
+    headers = {"Authorization": f"Bearer {access_token}"}
+    url = f"https://api.zoom.us/v2/past_meetings/{meeting_id}/participants"
+    response = requests.get(url, headers=headers)
+    print("--------------------------")
+    print(response.json())
+    print("--------------------------")
+    
+    if response.status_code == 200:
+        return response.json().get("participants", [])
+    else:
+        raise Exception(f"Error fetching participants: {response.text}")
+
+
+def get_host_zak(host_email):
+    access_token = get_access_token()  # Implement this function to retrieve your OAuth access token
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = requests.get(f"https://api.zoom.us/v2/users/{host_email}/token?type=zak", headers=headers)
+    print("111111111111111111111111111111111111111111")
+    print("Response Status Code:", response.status_code)
+    print("Response Content:", response.text)
+    print("111111111111111111111111111111111111111111")
+    if response.status_code == 200:
+        return response.json().get('token')
+    else:
+        return None
+
+
+def generate_start_url(meeting_id, host_email):
+    zak_token = get_host_zak(host_email)
+    if zak_token:
+        return f"https://zoom.us/s/{meeting_id}?zak={zak_token}"
+    else:
+        # Handle error
+        return None
+
 
 

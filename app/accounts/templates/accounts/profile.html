@@ -157,7 +157,8 @@
                                 </div>
                             </div>
                         </form>
-                    {% else %}
+                    {% endif %}
+                    {% if user_role == 'student' %}
                         <!-- Search only for students -->
                         <form method="GET" class="d-flex align-items-center">
                             <div class="form-outline flex-fill">
@@ -194,7 +195,7 @@
                                 <td>{{ group.course_name }}</td>
                                 <td>{{ group.capacity|default:"N/A" }}</td>
                                 <td>{{ group.number_of_expected_lectures }}</td>
-                                <td>${{ group.join_price }}</td>
+                                <td> {{ group.join_price }} LE</td>
                                 <td>{{ group.students|length }}</td>
                                 <td>
                                     {% for time in group.group_times %}
@@ -209,7 +210,8 @@
                     </tbody>
                 </table>
             </div>
-        {% else %}
+        {% endif %}
+        {% if user_role == 'student' %}
             <!-- Card View for Students -->
             <div class="row">
                 {% for group in study_groups %}
@@ -222,6 +224,7 @@
     {% else %}
         <p class="text-muted text-center">No study groups found.</p>
     {% endif %}
+
 </div>
 
 <script>

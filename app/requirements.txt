@@ -32,3 +32,4 @@ django-ckeditor
 geoip2
 pytz
 mysqlclient==2.2.4
+pyjwt

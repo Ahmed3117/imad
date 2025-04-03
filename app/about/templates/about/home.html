@@ -14,7 +14,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="z-index: 1000;">
     <div class="container">
     <a class="navbar-brand" href="/" >
-        <img src="{{logo_url}}" alt="Logo" height="60" >
+        <img src="{{logo_url}}" alt="Logo" >
     </a>
     <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <i class="fas fa-bars"></i>
@@ -26,6 +26,13 @@
             <span>Home</span>
             </a>
         </li>
+        {% if request.user.role == "admin" or request.user.is_superuser %}
+                <li class="nav-item px-2">
+                    <a class="nav-link " aria-current="page" href="{% url 'accounts:track_lectures' %}" data-translate="track_lectures">
+                        <span>Track Lectures</span>
+                    </a>
+                </li>
+        {% endif %}
         <!-- <li class="nav-item px-2">
             <a class="nav-link" href="{% url 'about:about_us' %}" data-translate="aboutus">
             <span>About Us</span>
@@ -397,12 +404,12 @@
     <div class="container">
         <div class="row pt-5 d-flex">
             <!-- Left Column -->
-            <div class="col-md-4 mb-4 mb-lg-0">
-                <div class="mb-4">
-                    <a class="navbar-brand mb-4" href="#">
-                        <img src="{% static 'imgs/footer/logo1.png' %}" alt="Logo" height="40">
+            <div class="col-md-4 mb-lg-0">
+                <div class="">
+                    <a class="navbar-brand" href="/" >
+                        <img src="{{logo_url}}" alt="Logo" >
                     </a>
-                    <p class="fw-bold mb-4" data-translate="footer_description">{{company_info.description}}</p>
+                    <p class="fw-bold my-4" data-translate="footer_description">{{company_info.description}}</p>
                     
                     <div>
                         <span data-translate="created_by">Created By BlueBook Team</span>
@@ -411,7 +418,7 @@
                 </div>
             </div>
             <!-- Middle Column -->
-            <div class="col-md-4 mb-4 px-lg-5 text-start justify-content-start">
+            <div class="col-md-4 mb-4 px-lg-5 text-center text-lg-start ">
                 <img src="{% static 'imgs/footer/footer.png' %}" alt="Footer Image" class="img-fluid rounded">
             </div>
             <!-- Right Column -->
@@ -432,7 +439,7 @@
                                 <i class="fab fa-facebook-f"></i>
                             </a>
                         </li>
-                        <li>
+                        {% comment %} <li>
                             <a href="{{ company_info.twitter }}" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-twitter"></i>
                             </a>
@@ -446,7 +453,7 @@
                             <a href="{{ company_info.linkedin }}" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-linkedin-in"></i>
                             </a>
-                        </li>
+                        </li> {% endcomment %}
                     </ul>
                 </div>
             </div>

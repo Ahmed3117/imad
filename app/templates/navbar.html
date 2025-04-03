@@ -17,6 +17,13 @@
                         <span>Home</span>
                     </a>
                 </li>
+                {% if request.user.role == "admin" or request.user.is_superuser %}
+                <li class="nav-item px-2 ">
+                    <a class="nav-link text-primary" aria-current="page" href="{% url 'accounts:track_lectures' %}" data-translate="track_lectures">
+                        <span>Track Lectures</span>
+                    </a>
+                </li>
+                {% endif %}
                 <!-- <li class="nav-item px-2">
                     <a class="nav-link active" aria-current="page" href="{% url 'about:about_us' %}" data-translate="aboutus">
                         <span>About Us</span>

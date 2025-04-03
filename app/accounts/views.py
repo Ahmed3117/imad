@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login,logout,authenticate
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.hashers import make_password
-
+from django.utils.timezone import now
 from project.settings import BASE_URL
 from subscriptions.models import GroupTime, Lecture, LectureFile, StudyGroup
 from .models import TeacherInfo, User, StudentProfile
@@ -19,7 +19,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 import random
 from django.views.decorators.cache import never_cache
-
+from subscriptions.zoom import generate_start_url, get_meeting_participants, get_meeting_status
 import logging
 
 # Set up logging
@@ -367,8 +367,6 @@ def user_logout(request):
     return redirect('accounts:login')
 
 
-
-
 from django.utils import timezone
 from django.contrib import messages
 import requests
@@ -414,6 +412,8 @@ def check_study_group_access(request, study_group):
 
 # Helper function to create Zoom meeting
 def create_zoom_meeting(title, description, duration, date, time, timezone='Africa/Cairo'):
+
+    print("aaaaaaaaaaaaaaaaaadel")
     zoom_data = {
         'topic': title,
         'agenda': description,
@@ -427,6 +427,7 @@ def create_zoom_meeting(title, description, duration, date, time, timezone='Afri
             f'{BASE_URL}/subscriptions/create-meeting/',
             data=zoom_data
         )
+        print(response.json())
         if response.status_code == 200:
             return response.json().get('meeting_url')
         return None
@@ -442,10 +443,18 @@ def study_group_lectures(request, study_group_id):
         return render(request, '403.html', status=403)
 
     lectures = Lecture.objects.filter(group=study_group)
-    lectures_with_files = [
-        {'lecture': lecture, 'files': LectureFile.objects.filter(lecture=lecture)}
-        for lecture in lectures
-    ]
+    lectures_with_files = []
+
+    for lecture in lectures:
+        files = LectureFile.objects.filter(lecture=lecture)
+        start_url = None
+        if request.user.role == 'teacher' and lecture.live_link:
+            meeting_id = lecture.get_meeting_id()
+            start_url = generate_start_url(meeting_id, 'nabbiuwny@gmail.com')
+            print("00000000000000000000000000000000000000000000")
+            print(start_url)
+            print("00000000000000000000000000000000000000000000")
+        lectures_with_files.append({'lecture': lecture, 'files': files, 'start_url': start_url})
 
     lecture_form = LectureForm(study_group=study_group) if request.user.role == 'teacher' else None
     file_form = LectureFileForm() if request.user.role == 'teacher' else None
@@ -493,6 +502,18 @@ def add_lecture(request, study_group_id):
             return JsonResponse({'success': False, 'message': 'Failed to create Zoom meeting'})
         return JsonResponse({'success': False, 'message': 'Invalid form data: ' + str(form.errors)})
     return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
+
+# mark lecture as finished
+@login_required
+def mark_lecture_as_finished(request, lecture_id):
+    lecture = get_object_or_404(Lecture, id=lecture_id)
+    if request.user.role != 'teacher' or lecture.group.teacher != request.user:
+        return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
+
+    lecture.is_finished = True
+    lecture.finished_date = timezone.now()
+    lecture.save()
+    return JsonResponse({'success': True, 'message': 'Lecture marked as finished'})
 
 # Update an existing lecture
 import logging
@@ -603,3 +624,62 @@ def delete_lecture_file(request, file_id):
         lecture_file.delete()
         return JsonResponse({'success': True, 'message': 'File deleted successfully'})
     return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
+
+
+def track_lectures(request):
+    if request.user.role != 'admin' and not request.user.is_superuser:
+        return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
+    
+    selected_date = request.GET.get("date")
+    
+    if selected_date:
+        lectures = Lecture.objects.select_related('group__teacher').filter(live_link_date__date=selected_date)
+    else:
+        lectures = Lecture.objects.select_related('group__teacher').filter(live_link_date__date=now().date())
+    print("--------------------------------")
+    for lecture in lectures:
+        print(lecture.live_link_date.date())
+        print(now().date())
+    print("--------------------------------")
+    
+    return render(request, 'accounts/track_lectures.html', {'lectures': lectures})
+
+
+@csrf_exempt
+def meeting_participants(request, meeting_id):
+    print("mmmmmmmmmmmmmmmmmmmmmmmmm")
+    print(meeting_id)
+    print("mmmmmmmmmmmmmmmmmmmmmmmmm")
+    if request.method == 'GET':
+        try:
+            response = get_meeting_participants(meeting_id)
+            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+            print(response)
+            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+            if response:
+                print("200000000000000000000000")
+                participants = response
+                print(participants)
+                # meeting_status = get_meeting_status(meeting_id)  # Fetch meeting status
+                # print("nnnnnnnnnnnn")
+                # print(meeting_status)
+                # print("nnnnnnnnnnnn")
+                return JsonResponse({"participants": participants})
+
+            else:
+                return JsonResponse({'error': 'Unexpected response format'}, status=500)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+@csrf_exempt
+def mark_lecture_visited(request, lecture_id):
+    if request.method == "POST":
+        try:
+            lecture = Lecture.objects.get(id=lecture_id)
+            lecture.is_visited = True
+            lecture.save()
+            return JsonResponse({"success": True})
+        except Lecture.DoesNotExist:
+            return JsonResponse({"error": "Lecture not found"}, status=404)
+    
+    return JsonResponse({"error": "Invalid request"}, status=400)

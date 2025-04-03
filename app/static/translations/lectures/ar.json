@@ -1,8 +1,20 @@
 {
-  "lectures": "محاضراتي",
+  "title": "العنوان",
+  "duration": "المدة (بالدقائق)",
+  "schedule": "الجدول",
+  "description": "الوصف",
+  "add_lecture": "إضافة محاضرة",
+  "loading": "جار التحميل...",
+  "finished": "منتهي",
+  "lecture_description": "الوصف",
   "created_on": "تم الإنشاء في:",
   "join_live_session": "انضم إلى الجلسة الحية",
   "files": "الملفات:",
-  "no_files": "لا توجد ملفات مرفقة بهذه المحاضرة.",
+  "file_size": "حجم الملف",
+  "delete": "حذف",
+  "upload_files": "تحميل الملفات",
+  "edit": "تعديل",
+  "reschedule": "إعادة جدولة",
+  "mark_as_finished": "وضع علامة كمنتهي",
   "no_lectures": "لا توجد محاضرات متاحة لهذه المجموعة الدراسية حتى الآن."
 }
