@@ -31,11 +31,7 @@
 </style>
 
 
-
-
-
-
-
+<!-- Add this inside the lecture loop in your template -->
 <div class="container mt-5">
     <!-- Add Lecture Form (Teacher Only) -->
     {% if user_role == 'teacher' %}
@@ -127,7 +123,6 @@
                                     <i class="fas fa-video me-1 text-primary"></i>
                                     <a href="{% if user.role == 'teacher' %}start_url {% else %} lecture_data.lecture.live_link {% endif %}" class="btn btn-sm btn-primary px-3 ripple-surface live-link" data-translate="join_live_session">Join Live Session</a>
                                 </div>
-                                
                                 {% endif %}
                             </div>
 
@@ -169,9 +164,59 @@
                                         <button class="btn btn-success mark-finished-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="mark_as_finished">Mark as Finished</button>
                                         {% endif %}
                                         <button class="btn btn-danger delete-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="delete">Delete</button>
+                                        <!-- Note Button and Modal -->
+                                        {% if not lecture_data.note %}
+                                        <button type="button" class="btn btn-secondary text-light mt-3" data-mdb-toggle="modal" data-mdb-target="#noteModal{{ lecture_data.lecture.id }}" data-translate="add_note">Add Note</button>
+                                        {% else %}
+                                        <p class="mt-3" data-translate="note_added">Note Added</p>
+                                        {% endif %}
                                     </div>
                                 {% endif %}
+                                {% if user_role == 'student' %}
+                                    <!-- Note Button and Modal -->
+                                    {% if not lecture_data.note %}
+                                    <button type="button" class="btn btn-secondary text-light mt-3" data-mdb-toggle="modal" data-mdb-target="#noteModal{{ lecture_data.lecture.id }}" data-translate="add_note">Add Note</button>
+                                    {% else %}
+                                    <p class="mt-3" data-translate="note_added">Note Added</p>
+                                    {% endif %}
+                                {% endif %}
                             </div>
+
+                            
+
+                            <div class="modal fade" id="noteModal{{ lecture_data.lecture.id }}" tabindex="-1" aria-labelledby="noteModalLabel{{ lecture_data.lecture.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="noteModalLabel{{ lecture_data.lecture.id }}" data-translate="add_note">Add Note</h5>
+                                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="POST" action="{% url 'accounts:add_lecture_note' lecture_data.lecture.id %}">
+                                            {% csrf_token %}
+                                            <div class="mb-3">
+                                                <label for="note{{ lecture_data.lecture.id }}" class="form-label" data-translate="note">Note</label>
+                                                <textarea class="form-control" id="note{{ lecture_data.lecture.id }}" name="note" rows="3" required></textarea>
+                                            </div>
+                                            {% if user_role == 'student' %}
+                                            <div class="mb-3">
+                                                <label for="rating{{ lecture_data.lecture.id }}" class="form-label" data-translate="rating">Rating</label>
+                                                <select class="form-select" id="rating{{ lecture_data.lecture.id }}" name="rating" required>
+                                                    <option value="1">1</option>
+                                                    <option value="2">2</option>
+                                                    <option value="3">3</option>
+                                                    <option value="4">4</option>
+                                                    <option value="5">5</option>
+                                                </select>
+                                            </div>
+                                            {% endif %}
+                                            <button type="submit" class="btn btn-primary" data-translate="submit">Submit</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -185,6 +230,7 @@
         </div>
     {% endif %}
 </div>
+
 
 
 <!-- Toast Container -->
@@ -501,6 +547,24 @@ document.addEventListener('DOMContentLoaded', function () {
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
+
+
+
+    const noteButtons = document.querySelectorAll('[data-mdb-toggle="modal"][data-mdb-target^="noteModal"]');
+        noteButtons.forEach(button => {
+            button.addEventListener('click', event => {
+                const lectureId = button.getAttribute('data-lecture-id');
+                const modal = document.querySelector(button.getAttribute('data-mdb-target'));
+                const noteForm = modal.querySelector('form');
+                // Ensure the form action is set correctly (though it should already be set in the template)
+                noteForm.action = noteForm.action.replace('0', lectureId);
+            });
+        });
+
 });
+
+
+
+
 </script>
 {% endblock %}

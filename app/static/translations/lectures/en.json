@@ -14,6 +14,12 @@
   "delete": "Delete",
   "upload_files": "Upload Files",
   "edit": "Edit",
+  "add_note": "Add Note",
+  "note": "Note",
+  "rating": "Rating",
+  "submit": "Submit",
+  "note_added": "Note added successfully.",
+
   "reschedule": "Reschedule",
   "mark_as_finished": "Mark as Finished",
   "no_lectures": "No lectures available for this study group yet."

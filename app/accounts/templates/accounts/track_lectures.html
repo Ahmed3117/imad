@@ -61,69 +61,43 @@
 <div class="container-fluid py-4">
   <!-- Filter Card -->
   <!-- Date Selection Card -->
-<div class="card mb-4 shadow-sm border-0">
-  <div class="card-body p-4">
-
-    <!-- Main Row: Controls layout shift at 'lg' breakpoint -->
-    <div class="row g-3 align-items-center">
-
-      <!-- Column 1: Date Picker -->
-      <!-- Takes full width below lg, auto width at lg+ -->
-      <!-- Adds margin bottom ONLY below lg breakpoint -->
-      <div class="col-12 col-lg-auto mb-3 mb-lg-0">
-         <label for="lecture-date" class="visually-hidden">Select Lecture Date</label> <!-- Accessibility -->
-         <div class="input-group">
+  <div class="card mb-4 shadow-sm border-0">
+    <div class="card-body p-4">
+      <!-- Main Row: Controls layout shift at 'lg' breakpoint -->
+      <div class="row g-3 align-items-center">
+        <!-- Column 1: Date Picker -->
+        <div class="col-12 col-lg-auto mb-3 mb-lg-0">
+          <label for="lecture-date" class="visually-hidden">Select Lecture Date</label>
+          <div class="input-group">
             <span class="input-group-text bg-white border-end-0" id="date-icon-addon">
               <i class="fas fa-calendar-alt text-secondary"></i>
             </span>
             <input
               type="date"
               id="lecture-date"
-              class="form-control" 
+              class="form-control"
               placeholder="Select date"
               aria-label="Select Lecture Date"
               aria-describedby="date-icon-addon">
-         </div>
-      </div>
-
-      <!-- Column 2: Buttons Container -->
-      <!-- Takes full width below lg, remaining width at lg+ -->
-      <div class="col-12 col-lg">
-          <!-- Button Group: Uses flexbox for alignment & wrapping -->
-          <!-- Centered below lg, aligned end (right) at lg+ -->
+          </div>
+        </div>
+        <!-- Column 2: Buttons Container -->
+        <div class="col-12 col-lg">
           <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-end gap-2">
-
-              <!-- Quick Button: Today -->
-              <button
-                  class="btn btn-sm btn-outline-primary rounded-pill date-quick-btn px-0"
-                  data-days="0">
-                  <i class="far fa-sun me-1"></i>Today
-              </button>
-
-              <!-- Quick Button: Yesterday -->
-              <button
-                  class="btn btn-sm btn-outline-primary rounded-pill date-quick-btn px-0"
-                  data-days="1">
-                  <i class="far fa-moon "></i>Yesterday
-              </button>
-              <!-- Reset Button -->
-              <button
-                  id="reset-date"
-                  class="btn btn-outline-secondary rounded-pill px-3"
-                  style="font-weight: 500;">
-                  <i class="fas fa-sync-alt me-1"></i>Reset
-              </button>
-
-          </div><!-- /.button-group -->
-      </div><!-- /.col-12 .col-lg (buttons container) -->
-
-    </div> <!-- /.row -->
-
-  </div><!-- /.card-body -->
-</div><!-- /.card -->
-  
-
-
+            <button class="btn btn-sm btn-outline-primary rounded-pill date-quick-btn px-0" data-days="0">
+              <i class="far fa-sun me-1"></i>Today
+            </button>
+            <button class="btn btn-sm btn-outline-primary rounded-pill date-quick-btn px-0" data-days="1">
+              <i class="far fa-moon "></i>Yesterday
+            </button>
+            <button id="reset-date" class="btn btn-outline-secondary rounded-pill px-3" style="font-weight: 500;">
+              <i class="fas fa-sync-alt me-1"></i>Reset
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Lectures Table Card -->
   <div class="card">
@@ -140,34 +114,33 @@
               <th>Created</th>
               <th>Duration</th>
               <th>Status</th>
-              <th>Zoom Status</th>
+              {% comment %} <th>Zoom Status</th> {% endcomment %}
               <th>Teacher</th>
               <th>Course</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {% for lecture in lectures %}
+            {% for lecture_data in lectures_with_notes %}
             <tr>
-              <td class="font-weight-bold">{{ lecture.title }}</td>
+              <td class="font-weight-bold">{{ lecture_data.lecture.title }}</td>
               <td>
-                {% if lecture.get_meeting_id %}
-                  <a href="#" 
-                     class="btn btn-sm btn-primary btn-rounded join-meeting-link {% if lecture.is_finished %}disabled{% endif %}" 
-                     data-meeting-id="{{ lecture.get_meeting_id }}" 
-                     data-meeting-url="{{ lecture.live_link }}"
-                     {% if lecture.is_finished %}aria-disabled="true"{% endif %}>
+                {% if lecture_data.lecture.get_meeting_id %}
+                  <a href="#"
+                     class="btn btn-sm btn-primary btn-rounded join-meeting-link {% if lecture_data.lecture.is_finished %}disabled{% endif %}"
+                     data-meeting-id="{{ lecture_data.lecture.get_meeting_id }}"
+                     data-meeting-url="{{ lecture_data.lecture.live_link }}"
+                     {% if lecture_data.lecture.is_finished %}aria-disabled="true"{% endif %}>
                     <i class="fas fa-video me-1"></i> Join
                   </a>
                 {% else %}
                   <span class="text-muted">N/A</span>
                 {% endif %}
               </td>
-            
-              <td>{{ lecture.created|date:"Y-m-d H:i" }}</td>
-              <td>{{ lecture.duration }} min</td>
+              <td>{{ lecture_data.lecture.created|date:"Y-m-d H:i" }}</td>
+              <td>{{ lecture_data.lecture.duration }} min</td>
               <td>
-                {% if lecture.is_finished %}
+                {% if lecture_data.lecture.is_finished %}
                   <span class="badge badge-success meeting-status-badge">
                     <i class="fas fa-check-circle me-1"></i> Finished
                   </span>
@@ -177,26 +150,33 @@
                   </span>
                 {% endif %}
               </td>
-              <td id="meeting-status-{{ lecture.get_meeting_id }}">
+              {% comment %} <td id="meeting-status-{{ lecture_data.lecture.get_meeting_id }}">
                 <span class="badge badge-secondary">
                   <i class="fas fa-spinner fa-pulse me-1"></i> Loading...
                 </span>
-              </td>
+              </td> {% endcomment %}
               <td>
                 <div class="d-flex flex-column">
-                  <span>{{ lecture.group.teacher.username }}</span>
-                  <small class="text-muted">{{ lecture.group.teacher.name }}</small>
+                  <span>{{ lecture_data.lecture.group.teacher.username }}</span>
+                  <small class="text-muted">{{ lecture_data.lecture.group.teacher.name }}</small>
                 </div>
               </td>
-              <td>{{ lecture.group.course.name }}</td>
-              
+              <td>{{ lecture_data.lecture.group.course.name }}</td>
               <td>
-                <button 
-                  type="button" 
-                  class="btn btn-sm btn-info btn-rounded track-btn" 
-                  data-meeting-id="{{ lecture.get_meeting_id }}"
+                <button
+                  type="button"
+                  class="btn btn-sm btn-info btn-rounded track-btn"
+                  data-meeting-id="{{ lecture_data.lecture.get_meeting_id }}"
                 >
                   <i class="fas fa-chart-line me-1"></i> Track
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-secondary text-light btn-rounded notes-btn"
+                  data-mdb-toggle="modal"
+                  data-mdb-target="#notesModal{{ lecture_data.lecture.id }}"
+                >
+                  <i class="fas fa-sticky-note me-1"></i> Notes
                 </button>
               </td>
             </tr>
@@ -207,6 +187,46 @@
     </div>
   </div>
 </div>
+
+<!-- Notes Modal -->
+{% for lecture_data in lectures_with_notes %}
+<div class="modal fade" id="notesModal{{ lecture_data.lecture.id }}" tabindex="-1" aria-labelledby="notesModalLabel{{ lecture_data.lecture.id }}" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header primary-color text-white">
+        <h5 class="modal-title" id="notesModalLabel{{ lecture_data.lecture.id }}">
+          <i class="fas fa-sticky-note me-2"></i>Notes and Ratings for {{ lecture_data.lecture.title }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-mdb-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="list-group">
+          {% for note in lecture_data.notes %}
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6>{{ note.user.username }}</h6>
+                <p>{{ note.note }}</p>
+              </div>
+              {% if note.rating %}
+              <div>
+                <span class="badge bg-primary">Rating: {{ note.rating }}/5</span>
+              </div>
+              {% endif %}
+            </div>
+          </li>
+          {% empty %}
+          <li class="list-group-item">No notes available.</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" data-mdb-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
 
 <!-- Tracking Modal -->
 <div class="modal fade" id="trackingModal" tabindex="-1" aria-labelledby="trackingModalLabel" aria-hidden="true">
@@ -232,6 +252,7 @@
     </div>
   </div>
 </div>
+
 
 <!-- Return Button -->
 <button id="return-button" class="btn btn-primary btn-floating btn-lg" style="position: fixed; bottom: 20px; right: 20px;">
@@ -418,7 +439,7 @@
         } catch (error) {
           document.getElementById('trackingContent').innerHTML = `
             <div class="alert alert-danger">
-              <i class="fas fa-exclamation-triangle me-2"></i>Error loading participants: ${error.message}
+              <i class="fas fa-exclamation-triangle me-2"></i> <span class="text-danger" data-translate="zoom_error"> it seems the zoom meeting is not finished or didn't start yet.</span>
             </div>
           `;
           console.error("Error fetching participants:", error);
@@ -528,6 +549,20 @@
       }, 300);
     });
   });
+
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const notesButtons = document.querySelectorAll('[data-mdb-toggle="modal"][data-mdb-target^="notesModal"]');
+    notesButtons.forEach(button => {
+        button.addEventListener('click', event => {
+            const lectureId = button.getAttribute('data-lecture-id');
+            const modal = document.querySelector(button.getAttribute('data-mdb-target'));
+            // Ensure the modal content is set correctly (though it should already be set in the template)
+            // You can add any additional dynamic behavior here if needed
+        });
+    });
+});
+
 
 </script>
 

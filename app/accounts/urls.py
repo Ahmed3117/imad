@@ -26,6 +26,8 @@ urlpatterns = [
     path('track-lectures/', views.track_lectures, name='track_lectures'),
     path('meeting-participants/<int:meeting_id>/', views.meeting_participants, name='meeting_participants'),
     path('mark-visited/<int:lecture_id>/', views.mark_lecture_visited, name='mark_lecture_visited'),
+    path('add_note/<int:lecture_id>/', views.add_lecture_note, name='add_lecture_note'),
+
 
 
 

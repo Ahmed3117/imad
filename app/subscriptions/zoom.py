@@ -194,27 +194,6 @@ def get_meeting_participants(meeting_id):
         raise Exception(f"Error fetching participants: {response.text}")
 
 
-def get_host_zak(host_email):
-    access_token = get_access_token()  # Implement this function to retrieve your OAuth access token
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = requests.get(f"https://api.zoom.us/v2/users/{host_email}/token?type=zak", headers=headers)
-    print("111111111111111111111111111111111111111111")
-    print("Response Status Code:", response.status_code)
-    print("Response Content:", response.text)
-    print("111111111111111111111111111111111111111111")
-    if response.status_code == 200:
-        return response.json().get('token')
-    else:
-        return None
-
-
-def generate_start_url(meeting_id, host_email):
-    zak_token = get_host_zak(host_email)
-    if zak_token:
-        return f"https://zoom.us/s/{meeting_id}?zak={zak_token}"
-    else:
-        # Handle error
-        return None
 
 
 

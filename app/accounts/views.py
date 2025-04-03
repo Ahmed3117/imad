@@ -5,7 +5,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.hashers import make_password
 from django.utils.timezone import now
 from project.settings import BASE_URL
-from subscriptions.models import GroupTime, Lecture, LectureFile, StudyGroup
+from subscriptions.models import GroupTime, Lecture, LectureFile, LectureNote, StudyGroup
 from .models import TeacherInfo, User, StudentProfile
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
@@ -14,12 +14,12 @@ from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect
 from django.db.models import Q, Sum, Prefetch, F
 from courses.models import   Course, CourseTranslation, Level, LevelTranslation, Track, TrackTranslation
-from .forms import SessionURLForm
+from .forms import LectureNoteForm, SessionURLForm
 from django.core.mail import send_mail
 from django.conf import settings
 import random
 from django.views.decorators.cache import never_cache
-from subscriptions.zoom import generate_start_url, get_meeting_participants, get_meeting_status
+from subscriptions.zoom import get_meeting_participants, get_meeting_status
 import logging
 
 # Set up logging
@@ -182,11 +182,11 @@ def edit_profile(request):
             user.image = request.FILES['image']
         user.save()
 
-        if user.role == 'parent':
-            parent_profile = ParentProfile.objects.get(user=user)
-            parent_profile.type = request.POST.get('account_type', parent_profile.type)
-            parent_profile.save()
-        elif user.role == 'student':
+        # if user.role == 'parent':
+        #     parent_profile = ParentProfile.objects.get(user=user)
+        #     parent_profile.type = request.POST.get('account_type', parent_profile.type)
+        #     parent_profile.save()
+        if user.role == 'student':
             student_profile = StudentProfile.objects.get(user=user)
             student_profile.age = request.POST.get('age', student_profile.age)
             student_profile.parent_phone = request.POST.get('parent_phone', student_profile.parent_phone)
@@ -437,6 +437,7 @@ def create_zoom_meeting(title, description, duration, date, time, timezone='Afri
 
 # Main view to display lectures
 @login_required
+@login_required
 def study_group_lectures(request, study_group_id):
     study_group = get_object_or_404(StudyGroup, id=study_group_id)
     if not check_study_group_access(request, study_group):
@@ -447,26 +448,40 @@ def study_group_lectures(request, study_group_id):
 
     for lecture in lectures:
         files = LectureFile.objects.filter(lecture=lecture)
-        start_url = None
-        if request.user.role == 'teacher' and lecture.live_link:
-            meeting_id = lecture.get_meeting_id()
-            start_url = generate_start_url(meeting_id, 'nabbiuwny@gmail.com')
-            print("00000000000000000000000000000000000000000000")
-            print(start_url)
-            print("00000000000000000000000000000000000000000000")
-        lectures_with_files.append({'lecture': lecture, 'files': files, 'start_url': start_url})
+        note = LectureNote.objects.filter(lecture=lecture, user=request.user).first()
+        lectures_with_files.append({'lecture': lecture, 'files': files, 'note': note})
 
     lecture_form = LectureForm(study_group=study_group) if request.user.role == 'teacher' else None
     file_form = LectureFileForm() if request.user.role == 'teacher' else None
+    note_form = LectureNoteForm()
 
     return render(request, 'accounts/lectures.html', {
         'study_group': study_group,
         'lectures_with_files': lectures_with_files,
         'lecture_form': lecture_form,
         'file_form': file_form,
+        'note_form': note_form,
         'user_role': request.user.role,
     })
 
+@login_required
+def add_lecture_note(request, lecture_id):
+    lecture = get_object_or_404(Lecture, id=lecture_id)
+    if request.method == 'POST':
+        note_form = LectureNoteForm(request.POST)
+        if note_form.is_valid():
+            note = note_form.save(commit=False)
+            note.lecture = lecture
+            note.user = request.user
+            note.save()
+            messages.success(request, "Lecture note added successfully.")
+            return redirect('accounts:lectures', study_group_id=lecture.group.id)
+        else:
+            messages.error(request, "Failed to add lecture note. Please check the form for errors.")
+    else:
+        note_form = LectureNoteForm()
+
+    return render(request, 'accounts/add_lecture_note.html', {'note_form': note_form, 'lecture': lecture})
 # Add a new lecture
 @login_required
 def add_lecture(request, study_group_id):
@@ -629,20 +644,20 @@ def delete_lecture_file(request, file_id):
 def track_lectures(request):
     if request.user.role != 'admin' and not request.user.is_superuser:
         return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
-    
+
     selected_date = request.GET.get("date")
-    
+
     if selected_date:
         lectures = Lecture.objects.select_related('group__teacher').filter(live_link_date__date=selected_date)
     else:
         lectures = Lecture.objects.select_related('group__teacher').filter(live_link_date__date=now().date())
-    print("--------------------------------")
+
+    lectures_with_notes = []
     for lecture in lectures:
-        print(lecture.live_link_date.date())
-        print(now().date())
-    print("--------------------------------")
-    
-    return render(request, 'accounts/track_lectures.html', {'lectures': lectures})
+        notes = LectureNote.objects.filter(lecture=lecture)
+        lectures_with_notes.append({'lecture': lecture, 'notes': notes})
+
+    return render(request, 'accounts/track_lectures.html', {'lectures_with_notes': lectures_with_notes})
 
 
 @csrf_exempt

@@ -97,7 +97,18 @@ class LectureFile(models.Model):
         return f"File for Lecture: {self.lecture.title}"
 
 
+class LectureNote(models.Model):
+    lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE, related_name='notes')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    note = models.TextField()
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ('lecture', 'user')
+
+    def __str__(self):
+        return f"Note for {self.lecture.title} by {self.user.username}"
 
 
 
