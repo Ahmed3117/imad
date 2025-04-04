@@ -1,7 +1,6 @@
 from pathlib import Path
 import os
-# import pymysql
-
+import dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 # GEOIP_PATH = os.path.join(BASE_DIR, 'geoip')
@@ -18,24 +17,22 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 
-from pathlib import Path
-import os
-import dotenv
-
 # Load environment variables from .env file
 dotenv.load_dotenv()
 
 # Hardcoded Zoom API credentials (use environment variables in production)
-ACCOUNT_ID = os.environ.get('ACCOUNT_ID')
-CLIENT_ID = os.environ.get('CLIENT_ID')
-CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
+ACCOUNT_ID = "qq6ef7OPSCeQP-8HBnSKNg"
+CLIENT_ID = "yDF5YazQgWwXX0bNiNTbA"
+CLIENT_SECRET = "5XJk5gY0YtMzzlZh4NoWNtXuPqXA8vyf" 
 
+#ACCOUNT_ID = os.environ.get('ACCOUNT_ID')
+#CLIENT_ID = os.environ.get('CLIENT_ID')
+#CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
 
 # Zoom API URLs
 TOKEN_URL = "https://zoom.us/oauth/token"
 MEETING_URL = "https://api.zoom.us/v2/users/me/meetings"
-BASE_URL = "http://127.0.0.1:8899"
-
+BASE_URL = "https://nabbiuwny.com"
 
 INSTALLED_APPS = [
     'admin_interface',
@@ -49,9 +46,9 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'about.apps.AboutConfig',
     'courses.apps.CoursesConfig',
-    # 'loves',
-    # 'carts',
-    # 'orders',
+    #'loves',
+    #'carts',
+    #'orders',
     'subscriptions',
     # 'appointments',
     # 'exams',
@@ -63,10 +60,11 @@ INSTALLED_APPS = [
     'ckeditor',
 ]
 
-
 ASGI_APPLICATION = 'project.asgi.application'
 
 AUTH_USER_MODEL ='accounts.User'
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -80,7 +78,6 @@ MIDDLEWARE = [
     'courses.middleware.RequestMiddleware',
     'courses.middleware.LocationMiddleware',
 ]
-
 ROOT_URLCONF = 'project.urls'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
@@ -91,6 +88,8 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+
+
 
 TEMPLATES = [
     {
@@ -103,7 +102,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                # 'courses.context_processors.cart_content',
                 'about.context_processors.get_logo_url',
             ],
         },
@@ -113,24 +111,17 @@ TEMPLATES = [
 WSGI_APPLICATION = 'project.wsgi.application'
 
 
+
 DATABASES = {
-   'default': {
-       'ENGINE': 'django.db.backends.sqlite3',
-       'NAME': BASE_DIR / 'db.sqlite3',
-   }
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('DB_NAME'),  # Default to 'bluebook' if not set
+        'USER': os.getenv('DB_USER'),      # Default to 'root' if not set
+        'PASSWORD': os.getenv('DB_PASSWORD'),  # Default to 'haitham' if not set
+        'HOST': os.getenv('DB_HOST'),     # Default to 'mysql' if not set
+        'PORT': os.getenv('DB_PORT'),      # Default to '3306' if not set
+    }
 }
-
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'imadProd',
-#         'USER': 'root', 
-#         'PASSWORD': 'haitham', 
-#         'HOST': '86.48.3.99',
-#         'PORT': '3366',
-#     }
-# }
 
 
 
@@ -156,7 +147,7 @@ STATIC_URL  = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Define STATIC_ROOT for collectstatic to gather files
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
@@ -181,7 +172,6 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 #SMTP Configuration
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -193,7 +183,6 @@ EMAIL_HOST_PASSWORD = 'meczfpooichwkudl'
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-
 # PlatRain010
 
 from django.contrib import admin
@@ -202,8 +191,6 @@ from django.contrib import admin
 from django.contrib import admin
 from django.contrib.admin import AdminSite
 from django.utils.translation import gettext_lazy as _
-
-
 
 ADMIN_ORDERING = (
     ('about', (
@@ -226,7 +213,7 @@ ADMIN_ORDERING = (
         'Course', 'CourseTranslation',
         # 'LevelContent', 'LevelContentTranslation'
     )),
-    ('subscriptions', ('StudyGroup','JoinRequest')),
+    ('subscriptions', ('StudyGroup','JoinRequest','Lecture')),
     # ('appointments', ('TeacherAvailability', 'Appointment')),
     # ('exams', ('Exam', 'Question', 'Option', 'ExamResult')),
     # ('orders', ('Order', 'OrderItem')),
@@ -235,6 +222,7 @@ ADMIN_ORDERING = (
     ('auth', ('Group',)),
     ('admin_interface', ('Theme',)),
 )
+
 
 def get_app_list(self, request, app_label=None):
     """Reorder the appearance of apps and models in the Django admin."""
@@ -273,4 +261,5 @@ admin.AdminSite.get_app_list = get_app_list
 
 
 
-
+CSRF_TRUSTED_ORIGINS = ['https://nabbiuwny.com']
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
