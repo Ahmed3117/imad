@@ -121,7 +121,7 @@
                                 {% if lecture_data.lecture.live_link %}
                                 <div class="live-session">
                                     <i class="fas fa-video me-1 text-primary"></i>
-                                    <a href="lecture_data.lecture.live_link" class="btn btn-sm btn-primary px-3 ripple-surface live-link" data-translate="join_live_session">Join Live Session</a>
+                                    <a href="{{ lecture_data.lecture.live_link }}" class="btn btn-sm btn-primary px-3 ripple-surface live-link" data-translate="join_live_session">Join Live Session</a>
                                 </div>
                                 {% endif %}
                             </div>
