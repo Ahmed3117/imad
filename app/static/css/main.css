@@ -168,7 +168,7 @@ body {
   
 }
 .navbar-dark {
-  padding: 20px 0;
+  /* padding: 20px 0; */
   background-color: var(--light-black-color); 
 }
 
