@@ -21,13 +21,10 @@ CSRF_TRUSTED_ORIGINS = [
 dotenv.load_dotenv()
 
 # Hardcoded Zoom API credentials (use environment variables in production)
-ACCOUNT_ID = "qq6ef7OPSCeQP-8HBnSKNg"
-CLIENT_ID = "yDF5YazQgWwXX0bNiNTbA"
-CLIENT_SECRET = "5XJk5gY0YtMzzlZh4NoWNtXuPqXA8vyf" 
 
-#ACCOUNT_ID = os.environ.get('ACCOUNT_ID')
-#CLIENT_ID = os.environ.get('CLIENT_ID')
-#CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
+ACCOUNT_ID = os.environ.get('ACCOUNT_ID')
+CLIENT_ID = os.environ.get('CLIENT_ID')
+CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
 
 # Zoom API URLs
 TOKEN_URL = "https://zoom.us/oauth/token"
