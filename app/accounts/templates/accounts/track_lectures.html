@@ -195,30 +195,144 @@
     <div class="modal-content">
       <div class="modal-header primary-color text-white">
         <h5 class="modal-title" id="notesModalLabel{{ lecture_data.lecture.id }}">
-          <i class="fas fa-sticky-note me-2"></i>Notes and Ratings for {{ lecture_data.lecture.title }}
+          <i class="fas fa-sticky-note me-2"></i>Lecture Details: {{ lecture_data.lecture.title }}
         </h5>
         <button type="button" class="btn-close btn-close-white" data-mdb-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <ul class="list-group">
+        <!-- Lecture Basic Info -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <p><strong><i class="far fa-calendar-alt me-2"></i>Scheduled:</strong> {{ lecture_data.lecture.schedule }}</p>
+                <p><strong><i class="fas fa-clock me-2"></i>Duration:</strong> {{ lecture_data.lecture.duration }} minutes</p>
+              </div>
+              <div class="col-md-6">
+                <p><strong><i class="fas fa-info-circle me-2"></i>Status:</strong> 
+                  <span class="badge 
+                    {% if lecture_data.teacher_note and lecture_data.teacher_note.lecture_status == 'completed' %}bg-success
+                    {% elif lecture_data.teacher_note and lecture_data.teacher_note.lecture_status == 'student_delayed' %}bg-warning text-dark
+                    {% elif lecture_data.teacher_note and lecture_data.teacher_note.lecture_status == 'teacher_delayed' %}bg-danger
+                    {% else %}bg-secondary{% endif %}">
+                    {% if lecture_data.teacher_note %}
+                      {{ lecture_data.teacher_note.get_lecture_status_display }}
+                    {% else %}
+                      Pending Review
+                    {% endif %}
+                  </span>
+                </p>
+                {% if lecture_data.teacher_note and lecture_data.teacher_note.delay_reason %}
+                <p><strong><i class="fas fa-exclamation-triangle me-2"></i>Delay Reason:</strong> {{ lecture_data.teacher_note.delay_reason }}</p>
+                {% endif %}
+              </div>
+            </div>
+            <hr>
+            <p><strong><i class="fas fa-align-left me-2"></i>Description:</strong> {{ lecture_data.lecture.description }}</p>
+          </div>
+        </div>
+
+        <!-- Notes and Ratings Section -->
+        <h5 class="mb-3"><i class="fas fa-comments me-2"></i>Participant Feedback</h5>
+        <ul class="list-group mb-4">
           {% for note in lecture_data.notes %}
           <li class="list-group-item">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <h6>{{ note.user.username }}</h6>
-                <p>{{ note.note }}</p>
+            <div class="d-flex justify-content-between align-items-start">
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h6 class="mb-0">
+                    {{ note.user.get_full_name|default:note.user.username }}
+                    <small class="text-muted ms-2">@{{ note.user.username }}</small>
+                  </h6>
+                  <small class="text-muted">{{ note.created_at|date:"M d, Y H:i" }}</small>
+                </div>
+                <p class="mb-2">{{ note.note }}</p>
+                {% if note.user.userprofile.role == 'teacher' %}
+                  <div class="teacher-feedback mt-2 p-2 bg-light rounded">
+                    <small class="text-muted d-block"><i class="fas fa-chalkboard-teacher me-1"></i> Teacher's Status:</small>
+                    <span class="badge 
+                      {% if note.lecture_status == 'completed' %}bg-success
+                      {% elif note.lecture_status == 'student_delayed' %}bg-warning text-dark
+                      {% elif note.lecture_status == 'teacher_delayed' %}bg-danger
+                      {% endif %}">
+                      {{ note.get_lecture_status_display }}
+                    </span>
+                    {% if note.delay_reason %}
+                      <div class="mt-1">
+                        <small class="text-muted d-block"><i class="fas fa-comment-dots me-1"></i> Delay Reason:</small>
+                        <p class="mb-0 small">{{ note.delay_reason }}</p>
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endif %}
               </div>
               {% if note.rating %}
-              <div>
-                <span class="badge bg-primary">Rating: {{ note.rating }}/5</span>
+              <div class="ms-3">
+                <div class="rating-display text-center">
+                  <div class="rating-number bg-primary text-white rounded-circle p-2" style="width: 40px; height: 40px; line-height: 26px;">
+                    {{ note.rating }}
+                  </div>
+                  <small class="d-block mt-1">out of 5</small>
+                </div>
               </div>
               {% endif %}
             </div>
           </li>
           {% empty %}
-          <li class="list-group-item">No notes available.</li>
+          <li class="list-group-item text-center py-4">
+            <i class="far fa-comment-dots fa-2x text-muted mb-2"></i>
+            <p class="mb-0">No feedback available for this lecture yet.</p>
+          </li>
           {% endfor %}
         </ul>
+
+        <!-- Statistics Section -->
+        {% if lecture_data.notes %}
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-chart-pie me-2"></i>Feedback Statistics</h5>
+            <div class="row">
+              <div class="col-md-6">
+                <p><strong>Average Rating:</strong> 
+                  <span class="badge bg-primary">
+                    {{ lecture_data.average_rating|floatformat:1 }}/5
+                  </span>
+                  ({{ lecture_data.rating_count }} ratings)
+                </p>
+                <div class="progress mb-3" style="height: 20px;">
+                  <div class="progress-bar bg-success" role="progressbar" 
+                       style="width: {{ lecture_data.rating_percentage }}%" 
+                       aria-valuenow="{{ lecture_data.rating_percentage }}" 
+                       aria-valuemin="0" aria-valuemax="100">
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <p><strong>Completion Status:</strong></p>
+                <ul class="list-unstyled">
+                  {% if lecture_data.teacher_note %}
+                  <li>
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    Marked as {{ lecture_data.teacher_note.get_lecture_status_display }}
+                  </li>
+                  {% if lecture_data.teacher_note.lecture_status != 'completed' %}
+                  <li>
+                    <i class="fas fa-info-circle text-warning me-2"></i>
+                    Reason: {{ lecture_data.teacher_note.delay_reason|default:"Not specified" }}
+                  </li>
+                  {% endif %}
+                  {% else %}
+                  <li>
+                    <i class="fas fa-clock text-secondary me-2"></i>
+                    Awaiting teacher's status update
+                  </li>
+                  {% endif %}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-primary" data-mdb-dismiss="modal">Close</button>

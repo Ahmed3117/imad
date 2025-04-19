@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static mdbootstrap %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2>Assignments for {{ studygroup.name }}</h2>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Lecture</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for assignment in assignments %}
+                        <tr>
+                            <td>{{ assignment.title }}</td>
+                            <td>{{ assignment.lecture.title }}</td>
+                            <td>{{ assignment.due_at|date:"DATETIME_FORMAT" }}</td>
+                            <td>
+                                {% if assignment.is_past_due %}
+                                    <span class="badge badge-danger">Closed</span>
+                                {% else %}
+                                    <span class="badge badge-success">Open</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% with answer=assignment.student_answers.filter(student=request.user).first %}
+                                    {% if answer %}
+                                        <a href="{% url 'edit_answer' answer.pk %}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="{% url 'delete_answer' answer.pk %}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'submit_answer' assignment.pk %}" class="btn btn-sm btn-success">
+                                            <i class="fas fa-plus"></i> Submit
+                                        </a>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">No assignments available.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

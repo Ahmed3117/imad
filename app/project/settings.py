@@ -12,7 +12,7 @@ ALLOWED_HOSTS = ['*', "localhost", "50.19.183.215","https://2a1e-45-100-68-117.n
 # ALLOWED_HOSTS = ['*', "localhost", "50.19.183.215"]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://2a1e-45-100-68-117.ngrok-free.app',
+    # 'https://2a1e-45-100-68-117.ngrok-free.app',
     # Add any other ngrok URLs here if you're using multiple
 ]
 
@@ -32,7 +32,8 @@ CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
 # Zoom API URLs
 TOKEN_URL = "https://zoom.us/oauth/token"
 MEETING_URL = "https://api.zoom.us/v2/users/me/meetings"
-BASE_URL = "https://nabbiuwny.com"
+# BASE_URL = "https://nabbiuwny.com"
+BASE_URL = "http://127.0.0.1:8000"
 
 INSTALLED_APPS = [
     'admin_interface',
@@ -50,6 +51,8 @@ INSTALLED_APPS = [
     #'carts',
     #'orders',
     'subscriptions',
+    'library',
+    'assignment',
     # 'appointments',
     # 'exams',
     "crispy_forms",
@@ -112,17 +115,22 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.getenv('DB_NAME'),  # Default to 'bluebook' if not set
+#         'USER': os.getenv('DB_USER'),      # Default to 'root' if not set
+#         'PASSWORD': os.getenv('DB_PASSWORD'),  # Default to 'haitham' if not set
+#         'HOST': os.getenv('DB_HOST'),     # Default to 'mysql' if not set
+#         'PORT': os.getenv('DB_PORT'),      # Default to '3306' if not set
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME'),  # Default to 'bluebook' if not set
-        'USER': os.getenv('DB_USER'),      # Default to 'root' if not set
-        'PASSWORD': os.getenv('DB_PASSWORD'),  # Default to 'haitham' if not set
-        'HOST': os.getenv('DB_HOST'),     # Default to 'mysql' if not set
-        'PORT': os.getenv('DB_PORT'),      # Default to '3306' if not set
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 
 # Password validation
@@ -204,7 +212,8 @@ ADMIN_ORDERING = (
     )),
     ('accounts', (
         'User', 'ParentStudent',
-        'TeacherInfo', 'TeacherInfoTranslation'
+        'TeacherInfo', 'TeacherInfoTranslation',
+        'TeacheroomAccount'
     )),
     # ('freemeet', ('FreeMeet',)),
     ('courses', (
@@ -213,7 +222,10 @@ ADMIN_ORDERING = (
         'Course', 'CourseTranslation',
         # 'LevelContent', 'LevelContentTranslation'
     )),
-    ('subscriptions', ('StudyGroup','JoinRequest','Lecture')),
+    ('library', (
+        'CourseLibrary', 'MyLibrary',
+    )),
+    ('subscriptions', ('StudyGroup','JoinRequest','Lecture','StudyGroupResource')),
     # ('appointments', ('TeacherAvailability', 'Appointment')),
     # ('exams', ('Exam', 'Question', 'Option', 'ExamResult')),
     # ('orders', ('Order', 'OrderItem')),
@@ -261,5 +273,5 @@ admin.AdminSite.get_app_list = get_app_list
 
 
 
-CSRF_TRUSTED_ORIGINS = ['https://nabbiuwny.com']
+CSRF_TRUSTED_ORIGINS = ['https://nabbiuwny.com','http://127.0.0.1:8000']
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'

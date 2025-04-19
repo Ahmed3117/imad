@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static mdbootstrap %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2>{{ assignment.title }}</h2>
+            <p class="mb-0">For Lecture: {{ assignment.lecture.title }}</p>
+        </div>
+        <div class="card-body">
+            <div class="mb-4">
+                <h4>Description:</h4>
+                <p>{{ assignment.description }}</p>
+                <p><strong>Due:</strong> {{ assignment.due_at|date:"DATETIME_FORMAT" }}</p>
+                <p><strong>Max Grade:</strong> {{ assignment.max_grade }}</p>
+                {% if assignment.attachment %}
+                <p><strong>Attachment:</strong> 
+                    <a href="{{ assignment.attachment.url }}" target="_blank" class="btn btn-sm btn-info">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                </p>
+                {% endif %}
+            </div>
+            <div class="mb-4">
+                <a href="{% url 'assignment_edit' assignment.pk %}" class="btn btn-warning btn-sm">
+                    <i class="fas fa-edit"></i> Edit Assignment
+                </a>
+                <a href="{% url 'assignment_delete' assignment.pk %}" class="btn btn-danger btn-sm">
+                    <i class="fas fa-trash"></i> Delete Assignment
+                </a>
+            </div>
+            
+            <h3>Student Answers</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Submitted At</th>
+                            <th>Answer</th>
+                            <th>Grade</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for answer in student_answers %}
+                        <tr>
+                            <td>{{ answer.student.get_full_name }}</td>
+                            <td>{{ answer.submitted_at|date:"DATETIME_FORMAT" }}</td>
+                            <td>
+                                {{ answer.answer_text|truncatewords:10 }}
+                                {% if answer.attachment %}
+                                <br>
+                                <a href="{{ answer.attachment.url }}" target="_blank" class="btn btn-sm btn-info mt-1">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if answer.grade is not None %}
+                                    {{ answer.grade }} / {{ assignment.max_grade }}
+                                {% else %}
+                                    Not graded
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'grade_answer' answer.pk %}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-check-circle"></i> Grade
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">No answers submitted yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

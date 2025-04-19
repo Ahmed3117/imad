@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static mdbootstrap %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2>{{ action }} Answer for {{ assignment.title }}</h2>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                
+                <div class="form-group">
+                    {{ form.answer_text.label_tag }}
+                    {{ form.answer_text }}
+                    {{ form.answer_text.errors }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.attachment.label_tag }}
+                    {{ form.attachment }}
+                    {{ form.attachment.errors }}
+                    {% if form.instance.attachment %}
+                        <p>Current file: <a href="{{ form.instance.attachment.url }}" target="_blank">{{ form.instance.attachment.name }}</a></p>
+                    {% endif %}
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <a href="{% url 'student_assignment_list' assignment.lecture.group.pk %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

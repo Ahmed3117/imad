@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import TeacherInfoTranslation, User, StudentProfile
+from .models import TeacherInfoTranslation, TeacheroomAccount, User, StudentProfile
 
 # Inline admin for StudentProfile
 class StudentProfileInline(admin.StackedInline):
@@ -110,5 +110,6 @@ class TeacherInfoAdmin(admin.ModelAdmin):
     autocomplete_fields = ('teacher',)
     # filter_horizontal = ('courses',)
     
-
+# admin for teacheroom account
+admin.site.register(TeacheroomAccount)
 

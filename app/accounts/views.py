@@ -1,12 +1,13 @@
 import datetime
+import json
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login,logout,authenticate
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.hashers import make_password
 from django.utils.timezone import now
 from project.settings import BASE_URL
-from subscriptions.models import GroupTime, Lecture, LectureFile, LectureNote, StudyGroup
-from .models import TeacherInfo, User, StudentProfile
+from subscriptions.models import GroupTime, Lecture, LectureFile, LectureNote, StudyGroup, StudyGroupResource
+from .models import TeacherInfo, TeacheroomAccount, User, StudentProfile
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -21,7 +22,12 @@ import random
 from django.views.decorators.cache import never_cache
 from subscriptions.zoom import get_meeting_participants, get_meeting_status
 import logging
-
+from django.utils import timezone
+from django.contrib import messages
+import requests
+from django import forms
+from django.db.models import Avg, Count
+from django.utils.timezone import now
 # Set up logging
 logger = logging.getLogger(__name__)
 
@@ -332,6 +338,7 @@ def profile(request):
 
         study_groups_data.append({
             'id': study_group.id,
+            'name': study_group.name,
             'course_name': course_name,
             'course_description': course_description,
             'course_image': study_group.course.image.url if study_group.course.image else None,
@@ -367,10 +374,6 @@ def user_logout(request):
     return redirect('accounts:login')
 
 
-from django.utils import timezone
-from django.contrib import messages
-import requests
-from django import forms
 # Forms
 class LectureForm(forms.ModelForm):
     SCHEDULE_CHOICES = [
@@ -410,33 +413,8 @@ def check_study_group_access(request, study_group):
         return False
     return True
 
-# Helper function to create Zoom meeting
-def create_zoom_meeting(title, description, duration, date, time, timezone='Africa/Cairo'):
-
-    print("aaaaaaaaaaaaaaaaaadel")
-    zoom_data = {
-        'topic': title,
-        'agenda': description,
-        'duration': duration,
-        'date': date.strftime('%Y-%m-%d'),
-        'time': time.strftime('%H:%M'),
-        'timezone': timezone,
-    }
-    try:
-        response = requests.post(
-            f'{BASE_URL}/subscriptions/create-meeting/',
-            data=zoom_data
-        )
-        print(response.json())
-        if response.status_code == 200:
-            return response.json().get('meeting_url')
-        return None
-    except Exception as e:
-        print(f"Error creating Zoom meeting: {str(e)}")
-        return None
 
 # Main view to display lectures
-@login_required
 @login_required
 def study_group_lectures(request, study_group_id):
     study_group = get_object_or_404(StudyGroup, id=study_group_id)
@@ -451,6 +429,11 @@ def study_group_lectures(request, study_group_id):
         note = LectureNote.objects.filter(lecture=lecture, user=request.user).first()
         lectures_with_files.append({'lecture': lecture, 'files': files, 'note': note})
 
+    # Get shared resources for this study group
+    shared_resources = StudyGroupResource.objects.filter(
+        studygroup=study_group
+    ).select_related('resource', 'resource__course', 'shared_by')
+
     lecture_form = LectureForm(study_group=study_group) if request.user.role == 'teacher' else None
     file_form = LectureFileForm() if request.user.role == 'teacher' else None
     note_form = LectureNoteForm()
@@ -458,22 +441,60 @@ def study_group_lectures(request, study_group_id):
     return render(request, 'accounts/lectures.html', {
         'study_group': study_group,
         'lectures_with_files': lectures_with_files,
+        'shared_resources': shared_resources,
         'lecture_form': lecture_form,
         'file_form': file_form,
         'note_form': note_form,
         'user_role': request.user.role,
     })
 
+
+@login_required
+@require_POST
+def delete_shared_resource(request):
+    try:
+        data = json.loads(request.body)
+        resource_id = data.get('resource_id')
+        
+        if not resource_id:
+            return JsonResponse({'status': 'error', 'message': 'Resource ID required'}, status=400)
+        
+        resource = get_object_or_404(StudyGroupResource, id=resource_id)
+        
+        # Verify the requesting user is the one who shared it
+        if resource.shared_by != request.user:
+            return JsonResponse({'status': 'error', 'message': 'Not authorized'}, status=403)
+        
+        resource.delete()
+        return JsonResponse({'status': 'success'})
+    
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
 @login_required
 def add_lecture_note(request, lecture_id):
     lecture = get_object_or_404(Lecture, id=lecture_id)
+    
     if request.method == 'POST':
         note_form = LectureNoteForm(request.POST)
         if note_form.is_valid():
             note = note_form.save(commit=False)
             note.lecture = lecture
             note.user = request.user
+            
+            # Only set status and delay reason for teachers
+            if request.user.role == 'teacher':
+                note.lecture_status = request.POST.get('lecture_status', 'completed')
+                if note.lecture_status in ['student_delayed', 'teacher_delayed']:
+                    note.delay_reason = request.POST.get('delay_reason', '')
+            
             note.save()
+            
+            # Update lecture status if teacher is submitting
+            if request.user.role == 'teacher':
+                lecture.is_finished = True
+                lecture.save()
+            
             messages.success(request, "Lecture note added successfully.")
             return redirect('accounts:lectures', study_group_id=lecture.group.id)
         else:
@@ -481,8 +502,41 @@ def add_lecture_note(request, lecture_id):
     else:
         note_form = LectureNoteForm()
 
-    return render(request, 'accounts/add_lecture_note.html', {'note_form': note_form, 'lecture': lecture})
-# Add a new lecture
+    return render(request, 'accounts/add_lecture_note.html', {
+        'note_form': note_form,
+        'lecture': lecture,
+        'user_role': request.user.role
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @login_required
 def add_lecture(request, study_group_id):
     study_group = get_object_or_404(StudyGroup, id=study_group_id)
@@ -500,13 +554,13 @@ def add_lecture(request, study_group_id):
             if schedule == 'NOW':
                 live_link = create_zoom_meeting(
                     lecture.title, lecture.description, lecture.duration,
-                    timezone.now(), timezone.now()
+                    timezone.now(), timezone.now(), user=request.user
                 )
             else:
                 group_time = GroupTime.objects.get(id=int(schedule))
                 live_link = create_zoom_meeting(
                     lecture.title, lecture.description, lecture.duration,
-                    timezone.now(), group_time.time  # Assuming current date for simplicity
+                    timezone.now(), group_time.time, user=request.user
                 )
 
             if live_link:
@@ -517,6 +571,66 @@ def add_lecture(request, study_group_id):
             return JsonResponse({'success': False, 'message': 'Failed to create Zoom meeting'})
         return JsonResponse({'success': False, 'message': 'Invalid form data: ' + str(form.errors)})
     return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
+
+@login_required
+def reschedule_lecture(request, lecture_id):
+    lecture = get_object_or_404(Lecture, id=lecture_id)
+    if request.user.role != 'teacher' or lecture.group.teacher != request.user:
+        return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
+
+    if request.method == 'POST':
+        live_link = create_zoom_meeting(
+            lecture.title, lecture.description, lecture.duration,
+            timezone.now(), timezone.now(), user=request.user
+        )
+        if live_link:
+            lecture.live_link = live_link
+            lecture.live_link_date = timezone.now()
+            lecture.save()
+            return JsonResponse({'success': True, 'message': 'Lecture rescheduled successfully', 'live_link': live_link})
+        return JsonResponse({'success': False, 'message': 'Failed to reschedule Zoom meeting'})
+    return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
+
+def create_zoom_meeting(title, description, duration, date, time, timezone='Africa/Cairo', user=None):
+    if not user or not user.is_authenticated:
+        return None
+    teacher_zoom_account = TeacheroomAccount.objects.get(user=user)
+    print("bbbbbbbbbbbbbbbbbbbbbbbbbb")
+    print(teacher_zoom_account)
+    
+        
+    
+    zoom_data = {
+        'topic': title,
+        'agenda': description,
+        'duration': duration,
+        'date': date.strftime('%Y-%m-%d'),
+        'time': time.strftime('%H:%M'),
+        'timezone': timezone,
+        'client_id' : teacher_zoom_account.client_id,
+        'client_secret' : teacher_zoom_account.client_secret,
+        'account_id' : teacher_zoom_account.account_id
+    }
+    try:
+        response = requests.post(
+            f'{BASE_URL}/subscriptions/create-meeting/',
+            data=zoom_data
+        )
+        if response.status_code == 200:
+            return response.json().get('meeting_url')
+        return None
+    except Exception as e:
+        print(f"Error creating Zoom meeting: {str(e)}")
+        return None
+
+
+
+
+
+
+
+
+
 
 # mark lecture as finished
 @login_required
@@ -571,25 +685,6 @@ def update_lecture(request, lecture_id):
     
     return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
 
-# Reschedule a lecture to "now"
-@login_required
-def reschedule_lecture(request, lecture_id):
-    lecture = get_object_or_404(Lecture, id=lecture_id)
-    if request.user.role != 'teacher' or lecture.group.teacher != request.user:
-        return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
-
-    if request.method == 'POST':
-        live_link = create_zoom_meeting(
-            lecture.title, lecture.description, lecture.duration,
-            timezone.now(), timezone.now()
-        )
-        if live_link:
-            lecture.live_link = live_link
-            lecture.live_link_date = timezone.now()
-            lecture.save()
-            return JsonResponse({'success': True, 'message': 'Lecture rescheduled successfully', 'live_link': live_link})
-        return JsonResponse({'success': False, 'message': 'Failed to reschedule Zoom meeting'})
-    return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
 
 # Delete a lecture
 @login_required
@@ -654,10 +749,30 @@ def track_lectures(request):
 
     lectures_with_notes = []
     for lecture in lectures:
-        notes = LectureNote.objects.filter(lecture=lecture)
-        lectures_with_notes.append({'lecture': lecture, 'notes': notes})
+        notes = LectureNote.objects.filter(lecture=lecture).select_related('user')
+        
+        # Get teacher's note separately
+        teacher_note = notes.filter(user__role='teacher').first()
+        
+        # Calculate statistics
+        rating_stats = notes.filter(rating__isnull=False).aggregate(
+            average_rating=Avg('rating'),
+            rating_count=Count('rating')
+        )
+        
+        lectures_with_notes.append({
+            'lecture': lecture,
+            'notes': notes,
+            'teacher_note': teacher_note,
+            'average_rating': rating_stats['average_rating'] or 0,
+            'rating_count': rating_stats['rating_count'],
+            'rating_percentage': (rating_stats['average_rating'] or 0) * 20 if rating_stats['average_rating'] else 0
+        })
 
-    return render(request, 'accounts/track_lectures.html', {'lectures_with_notes': lectures_with_notes})
+    return render(request, 'accounts/track_lectures.html', {
+        'lectures_with_notes': lectures_with_notes,
+        'selected_date': selected_date or now().date()
+    })
 
 
 @csrf_exempt

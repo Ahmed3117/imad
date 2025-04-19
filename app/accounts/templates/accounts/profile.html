@@ -180,6 +180,7 @@
                 <table class="table table-hover table-striped">
                     <thead class="table-primary">
                         <tr>
+                            <th>Group</th>
                             <th>Course</th>
                             <th>Capacity</th>
                             <th>Lectures</th>
@@ -192,6 +193,7 @@
                     <tbody>
                         {% for group in study_groups %}
                             <tr>
+                                <td>{{ group.name }}</td>
                                 <td>{{ group.course_name }}</td>
                                 <td>{{ group.capacity|default:"N/A" }}</td>
                                 <td>{{ group.number_of_expected_lectures }}</td>

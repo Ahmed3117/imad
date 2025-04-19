@@ -66,16 +66,19 @@ class User(AbstractUser):
                     return None
         return None  # Return None if no email is found
 
-# class ParentProfile(models.Model):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#     TYPE_CHOICES = [
-#         ('mom', 'Mom'),
-#         ('dad', 'Dad'),
-#     ]
-#     type = models.CharField(max_length=5, choices=TYPE_CHOICES,default='dad')
 
-#     def __str__(self):
-#         return f"{self.user.name}'s {self.type} profile"
+class TeacheroomAccount(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='teacheroom_account', limit_choices_to={'role': 'teacher'})
+    account_id = models.CharField(max_length=100, blank=True, null=True)
+    client_id = models.CharField(max_length=100, blank=True, null=True)
+    client_secret = models.CharField(max_length=100, blank=True, null=True)
+    secret_token = models.CharField(max_length=100, blank=True, null=True)
+    verification_token = models.CharField(max_length=100, blank=True, null=True)
+    is_paid = models.BooleanField(default=False)
+    def __str__(self):
+        return self.user.name if self.user.name else self.user.username
+
+
 
 class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -94,13 +97,13 @@ class StudentProfile(models.Model):
 #     def __str__(self):
 #         return f"Parent: {self.parent.name} - Student: {self.student.name}"
 
-class StudentProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    parent_phone = models.CharField(max_length=15, blank=True, null=True)
-    age = models.IntegerField()
+# class StudentProfile(models.Model):
+#     user = models.OneToOneField(User, on_delete=models.CASCADE)
+#     parent_phone = models.CharField(max_length=15, blank=True, null=True)
+#     age = models.IntegerField()
 
-    def __str__(self):
-        return f"{self.user.name}'s profile"
+#     def __str__(self):
+#         return f"{self.user.name}'s profile"
 
 
 

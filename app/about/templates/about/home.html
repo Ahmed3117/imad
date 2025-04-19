@@ -33,6 +33,13 @@
                     </a>
                 </li>
         {% endif %}
+        {% if request.user.role == "admin" or request.user.is_superuser or request.user.role == "teacher" %}
+                <li class="nav-item px-2 ">
+                    <a class="nav-link text-primary" aria-current="page" href="{% url 'library:course_library' %}" data-translate="general_library">
+                        <span>General library</span>
+                    </a>
+                </li>
+        {% endif %}
         <!-- <li class="nav-item px-2">
             <a class="nav-link" href="{% url 'about:about_us' %}" data-translate="aboutus">
             <span>About Us</span>

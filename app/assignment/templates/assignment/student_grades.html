@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static mdbootstrap %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2>Grades Report for {{ student.get_full_name }}</h2>
+            <p class="mb-0">Study Group: {{ studygroup.name }}</p>
+        </div>
+        <div class="card-body">
+            {% if average_grade is not None %}
+            <div class="alert alert-info">
+                <h4>Average Grade: {{ average_grade|floatformat:2 }}%</h4>
+            </div>
+            {% endif %}
+            
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Assignment</th>
+                            <th>Lecture</th>
+                            <th>Submitted At</th>
+                            <th>Grade</th>
+                            <th>Feedback</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for answer in student_answers %}
+                        <tr>
+                            <td>{{ answer.assignment.title }}</td>
+                            <td>{{ answer.assignment.lecture.title }}</td>
+                            <td>{{ answer.submitted_at|date:"DATETIME_FORMAT" }}</td>
+                            <td>
+                                {% if answer.grade is not None %}
+                                    {{ answer.grade }} / {{ answer.assignment.max_grade }}
+                                {% else %}
+                                    Not graded
+                                {% endif %}
+                            </td>
+                            <td>{{ answer.teacher_feedback|default:"No feedback" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">No assignments completed yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <a href="{% url 'studygroup_grades' studygroup.pk %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Group Grades
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

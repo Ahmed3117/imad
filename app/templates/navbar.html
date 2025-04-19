@@ -17,10 +17,18 @@
                         <span>Home</span>
                     </a>
                 </li>
+                
                 {% if request.user.role == "admin" or request.user.is_superuser %}
                 <li class="nav-item px-2 ">
                     <a class="nav-link text-primary" aria-current="page" href="{% url 'accounts:track_lectures' %}" data-translate="track_lectures">
                         <span>Track Lectures</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if request.user.role == "admin" or request.user.is_superuser or request.user.role == "teacher" %}
+                <li class="nav-item px-2 ">
+                    <a class="nav-link text-primary" aria-current="page" href="{% url 'library:course_library' %}" data-translate="general_library">
+                        <span>General library</span>
                     </a>
                 </li>
                 {% endif %}
