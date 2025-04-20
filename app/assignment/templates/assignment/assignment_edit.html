@@ -1,55 +1,194 @@
 {% extends 'base.html' %}
-{% load static mdbootstrap %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h2>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Assignment</h2>
-        </div>
-        <div class="card-body">
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ form.non_field_errors }}
-                
-                <div class="form-group">
-                    {{ form.title.label_tag }}
-                    {{ form.title }}
-                    {{ form.title.errors }}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white py-3">
+                    <h2 class="h4 mb-0">
+                        <i class="fas fa-tasks me-2"></i>
+                        {% if form.instance.pk %}Edit{% else %}Create{% endif %} Assignment
+                    </h2>
                 </div>
-                
-                <div class="form-group">
-                    {{ form.description.label_tag }}
-                    {{ form.description }}
-                    {{ form.description.errors }}
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Title -->
+                        <div class="mb-4">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">
+                                <i class="fas fa-heading me-2"></i>{{ form.title.label }}
+                            </label>
+                            {{ form.title }}
+                            <div class="invalid-feedback">
+                                Please provide a title for the assignment.
+                            </div>
+                            {% if form.title.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.title.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Description -->
+                        <div class="md-form mb-4">
+                            <label for="{{ form.description.id_for_label }}" class="form-label active">
+                                <i class="fas fa-align-left me-2"></i>{{ form.description.label }}
+                            </label>
+                            {{ form.description }}
+                            <div class="invalid-feedback">
+                                Please provide assignment description.
+                            </div>
+                            {% if form.description.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.description.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- File Attachment -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-paperclip me-2"></i>{{ form.attachment.label }}
+                            </label>
+                            <div class="file-upload-wrapper">
+                                {{ form.attachment }}
+                            </div>
+                            {% if form.instance.attachment %}
+                            <div class="mt-2">
+                                <span class="text-muted small">Current file:</span>
+                                <a href="{{ form.instance.attachment.url }}" target="_blank" class="ms-2">
+                                    <i class="fas fa-file-download me-1"></i>{{ form.instance.attachment.name|truncatechars:30 }}
+                                </a>
+                            </div>
+                            {% endif %}
+                            {% if form.attachment.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.attachment.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Due Date & Max Grade -->
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label for="{{ form.due_at.id_for_label }}" class="form-label">
+                                    <i class="far fa-calendar-alt me-2"></i>{{ form.due_at.label }}
+                                </label>
+                                {{ form.due_at }}
+                                <div class="invalid-feedback">
+                                    Please select a due date.
+                                </div>
+                                {% if form.due_at.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.due_at.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label for="{{ form.max_grade.id_for_label }}" class="form-label">
+                                    <i class="fas fa-star-half-alt me-2"></i>{{ form.max_grade.label }}
+                                </label>
+                                {{ form.max_grade }}
+                                <div class="invalid-feedback">
+                                    Please enter maximum grade.
+                                </div>
+                                {% if form.max_grade.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.max_grade.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% if form.instance.pk %}{% url 'assignment:assignment_detail' form.instance.pk %}{% else %}{% url 'accounts:lectures' lecture.group.id %}{% endif %}" 
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Assignment
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                
-                <div class="form-group">
-                    {{ form.attachment.label_tag }}
-                    {{ form.attachment }}
-                    {{ form.attachment.errors }}
-                    {% if form.instance.attachment %}
-                        <p>Current file: <a href="{{ form.instance.attachment.url }}" target="_blank">{{ form.instance.attachment.name }}</a></p>
-                    {% endif %}
-                </div>
-                
-                <div class="form-group">
-                    {{ form.due_at.label_tag }}
-                    {{ form.due_at }}
-                    {{ form.due_at.errors }}
-                </div>
-                
-                <div class="form-group">
-                    {{ form.max_grade.label_tag }}
-                    {{ form.max_grade }}
-                    {{ form.max_grade.errors }}
-                </div>
-                
-                <button type="submit" class="btn btn-primary">Save</button>
-                <a href="{% if form.instance.pk %}{% url 'assignment_detail' form.instance.pk %}{% else %}{% url 'lecture_detail' lecture.pk %}{% endif %}" 
-                   class="btn btn-secondary">Cancel</a>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 {% endblock %}
+
+{% block extra_css %}
+<style>
+    .md-form textarea {
+        min-height: 150px;
+        resize: vertical;
+    }
+    .file-upload-wrapper {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+    .file-upload-wrapper input[type="file"] {
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+    .file-upload-wrapper .file-upload-mask {
+        display: block;
+        padding: 0.5rem 1rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        background-color: #f8f9fa;
+    }
+    .file-upload-wrapper:hover .file-upload-mask {
+        background-color: #e9ecef;
+    }
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+        background: none;
+        padding: 0;
+        margin: 0;
+    }
+</style>
+
+<script>
+    // Enhanced form validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+        
+        // Custom file input display
+        document.querySelectorAll('.file-upload-wrapper input[type="file"]').forEach(function(input) {
+            input.addEventListener('change', function(e) {
+                var fileName = e.target.files[0] ? e.target.files[0].name : 'No file chosen';
+                var label = input.parentElement.querySelector('.file-upload-mask') || 
+                            document.createElement('div');
+                if (!input.parentElement.querySelector('.file-upload-mask')) {
+                    label.className = 'file-upload-mask';
+                    input.parentElement.insertBefore(label, input.nextSibling);
+                }
+                label.innerHTML = '<i class="fas fa-file-upload me-2"></i>' + fileName;
+            });
+        });
+    })();
+    </script>
+{% endblock %}
+

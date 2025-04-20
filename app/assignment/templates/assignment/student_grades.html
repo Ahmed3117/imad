@@ -1,12 +1,14 @@
 {% extends 'base.html' %}
-{% load static mdbootstrap %}
 
 {% block content %}
 <div class="container mt-5">
-    <div class="card">
+    <a href="{% url 'accounts:lectures' study_group.pk %}" class="btn btn-secondary text-light mb-3">
+        <i class="fas fa-arrow-left"></i> Back to Group
+    </a>
+    <div class="card shadow">
         <div class="card-header bg-primary text-white">
-            <h2>Grades Report for {{ student.get_full_name }}</h2>
-            <p class="mb-0">Study Group: {{ studygroup.name }}</p>
+            <h2>Grades Report for {{ student.get_name }}</h2>
+            <p class="mb-0">Study Group: {{ study_group.name }}</p>
         </div>
         <div class="card-body">
             {% if average_grade is not None %}
@@ -14,46 +16,162 @@
                 <h4>Average Grade: {{ average_grade|floatformat:2 }}%</h4>
             </div>
             {% endif %}
-            
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
+
+            <div class="table-responsive mb-4">
+                <table class="table table-striped table-hover">
+                    <thead class="thead-dark">
                         <tr>
                             <th>Assignment</th>
                             <th>Lecture</th>
                             <th>Submitted At</th>
                             <th>Grade</th>
+                            <th>Percentage</th>
                             <th>Feedback</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for answer in student_answers %}
+                        {% for data in assignment_data %}
                         <tr>
-                            <td>{{ answer.assignment.title }}</td>
-                            <td>{{ answer.assignment.lecture.title }}</td>
-                            <td>{{ answer.submitted_at|date:"DATETIME_FORMAT" }}</td>
+                            <td>{{ data.assignment.title }}</td>
+                            <td>{{ data.assignment.lecture.title }}</td>
                             <td>
-                                {% if answer.grade is not None %}
-                                    {{ answer.grade }} / {{ answer.assignment.max_grade }}
+                                {% if data.answer %}
+                                    {{ data.answer.submitted_at|date:"DATETIME_FORMAT" }}
                                 {% else %}
-                                    Not graded
+                                    <span class="text-danger">Not submitted</span>
                                 {% endif %}
                             </td>
-                            <td>{{ answer.teacher_feedback|default:"No feedback" }}</td>
+                            <td>
+                                {% if data.grade is not None %}
+                                    {{ data.grade }} / {{ data.assignment.max_grade }}
+                                {% else %}
+                                    <span class="text-muted">Not graded</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if data.percentage is not None %}
+                                    {{ data.percentage|floatformat:2 }}%
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ data.feedback }}</td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="5">No assignments completed yet.</td>
+                            <td colspan="6" class="text-center text-muted">No assignments completed yet.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-            
-            <a href="{% url 'studygroup_grades' studygroup.pk %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Group Grades
-            </a>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card shadow">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Grade Distribution</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="gradeDistributionChart" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Completion Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="completionChart" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Include JSON data using json_script -->
+<script type="application/json" id="gradeDistributionData">
+    {{ grade_distribution|safe }}
+</script>
+<script type="application/json" id="completionStatusData">
+    {{ completion_status|safe }}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Parse JSON data
+    const gradeDistributionData = JSON.parse(document.getElementById('gradeDistributionData').textContent);
+    const completionStatusData = JSON.parse(document.getElementById('completionStatusData').textContent);
+
+    // Grade Distribution Chart
+    const gradeCtx = document.getElementById('gradeDistributionChart').getContext('2d');
+    new Chart(gradeCtx, {
+        type: 'bar',
+        data: {
+            labels: ['90-100%', '80-89%', '70-79%', '60-69%', '50-59%', 'Below 50%'],
+            datasets: [{
+                label: 'Number of Assignments',
+                data: gradeDistributionData,
+                backgroundColor: [
+                    'rgba(40, 167, 69, 0.7)',
+                    'rgba(40, 167, 69, 0.5)',
+                    'rgba(255, 193, 7, 0.5)',
+                    'rgba(255, 193, 7, 0.7)',
+                    'rgba(220, 53, 69, 0.5)',
+                    'rgba(220, 53, 69, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(40, 167, 69, 1)',
+                    'rgba(40, 167, 69, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(220, 53, 69, 1)',
+                    'rgba(220, 53, 69, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // Completion Status Chart
+    const completionCtx = document.getElementById('completionChart').getContext('2d');
+    new Chart(completionCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Completed', 'Not Completed'],
+            datasets: [{
+                data: completionStatusData,
+                backgroundColor: [
+                    'rgba(40, 167, 69, 0.7)',
+                    'rgba(220, 53, 69, 0.7)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+});
+</script>
 {% endblock %}

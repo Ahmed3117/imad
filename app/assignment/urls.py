@@ -4,7 +4,10 @@ from . import views
 
 urlpatterns = [
     # Teacher URLs
-    path('lecture/<int:lecture_pk>/assignment/create/', 
+    path('lecture/<int:lecture_pk>/assignments/', 
+     views.lecture_assignments, 
+     name='lecture_assignments'),
+    path('lecture/<int:lecture_pk>/create/', 
          views.assignment_create, 
          name='assignment_create'),
     path('assignment/<int:pk>/edit/', 
@@ -21,7 +24,7 @@ urlpatterns = [
          name='grade_answer'),
     
     # Student URLs
-    path('group/<int:group_pk>/assignments/', 
+    path('lecture/<int:lecture_pk>/assignments/', 
          views.student_assignment_list, 
          name='student_assignment_list'),
     path('assignment/<int:assignment_pk>/submit/', 

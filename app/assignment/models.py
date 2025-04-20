@@ -1,8 +1,9 @@
-from datetime import timezone
+
 from django.db import models
 
 from accounts.models import User
 from subscriptions.models import Lecture
+from django.utils import timezone
 
 # Create your models here.
 class Assignment(models.Model):

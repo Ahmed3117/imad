@@ -35,6 +35,16 @@
 
 <div class="container mt-5">
 
+    <!-- assignments report button -->
+    <div class="text-end mb-3">
+        {% if request.user.role == "teacher" %}
+        <a href="{% url 'assignment:studygroup_grades' study_group.id %}" class="btn btn-secondary text-light" data-translate="assignment_report">Assignments Report</a>
+        {% else %}
+        <a href="{% url 'assignment:student_grades' study_group.id request.user.id %}" class="btn btn-secondary text-light" data-translate="assignment_report">Assignments Report</a>
+        {% endif %}
+    </div>
+    
+
     <!-- Shared Resources Section - Now Collapsible -->
     <div class="card mb-4 shadow-sm">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center" 
@@ -249,6 +259,7 @@
                                         <button class="btn btn-success mark-finished-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="mark_as_finished">Mark as Finished</button>
                                         {% endif %}
                                         <button class="btn btn-danger delete-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="delete">Delete</button>
+                                        <a class="btn btn-dark " href="{% url "assignment:lecture_assignments"  lecture_data.lecture.id %}"  data-translate="assignment">Aassignment</a>
                                         <!-- Note Button and Modal -->
                                         {% if not lecture_data.note %}
                                         <button type="button" class="btn btn-secondary text-light mt-3" data-mdb-toggle="modal" data-mdb-target="#noteModal{{ lecture_data.lecture.id }}" data-translate="add_note">Add Note</button>
@@ -258,6 +269,7 @@
                                     </div>
                                 {% endif %}
                                 {% if user_role == 'student' %}
+                                    <a class="btn btn-dark " href="{% url "assignment:student_assignment_list"  lecture_data.lecture.id %}"  data-translate="assignment">Aassignment</a>
                                     <!-- Note Button and Modal -->
                                     {% if not lecture_data.note %}
                                     <button type="button" class="btn btn-secondary text-light mt-3" data-mdb-toggle="modal" data-mdb-target="#noteModal{{ lecture_data.lecture.id }}" data-translate="add_note">Add Note</button>

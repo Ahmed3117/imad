@@ -32,6 +32,19 @@
                     </a>
                 </li>
                 {% endif %}
+                {% if request.user.is_superuser %}
+                <li class="nav-item px-2">
+                    <a class="nav-link" href="{% url "chat:dashboard" %}" data-translate="dashboard">
+                        <span>dashboard</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item px-2">
+                    <a class="nav-link" href="{% url "chat:contact" %}" data-translate="">
+                        <span>contact</span>
+                    </a>
+                </li> 
+                {% endif %}
                 <!-- <li class="nav-item px-2">
                     <a class="nav-link active" aria-current="page" href="{% url 'about:about_us' %}" data-translate="aboutus">
                         <span>About Us</span>

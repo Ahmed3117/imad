@@ -61,6 +61,8 @@ INSTALLED_APPS = [
     # 'payments',
     # 'freemeet',
     'ckeditor',
+    'channels',
+    'chat',
 ]
 
 ASGI_APPLICATION = 'project.asgi.application'
@@ -113,7 +115,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'project.wsgi.application'
 
+ASGI_APPLICATION = 'project.asgi.application'
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
+
+
+
+LANGUAGE_CODE = 'en'
+LANGUAGES = [
+    ('en', 'English'),
+    ('ar', 'Arabic'),
+]
 
 # DATABASES = {
 #     'default': {

@@ -5,7 +5,7 @@
 <div class="container mt-5">
     <div class="card">
         <div class="card-header bg-primary text-white">
-            <h2>Assignments for {{ studygroup.name }}</h2>
+            <h2>Assignments for {{ lecture.name }}</h2>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -35,14 +35,14 @@
                             <td>
                                 {% with answer=assignment.student_answers.filter(student=request.user).first %}
                                     {% if answer %}
-                                        <a href="{% url 'edit_answer' answer.pk %}" class="btn btn-sm btn-warning">
+                                        <a href="{% url 'assignment:edit_answer' answer.pk %}" class="btn btn-sm btn-warning">
                                             <i class="fas fa-edit"></i> Edit
                                         </a>
-                                        <a href="{% url 'delete_answer' answer.pk %}" class="btn btn-sm btn-danger">
+                                        <a href="{% url 'assignment:delete_answer' answer.pk %}" class="btn btn-sm btn-danger">
                                             <i class="fas fa-trash"></i> Delete
                                         </a>
                                     {% else %}
-                                        <a href="{% url 'submit_answer' assignment.pk %}" class="btn btn-sm btn-success">
+                                        <a href="{% url 'assignment:submit_answer' assignment.pk %}" class="btn btn-sm btn-success">
                                             <i class="fas fa-plus"></i> Submit
                                         </a>
                                     {% endif %}

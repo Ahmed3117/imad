@@ -26,6 +26,12 @@ urlpatterns = [
     path('library/', include('library.urls',namespace='library')),
     path('assignment/', include('assignment.urls',namespace='assignment')),
     # path('freemeet/', include('freemeet.urls',namespace='freemeet')),
+    path('chat/', include('chat.urls', namespace='chat')),
 ]
 urlpatterns+=static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns+=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+urlpatterns += i18n_patterns(
+    path('admin/', admin.site.urls),
+    path('i18n/', include('django.conf.urls.i18n')),
+)

@@ -1,36 +1,130 @@
 {% extends 'base.html' %}
-{% load static mdbootstrap %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h2>{{ action }} Answer for {{ assignment.title }}</h2>
-        </div>
-        <div class="card-body">
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ form.non_field_errors }}
-                
-                <div class="form-group">
-                    {{ form.answer_text.label_tag }}
-                    {{ form.answer_text }}
-                    {{ form.answer_text.errors }}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white py-3">
+                    <h2 class="h4 mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        {{ action }} Answer for {{ assignment.title }}
+                    </h2>
                 </div>
-                
-                <div class="form-group">
-                    {{ form.attachment.label_tag }}
-                    {{ form.attachment }}
-                    {{ form.attachment.errors }}
-                    {% if form.instance.attachment %}
-                        <p>Current file: <a href="{{ form.instance.attachment.url }}" target="_blank">{{ form.instance.attachment.name }}</a></p>
-                    {% endif %}
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Answer Text -->
+                        <div class="md-form mb-4">
+                            <label for="{{ form.answer_text.id_for_label }}" class="form-label active">
+                                <i class="fas fa-pencil-alt me-2"></i>{{ form.answer_text.label }}
+                            </label>
+                            {{ form.answer_text }}
+                            <div class="invalid-feedback">
+                                Please provide your answer.
+                            </div>
+                            {% if form.answer_text.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.answer_text.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- File Attachment -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-paperclip me-2"></i>{{ form.attachment.label }}
+                            </label>
+                            <div class="file-upload-wrapper">
+                                {{ form.attachment }}
+                            </div>
+                            {% if form.instance.attachment %}
+                            <div class="mt-2">
+                                <span class="text-muted small">Current file:</span>
+                                <a href="{{ form.instance.attachment.url }}" target="_blank" class="ms-2">
+                                    <i class="fas fa-file-download me-1"></i>{{ form.instance.attachment.name|truncatechars:30 }}
+                                </a>
+                            </div>
+                            {% endif %}
+                            {% if form.attachment.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.attachment.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'assignment:student_assignment_list' assignment.lecture.pk %}" 
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Submit Answer
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                
-                <button type="submit" class="btn btn-primary">Submit</button>
-                <a href="{% url 'student_assignment_list' assignment.lecture.group.pk %}" class="btn btn-secondary">Cancel</a>
-            </form>
+            </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .md-form textarea {
+        min-height: 150px;
+        resize: vertical;
+    }
+    .file-upload-wrapper {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+    .file-upload-wrapper input[type="file"] {
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+    .file-upload-wrapper .file-upload-mask {
+        display: block;
+        padding: 0.5rem 1rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        background-color: #f8f9fa;
+    }
+    .file-upload-wrapper:hover .file-upload-mask {
+        background-color: #e9ecef;
+    }
+</style>
+
+<script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+    </script>
+
+
 {% endblock %}

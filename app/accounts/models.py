@@ -66,6 +66,12 @@ class User(AbstractUser):
                     return None
         return None  # Return None if no email is found
 
+    def get_name(self):
+        # get name or username
+        if self.name:
+            return self.name
+        else:
+            return self.username
 
 class TeacheroomAccount(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='teacheroom_account', limit_choices_to={'role': 'teacher'})
