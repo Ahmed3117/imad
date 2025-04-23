@@ -48,9 +48,14 @@ class StudyGroup(models.Model):
     )
 
     def save(self, *args, **kwargs):
+    # First save to get the pk
+        super().save(*args, **kwargs)
+        
+        # Then set the name if it's not already set
         if not self.name:
             self.name = f"Group-{self.pk}"
-            super().save(*args, **kwargs)
+            # Save again with the updated name, but avoid recursive calls
+            super().save(update_fields=['name'])
 
     def __str__(self):
         # Safely get level name (should always exist due to CASCADE)
