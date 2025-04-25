@@ -6,29 +6,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="nabbiuwny institution">
-  <meta property="og:description" content="">
-  <meta property="og:image" content="https://nabbiuwny.com/static/imgs/hero/hero.png">
-  <meta property="og:url" content="https://nabbiuwny.com/">
-  <meta property="og:type" content="website">
-  <meta name="csrf-token" content="{{ csrf_token }}">
+    <meta property="og:description" content="">
+    <meta property="og:image" content="https://nabbiuwny.com/static/imgs/hero/hero.png">
+    <meta property="og:url" content="https://nabbiuwny.com/">
+    <meta property="og:type" content="website">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <title>{% block title %}{% endblock %}</title>
 
-    <!-- CSS Libraries -->
+    <!-- Define a version constant for cache busting -->
+    <script>
+        const APP_VERSION = '1.0.0';  // Update this when you make frontend changes
+    </script>
+
+    <!-- CSS Libraries with versioning -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700&display=swap" rel="stylesheet" />
     <!-- fav icon -->
-    <link rel="icon" type="image/x-icon" href="{% static 'imgs/bg/l2.png' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'imgs/bg/l2.png' %}?v=1.0.0">
 
-    <link id="rtl-css" href="{% static 'css/mdb.rtl.min.css' %}" rel="stylesheet" disabled />
-    <link id="ltr-css" href="{% static 'css/mdb.min.css' %}" rel="stylesheet" />
+    <link id="rtl-css" href="{% static 'css/mdb.rtl.min.css' %}?v=1.0.0" rel="stylesheet" disabled />
+    <link id="ltr-css" href="{% static 'css/mdb.min.css' %}?v=1.0.0" rel="stylesheet" />
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <!-- Bootstrap CSS with versioning -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.0.0">
 
     <!-- Additional CSS -->
     {% block extra_css %}{% endblock %}
-
-    
 </head>
 <body>
 {% if request.path != '/' %}
@@ -66,42 +69,6 @@
   {% endif %}
 </div>
 
-<!-- Script for Messages -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all visible toasts
-    const toastElements = document.querySelectorAll('.toast');
-    toastElements.forEach(toastEl => {
-        // Initialize the MDB Toast instance
-        const toastInstance = new mdb.Toast(toastEl, {
-            autohide: true,  // Automatically hide after a delay
-            delay: 5000      // Delay before hiding (5 seconds)
-        });
-
-        toastInstance.show(); // Show the toast programmatically
-
-        // Remove the toast completely from the DOM after it's hidden
-        toastEl.addEventListener('hidden.mdb.toast', function () {
-            toastEl.remove();
-        });
-    });
-
-    // Handle close button clicks
-    const closeButtons = document.querySelectorAll('[data-mdb-dismiss="toast"]');
-    closeButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            const toast = this.closest('.toast');
-            if (toast) {
-                const toastInstance = mdb.Toast.getInstance(toast);
-                if (toastInstance) {
-                    toastInstance.hide(); // Hide the toast programmatically
-                }
-            }
-        });
-    });
-});
-</script>
-
 <!-- Content -->
 <div class="">
     {% block content %}{% endblock %}
@@ -112,12 +79,11 @@ document.addEventListener('DOMContentLoaded', function() {
     <i class="fab fa-whatsapp whatsapp-icon"></i>
 </a>
 
+<!-- JavaScript Libraries with versioning -->
+<script type="text/javascript" src="{% static 'js/mdb.min.js' %}?v=1.0.0"></script>
 
-
-<!-- JavaScript Libraries -->
-<script type="text/javascript" src="{% static 'js/mdb.min.js' %}"></script>
-  <!-- Translations -->
-  <script>
+<!-- Translations -->
+<script>
     document.addEventListener('DOMContentLoaded', function() {
       const langButtons = document.querySelectorAll('.lang-btn');
       let currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
@@ -128,10 +94,10 @@ document.addEventListener('DOMContentLoaded', function() {
       }
 
       async function loadTranslations(lang, folder) {
-          const response = await fetch(`/static/translations/${folder}/${lang}.json`);
+          const response = await fetch(`/static/translations/${folder}/${lang}.json?v=${APP_VERSION}`);
           const pageTranslations = await response.json();
 
-          const navbarResponse = await fetch(`/static/translations/navbar/${lang}.json`);
+          const navbarResponse = await fetch(`/static/translations/navbar/${lang}.json?v=${APP_VERSION}`);
           const navbarTranslations = await navbarResponse.json();
 
           translations = { ...translations, ...pageTranslations, ...navbarTranslations };
@@ -213,7 +179,8 @@ document.addEventListener('DOMContentLoaded', function() {
             subtree: true
         });
     });
-  </script>
+</script>
+
 <!-- Script to handle messages in the JS scripts in pages -->
 <script>
   function showToastMessage(message, type) {
