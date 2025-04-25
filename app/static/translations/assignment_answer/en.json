@@ -1,0 +1,9 @@
+{
+  "answer_header": "{{ action }} Answer for",
+  "answer_text_label": "Answer Text",
+  "answer_text_error": "Please provide your answer.",
+  "attachment_label": "Attachment",
+  "current_file": "Current file:",
+  "cancel_button": "Cancel",
+  "submit_button": "Submit Answer"
+}

@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 
+{% load custom_filters %}
+{% block translationFolder %}data-translation-folder="assignment_details"{% endblock %}
+{% block title %}Assignment Details{% endblock %}
+
+
 {% block content %}
 <div class="container my-5">
     <div class="card shadow-lg">
@@ -11,18 +16,18 @@
                         <i class="fas fa-tasks me-2"></i>{{ assignment.title }}
                     </h2>
                     <p class="mb-0 small opacity-75">
-                        <i class="fas fa-book me-1"></i>Lecture: {{ assignment.lecture.title }}
+                        <i class="fas fa-book me-1"></i><span data-translate="lecture_label"></span> {{ assignment.lecture.title }}
                     </p>
                 </div>
                 {% if is_teacher %}
                 <div class="btn-group">
-                    <a href="{% url 'assignment:assignment_edit' assignment.pk %}" 
+                    <a href="{% url 'assignment:assignment_edit' assignment.pk %}"
                        class="btn btn-warning btn-sm">
-                        <i class="fas fa-edit me-1"></i>Edit
+                        <i class="fas fa-edit me-1"></i><span data-translate="edit_button"></span>
                     </a>
-                    <button type="button" class="btn btn-danger btn-sm" 
+                    <button type="button" class="btn btn-danger btn-sm"
                             data-mdb-toggle="modal" data-mdb-target="#deleteAssignmentModal">
-                        <i class="fas fa-trash me-1"></i>Delete
+                        <i class="fas fa-trash me-1"></i><span data-translate="delete_button"></span>
                     </button>
                 </div>
                 {% endif %}
@@ -33,34 +38,34 @@
         <div class="card-body">
             <div class="mb-4">
                 <h4 class="h5 text-primary mb-3">
-                    <i class="fas fa-info-circle me-2"></i>Description
+                    <i class="fas fa-info-circle me-2"></i><span data-translate="description_label"></span>
                 </h4>
                 <div class="ps-4">
                     <p class="mb-3">{{ assignment.description }}</p>
-                    
+
                     <div class="d-flex flex-wrap gap-4 mb-3">
                         <div>
                             <span class="badge bg-secondary me-2">
-                                <i class="far fa-clock me-1"></i>Due:
+                                <i class="far fa-clock me-1"></i><span data-translate="due_label"></span>
                             </span>
                             <span>{{ assignment.due_at|date:"M j, Y H:i" }}</span>
                         </div>
                         <div>
                             <span class="badge bg-secondary me-2">
-                                <i class="fas fa-star-half-alt me-1"></i>Max Grade:
+                                <i class="fas fa-star-half-alt me-1"></i><span data-translate="max_grade_label"></span>
                             </span>
                             <span>{{ assignment.max_grade }}</span>
                         </div>
                     </div>
-                    
+
                     {% if assignment.attachment %}
                     <div>
                         <span class="badge bg-secondary me-2">
-                            <i class="fas fa-paperclip me-1"></i>Attachment:
+                            <i class="fas fa-paperclip me-1"></i><span data-translate="attachment_label"></span>
                         </span>
-                        <a href="{{ assignment.attachment.url }}" target="_blank" 
+                        <a href="{{ assignment.attachment.url }}" target="_blank"
                            class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-download me-1"></i>Download
+                            <i class="fas fa-download me-1"></i><span data-translate="download_button"></span>
                         </a>
                     </div>
                     {% endif %}
@@ -71,19 +76,19 @@
             <!-- Teacher View -->
             <div class="mt-5">
                 <h4 class="h5 text-primary mb-3 border-bottom pb-2">
-                    <i class="fas fa-users me-2"></i>Student Submissions
+                    <i class="fas fa-users me-2"></i><span data-translate="student_submissions_label"></span>
                 </h4>
-                
+
                 {% if student_answers %}
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead class="table-light">
                             <tr>
-                                <th>Student</th>
-                                <th>Submitted</th>
-                                <th>Answer</th>
-                                <th>Grade</th>
-                                <th>Actions</th>
+                                <th><span data-translate="student_label"></span></th>
+                                <th><span data-translate="submitted_label"></span></th>
+                                <th><span data-translate="answer_label"></span></th>
+                                <th><span data-translate="grade_label"></span></th>
+                                <th><span data-translate="actions_label"></span></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -111,35 +116,35 @@
                                     </div>
                                     {% if answer.attachment %}
                                     <div class="mt-1">
-                                        <a href="{{ answer.attachment.url }}" target="_blank" 
+                                        <a href="{{ answer.attachment.url }}" target="_blank"
                                            class="btn btn-xs btn-outline-primary btn-sm">
-                                            <i class="fas fa-file-download me-1"></i>File
+                                            <i class="fas fa-file-download me-1"></i><span data-translate="file_button"></span>
                                         </a>
                                     </div>
                                     {% endif %}
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <input type="number" 
-                                               class="form-control form-control-sm grade-input" 
-                                               style="width: 70px;" 
-                                               value="{{ answer.grade|default:'' }}" 
-                                               min="0" 
+                                        <input type="number"
+                                               class="form-control form-control-sm grade-input"
+                                               style="width: 70px;"
+                                               value="{{ answer.grade|default:'' }}"
+                                               min="0"
                                                max="{{ assignment.max_grade }}"
                                                data-answer-id="{{ answer.pk }}">
                                         <span class="ms-1">/ {{ assignment.max_grade }}</span>
                                     </div>
                                     <div class="mt-1">
-                                        <textarea class="form-control form-control-sm feedback-input" 
-                                                  rows="1" 
-                                                  placeholder="Feedback..."
+                                        <textarea class="form-control form-control-sm feedback-input"
+                                                  rows="1"
+                                                  placeholder="<span data-translate='feedback_placeholder'></span>"
                                                   data-answer-id="{{ answer.pk }}">{{ answer.teacher_feedback|default:'' }}</textarea>
                                     </div>
                                 </td>
                                 <td>
-                                    <button class="btn btn-sm btn-success save-grade-btn" 
+                                    <button class="btn btn-sm btn-success save-grade-btn"
                                             data-answer-id="{{ answer.pk }}">
-                                        <i class="fas fa-save me-1"></i>Save
+                                        <i class="fas fa-save me-1"></i><span data-translate="save_button"></span>
                                     </button>
                                     <div class="grade-status small mt-1" id="grade-status-{{ answer.pk }}"></div>
                                 </td>
@@ -151,7 +156,7 @@
                 {% else %}
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i>
-                    No student submissions yet.
+                    <span data-translate="no_submissions_message"></span>
                 </div>
                 {% endif %}
             </div>
@@ -160,9 +165,9 @@
             <!-- Student View -->
             <div class="mt-5">
                 <h4 class="h5 text-primary mb-3 border-bottom pb-2">
-                    <i class="fas fa-user-edit me-2"></i>My Submission
+                    <i class="fas fa-user-edit me-2"></i><span data-translate="my_submission_label"></span>
                 </h4>
-                
+
                 {% if student_answer %}
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-light">
@@ -170,23 +175,23 @@
                             <div>
                                 <h5 class="mb-0">
                                     <i class="far fa-calendar-check me-2"></i>
-                                    Submitted on {{ student_answer.submitted_at|date:"M j, Y H:i" }}
+                                    <span data-translate="submitted_on_label"></span> {{ student_answer.submitted_at|date:"M j, Y H:i" }}
                                 </h5>
                                 {% if student_answer.updated_at != student_answer.submitted_at %}
                                 <small class="text-muted">
-                                    Last updated: {{ student_answer.updated_at|date:"M j, Y H:i" }}
+                                    <span data-translate="last_updated_label"></span> {{ student_answer.updated_at|date:"M j, Y H:i" }}
                                 </small>
                                 {% endif %}
                             </div>
                             {% if can_edit %}
                             <div class="btn-group">
-                                <a href="{% url 'assignment:edit_answer' student_answer.pk %}" 
+                                <a href="{% url 'assignment:edit_answer' student_answer.pk %}"
                                    class="btn btn-warning btn-sm">
-                                    <i class="fas fa-edit me-1"></i>Edit
+                                    <i class="fas fa-edit me-1"></i><span data-translate="edit_button"></span>
                                 </a>
-                                <button type="button" class="btn btn-danger btn-sm" 
+                                <button type="button" class="btn btn-danger btn-sm"
                                         data-mdb-toggle="modal" data-mdb-target="#deleteAnswerModal">
-                                    <i class="fas fa-trash me-1"></i>Delete
+                                    <i class="fas fa-trash me-1"></i><span data-translate="delete_button"></span>
                                 </button>
                             </div>
                             {% endif %}
@@ -194,25 +199,25 @@
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <h6 class="text-muted">Answer:</h6>
+                            <h6 class="text-muted"><span data-translate="answer_label"></span></h6>
                             <div class="p-3 bg-light rounded">
                                 {{ student_answer.answer_text|linebreaks }}
                             </div>
                         </div>
-                        
+
                         {% if student_answer.attachment %}
                         <div class="mb-3">
-                            <h6 class="text-muted">Attachment:</h6>
-                            <a href="{{ student_answer.attachment.url }}" target="_blank" 
+                            <h6 class="text-muted"><span data-translate="attachment_label"></span></h6>
+                            <a href="{{ student_answer.attachment.url }}" target="_blank"
                                class="btn btn-outline-primary">
-                                <i class="fas fa-file-download me-1"></i>Download File
+                                <i class="fas fa-file-download me-1"></i><span data-translate="download_file_button"></span>
                             </a>
                         </div>
                         {% endif %}
-                        
-                        <button type="button" class="btn btn-primary" 
+
+                        <button type="button" class="btn btn-primary"
                                 data-mdb-toggle="modal" data-mdb-target="#gradeModal">
-                            <i class="fas fa-chart-bar me-1"></i>View Grade
+                            <i class="fas fa-chart-bar me-1"></i><span data-translate="view_grade_button"></span>
                         </button>
                     </div>
                 </div>
@@ -221,11 +226,11 @@
                     <div class="d-flex align-items-center">
                         <i class="fas fa-info-circle fa-2x me-3"></i>
                         <div>
-                            <h5 class="alert-heading">No Submission Yet</h5>
-                            <p class="mb-2">You haven't submitted an answer for this assignment.</p>
-                            <a href="{% url 'assignment:submit_answer' assignment.pk %}" 
+                            <h5 class="alert-heading"><span data-translate="no_submission_yet_heading"></span></h5>
+                            <p class="mb-2"><span data-translate="no_submission_yet_message"></span></p>
+                            <a href="{% url 'assignment:submit_answer' assignment.pk %}"
                                class="btn btn-success">
-                                <i class="fas fa-plus me-1"></i>Submit Answer
+                                <i class="fas fa-plus me-1"></i><span data-translate="submit_answer_button"></span>
                             </a>
                         </div>
                     </div>
@@ -235,8 +240,8 @@
                     <div class="d-flex align-items-center">
                         <i class="fas fa-exclamation-circle fa-2x me-3"></i>
                         <div>
-                            <h5 class="alert-heading">Submission Closed</h5>
-                            <p class="mb-0">This assignment is past due and can no longer be submitted.</p>
+                            <h5 class="alert-heading"><span data-translate="submission_closed_heading"></span></h5>
+                            <p class="mb-0"><span data-translate="submission_closed_message"></span></p>
                         </div>
                     </div>
                 </div>
@@ -253,23 +258,23 @@
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
+                    <i class="fas fa-exclamation-triangle me-2"></i><span data-translate="confirm_deletion_heading"></span>
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-mdb-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to permanently delete this assignment?</p>
+                <p><span data-translate="confirm_deletion_message"></span></p>
                 <div class="alert alert-warning">
                     <i class="fas fa-exclamation-circle me-2"></i>
-                    This action cannot be undone and will delete all associated student submissions.
+                    <span data-translate="confirm_deletion_warning"></span>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">
-                    <i class="fas fa-times me-1"></i>Cancel
+                    <i class="fas fa-times me-1"></i><span data-translate="cancel_button"></span>
                 </button>
                 <a href="{% url 'assignment:assignment_delete' assignment.pk %}" class="btn btn-danger">
-                    <i class="fas fa-trash me-1"></i>Delete Assignment
+                    <i class="fas fa-trash me-1"></i><span data-translate="delete_assignment_button"></span>
                 </a>
             </div>
         </div>
@@ -282,20 +287,20 @@
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
+                    <i class="fas fa-exclamation-triangle me-2"></i><span data-translate="confirm_deletion_heading"></span>
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-mdb-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete your answer submission?</p>
+                <p><span data-translate="confirm_answer_deletion_message"></span></p>
                 <div class="alert alert-warning">
                     <i class="fas fa-exclamation-circle me-2"></i>
-                    This action cannot be undone.
+                    <span data-translate="confirm_deletion_warning"></span>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">
-                    <i class="fas fa-times me-1"></i>Cancel
+                    <i class="fas fa-times me-1"></i><span data-translate="cancel_button"></span>
                 </button>
             </div>
         </div>
@@ -308,7 +313,7 @@
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title">
-                    <i class="fas fa-chart-bar me-2"></i>My Grade
+                    <i class="fas fa-chart-bar me-2"></i><span data-translate="my_grade_heading"></span>
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-mdb-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -319,118 +324,114 @@
                         {{ student_answer.grade }}<small style="font-size: 1.5rem; color: #6c757d;">/{{ assignment.max_grade }}</small>
                     </div>
                     <div class="progress mt-2" style="height: 10px;">
-                        <div class="progress-bar bg-success" 
-                             role="progressbar" 
-                             style="width: {% widthratio student_answer.grade assignment.max_grade 100 %}%" 
-                             aria-valuenow="{{ student_answer.grade }}" 
-                             aria-valuemin="0" 
+                        <div class="progress-bar bg-success"
+                             role="progressbar"
+                             style="width: {% widthratio student_answer.grade assignment.max_grade 100 %}%"
+                             aria-valuenow="{{ student_answer.grade }}"
+                             aria-valuemin="0"
                              aria-valuemax="{{ assignment.max_grade }}">
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="card mb-3">
                     <div class="card-header bg-light">
                         <h6 class="mb-0">
-                            <i class="fas fa-comment me-2"></i>Teacher Feedback
+                            <i class="fas fa-comment me-2"></i><span data-translate="teacher_feedback_label"></span>
                         </h6>
                     </div>
                     <div class="card-body">
                         {% if student_answer.teacher_feedback %}
                             {{ student_answer.teacher_feedback|linebreaks }}
                         {% else %}
-                            <p class="text-muted">No feedback provided</p>
+                            <p class="text-muted"><span data-translate="no_feedback_message"></span></p>
                         {% endif %}
                     </div>
                 </div>
                 {% else %}
                 <div class="alert alert-info text-center">
                     <i class="fas fa-info-circle fa-2x mb-3"></i>
-                    <h5>Not Graded Yet</h5>
-                    <p class="mb-0">Your submission is still being reviewed by the teacher.</p>
+                    <h5><span data-translate="not_graded_yet_heading"></span></h5>
+                    <p class="mb-0"><span data-translate="not_graded_yet_message"></span></p>
                 </div>
                 {% endif %}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-mdb-dismiss="modal">
-                    <i class="fas fa-check me-1"></i>Close
+                    <i class="fas fa-check me-1"></i><span data-translate="close_button"></span>
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-{% endblock %}
 
-{% block extra_js %}
 <script>
-$(document).ready(function() {
-    // Save grade functionality
-    $('.save-grade-btn').click(function() {
-        const answerId = $(this).data('answer-id');
-        const gradeInput = $(`.grade-input[data-answer-id="${answerId}"]`);
-        const feedbackInput = $(`.feedback-input[data-answer-id="${answerId}"]`);
-        const statusDiv = $(`#grade-status-${answerId}`);
-        
-        const grade = gradeInput.val();
-        const feedback = feedbackInput.val();
-        
-        if (grade === '') {
-            statusDiv.html('<div class="alert alert-danger p-2">Please enter a grade</div>');
-            return;
-        }
-        
-        statusDiv.html('<div class="alert alert-info p-2">Saving...</div>');
-        
-        $.ajax({
-            url: "{% url 'assignment:grade_answer' 0 %}".replace('0', answerId),
-            type: 'POST',
-            data: {
-                'grade': grade,
-                'feedback': feedback,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
-            },
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            success: function(response) {
-                if (response.success) {
-                    statusDiv.html('<div class="alert alert-success p-2">Grade saved!</div>');
-                } else {
-                    statusDiv.html(`<div class="alert alert-danger p-2">${response.error}</div>`);
+    $(document).ready(function() {
+        // Save grade functionality
+        $('.save-grade-btn').click(function() {
+            const answerId = $(this).data('answer-id');
+            const gradeInput = $(`.grade-input[data-answer-id="${answerId}"]`);
+            const feedbackInput = $(`.feedback-input[data-answer-id="${answerId}"]`);
+            const statusDiv = $(`#grade-status-${answerId}`);
+            
+            const grade = gradeInput.val();
+            const feedback = feedbackInput.val();
+            
+            if (grade === '') {
+                statusDiv.html('<div class="alert alert-danger p-2">Please enter a grade</div>');
+                return;
+            }
+            
+            statusDiv.html('<div class="alert alert-info p-2">Saving...</div>');
+            
+            $.ajax({
+                url: "{% url 'assignment:grade_answer' 0 %}".replace('0', answerId),
+                type: 'POST',
+                data: {
+                    'grade': grade,
+                    'feedback': feedback,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        statusDiv.html('<div class="alert alert-success p-2">Grade saved!</div>');
+                    } else {
+                        statusDiv.html(`<div class="alert alert-danger p-2">${response.error}</div>`);
+                    }
+                    
+                    setTimeout(function() {
+                        statusDiv.fadeOut();
+                    }, 3000);
+                },
+                error: function(xhr) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        statusDiv.html(`<div class="alert alert-danger p-2">${response.error}</div>`);
+                    } catch {
+                        statusDiv.html('<div class="alert alert-danger p-2">Error saving grade</div>');
+                    }
                 }
-                
-                setTimeout(function() {
-                    statusDiv.fadeOut();
-                }, 3000);
-            },
-            error: function(xhr) {
-                try {
-                    const response = JSON.parse(xhr.responseText);
-                    statusDiv.html(`<div class="alert alert-danger p-2">${response.error}</div>`);
-                } catch {
-                    statusDiv.html('<div class="alert alert-danger p-2">Error saving grade</div>');
-                }
+            });
+        });
+        
+        // Grade input validation
+        $('.grade-input').on('change', function() {
+            const maxGrade = parseInt('{{ assignment.max_grade }}');
+            const value = parseInt($(this).val()) || 0;
+            
+            if (value > maxGrade) {
+                $(this).val(maxGrade);
+            } else if (value < 0) {
+                $(this).val(0);
             }
         });
     });
-    
-    // Grade input validation
-    $('.grade-input').on('change', function() {
-        const maxGrade = parseInt('{{ assignment.max_grade }}');
-        const value = parseInt($(this).val()) || 0;
-        
-        if (value > maxGrade) {
-            $(this).val(maxGrade);
-        } else if (value < 0) {
-            $(this).val(0);
-        }
-    });
-});
 </script>
-{% endblock %}
-
-{% block extra_css %}
+    
 <style>
     .grade-display {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -453,4 +454,8 @@ $(document).ready(function() {
         border-color: #86b7fe;
     }
 </style>
+
+
+
 {% endblock %}
+

@@ -1,0 +1,14 @@
+{
+  "assignments_for_label": "Assignments for",
+  "title_label": "Title",
+  "lecture_label": "Lecture",
+  "due_date_label": "Due Date",
+  "status_label": "Status",
+  "actions_label": "Actions",
+  "closed_label": "Closed",
+  "open_label": "Open",
+  "edit_button": "Edit",
+  "delete_button": "Delete",
+  "submit_button": "Submit",
+  "no_assignments_message": "No assignments available."
+}

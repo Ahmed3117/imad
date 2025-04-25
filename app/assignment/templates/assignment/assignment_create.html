@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
+{% block translationFolder %}data-translation-folder="assignment_create"{% endblock %}
+{% block title %}Add Assignment{% endblock %}
+
+
 
 {% block content %}
 <div class="container my-5">
@@ -8,21 +13,21 @@
                 <div class="card-header bg-primary text-white py-3">
                     <h2 class="h4 mb-0">
                         <i class="fas fa-tasks me-2"></i>
-                        {% if form.instance.pk %}Edit{% else %}Create{% endif %} Assignment
+                        <span data-translate="Create"></span>
                     </h2>
                 </div>
                 <div class="card-body p-4">
                     <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
                         {% csrf_token %}
-                        
+
                         <!-- Title -->
                         <div class="mb-4">
                             <label for="{{ form.title.id_for_label }}" class="form-label">
-                                <i class="fas fa-heading me-2"></i>{{ form.title.label }}
+                                <i class="fas fa-heading me-2"></i><span data-translate="title_label"></span>
                             </label>
                             {{ form.title }}
                             <div class="invalid-feedback">
-                                Please provide a title for the assignment.
+                                <span data-translate="title_error"></span>
                             </div>
                             {% if form.title.errors %}
                             <div class="text-danger small mt-1">
@@ -30,15 +35,15 @@
                             </div>
                             {% endif %}
                         </div>
-                        
+
                         <!-- Description -->
                         <div class="md-form mb-4">
                             <label for="{{ form.description.id_for_label }}" class="form-label active">
-                                <i class="fas fa-align-left me-2"></i>{{ form.description.label }}
+                                <i class="fas fa-align-left me-2"></i><span data-translate="description_label"></span>
                             </label>
                             {{ form.description }}
                             <div class="invalid-feedback">
-                                Please provide assignment description.
+                                <span data-translate="description_error"></span>
                             </div>
                             {% if form.description.errors %}
                             <div class="text-danger small mt-1">
@@ -46,39 +51,32 @@
                             </div>
                             {% endif %}
                         </div>
-                        
+
                         <!-- File Attachment -->
                         <div class="mb-4">
-                            <label class="form-label">
-                                <i class="fas fa-paperclip me-2"></i>{{ form.attachment.label }}
+                            <label for="id_attachment" class="form-label">
+                                <i class="fas fa-paperclip me-2"></i><span data-translate="attachment_label"></span>
                             </label>
-                            <div class="file-upload-wrapper">
-                                {{ form.attachment }}
-                            </div>
-                            {% if form.instance.attachment %}
-                            <div class="mt-2">
-                                <span class="text-muted small">Current file:</span>
-                                <a href="{{ form.instance.attachment.url }}" target="_blank" class="ms-2">
-                                    <i class="fas fa-file-download me-1"></i>{{ form.instance.attachment.name|truncatechars:30 }}
-                                </a>
-                            </div>
-                            {% endif %}
+                            <input type="file" name="attachment" class="form-control" id="id_attachment">
+                            <small class="form-text text-muted">
+                                <span data-translate="file_upload_hint"></span>
+                            </small>
                             {% if form.attachment.errors %}
                             <div class="text-danger small mt-1">
                                 {{ form.attachment.errors }}
                             </div>
                             {% endif %}
                         </div>
-                        
+
                         <!-- Due Date & Max Grade -->
                         <div class="row">
                             <div class="col-md-6 mb-4">
                                 <label for="{{ form.due_at.id_for_label }}" class="form-label">
-                                    <i class="far fa-calendar-alt me-2"></i>{{ form.due_at.label }}
+                                    <i class="far fa-calendar-alt me-2"></i><span data-translate="due_date_label"></span>
                                 </label>
                                 {{ form.due_at }}
                                 <div class="invalid-feedback">
-                                    Please select a due date.
+                                    <span data-translate="due_date_error"></span>
                                 </div>
                                 {% if form.due_at.errors %}
                                 <div class="text-danger small mt-1">
@@ -88,11 +86,11 @@
                             </div>
                             <div class="col-md-6 mb-4">
                                 <label for="{{ form.max_grade.id_for_label }}" class="form-label">
-                                    <i class="fas fa-star-half-alt me-2"></i>{{ form.max_grade.label }}
+                                    <i class="fas fa-star-half-alt me-2"></i><span data-translate="max_grade_label"></span>
                                 </label>
                                 {{ form.max_grade }}
                                 <div class="invalid-feedback">
-                                    Please enter maximum grade.
+                                    <span data-translate="max_grade_error"></span>
                                 </div>
                                 {% if form.max_grade.errors %}
                                 <div class="text-danger small mt-1">
@@ -101,15 +99,15 @@
                                 {% endif %}
                             </div>
                         </div>
-                        
+
                         <!-- Form Actions -->
                         <div class="d-flex justify-content-between mt-4">
-                            <a href="{% if form.instance.pk %}{% url 'assignment:assignment_detail' form.instance.pk %}{% else %}{% url 'accounts:lectures' lecture.group.id %}{% endif %}" 
+                            <a href="{% url 'accounts:lectures' lecture.group.id %}"
                                class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left me-2"></i>Cancel
+                                <i class="fas fa-arrow-left me-2"></i><span data-translate="cancel_button"></span>
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-2"></i>Save Assignment
+                                <i class="fas fa-save me-2"></i><span data-translate="save_button"></span>
                             </button>
                         </div>
                     </form>
@@ -118,9 +116,9 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_css %}
+
+
 <style>
     .md-form textarea {
         min-height: 150px;
@@ -190,7 +188,12 @@
             });
         });
     })();
-    </script>
+</script>
+
+
 
 {% endblock %}
+
+
+
 

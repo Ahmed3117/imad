@@ -1,23 +1,28 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
+{% block translationFolder %}data-translation-folder="studygroup_grades"{% endblock %}
+{% block title %}Grades{% endblock %}
+
+
 
 {% block content %}
 <div class="container mt-5">
     <div class="card">
         <div class="card-header bg-primary text-white">
             <div class="d-flex justify-content-between align-items-center">
-                <h2>Grades Report for {{ study_group.name }}</h2>
+                <h2><span data-translate="grades_report_for_label"></span> {{ study_group.name }}</h2>
                 <a href="{% url 'accounts:lectures' study_group.pk %}" class="btn btn-light btn-sm">
-                    <i class="fas fa-arrow-left"></i> Back to Group
+                    <i class="fas fa-arrow-left"></i> <span data-translate="back_to_group_button"></span>
                 </a>
             </div>
-            <p class="mb-0">Course: {{ study_group.course.name }}</p>
+            <p class="mb-0"><span data-translate="course_label"></span> {{ study_group.course.name }}</p>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-striped table-bordered">
                     <thead class="thead-dark">
                         <tr>
-                            <th rowspan="2">Student</th>
+                            <th rowspan="2"><span data-translate="student_label"></span></th>
                             {% for assignment in assignments %}
                             <th colspan="2" class="text-center">
                                 <a href="{% url 'assignment:assignment_detail' assignment.pk %}" class="text-white">
@@ -27,12 +32,12 @@
                                 <small class="text-muted">{{ assignment.due_at|date:"M d" }}</small>
                             </th>
                             {% endfor %}
-                            <th rowspan="2" class="text-center">Average</th>
+                            <th rowspan="2" class="text-center"><span data-translate="average_label"></span></th>
                         </tr>
                         <tr>
                             {% for assignment in assignments %}
-                            <th class="text-center">Grade</th>
-                            <th class="text-center">Max</th>
+                            <th class="text-center"><span data-translate="grade_label"></span></th>
+                            <th class="text-center"><span data-translate="max_label"></span></th>
                             {% endfor %}
                         </tr>
                     </thead>
@@ -73,7 +78,7 @@
                     </tbody>
                     <tfoot>
                         <tr class="font-weight-bold">
-                            <td>Average</td>
+                            <td><span data-translate="average_label"></span></td>
                             {% for assignment in assignments %}
                             <td colspan="2" class="text-center">
                                 {% widthratio assignment.average_grade assignment.max_grade 100 as percentage %}
@@ -94,7 +99,7 @@
                     <div class="col-md-6">
                         <div class="card">
                             <div class="card-header bg-info text-white">
-                                <h5 class="mb-0">Grading Summary</h5>
+                                <h5 class="mb-0"><span data-translate="grading_summary_label"></span></h5>
                             </div>
                             <div class="card-body">
                                 <canvas id="gradeDistributionChart" height="200"></canvas>
@@ -104,7 +109,7 @@
                     <div class="col-md-6">
                         <div class="card">
                             <div class="card-header bg-success text-white">
-                                <h5 class="mb-0">Completion Status</h5>
+                                <h5 class="mb-0"><span data-translate="completion_status_label"></span></h5>
                             </div>
                             <div class="card-body">
                                 <canvas id="completionChart" height="200"></canvas>
@@ -116,6 +121,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Include JSON data using json_script -->
 <script type="application/json" id="gradeDistributionData">

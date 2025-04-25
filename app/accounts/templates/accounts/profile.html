@@ -4,7 +4,6 @@
 {% block translationFolder %}data-translation-folder="profile"{% endblock %}
 {% block title %}Profile{% endblock %}
 
-
 {% block content %}
 <!-- Toggle Button -->
 <div class="container text-end mt-3">
@@ -84,7 +83,7 @@
                         </div>
                     {% endif %}
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal" data-translate="close">Close</button>
                         <button type="submit" class="btn btn-primary" data-translate="save_changes">Save changes</button>
                     </div>
                 </form>
@@ -104,7 +103,7 @@
                             <!-- Course Filter -->
                             <div class="col-md-2">
                                 <select name="course" class="form-select" onchange="this.form.submit()">
-                                    <option value="">All Courses</option>
+                                    <option value="" data-translate="all_courses">All Courses</option>
                                     {% for course in courses %}
                                         <option value="{{ course.id }}" {% if selected_course == course.id|stringformat:"s" %}selected{% endif %}>
                                             {{ course }}
@@ -116,7 +115,7 @@
                             <!-- Level Filter -->
                             <div class="col-md-2">
                                 <select name="level" class="form-select" onchange="this.form.submit()">
-                                    <option value="">All Levels</option>
+                                    <option value="" data-translate="all_levels">All Levels</option>
                                     {% for level in levels %}
                                         <option value="{{ level.id }}" {% if selected_level == level.id|stringformat:"s" %}selected{% endif %}>
                                             {{ level }}
@@ -128,7 +127,7 @@
                             <!-- Track Filter -->
                             <div class="col-md-2">
                                 <select name="track" class="form-select" onchange="this.form.submit()">
-                                    <option value="">All Tracks</option>
+                                    <option value="" data-translate="all_tracks">All Tracks</option>
                                     {% for track in tracks %}
                                         <option value="{{ track.id }}" {% if selected_track == track.id|stringformat:"s" %}selected{% endif %}>
                                             {{ track }}
@@ -140,7 +139,7 @@
                             <!-- Day Filter -->
                             <div class="col-md-2">
                                 <select name="day" class="form-select" onchange="this.form.submit()">
-                                    <option value="">All Days</option>
+                                    <option value="" data-translate="all_days">All Days</option>
                                     {% for day_code, day_name in days %}
                                         <option value="{{ day_code }}" {% if selected_day == day_code %}selected{% endif %}>
                                             {{ day_name }}
@@ -153,7 +152,7 @@
                             <div class="col-md-4">
                                 <div class="input-group">
                                     <input type="text" name="search" class="form-control" placeholder="Search by course or teacher" value="{{ search_query }}">
-                                    <button class="btn btn-primary" type="submit">Search</button>
+                                    <button class="btn btn-primary" type="submit" data-translate="search">Search</button>
                                 </div>
                             </div>
                         </form>
@@ -180,14 +179,14 @@
                 <table class="table table-hover table-striped">
                     <thead class="table-primary">
                         <tr>
-                            <th>Group</th>
-                            <th>Course</th>
-                            <th>Capacity</th>
-                            <th>Lectures</th>
-                            <th>Price</th>
-                            <th>Students Enrolled</th>
-                            <th>Schedule</th>
-                            <th>Start</th>
+                            <th data-translate="group">Group</th>
+                            <th data-translate="course">Course</th>
+                            <th data-translate="capacity">Capacity</th>
+                            <th data-translate="lectures">Lectures</th>
+                            <th data-translate="price">Price</th>
+                            <th data-translate="students_enrolled">Students Enrolled</th>
+                            <th data-translate="schedule">Schedule</th>
+                            <th data-translate="start">Start</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -203,10 +202,10 @@
                                     {% for time in group.group_times %}
                                     {{ time.get_day_display }} at {{ time.time }}<br>
                                     {% empty %}
-                                    No schedule set
+                                    <span data-translate="no_schedule">No schedule set</span>
                                     {% endfor %}
                                 </td>
-                                <td> <a href="{% url 'accounts:lectures' group.id %}" class="btn btn-primary btn-sm" data-translate="start"> Start</a> </td>
+                                <td> <a href="{% url 'accounts:lectures' group.id %}" class="btn btn-primary btn-sm" data-translate="start">Start</a> </td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -224,7 +223,7 @@
             </div>
         {% endif %}
     {% else %}
-        <p class="text-muted text-center">No study groups found.</p>
+        <p class="text-muted text-center" data-translate="no_study_groups">No study groups found.</p>
     {% endif %}
 
 </div>
@@ -253,4 +252,3 @@
     });
 </script>
 {% endblock %}
-

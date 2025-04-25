@@ -1,17 +1,10 @@
 {
-  "parent_dashboard": "لوحة تحكم الوالدين",
-  "go_with_profile": "اذهب مع هذا الملف الشخصي",
-  "add_new_student": "إضافة طالب جديد",
-  "add_new_student_profile": "إضافة ملف طالب جديد",
-  "student_name": "اسم الطالب",
-  "student_username": "اسم مستخدم الطالب",
-  "password": "كلمة المرور",
-  "age": "العمر",
-  "profile_image": "صورة الملف الشخصي",
-  "add_student": "إضافة طالب",
-  "login_to_student_profile": "تسجيل الدخول إلى ملف الطالب",
-  "username": "اسم المستخدم",
-  "login": "تسجيل الدخول",
-  "parent_phone": "هاتف الوالدين:",
-  "complete_registration": "إكمال التسجيل"
+  "dashboardTitle": "غرف الدردشة",
+  "allRooms": "جميع الغرف",
+  "activeRooms": "الغرف النشطة",
+  "openedRooms": "الغرف المفتوحة",
+  "confirmAction": "تأكيد الإجراء",
+  "confirmMessage": "هل أنت متأكد من رغبتك في إنهاء هذه الدردشة؟",
+  "cancelButton": "إلغاء",
+  "endChatButton": "إنهاء الدردشة"
 }

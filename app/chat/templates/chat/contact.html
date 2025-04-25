@@ -27,39 +27,40 @@
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h5 class="text-primary fw-medium mb-1">Continue Your Last Conversation</h5>
+                                <h5 class="text-primary fw-medium mb-1"><span data-translate="continueConversationHeader"></span></h5>
                             </div>
                             <button id="joinLastRoomBtn" class="btn btn-sm btn-primary">
-                                <i class="fas fa-comments me-1"></i> Join Now
+                                <i class="fas fa-comments me-1"></i> <span data-translate="joinNowButton"></span>
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-
+    
             <!-- Main Card -->
             <div class="card shadow-2-strong" style="border-radius: 12px;">
                 <div class="card-body p-5 text-center">
                     <div class="mb-4">
-                        <h2 class="text-primary fw-medium" data-translate="header">Create a Chat Room</h2>
-                        <p class="text-muted fs-6" data-translate="subheader">Start a new conversation with our support team</p>
+                        <h2 class="text-primary fw-medium" data-translate="header"></h2>
+                        <p class="text-muted fs-6" data-translate="subheader"></p>
                     </div>
                     <form id="createRoomForm" class="d-flex flex-column gap-4">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-primary btn-rounded w-100 fw-medium">
-                            <i class="fas fa-plus-circle me-2"></i> Start a New Chat
+                            <i class="fas fa-plus-circle me-2"></i> <span data-translate="startNewChatButton"></span>
                         </button>
                     </form>
                     <div id="loadingIndicator" class="mt-4" style="display: none;">
                         <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                            <span class="visually-hidden"><span data-translate="loadingText"></span></span>
                         </div>
-                        <p class="mt-2 text-muted">Creating your chat room...</p>
+                        <p class="mt-2 text-muted"><span data-translate="creatingChatRoomText"></span></p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

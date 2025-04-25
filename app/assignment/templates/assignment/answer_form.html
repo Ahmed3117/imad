@@ -1,4 +1,8 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
+{% block translationFolder %}data-translation-folder="assignment_answer"{% endblock %}
+{% block title %}Assignment Answer{% endblock %}
+
 
 {% block content %}
 <div class="container my-5">
@@ -8,21 +12,21 @@
                 <div class="card-header bg-primary text-white py-3">
                     <h2 class="h4 mb-0">
                         <i class="fas fa-edit me-2"></i>
-                        {{ action }} Answer for {{ assignment.title }}
+                        <span data-translate="answer_header"></span> {{ assignment.title }}
                     </h2>
                 </div>
                 <div class="card-body p-4">
                     <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
                         {% csrf_token %}
-                        
+
                         <!-- Answer Text -->
                         <div class="md-form mb-4">
                             <label for="{{ form.answer_text.id_for_label }}" class="form-label active">
-                                <i class="fas fa-pencil-alt me-2"></i>{{ form.answer_text.label }}
+                                <i class="fas fa-pencil-alt me-2"></i><span data-translate="answer_text_label"></span>
                             </label>
                             {{ form.answer_text }}
                             <div class="invalid-feedback">
-                                Please provide your answer.
+                                <span data-translate="answer_text_error"></span>
                             </div>
                             {% if form.answer_text.errors %}
                             <div class="text-danger small mt-1">
@@ -30,18 +34,18 @@
                             </div>
                             {% endif %}
                         </div>
-                        
+
                         <!-- File Attachment -->
                         <div class="mb-4">
                             <label class="form-label">
-                                <i class="fas fa-paperclip me-2"></i>{{ form.attachment.label }}
+                                <i class="fas fa-paperclip me-2"></i><span data-translate="attachment_label"></span>
                             </label>
                             <div class="file-upload-wrapper">
                                 {{ form.attachment }}
                             </div>
                             {% if form.instance.attachment %}
                             <div class="mt-2">
-                                <span class="text-muted small">Current file:</span>
+                                <span class="text-muted small"><span data-translate="current_file"></span></span>
                                 <a href="{{ form.instance.attachment.url }}" target="_blank" class="ms-2">
                                     <i class="fas fa-file-download me-1"></i>{{ form.instance.attachment.name|truncatechars:30 }}
                                 </a>
@@ -53,15 +57,15 @@
                             </div>
                             {% endif %}
                         </div>
-                        
+
                         <!-- Form Actions -->
                         <div class="d-flex justify-content-between mt-4">
-                            <a href="{% url 'assignment:student_assignment_list' assignment.lecture.pk %}" 
+                            <a href="{% url 'assignment:student_assignment_list' assignment.lecture.pk %}"
                                class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left me-2"></i>Cancel
+                                <i class="fas fa-arrow-left me-2"></i><span data-translate="cancel_button"></span>
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-2"></i>Submit Answer
+                                <i class="fas fa-save me-2"></i><span data-translate="submit_button"></span>
                             </button>
                         </div>
                     </form>
@@ -70,9 +74,8 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_css %}
+
 <style>
     .md-form textarea {
         min-height: 150px;
@@ -124,7 +127,13 @@
             });
         }, false);
     })();
-    </script>
+</script>
+
 
 
 {% endblock %}
+
+
+
+
+

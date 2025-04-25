@@ -17,6 +17,10 @@ class AssignmentForm(forms.ModelForm):
                 self.fields[field].widget.attrs.update({
                     'class': 'form-control-file',
                 })
+                # Clear checkbox for existing files in edit form
+                if self.instance and self.instance.attachment:
+                    self.fields['attachment'].widget.clear_checkbox_label = "Remove current file"
+                    self.fields['attachment'].widget.template_name = 'widgets/clearable_file_input.html'
 
     class Meta:
         model = Assignment

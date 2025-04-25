@@ -1,0 +1,18 @@
+{
+  "back_to_group_button": "Back to Group",
+  "grades_report_for_label": "Grades Report for",
+  "study_group_label": "Study Group:",
+  "average_grade_label": "Average Grade:",
+  "assignment_label": "Assignment",
+  "lecture_label": "Lecture",
+  "submitted_at_label": "Submitted At",
+  "grade_label": "Grade",
+  "percentage_label": "Percentage",
+  "feedback_label": "Feedback",
+  "not_submitted_label": "Not submitted",
+  "not_graded_label": "Not graded",
+  "not_available_label": "N/A",
+  "no_assignments_completed_message": "No assignments completed yet.",
+  "grade_distribution_label": "Grade Distribution",
+  "completion_status_label": "Completion Status"
+}

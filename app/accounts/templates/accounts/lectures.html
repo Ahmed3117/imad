@@ -30,12 +30,59 @@
     }
 </style>
 
-
+<!-- Optional: Add custom CSS in your static files or <style> block -->
+    <style>
+        .lecture-accordion .accordion-button:not(.collapsed) {
+            /* Example: Subtle highlight for the open item's button */
+            /* background-color: rgba(0, 0, 0, 0.03); */
+        }
+        .lecture-accordion .finished-lecture .accordion-button {
+           /* Style for finished lecture header - e.g., slightly muted */
+           opacity: 0.75;
+        }
+        /* Add a subtle left border indicator for state */
+        .lecture-accordion .active-lecture > .accordion-header {
+            border-left: 4px solid var(--mdb-primary, #3b71ca); /* MDB Primary */
+        }
+        .lecture-accordion .finished-lecture > .accordion-header {
+           border-left: 4px solid var(--mdb-secondary, #9fa6b2); /* MDB Secondary */
+        }
+        /* Ensure header border aligns with item */
+        .lecture-accordion .accordion-header {
+            border-top-left-radius: inherit;
+            border-bottom-left-radius: inherit;
+        }
+        /* Style for file list items */
+        .file-list-item {
+            background-color: rgba(0, 0, 0, 0.03);
+            transition: background-color 0.2s ease-in-out;
+        }
+        .file-list-item:hover {
+            background-color: rgba(0, 0, 0, 0.06);
+        }
+        .file-icon-wrapper {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0; /* Prevent icon shrinking */
+            background-color: rgba(var(--mdb-secondary-rgb), 0.1); /* Use MDB color variable */
+        }
+        /* Ensure action buttons wrap nicely */
+        .lecture-actions .btn-group-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem; /* Spacing between buttons */
+            align-items: center;
+        }
+        .modal-rating-select option {
+            padding: 5px; /* Add some padding to star options */
+        }
+    </style>
+    
 
 
 <div class="container mt-5">
 
-    <!-- assignments report button -->
+    <!-- Assignments Report Button -->
     <div class="text-end mb-3">
         {% if request.user.role == "teacher" %}
         <a href="{% url 'assignment:studygroup_grades' study_group.id %}" class="btn btn-secondary text-light" data-translate="assignment_report">Assignments Report</a>
@@ -43,17 +90,17 @@
         <a href="{% url 'assignment:student_grades' study_group.id request.user.id %}" class="btn btn-secondary text-light" data-translate="assignment_report">Assignments Report</a>
         {% endif %}
     </div>
-    
 
     <!-- Shared Resources Section - Now Collapsible -->
     <div class="card mb-4 shadow-sm">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center" 
-             data-mdb-toggle="collapse" 
+        <div class="card-header bg-primary text-light d-flex justify-content-between align-items-center"
+             data-mdb-toggle="collapse"
              data-mdb-target="#sharedResourcesCollapse"
              aria-expanded="true"
              aria-controls="sharedResourcesCollapse"
-             style="cursor: pointer;">
-            <h5 class="mb-0">
+             style="cursor: pointer;"
+             id="sharedResourcesHeader">
+            <h5 class="mb-0 text-light">
                 <i class="fas fa-share-alt me-2"></i>
                 <span data-translate="shared_resources">Shared Resources</span>
             </h5>
@@ -82,14 +129,14 @@
                                         <td>{{ resource.resource.course.name }}</td>
                                         <td>{{ resource.shared_by.username }}</td>
                                         <td>
-                                            <a href="{{ resource.resource.file.url }}" 
-                                            class="btn btn-sm btn-primary" 
+                                            <a href="{{ resource.resource.file.url }}"
+                                            class="btn btn-sm btn-primary"
                                             target="_blank"
                                             data-translate="download">
                                                 <i class="fas fa-download"></i> Download
                                             </a>
                                             {% if user_role == 'teacher' and resource.shared_by == request.user %}
-                                                <button class="btn btn-sm btn-danger delete-resource-btn" 
+                                                <button class="btn btn-sm btn-danger delete-resource-btn"
                                                         data-resource-id="{{ resource.id }}"
                                                         data-translate="delete">
                                                     <i class="fas fa-trash"></i> Delete
@@ -111,21 +158,20 @@
         </div>
     </div>
 
-
-    <!-- Add Lecture Form (Teacher Only) - Now Collapsible -->
     {% if user_role == 'teacher' %}
-    <div class="card mb-4 shadow-sm" style="background-color: #f2fdfa;">
-        <div class="card-header d-flex justify-content-between align-items-center" 
-             data-mdb-toggle="collapse" 
+    <div class="card mb-4 shadow-sm " >
+        <div class="card-header d-flex justify-content-between align-items-center bg-primary"
+             data-mdb-toggle="collapse"
              data-mdb-target="#addLectureFormCollapse"
-             aria-expanded="true"
+             aria-expanded="true" 
              aria-controls="addLectureFormCollapse"
-             style="cursor: pointer; background-color: #d1f7ed;">
-            <h5 class="mb-0">
+             style="cursor: pointer; "
+             id="addLectureHeader"> 
+            <h5 class="mb-0 text-light">
                 <i class="fas fa-plus-circle me-2"></i>
                 <span data-translate="add_lecture">Add New Lecture</span>
             </h5>
-            <i class="fas fa-chevron-down toggle-icon"></i>
+            <i class="fas fa-chevron-down toggle-icon"></i> 
         </div>
         <div class="collapse show" id="addLectureFormCollapse">
             <div class="card-body">
@@ -178,186 +224,224 @@
 
     <!-- Lectures List with MDB Accordion -->
     {% if lectures_with_files %}
-        <div class="accordion" id="lecturesAccordion">
-            {% for lecture_data in lectures_with_files %}
-            <div class="accordion-item lecture-item" data-lecture-id="{{ lecture_data.lecture.id }}">
-                <h2 class="accordion-header {% if lecture_data.lecture.is_finished %}finished-lecture {% else %} active-lecture {% endif %}" id="heading{{ forloop.counter }}">
-                    <button
-                        data-mdb-collapse-init
-                        class="accordion-button collapsed"
-                        type="button"
-                        data-mdb-toggle="collapse"
-                        data-mdb-target="#collapse{{ forloop.counter }}"
-                        aria-expanded="false"
-                        aria-controls="collapse{{ forloop.counter }}"
-                    >
-                        <i class="fas fa-book-open me-2"></i> {{ lecture_data.lecture.title }}
-                        {% if lecture_data.lecture.is_finished %}
-                            <span class="badge bg-danger ms-2" data-translate="finished">Finished</span>
+
+    
+    <div class="accordion lecture-accordion" id="lecturesAccordion">
+        {% for lecture_data in lectures_with_files %}
+        <div class="accordion-item lecture-item shadow-sm mb-3 border rounded-1 {% if lecture_data.lecture.is_finished %}finished-lecture{% else %}active-lecture{% endif %}" data-lecture-id="{{ lecture_data.lecture.id }}">
+            <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                <button
+                    class="accordion-button collapsed fw-medium"
+                    type="button"
+                    data-mdb-collapse-init {# MDB Attribute #}
+                    data-mdb-toggle="collapse"
+                    data-mdb-target="#collapse{{ forloop.counter }}"
+                    aria-expanded="false"
+                    aria-controls="collapse{{ forloop.counter }}"
+                >
+                    <i class="fas fa-book-reader me-2 text-primary fa-fw"></i>
+                    <span class="me-auto" data-translate="lecture_title">{{ lecture_data.lecture.title }}</span> {# Pushes badge right #}
+    
+                    {% if lecture_data.lecture.is_finished %}
+                        <span class="badge rounded-pill bg-secondary ms-2" data-translate="finished">Finished</span>
+                    {% endif %}
+                </button>
+            </h2>
+            <div
+                id="collapse{{ forloop.counter }}"
+                class="accordion-collapse collapse"
+                aria-labelledby="heading{{ forloop.counter }}"
+                data-mdb-parent="#lecturesAccordion"
+            >
+                <div class="accordion-body p-lg-4 p-3"> {# Responsive Padding #}
+                    <p class="text-muted mb-4 lecture-description" data-translate="lecture_description">
+                        {{ lecture_data.lecture.description|default:"No description provided." }}
+                    </p>
+    
+                    {# Responsive Row for Date & Live Link #}
+                    <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center mb-4 gap-3 border-bottom pb-3">
+                        <div class="date-info text-muted small" data-translate="created_on">
+                            <i class="far fa-calendar-alt me-1 fa-fw"></i>
+                            <strong data-translate="created">Created:</strong>
+                            {{ lecture_data.lecture.created_at|date:"M d, Y" }} {# Standard Django date filter #}
+                        </div>
+    
+                        {% if lecture_data.lecture.live_link and not lecture_data.lecture.is_finished %}
+                        <div class="live-session text-sm-end mt-2 mt-sm-0"> {# Align right on small+ screens #}
+                            <a href="{{ lecture_data.lecture.live_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary px-3 rounded-pill" data-mdb-ripple-init> {# MDB Ripple #}
+                                <i class="fas fa-video me-1"></i>
+                                <span data-translate="join_live_session">Join Live Session</span>
+                            </a>
+                        </div>
                         {% endif %}
-                    </button>
-                </h2>
-                    <div
-                        id="collapse{{ forloop.counter }}"
-                        class="accordion-collapse collapse"
-                        aria-labelledby="heading{{ forloop.counter }}"
-                        data-mdb-parent="#lecturesAccordion"
-                    >
-                        <div class="accordion-body">
-                            <p class="text-muted mb-4 lecture-description" data-translate="lecture_description">{{ lecture_data.lecture.description }}</p>
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <div class="date-info">
-                                    <i class="far fa-calendar-alt me-1 text-muted"></i>
-                                    <small class="text-muted" data-translate="created_on">Created on:</small>
-                                    {{ lecture_data.lecture.created|date:"m/d/Y" }}
-                                </div>
-                                {% if lecture_data.lecture.live_link %}
-                                    {% if not lecture_data.lecture.is_finished %}
-                                    <div class="live-session">
-                                        <i class="fas fa-video me-1 text-primary"></i>
-                                        <a href="{{ lecture_data.lecture.live_link }}" class="btn btn-sm btn-primary px-3 ripple-surface live-link" data-translate="join_live_session">Join Live Session</a>
+                    </div>
+    
+                    <!-- Files Section -->
+                    <div class="lecture-files mt-3">
+                        <h6 class="mb-3 text-muted fw-bold text-uppercase small" data-translate="files">
+                            <i class="fas fa-paperclip me-2 fa-fw"></i> <span>Files</span>
+                        </h6>
+                        {% if lecture_data.files %}
+                            <ul class="list-unstyled mb-0" id="file-list-{{ lecture_data.lecture.id }}">
+                                {% for file in lecture_data.files %}
+                                <li class="d-flex align-items-center p-2 mb-2 file-list-item rounded-1 position-relative" data-file-id="{{ file.id }}">
+                                    <div class="file-icon-wrapper rounded-circle d-flex align-items-center justify-content-center me-3">
+                                        <i class="far fa-file-alt text-secondary fs-5"></i>
                                     </div>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-
-                            <!-- Files Section -->
-                            <div class="lecture-files">
-                                <h5 class="mb-3 text-secondary"><i class="fas fa-paperclip me-2"></i> <span data-translate="files">Files:</span></h5>
-                                <ul class="list-unstyled" id="file-list-{{ lecture_data.lecture.id }}">
-                                    {% for file in lecture_data.files %}
-                                        <li class="d-flex align-items-center mb-3 file-item" data-file-id="{{ file.id }}">
-                                            <div class="file-icon bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                                <i class="far fa-file-alt text-muted"></i>
-                                            </div>
-                                            <div class="file-info ms-3 flex-grow-1">
-                                                <a href="{{ file.file.url }}" class="text-decoration-none text-primary fw-bold">
-                                                    {{ file.file.name|split:"/"|last }}
-                                                </a>
-                                                <div class="file-size text-muted small" data-translate="file_size">{{ file.file.size|filesizeformat }}</div>
-                                            </div>
-                                            {% if user_role == 'teacher' %}
-                                                <button class="btn btn-sm btn-danger delete-file-btn" data-file-id="{{ file.id }}" data-translate="delete">Delete</button>
-                                            {% endif %}
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-
-                                <!-- Add File Form and Actions (Teacher Only) -->
-                                {% if user_role == 'teacher' %}
-                                    <form class="mt-3 file-upload-form" data-lecture-id="{{ lecture_data.lecture.id }}">
-                                        {% csrf_token %}
-                                        <div class="input-group">
-                                            <input type="file" name="file" class="form-control" multiple>
-                                            <button type="submit" class="btn btn-outline-primary" data-translate="upload_files">Upload Files</button>
-                                        </div>
-                                    </form>
-                                    <div class="mt-3 lecture-actions">
-                                        <button class="btn btn-warning edit-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="edit">Edit</button>
-                                        <button class="btn btn-info reschedule-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="reschedule">Reschedule</button>
-                                        {% if not lecture_data.lecture.is_finished %}
-                                        <button class="btn btn-success mark-finished-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="mark_as_finished">Mark as Finished</button>
-                                        {% endif %}
-                                        <button class="btn btn-danger delete-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="delete">Delete</button>
-                                        <a class="btn btn-dark " href="{% url "assignment:lecture_assignments"  lecture_data.lecture.id %}"  data-translate="assignment">Aassignment</a>
-                                        <!-- Note Button and Modal -->
-                                        {% if not lecture_data.note %}
-                                        <button type="button" class="btn btn-secondary text-light mt-3" data-mdb-toggle="modal" data-mdb-target="#noteModal{{ lecture_data.lecture.id }}" data-translate="add_note">Add Note</button>
-                                        {% else %}
-                                        <p class="mt-3" data-translate="note_added">Note Added</p>
-                                        {% endif %}
-                                    </div>
-                                {% endif %}
-                                {% if user_role == 'student' %}
-                                    <a class="btn btn-dark " href="{% url "assignment:student_assignment_list"  lecture_data.lecture.id %}"  data-translate="assignment">Aassignment</a>
-                                    <!-- Note Button and Modal -->
-                                    {% if not lecture_data.note %}
-                                    <button type="button" class="btn btn-secondary text-light mt-3" data-mdb-toggle="modal" data-mdb-target="#noteModal{{ lecture_data.lecture.id }}" data-translate="add_note">Add Note</button>
-                                    {% else %}
-                                    <p class="mt-3" data-translate="note_added">Note Added</p>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-
-                            
-
-                            <div class="modal fade" id="noteModal{{ lecture_data.lecture.id }}" tabindex="-1" aria-labelledby="noteModalLabel{{ lecture_data.lecture.id }}" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="noteModalLabel{{ lecture_data.lecture.id }}" data-translate="add_note">Add Note</h5>
-                                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form method="POST" action="{% url 'accounts:add_lecture_note' lecture_data.lecture.id %}">
-                                            {% csrf_token %}
-                                            <div class="mb-3">
-                                                <label for="note{{ lecture_data.lecture.id }}" class="form-label" data-translate="note">Note</label>
-                                                <textarea class="form-control" id="note{{ lecture_data.lecture.id }}" name="note" rows="3" required></textarea>
-                                            </div>
-                                            
-                                            {% if user_role == 'student' %}
-                                            <div class="mb-3">
-                                                <label for="rating{{ lecture_data.lecture.id }}" class="form-label" data-translate="rating">Rating</label>
-                                                <select class="form-select" id="rating{{ lecture_data.lecture.id }}" name="rating" required>
-                                                    <option value="1">1</option>
-                                                    <option value="2">2</option>
-                                                    <option value="3">3</option>
-                                                    <option value="4">4</option>
-                                                    <option value="5">5</option>
-                                                </select>
-                                            </div>
-                                            {% endif %}
-                                            
-                                            {% if user_role == 'teacher' %}
-                                            <div class="mb-3">
-                                                <label for="lecture_status{{ lecture_data.lecture.id }}" class="form-label" data-translate="lecture_status">Lecture Status</label>
-                                                <select class="form-select" id="lecture_status{{ lecture_data.lecture.id }}" name="lecture_status" required>
-                                                    <option value="completed" data-translate="completed">Completed Successfully</option>
-                                                    <option value="student_delayed" data-translate="student_delayed">Delayed by Student</option>
-                                                    <option value="teacher_delayed" data-translate="teacher_delayed">Delayed by Teacher</option>
-                                                </select>
-                                            </div>
-                                            
-                                            <div class="mb-3" id="delayReasonContainer{{ lecture_data.lecture.id }}" style="display: none;">
-                                                <label for="delay_reason{{ lecture_data.lecture.id }}" class="form-label" data-translate="delay_reason">Delay Reason</label>
-                                                <textarea class="form-control" id="delay_reason{{ lecture_data.lecture.id }}" name="delay_reason" rows="2"></textarea>
-                                            </div>
-                                            {% endif %}
-                                            
-                                            <button type="submit" class="btn btn-primary" data-translate="submit">Submit</button>
-                                        </form>
+                                    <div class="file-info flex-grow-1">
+                                        <a href="{{ file.file.url }}" target="_blank" rel="noopener noreferrer" class="text-dark fw-medium stretched-link text-decoration-none">
+                                            {{ file.file.name|split:"/"|last }}
+                                        </a>
                                         
-                                        <script>
-                                            document.addEventListener('DOMContentLoaded', function() {
-                                                // Show/hide delay reason based on status selection
-                                                const statusSelect = document.getElementById('lecture_status{{ lecture_data.lecture.id }}');
-                                                const reasonContainer = document.getElementById('delayReasonContainer{{ lecture_data.lecture.id }}');
-                                                
-                                                if (statusSelect && reasonContainer) {
-                                                    statusSelect.addEventListener('change', function() {
-                                                        if (this.value === 'student_delayed' || this.value === 'teacher_delayed') {
-                                                            reasonContainer.style.display = 'block';
-                                                        } else {
-                                                            reasonContainer.style.display = 'none';
-                                                        }
-                                                    });
-                                                    
-                                                    // Trigger change event on load in case a delayed status is preselected
-                                                    statusSelect.dispatchEvent(new Event('change'));
-                                                }
-                                            });
-                                        </script>
                                     </div>
+                                    {% if user_role == 'teacher' %}
+                                        <button class="btn btn-outline-danger btn-sm delete-file-btn ms-2 flex-shrink-0 position-relative z-index-1 rounded-circle p-0" style="width: 30px; height: 30px;" data-file-id="{{ file.id }}" title="Delete file" data-mdb-ripple-init data-mdb-ripple-color="dark" >
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted small fst-italic" data-translate="no_files">No files uploaded yet.</p>
+                        {% endif %}
+    
+                        <!-- Add File Form (Teacher Only) -->
+                        {% if user_role == 'teacher' %}
+                            <form class="mt-3 file-upload-form" data-lecture-id="{{ lecture_data.lecture.id }}" method="POST" action="." enctype="multipart/form-data"> {# Assume action handled by JS or specific URL needed #}
+                                {% csrf_token %}
+                                <div class="input-group input-group-sm">
+                                    <input type="file" name="file" class="form-control" multiple aria-label="Upload file" required>
+                                    <button type="submit" class="btn btn-outline-primary" data-mdb-ripple-init>
+                                        <i class="fas fa-upload me-1"></i> <span data-translate="upload_files">Upload</span>
+                                    </button>
                                 </div>
-                            </div>
-                            </div>
-
+                            </form>
+                        {% endif %}
+                    </div>
+    
+                    <!-- Actions Section -->
+                    <div class="lecture-actions mt-4 pt-3 border-top">
+                        <div class="btn-group-actions"> {# Custom class for flex wrap defined in CSS #}
+                            {% if user_role == 'teacher' %}
+                                <button class="btn btn-sm btn-warning edit-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-mdb-ripple-init data-translate="edit">Edit</button>
+                                <button class="btn btn-sm btn-secondary reschedule-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-mdb-ripple-init data-translate="reschedule">Reschedule</button>
+                                {% if not lecture_data.lecture.is_finished %}
+                                <button class="btn btn-sm btn-success mark-finished-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-mdb-ripple-init data-translate="mark_as_finished">Mark Finished</button>
+                                {% endif %}
+                                <a class="btn btn-sm btn-dark" href="{% url 'assignment:lecture_assignments' lecture_data.lecture.id %}" data-mdb-ripple-init data-translate="assignments">Assignments</a>
+                                <!-- Note Button Trigger -->
+                                <button type="button" class="btn btn-sm {% if lecture_data.note %}btn-info{% else %}btn-info{% endif %}" data-mdb-toggle="modal" data-mdb-target="#noteModal{{ lecture_data.lecture.id }}" data-mdb-ripple-init>
+                                    <i class="far fa-comment-alt me-1"></i> <span data-translate="add_note">Feedback</span> {% if lecture_data.note %}<span class="badge bg-success rounded-pill ms-1 p-1"></span>{% endif %}
+                                </button>
+                                <button class="btn btn-sm btn-danger delete-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-mdb-ripple-init data-translate="delete">Delete</button>
+    
+                            {% elif user_role == 'student' %}
+                                <a class="btn btn-sm btn-dark" href="{% url 'assignment:student_assignment_list' lecture_data.lecture.id %}" data-mdb-ripple-init data-translate="view_assignments">View Assignments</a>
+                                <!-- Note Button Trigger -->
+                                <button type="button" class="btn btn-sm {% if lecture_data.note %}btn-info{% else %}btn-info{% endif %}" data-mdb-toggle="modal" data-mdb-target="#noteModal{{ lecture_data.lecture.id }}" data-mdb-ripple-init>
+                                    <i class="far fa-comment-alt me-1"></i> <span data-translate="add_note_and_rating">Add Note & Rating</span> {% if lecture_data.note %}<span class="badge bg-success rounded-pill ms-1 p-1" title="Note added"></span>{% endif %}
+                                </button>
+                            {% endif %}
                         </div>
                     </div>
+    
+                </div> {# End accordion-body #}
+            </div> {# End accordion-collapse #}
+        </div> {# End accordion-item #}
+    
+        <!-- Note Modal -->
+        <div class="modal fade" id="noteModal{{ lecture_data.lecture.id }}" tabindex="-1" aria-labelledby="noteModalLabel{{ lecture_data.lecture.id }}" aria-hidden="true" data-mdb-backdrop="static" data-mdb-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form method="POST" action="{% url 'accounts:add_lecture_note' lecture_data.lecture.id %}" id="noteForm{{ lecture_data.lecture.id }}">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="noteModalLabel{{ lecture_data.lecture.id }}" data-translate="lecture_feedback">
+                                <i class="far fa-comment-dots me-2"></i>Lecture Feedback
+                            </h5>
+                            <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="note{{ lecture_data.lecture.id }}" class="form-label small text-muted" data-translate="your_note">Your Note:</label>
+                                <textarea class="form-control" id="note{{ lecture_data.lecture.id }}" name="note" rows="4" required></textarea>
+                            </div>
+    
+                            {% if user_role == 'student' %}
+                            <div class="mb-3">
+                                <label for="rating{{ lecture_data.lecture.id }}" class="form-label small text-muted" data-translate="your_rating">Your Rating:</label>
+                                <select class="form-select modal-rating-select" id="rating{{ lecture_data.lecture.id }}" name="rating" required>
+                                    <option value="" disabled selected data-translate="select_rating">Select rating...</option>
+                                    <option value="1">⭐ (Poor)</option>
+                                    <option value="2">⭐⭐</option>
+                                    <option value="3">⭐⭐⭐ (Average)</option>
+                                    <option value="4">⭐⭐⭐⭐</option>
+                                    <option value="5">⭐⭐⭐⭐⭐ (Excellent)</option>
+                                </select>
+                            </div>
+                            {% endif %}
+    
+                            {% if user_role == 'teacher' %}
+                            <div class="mb-3">
+                                <label for="lecture_status{{ lecture_data.lecture.id }}" class="form-label small text-muted" data-translate="lecture_status">Lecture Status:</label>
+                                <select class="form-select" id="lecture_status{{ lecture_data.lecture.id }}" name="lecture_status" required>
+                                    <option value="completed" data-translate="completed">Completed Successfully</option>
+                                    <option value="student_delayed" data-translate="student_delayed">Delayed by Student</option>
+                                    <option value="teacher_delayed" data-translate="teacher_delayed">Delayed by Teacher</option>
+                                </select>
+                            </div>
+    
+                            {# JS Toggled field #}
+                            <div class="mb-3" id="delayReasonContainer{{ lecture_data.lecture.id }}" style="display: none;">
+                                <label for="delay_reason{{ lecture_data.lecture.id }}" class="form-label small text-muted" data-translate="delay_reason">Reason for Delay:</label>
+                                <textarea class="form-control" id="delay_reason{{ lecture_data.lecture.id }}" name="delay_reason" rows="2"></textarea>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal" data-mdb-ripple-init data-translate="cancel">Cancel</button>
+                            <button type="submit" class="btn btn-primary" data-mdb-ripple-init data-translate="submit_feedback">Submit Feedback</button>
+                        </div>
+                    </form> {# End Form #}
                 </div>
-            {% endfor %}
+            </div>
         </div>
+    
+        {# JS for teacher's modal delay reason (remains the same logic) #}
+        {% if user_role == 'teacher' %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const modalElement = document.getElementById('noteModal{{ lecture_data.lecture.id }}');
+                if (modalElement) {
+                    const statusSelect = modalElement.querySelector('#lecture_status{{ lecture_data.lecture.id }}');
+                    const reasonContainer = modalElement.querySelector('#delayReasonContainer{{ lecture_data.lecture.id }}');
+                    const reasonTextarea = modalElement.querySelector('#delay_reason{{ lecture_data.lecture.id }}');
+                    if (statusSelect && reasonContainer && reasonTextarea) {
+                        const toggleReason = () => {
+                            const isDelayed = statusSelect.value === 'student_delayed' || statusSelect.value === 'teacher_delayed';
+                            reasonContainer.style.display = isDelayed ? 'block' : 'none';
+                            reasonTextarea.required = isDelayed;
+                            if (!isDelayed) {
+                                reasonTextarea.value = '';
+                            }
+                        };
+                        statusSelect.addEventListener('change', toggleReason);
+                        toggleReason(); // Initial check
+                    }
+                }
+            });
+        </script>
+        {% endif %}
+    
+        {% empty %}
+            <div class="alert alert-secondary text-center" role="alert" data-translate="no_lectures">
+                <i class="fas fa-info-circle me-2"></i> There are no lectures scheduled for this course yet.
+            </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Make sure MDB JS is loaded in your base template for data-mdb-* attributes to work -->
     {% else %}
         <div class="alert alert-light alert-dismissible fade show text-center mt-4">
             <i class="fas fa-info-circle me-2"></i>
@@ -365,7 +449,11 @@
             <button type="button" class="btn-close" data-mdb-dismiss="alert" aria-label="Close"></button>
         </div>
     {% endif %}
+    
 </div>
+
+
+
 
 
 
@@ -762,8 +850,91 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-
-
-
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    
+        // --- Configuration for Collapsible Sections ---
+        // Add entries here for any new collapsible sections you create
+        const collapsibleSections = [
+            {
+                headerId: 'sharedResourcesHeader',
+                collapseId: 'sharedResourcesCollapse',
+                storageKey: 'sharedResourcesCollapsed'
+            },
+            {
+                headerId: 'addLectureHeader',
+                collapseId: 'addLectureFormCollapse',
+                storageKey: 'addLectureFormCollapsed'
+            }
+            // Add more sections like this:
+            // { headerId: 'anotherHeaderId', collapseId: 'anotherCollapseId', storageKey: 'anotherCollapsedStateKey' }
+        ];
+    
+        // --- Generic Function to Update Toggle Icon ---
+        const updateToggleIcon = (iconElement, isCollapsing) => {
+            if (!iconElement) return; // Safety check if icon isn't found
+            if (isCollapsing) {
+                // It's going to be hidden (or is hidden) -> show 'up' arrow
+                iconElement.classList.remove('fa-chevron-down');
+                iconElement.classList.add('fa-chevron-up');
+            } else {
+                // It's going to be shown (or is shown) -> show 'down' arrow
+                iconElement.classList.remove('fa-chevron-up');
+                iconElement.classList.add('fa-chevron-down');
+            }
+        };
+    
+        // --- Loop through each configured section and apply logic ---
+        collapsibleSections.forEach(section => {
+            const headerElement = document.getElementById(section.headerId);
+            const collapseElement = document.getElementById(section.collapseId);
+            const toggleIconElement = headerElement ? headerElement.querySelector('.toggle-icon') : null;
+    
+            // Check if elements exist before proceeding
+            if (!headerElement || !collapseElement || !toggleIconElement) {
+                console.warn(`Could not find all elements for collapsible section:`, section);
+                return; // Skip this section if elements are missing
+            }
+    
+            // --- Set Initial State on Page Load ---
+            const isCollapsedInitially = localStorage.getItem(section.storageKey) === 'true';
+    
+            if (isCollapsedInitially) {
+                // If localStorage says collapsed, ensure it is (remove 'show')
+                collapseElement.classList.remove('show');
+                updateToggleIcon(toggleIconElement, true); // Set icon to 'up'
+                headerElement.setAttribute('aria-expanded', 'false');
+            } else {
+                // If localStorage says expanded (or no value), ensure it has 'show'
+                // Note: Only add if not already present, though add() is safe
+                if (!collapseElement.classList.contains('show')) {
+                     collapseElement.classList.add('show');
+                }
+                updateToggleIcon(toggleIconElement, false); // Set icon to 'down'
+                headerElement.setAttribute('aria-expanded', 'true');
+            }
+    
+            // --- Listen for MDB/Bootstrap Collapse Events ---
+    
+            // Event listener for AFTER it has been shown (expanded)
+            collapseElement.addEventListener('shown.bs.collapse', function () {
+                localStorage.setItem(section.storageKey, 'false'); // It's now expanded
+                updateToggleIcon(toggleIconElement, false);       // Update icon to 'down'
+                headerElement.setAttribute('aria-expanded', 'true'); // Sync aria
+            });
+    
+            // Event listener for AFTER it has been hidden (collapsed)
+            collapseElement.addEventListener('hidden.bs.collapse', function () {
+                localStorage.setItem(section.storageKey, 'true'); // It's now collapsed
+                updateToggleIcon(toggleIconElement, true);        // Update icon to 'up'
+                headerElement.setAttribute('aria-expanded', 'false'); // Sync aria
+            });
+        });
+    
+    });
+    </script>
+
+
 {% endblock %}

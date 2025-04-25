@@ -1,0 +1,14 @@
+{
+  "assignments_for_label": "التكاليف لـ",
+  "title_label": "العنوان",
+  "lecture_label": "المحاضرة",
+  "due_date_label": "تاريخ الاستحقاق",
+  "status_label": "الحالة",
+  "actions_label": "الإجراءات",
+  "closed_label": "مغلق",
+  "open_label": "مفتوح",
+  "edit_button": "تعديل",
+  "delete_button": "حذف",
+  "submit_button": "تسليم",
+  "no_assignments_message": "لا توجد تكاليف متاحة."
+}

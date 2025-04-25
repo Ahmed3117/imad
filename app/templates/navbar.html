@@ -1,7 +1,6 @@
 {% load static %}
 
-
-<nav class="navbar navbar-expand-lg sticky-top">
+<nav class="navbar navbar-expand-lg sticky-top bg-light">
     <div class="container">
         <a class="navbar-brand" href="/">
             <img src="{{logo_url}}" alt="Logo" height="60">
@@ -13,77 +12,65 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item px-2">
-                    <a class="nav-link active" aria-current="page" href="/" data-translate="home">
+                    <a class="nav-link fw-bold" aria-current="page" href="/" data-translate="home">
                         <span>Home</span>
                     </a>
                 </li>
                 
                 {% if request.user.role == "admin" or request.user.is_superuser %}
-                <li class="nav-item px-2 ">
-                    <a class="nav-link text-primary" aria-current="page" href="{% url 'accounts:track_lectures' %}" data-translate="track_lectures">
+                <li class="nav-item px-2">
+                    <a class="nav-link fw-bold" aria-current="page" href="{% url 'accounts:track_lectures' %}" data-translate="track_lectures">
                         <span>Track Lectures</span>
                     </a>
                 </li>
                 {% endif %}
                 {% if request.user.role == "admin" or request.user.is_superuser or request.user.role == "teacher" %}
-                <li class="nav-item px-2 ">
-                    <a class="nav-link text-primary" aria-current="page" href="{% url 'library:course_library' %}" data-translate="general_library">
+                <li class="nav-item px-2">
+                    <a class="nav-link fw-bold" aria-current="page" href="{% url 'library:course_library' %}" data-translate="general_library">
                         <span>General library</span>
                     </a>
                 </li>
                 {% endif %}
                 {% if request.user.is_superuser %}
-                <li class="nav-item px-2">
-                    <a class="nav-link" href="{% url "chat:dashboard" %}" data-translate="dashboard">
-                        <span>Customer Service</span>
+                <li>
+                    <a class="nav-link fw-bold" href="{% url "chat:dashboard" %}" >
+                        <span data-translate="customer_service">Customer Service</span>
                     </a>
                 </li>
                 {% else %}
-                <li class="nav-item px-2">
-                    <a class="nav-link" href="{% url "chat:contact" %}" data-translate="">
-                        <span>Customer Service</span>
+                <li>
+                    <a class="nav-link fw-bold" href="{% url "chat:contact" %}" >
+                        <span data-translate="customer_service">Customer Service</span>
                     </a>
-                </li> 
-            {% endif %}
-                <!-- <li class="nav-item px-2">
-                    <a class="nav-link active" aria-current="page" href="{% url 'about:about_us' %}" data-translate="aboutus">
-                        <span>About Us</span>
-                    </a>
-                </li> -->
+                </li>
+                {% endif %}
                 <li class="nav-item px-2 dropdown">
-                    <a class="nav-link dropdown-toggle text-primary" href="#" id="navbarDropdown" role="button" data-mdb-toggle="dropdown"
+                    <a class="nav-link fw-bold dropdown-toggle" href="#" id="navbarDropdown" role="button" data-mdb-toggle="dropdown"
                         aria-expanded="false" data-translate="go_to">
                         <span>Go To</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                         {% if request.path == '/' %}
-                            <li><a class="dropdown-item fw-bold" href="{% url 'courses:levels' %}" data-translate="levels"><span>Levels & Courses</span></a></li>
+                            <li><a class="dropdown-item" href="{% url 'courses:levels' %}" data-translate="levels"><span>Levels & Courses</span></a></li>
                             {% if request.user.is_authenticated %}
-                            
-                            
                                 {% if request.user.role == "parent" %}
-                                    <a class="dropdown-item fw-bold" href="{% url 'accounts:parent_dashboard' %}" data-translate="profile"><span>My Profile</span></a>
+                                    <li><a class="dropdown-item" href="{% url 'accounts:parent_dashboard' %}" data-translate="profile"><span>My Profile</span></a></li>
                                 {% else %}
-                                    <a class="dropdown-item fw-bold" href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a>
+                                    <li><a class="dropdown-item" href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a></li>
                                 {% endif %}
                             {% endif %}
-
-                        <li><a class="dropdown-item" href="#contact" data-translate="contacts"><span>Contact</span></a></li>
+                            <li><a class="dropdown-item" href="#contact" data-translate="contacts"><span>Contact</span></a></li>
                         {% else %}
-                        <li>
                             {% if request.user.role == "parent" %}
-                                    <li><a class="dropdown-item fw-bold" href="{% url 'accounts:parent_dashboard' %}" data-translate="profile"><span>My Profile</span></a></li>
-                                {% else %}
-                                    <li><a class="dropdown-item fw-bold" href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:parent_dashboard' %}" data-translate="profile"><span>My Profile</span></a></li>
+                            {% else %}
+                                <li><a class="dropdown-item" href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a></li>
                             {% endif %}
-
-                            <li><a class="dropdown-item fw-bold" href="{% url 'courses:levels' %}" data-translate="levels"><span>Levels & Courses</span></a></li>
-                            
+                            <li><a class="dropdown-item" href="{% url 'courses:levels' %}" data-translate="levels"><span>Levels & Courses</span></a></li>
                         {% endif %}
                     </ul>
                 </li>
 
-                <!-- Language Switcher -->
                 <li class="nav-item px-2 d-flex align-items-center mx-md-3">
                     <div class="lang-switcher">
                         <button class="lang-btn active" data-lang="en">EN</button>
@@ -91,24 +78,22 @@
                     </div>
                 </li>
 
-                <!-- User Profile Dropdown -->
                 <li class="nav-item dropdown">
                   {% if request.user.is_authenticated %}
-                  <a class="nav-link dropdown-toggle ms-md-5" href="#" id="userDropdown" role="button" data-mdb-toggle="dropdown"
+                  <a class="nav-link fw-bold dropdown-toggle ms-md-5" href="#" id="userDropdown" role="button" data-mdb-toggle="dropdown"
                       aria-expanded="false">
                       {% if request.user.image %}
-                      <img src="{{request.user.image.url}}" alt="User" class="rounded-circle" height="55" />
+                      <img src="{{request.user.image.url}}" alt="User" class="rounded-circle" height="40" width="40" style="object-fit: cover;">
                       {% else %}
-                      <img src="{% static 'imgs/defaults/person.png' %}" alt="User" class="" height="55" />
+                      <img src="{% static 'imgs/defaults/person.png' %}" alt="User" class="rounded-circle" height="40" width="40" style="object-fit: cover;">
                       {% endif %}
                   </a>
                   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                       <li>
-                        
                         {% if request.user.role == "teacher" %}
-                            <a class="dropdown-item " href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a>
+                            <a class="dropdown-item" href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a>
                         {% else %}
-                            <a class="dropdown-item " href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a>
+                            <a class="dropdown-item" href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a>
                         {% endif %}
                     </li>
                       <li><a class="dropdown-item" href="{% url 'accounts:logout' %}" data-translate="logout"><span>Logout</span></a></li>
@@ -116,10 +101,10 @@
                   {% else %}
                   <ul class="navbar-nav ms-auto align-items-center">
                       <li class="nav-item px-2">
-                          <a class=" btn btn-primary " href="{% url 'accounts:login' %}?next={{ request.path }}" data-translate="login"><span>Login</span></a>
+                          <a class="btn btn-primary" href="{% url 'accounts:login' %}?next={{ request.path }}" data-translate="login"><span>Login</span></a>
                       </li>
                       <li class="nav-item px-2">
-                          <a class="btn btn-primary " href="{% url 'accounts:register' %}?next={{ request.path }}" data-translate="register"><span>Register</span></a>
+                          <a class="btn btn-primary" href="{% url 'accounts:register' %}?next={{ request.path }}" data-translate="register"><span>Register</span></a>
                       </li>
                   </ul>
                   {% endif %}
@@ -127,4 +112,5 @@
             </ul>
         </div>
     </div>
+
 </nav>
