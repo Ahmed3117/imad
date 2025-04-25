@@ -33,7 +33,7 @@ CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
 TOKEN_URL = "https://zoom.us/oauth/token"
 MEETING_URL = "https://api.zoom.us/v2/users/me/meetings"
 # BASE_URL = "https://nabbiuwny.com"
-BASE_URL = "http://127.0.0.1:8800"
+BASE_URL = "http://192.168.8.8:8800"
 
 INSTALLED_APPS = [
     'admin_interface',

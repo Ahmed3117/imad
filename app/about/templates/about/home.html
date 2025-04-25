@@ -1,154 +1,138 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 {% load static %}
 {% block translationFolder %}data-translation-folder="home"{% endblock %}
 {% block title %}Home{% endblock %}
+
+
+
 {% block content %}
 
-</head>
-
-<body>
-
-<!-- Hero Section with Navbar -->
+<!-- Hero Section -->
 <div class="hero-section">
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="z-index: 1000;">
-    <div class="container">
-    <a class="navbar-brand" href="/" >
-        <img src="{{logo_url}}" alt="Logo" >
-    </a>
-    <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <i class="fas fa-bars"></i>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto align-items-center">
-        <li class="nav-item px-2">
-            <a class="nav-link active" aria-current="page" href="/" data-translate="home">
-            <span>Home</span>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top " style="background-color :#0000001c !important;">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="{{ logo_url }}" alt="Logo">
             </a>
-        </li>
-        {% if request.user.role == "admin" or request.user.is_superuser %}
-                <li class="nav-item px-2 ">
-                    <a class="nav-link text-primary" aria-current="page" href="{% url 'accounts:track_lectures' %}" data-translate="track_lectures">
-                        <span>Track Lectures</span>
-                    </a>
-                </li>
-                {% endif %}
-                {% if request.user.role == "admin" or request.user.is_superuser or request.user.role == "teacher" %}
-                <li class="nav-item px-2 ">
-                    <a class="nav-link text-primary" aria-current="page" href="{% url 'library:course_library' %}" data-translate="general_library">
-                        <span>General library</span>
-                    </a>
-                </li>
-                {% endif %}
-                {% if request.user.is_superuser %}
-                <li class="nav-item px-2">
-                    <a class="nav-link" href="{% url "chat:dashboard" %}" data-translate="dashboard">
-                        <span>Customer Service</span>
-                    </a>
-                </li>
-                {% else %}
-                <li class="nav-item px-2">
-                    <a class="nav-link" href="{% url "chat:contact" %}" data-translate="">
-                        <span>Customer Service</span>
-                    </a>
-                </li> 
-            {% endif %}
-        <!-- <li class="nav-item px-2">
-            <a class="nav-link" href="{% url 'about:about_us' %}" data-translate="aboutus">
-            <span>About Us</span>
-            </a>
-        </li> -->
-        <li class="nav-item px-2 dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-mdb-toggle="dropdown" aria-expanded="false" data-translate="go_to">
-            <span>Go To</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-            {% if request.path == '/' %}
-                <li><a class="dropdown-item fw-bold" href="{% url 'courses:levels' %}" data-translate="levels"><span>Levels & Courses</span></a></li>
-                {% if request.user.is_authenticated %}
-                {% if request.user.role == "parent" %}
-                    <li><a class="dropdown-item fw-bold" href="{% url 'accounts:parent_dashboard' %}" data-translate="profile"><span>My Profile</span></a></li>
-                {% else %}
-                    <li><a class="dropdown-item fw-bold" href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a></li>
-                {% endif %}
-                {% endif %}
-            <li><a class="dropdown-item" href="#contact" data-translate="contacts"><span>Contact</span></a></li>
-            {% else %}
-                {% if request.user.role == "parent" %}
-                <li><a class="dropdown-item fw-bold" href="{% url 'accounts:parent_dashboard' %}" data-translate="profile"><span>My Profile</span></a></li>
-                {% else %}
-                <li><a class="dropdown-item fw-bold" href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a></li>
-                {% endif %}
-                <li><a class="dropdown-item fw-bold" href="{% url 'courses:levels' %}" data-translate="levels"><span>Levels & Courses</span></a></li>
-                
-            {% endif %}
-            </ul>
-        </li>
-
-        <!-- Language Switcher -->
-        <li class="nav-item px-2 d-flex align-items-center mx-md-3">
-            <div class="lang-switcher">
-            <button class="lang-btn active" data-lang="en">EN</button>
-            <button class="lang-btn" data-lang="ar">AR</button>
+            <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item px-2">
+                        <a class="nav-link fw-bold active" aria-current="page" href="/" data-translate="home"><span>Home</span></a>
+                    </li>
+                    <li class="nav-item px-2">
+                        <a class="nav-link fw-bold" href="#who-we-are" data-translate="who_we_are_title"><span>Who We Are</span></a>
+                    </li>
+                    {% if request.user.is_superuser %}
+                                <li>
+                                    <a class="nav-link fw-bold" href="{% url "chat:dashboard" %}" >
+                                        <span data-translate="customer_service">Customer Service</span>
+                                    </a>
+                                </li>
+                             {% else %}
+                                <li>
+                                    <a class="nav-link fw-bold" href="{% url "chat:contact" %}" >
+                                        <span data-translate="customer_service">Customer Service</span>
+                                    </a>
+                                </li>
+                             {% endif %}
+                    {% if request.user.role == "admin" or request.user.is_superuser %}
+                    <li class="nav-item px-2">
+                        <a class="nav-link fw-bold" aria-current="page" href="{% url 'accounts:track_lectures' %}" data-translate="track_lectures"><span>Track Lectures</span></a>
+                    </li>
+                    {% endif %}
+                    {% if request.user.role == "admin" or request.user.is_superuser or request.user.role == "teacher" %}
+                    <li class="nav-item px-2">
+                        <a class="nav-link fw-bold" aria-current="page" href="{% url 'library:course_library' %}" data-translate="general_library"><span>General Library</span></a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item px-2 dropdown">
+                        <a class="nav-link fw-bold dropdown-toggle" href="#" id="navbarDropdown" role="button" data-mdb-toggle="dropdown" aria-expanded="false" data-translate="go_to">
+                            <span>Go To</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item fw-bold" href="{% url 'courses:levels' %}" data-translate="levels"><span>Levels & Courses</span></a></li>
+                            {% if request.user.is_authenticated %}
+                                {% if request.user.role == "parent" %}
+                                <li><a class="dropdown-item fw-bold" href="{% url 'accounts:parent_dashboard' %}" data-translate="profile"><span>My Profile</span></a></li>
+                                {% else %}
+                                <li><a class="dropdown-item fw-bold" href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a></li>
+                                {% endif %}
+                            {% endif %}
+                            <li><a class="dropdown-item" href="#teachers" data-translate="our_teachers"><span>Our Team</span></a></li>
+                            <li><a class="dropdown-item" href="#contact" data-translate="contacts"><span>Contact</span></a></li>
+                             
+                        </ul>
+                    </li>
+                    <li class="nav-item px-2 d-flex align-items-center mx-md-2">
+                        <div class="lang-switcher">
+                            <button class="lang-btn active" data-lang="en">EN</button>
+                            <button class="lang-btn" data-lang="ar">AR</button>
+                        </div>
+                    </li>
+                    {% if request.user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-mdb-toggle="dropdown" aria-expanded="false">
+                            {% if request.user.image %}
+                            <img src="{{request.user.image.url}}" alt="User" class="rounded-circle me-2" height="35" width="35" style="object-fit: cover;"/>
+                            {% else %}
+                            <img src="{% static 'imgs/defaults/person.png' %}" alt="User" class="rounded-circle me-2" height="35" width="35" />
+                            {% endif %}
+                            <span class="d-none d-lg-inline">{{ request.user.get_short_name }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li>
+                                {% if request.user.role == "parent" %}
+                                <a class="dropdown-item" href="{% url 'accounts:parent_dashboard' %}" data-translate="profile"><span>My Profile</span></a>
+                                {% else %}
+                                <a class="dropdown-item" href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a>
+                                {% endif %}
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:logout' %}" data-translate="logout"><span>Logout</span></a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item px-1">
+                        <a class="btn btn-primary btn-rounded" href="{% url 'accounts:login' %}?next={{ request.path }}" data-translate="login"><span>Login</span></a>
+                    </li>
+                    <li class="nav-item ps-1">
+                        <a class="btn btn-primary btn-rounded" href="{% url 'accounts:register' %}?next={{ request.path }}" data-translate="register"><span>Register</span></a>
+                    </li>
+                    {% endif %}
+                </ul>
             </div>
-        </li>
+        </div>
+    </nav>
 
-        <!-- User Profile Dropdown -->
-        <li class="nav-item dropdown">
+    <!-- Hero Content -->
+    <div class="hero-content container">
+        <h1 class="hero-title" data-translate="hero_title">Unlock Your Potential with Our E-Learning Platform</h1>
+        <p class="hero-description" data-translate="hero_description">Join thousands of learners worldwide and start your journey to success with our comprehensive courses and expert instructors.</p>
+        <div>
+            <a href="{% url 'courses:levels' %}" class="btn btn-primary btn-lg hero-button" data-translate="hero_button">Get Started Today</a>
             {% if request.user.is_authenticated %}
-            <a class="nav-link dropdown-toggle ms-md-5" href="#" id="userDropdown" role="button" data-mdb-toggle="dropdown" aria-expanded="false">
-            {% if request.user.image %}
-            <img src="{{request.user.image.url}}" alt="User" class="rounded-circle" height="40" />
-            {% else %}
-            <img src="{% static 'imgs/defaults/person.png' %}" alt="User" class="" height="40" />
+            <a href="{% if request.user.role == 'parent' %}{% url 'accounts:parent_dashboard' %}{% else %}{% url 'accounts:profile' %}{% endif %}" class="btn btn-accent btn-lg profile-button" data-translate="profile">My Profile</a>
             {% endif %}
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-            <li>
-                {% if request.user.role == "parent" %}
-                <a class="dropdown-item" href="{% url 'accounts:parent_dashboard' %}" data-translate="profile"><span>My Profile</span></a>
-                {% else %}
-                <a class="dropdown-item" href="{% url 'accounts:profile' %}" data-translate="profile"><span>My Profile</span></a>
-                {% endif %}
-            </li>
-            <li><a class="dropdown-item" href="{% url 'accounts:logout' %}" data-translate="logout"><span>Logout</span></a></li>
-            </ul>
-            {% else %}
-            <ul class="navbar-nav ms-auto align-items-center">
-            <li class="nav-item px-2">
-                <a class="btn btn-primary" href="{% url 'accounts:login' %}?next={{ request.path }}" data-translate="login"><span>Login</span></a>
-            </li>
-            <li class="nav-item px-2">
-                <a class="btn btn-primary" href="{% url 'accounts:register' %}?next={{ request.path }}" data-translate="register"><span>Register</span></a>
-            </li>
-            </ul>
-            {% endif %}
-        </li>
-        </ul>
+            <a href="{% url 'chat:contact' %}" class="btn btn-info btn-lg hero-button" data-translate="chat_with_us">Chat with Us</a>
+        </div>
     </div>
-    </div>
-</nav>
-
-<!-- Hero Content -->
-<div class="hero-content">
-    <h1 class="hero-title" data-translate="hero_title">Unlock Your Potential with Our E-Learning Platform</h1>
-    <p class="hero-description" data-translate="hero_description">Join thousands of learners worldwide and start your journey to success with our comprehensive courses and expert instructors.</p>
-    <a href="{% url 'courses:levels' %}" class="hero-button me-2 px-2 px-lg-4 " data-translate="hero_button">Get Started Today</a>
-    <a href="{% url 'accounts:profile' %}" class="profile-button px-2 px-lg-4" data-translate="profile">My Profile</a>
-</div>
 </div>
 
-<!-- Features Section -->
+<!-- features -->
 <section class="features-section py-6 my-5">
     <div class="container">
         <div class="row justify-content-center"></div>
-            <div class="text-center mb-5">
+            <div class=" text-center mb-5">
                 <h2 class="display-5 fw-bold mb-3 text-gradient" data-translate="learning_journey">Start Your Learning Journey</h2>
                 <p class="lead text-muted" data-translate="platform_features">Discover the key features that make our e-learning platform stand out</p>
             </div>
         </div>
-        <div class="container">
-            <div class="container row">
+        <div class="container ">
+            <div class="container row ">
                 <div class="col-md-6 col-lg-3 mb-4">
                     <div class="feature-card card h-100 border-0 transform-hover">
                         <div class="card-body d-flex flex-column align-items-center text-center p-4">
@@ -237,475 +221,658 @@
             transform: translateY(-5px);
         }
     </style>
+
+</section>
+
+
+<!-- Who We Are Section -->
+<section class="who-we-are-section" id="who-we-are">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <img src="{% static 'imgs/bg/t3.jpg' %}" alt="Who We Are" class="img-fluid w-100">
+            </div>
+            <div class="col-lg-6">
+                <h2 class="display-5 fw-bold mb-4" data-translate="who_we_are_title">Who We Are</h2>
+                <p class="lead mb-4" data-translate="who_we_are_p1">
+                    We are a passionate team of educators, technologists, and innovators dedicated to transforming the online learning experience. Our mission is to make high-quality education accessible, engaging, and effective for everyone, everywhere.
+                </p>
+                <p class="mb-4" data-translate="who_we_are_p2">
+                    Founded on the belief that learning should be limitless, we strive to create a platform that not only imparts knowledge but also fosters curiosity, critical thinking, and a lifelong love for learning. We connect expert instructors with eager learners in a dynamic and supportive environment.
+                </p>
+                <a href="{% url 'courses:levels' %}" class="btn btn-primary" data-translate="explore_courses">Explore Our Courses</a>
+            </div>
+        </div>
+    </div>
 </section>
 
 <!-- Video Section -->
-<section class="video-section py-5 " style="background-color:rgb(228 161 27 / 64%)" id="video">
+<section class="video-section" id="video">
     <div class="container">
-        <div class="row align-items-center g-4">
-            <!-- Left Column (Video) -->
+        <div class="row align-items-center g-5">
             <div class="col-lg-6">
-                <div class="video-container position-relative rounded-3 overflow-hidden shadow-lg" style="max-width: 600px; margin: 0 auto;">
-                    <!-- Cover Image -->
-                    <img src="{% static 'imgs/bg/a1.png' %}" alt="Video Cover" class="img-fluid w-100" style="aspect-ratio: 16/9; object-fit: cover;" id="video-cover">
-
-                    <!-- Play/Pause Button -->
-                    <button id="play-pause-button" class="btn btn-primary rounded-circle position-absolute top-50 start-50 translate-middle" 
-                            style="width: 70px; height: 70px; background-color: rgba(255, 255, 255, 0.9); border: none; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-play" id="play-icon" style="font-size: 28px; color: #000;"></i>
+                <div class="video-container position-relative">
+                    <img src="{% static 'imgs/bg/t1.png' %}" alt="Video Cover" class="img-fluid" id="video-cover">
+                    <button id="play-pause-button">
+                        <i class="fas fa-play" id="play-icon"></i>
                     </button>
-
-                    <!-- Video -->
-                    <video id="video-player" class="w-100" style="display: none; aspect-ratio: 16/9; object-fit: cover;">
+                    <video id="video-player" class="w-100" style="display: none;" controls>
                         <source src="{% static 'videos/nab.mp4' %}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
                 </div>
             </div>
-
-            <!-- Right Column (Text) -->
-            <div class="col-lg-6">
-                <div class="ps-lg-4">
-                    <h2 class="display-5 fw-bold mb-4 text-primary">Discover Our Platform</h2>
-                    <p class="lead text-muted mb-4">
-                        Watch our introductory video to learn more about our innovative e-learning platform and how it can help you achieve your educational goals.
-                    </p>
-                    <div class="d-flex align-items-center">
-                        <div class="me-3">
-                            <i class="fas fa-check-circle text-primary fa-2x"></i>
-                        </div>
-                        <p class="mb-0">High-quality video lectures from expert instructors</p>
-                    </div>
-                    <div class="d-flex align-items-center my-3">
-                        <div class="me-3">
-                            <i class="fas fa-check-circle text-primary fa-2x"></i>
-                        </div>
-                        <p class="mb-0">Interactive learning materials and resources</p>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <div class="me-3">
-                            <i class="fas fa-check-circle text-primary fa-2x"></i>
-                        </div>
-                        <p class="mb-0">Flexible learning at your own pace</p>
-                    </div>
+            <div class="col-lg-6 video-text-content">
+                <h2 class="display-5 fw-bold mb-4" data-translate="discover_platform">Discover Our Platform</h2>
+                <p class="lead mb-4" data-translate="discover_platform_desc">
+                    Watch our introductory video to learn more about our innovative e-learning platform and how it can help you achieve your educational goals.
+                </p>
+                <div class="d-flex align-items-start mb-3">
+                    <i class="fas fa-check-circle fa-fw fa-lg me-3 mt-1"></i>
+                    <p class="mb-0" data-translate="feature_video">High-quality video lectures from expert instructors</p>
+                </div>
+                <div class="d-flex align-items-start mb-3">
+                    <i class="fas fa-check-circle fa-fw fa-lg me-3 mt-1"></i>
+                    <p class="mb-0" data-translate="feature_interactive">Interactive learning materials and resources</p>
+                </div>
+                <div class="d-flex align-items-start">
+                    <i class="fas fa-check-circle fa-fw fa-lg me-3 mt-1"></i>
+                    <p class="mb-0" data-translate="feature_flexible">Flexible learning options to fit your schedule</p>
                 </div>
             </div>
         </div>
     </div>
-
-    <style>
-        .video-section {
-            background: linear-gradient(to right, rgba(var(--main-color-rgb), 0.03), rgba(var(--sub-color-rgb), 0.03));
-        }
-        .video-container {
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        .video-container:hover {
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-        }
-        #play-pause-button {
-            transition: all 0.2s ease;
-        }
-        #play-pause-button:hover {
-            transform: scale(1.1);
-        }
-    </style>
 </section>
 
 <!-- Chat Section -->
-<section class="chat-section py-5 bg-warning text-white " id="chat">
+<section class="chat-section" id="chat">
     <div class="container">
-        <div class="row align-items-center g-4">
-            <!-- Left Column (Text) -->
+        <div class="row align-items-center g-5">
             <div class="col-lg-6 order-lg-1 order-2">
-                <div class="pe-lg-4">
-                    <h2 class="display-5 fw-bold mb-4 text-primary">Connect With Our Team</h2>
-                    
-                    <div class="mb-4">
-                        <p class="lead text-light mb-3">
-                            Have questions or need support? Our team is here to help you 24/7.
-                        </p>
-                        <p class="lead text-light">
-                            Get instant answers to your questions through our live chat system.
-                        </p>
-                    </div>
-                    
-                    <!-- Chat Button -->
-                    <div class="d-grid gap-3">
-                        <button id="homeChatButton" class="btn btn-primary btn-lg py-3">
-                            <i class="fas fa-comments me-2"></i> Start Live Chat
-                        </button>
-                        
-                        <!-- Last Room Card (hidden by default) -->
-                        <div id="homeLastRoomContainer" class="mb-4" style="display: none;">
-                            <div class="card border-0 shadow-sm hover-shadow transition-all bg-light text-dark">
-                                <div class="card-body p-3">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h6 class="text-primary fw-medium mb-1">Continue Your Conversation</h6>
-                                            <p class="text-muted small mb-0">Pick up where you left off</p>
-                                        </div>
-                                        <button id="homeJoinLastRoomBtn" class="btn btn-sm btn-outline-primary rounded-pill">
-                                            <i class="fas fa-arrow-right me-1"></i> Join
-                                        </button>
-                                    </div>
+                <h2 class="display-5 fw-bold mb-4" data-translate="connect_team">Connect With Our Team</h2>
+                <p class="lead mb-3" data-translate="connect_desc1">
+                    Have questions or need support? Our dedicated team is available around the clock to assist you.
+                </p>
+                <p class="lead mb-4" data-translate="connect_desc2">
+                    Get instant answers and guidance through our user-friendly live chat system.
+                </p>
+                {% csrf_token %}
+                <div id="homeLastRoomContainer" class="mb-4" style="display: none;">
+                    <div class="card border-0 hover-shadow">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="fw-bold mb-1" data-translate="continue_chat">Continue Your Conversation</h6>
+                                    <p class="text-muted small mb-0" data-translate="continue_chat_desc">Pick up where you left off</p>
                                 </div>
+                                <button id="homeJoinLastRoomBtn" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    <i class="fas fa-arrow-right me-1"></i> <span data-translate="join">Join</span>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
+                <button id="homeChatButton" class="btn btn-lg py-3 px-5">
+                    <i class="fas fa-comments me-2"></i> <span data-translate="start_chat">Start Live Chat</span>
+                </button>
             </div>
+            <div class="col-lg-6 order-lg-2 order-1 text-center">
+                <img src="{% static 'imgs/bg/chat.png' %}" alt="Chat Support" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</section>
 
-            <!-- Right Column (Image) -->
-            <div class="col-lg-6 order-lg-2 order-1">
-                <div class="text-center">
-                    <img src="{% static 'imgs/bg/chat.png' %}" alt="Chat Support" class="img-fluid rounded-3" style="max-height: 400px;">
+<!-- Learning Features Section -->
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="feature-card card h-100 border-0">
+                <div class="card-body d-flex flex-column align-items-center text-center p-4">
+                    <div class="feature-icon-wrapper">
+                        <i class="fas fa-tasks fa-2x"></i> <!-- Assignments icon -->
+                    </div>
+                    <h4 class="fw-bold mb-2" data-translate="assignments">Structured Assignments</h4>
+                    <p class="text-muted small" data-translate="assignments_desc">Reinforce learning with practical tasks and real-world applications.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="feature-card card h-100 border-0">
+                <div class="card-body d-flex flex-column align-items-center text-center p-4">
+                    <div class="feature-icon-wrapper">
+                        <i class="fas fa-file-alt fa-2x"></i> <!-- Exams icon -->
+                    </div>
+                    <h4 class="fw-bold mb-2" data-translate="exams">Progress Exams</h4>
+                    <p class="text-muted small" data-translate="exams_desc">Test your knowledge with quizzes and exams to track mastery.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="feature-card card h-100 border-0">
+                <div class="card-body d-flex flex-column align-items-center text-center p-4">
+                    <div class="feature-icon-wrapper">
+                        <i class="fas fa-heartbeat fa-2x"></i> <!-- Vital education icon -->
+                    </div>
+                    <h4 class="fw-bold mb-2" data-translate="vital_education">Vital Education</h4>
+                    <p class="text-muted small" data-translate="vital_education_desc">Essential skills for career growth and personal development.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="feature-card card h-100 border-0">
+                <div class="card-body d-flex flex-column align-items-center text-center p-4">
+                    <div class="feature-icon-wrapper">
+                        <i class="fas fa-chalkboard-teacher fa-2x"></i> <!-- Interactive learning icon -->
+                    </div>
+                    <h4 class="fw-bold mb-2" data-translate="interactive_learning">Interactive Learning</h4>
+                    <p class="text-muted small" data-translate="interactive_learning_desc">Engage with multimedia lessons, discussions, and peer feedback.</p>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <style>
-        .chat-section {
-            background: linear-gradient(135deg, rgba(var(--main-color-rgb), 0.8), rgba(var(--sub-color-rgb), 0.8)), url('{% static "imgs/bg/chat-bg.jpg" %}');
-            background-size: cover;
-            background-position: center;
-        }
-        .hover-shadow {
-            transition: all 0.3s ease;
-        }
-        .hover-shadow:hover {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            transform: translateY(-3px);
-        }
-    </style>
-</section>
 
-<!-- Stats Section -->
-<section class="stats-section py-5 bg-light">
-    <div class="container">
-        <div class="row text-center">
-            <div class="col-md-3 col-6 mb-4">
-                <div class="stat-card p-4 rounded-3 bg-white shadow-sm">
-                    <h3 class="display-4 fw-bold text-primary">500+</h3>
-                    <p class="text-muted mb-0">Active Students</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6 mb-4">
-                <div class="stat-card p-4 rounded-3 bg-white shadow-sm">
-                    <h3 class="display-4 fw-bold text-primary">50+</h3>
-                    <p class="text-muted mb-0">Expert Teachers</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6 mb-4">
-                <div class="stat-card p-4 rounded-3 bg-white shadow-sm">
-                    <h3 class="display-4 fw-bold text-primary">100+</h3>
-                    <p class="text-muted mb-0">Courses Available</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6 mb-4">
-                <div class="stat-card p-4 rounded-3 bg-white shadow-sm">
-                    <h3 class="display-4 fw-bold text-primary">24/7</h3>
-                    <p class="text-muted mb-0">Support Available</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <style>
-        .stat-card {
-            transition: all 0.3s ease;
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(var(--main-color-rgb), 0.1) !important;
-        }
-    </style>
-</section>
-
+<!-- Our Teachers Section -->
 {% if teachers %}
-<!-- Our Teachers -->
-<section class="container teachers-section py-5" id="teachers">
-    <div class="card p-3 shadow-sm" style="width: 100%; border-radius: 15px;">
-        <!-- Form Header -->
-        <div class="form-header text-center mb-4">
-            <div class="header-container">
-                <div class="diagonal-layer"></div>
-                <div class="floating-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="header-content">
-                    <h3 class="header-title" data-translate="our_teachers">OUR Team</h3>
-                </div>
-            </div>
+<section class="container teachers-section-container py-0">
+    <div class="teachers-section" id="teachers">
+        <div class="form-header">
+            <h3 class="header-title" data-translate="our_teachers">OUR TEAM</h3>
+            <p class="section-subtitle text-center mb-0" data-translate="meet_our_teachers">Meet our exceptional teachers who inspire and guide learners.</p>
         </div>
-        <p class="fw-bold section-subtitle text-center mb-5" data-translate="meet_our_teachers">Meet our exceptional teachers who inspire and guide learners:</p>
-        <div class="teacher-slider d-flex overflow-auto position-relative" style="padding-bottom: 20px;">
-            {% for teacher in teachers %}
-            <div class="slider-item flex-shrink-0 me-3" style="width: 300px; transition: transform 0.3s ease-in-out;">
-                <div class="card h-100 shadow-sm" style="border-radius: 15px; box-shadow: 0px 0px 20px rgba(var(--main-color-rgb), 0.2); transition: box-shadow 0.3s ease-in-out;">
-                    <!-- Teacher Image -->
-                    <div class="text-center p-3">
-                        {% if teacher.teacher.image %}
-                        <img src="{{ teacher.teacher.image.url }}" alt="{{ teacher.teacher.name }}" class="img-fluid rounded-circle" style="width: 120px; height: 120px; border: 4px solid var(--main-color);">
+
+        <!-- Teacher Slider Container -->
+        <div class="teacher-slider-container position-relative">
+            <!-- Slider Wrapper -->
+            <div class="teacher-slider d-flex">
+                {% for teacher in teachers %}
+                <div class="slider-item flex-shrink-0 px-2 py-5">
+                    <div class="teacher-card card text-center">
+                        <div class="teacher-image-container">
+                            {% if teacher.image %}
+                            <img src="{{ teacher.image.url }}" alt="{{ teacher.name }}" class="img-fluid rounded-circle">
+                            {% else %}
+                            <img src="{% static 'imgs/defaults/person.png' %}" alt="{{ teacher.name }}" class="img-fluid rounded-circle">
+                            {% endif %}
+                        </div>
+                        <div class="card-body pt-3">
+                            <h5 class="mb-1">{{ teacher.name }}</h5>
+                            <p class="text-primary mb-2">{{ teacher.specialization }}</p>
+                            <p class="text-muted small mb-0">{{ teacher.bio|truncatechars:80 }}</p>
+                        </div>
+                        {% if teacher.profile_link %}
+                        <div class="card-footer">
+                            <a href="{{ teacher.profile_link }}" class="btn btn-sm btn-outline-primary btn-rounded" data-translate="view_profile">View Profile</a>
+                        </div>
                         {% endif %}
                     </div>
-
-                    <!-- Teacher Name -->
-                    <div class="text-center mt-3">
-                        <h5 class="text-dark mb-0">{{ teacher.teacher.name }}</h5>
-                    </div>
-
-                    <!-- Teacher Title -->
-                    <div class="text-center mt-2">
-                        <span class="text-primary fw-bold">{{ teacher.specialization }}</span>
-                    </div>
-
-                    <!-- Card Body (Description) -->
-                    <div class="card-body text-center">
-                        <p class="fw-bold text-muted small">{{ teacher.bio }}</p>
-                    </div>
-
-                    <!-- Card Footer (View Profile Button) -->
-                    {% if teacher.profile_link %}
-                    <div class="card-footer bg-light border-top d-flex justify-content-center">
-                        <a href="{{ teacher.profile_link }}" class="btn btn-primary btn-sm" data-translate="view_profile">View Profile</a>
-                    </div>
-                    {% endif %}
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
-        <!-- Arrows -->
-        <div class="d-flex justify-content-between mt-4">
-            <button id="teacherprevArrow" class="btn btn-outline-primary btn-floating">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button id="teachernextArrow" class="btn btn-outline-primary btn-floating">
-                <i class="fas fa-chevron-right"></i>
-            </button>
+            
+            <!-- Navigation Arrows -->
+            <div class="slider-controls">
+                <button id="teacherPrevArrow" class="btn btn-outline-primary btn-floating">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button id="teacherNextArrow" class="btn btn-outline-primary btn-floating">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
         </div>
     </div>
 </section>
+
 {% endif %}
 
 <!-- Contact Section -->
-<section class="container py-5" id="contact">
-    <div class="card p-4 shadow-lg" style="width: 100%; border-radius: 15px;">
-        <!-- Form Header -->
-        <div class="form-header text-center mb-4">
-            <div class="header-container">
-                <div class="diagonal-layer"></div>
-                <div class="floating-icon">
-                    <i class="fas fa-envelope"></i>
-                </div>
-                <div class="header-content">
+<section class="container contact-section py-5" id="contact">
+    <div class="contact-card card p-0">
+        <div class="row g-0">
+            <div class="col-lg-7 order-lg-1 order-2 contact-form-col">
+                <div class="form-header text-start mb-4">
                     <h3 class="header-title" data-translate="get_in_touch">Get in Touch</h3>
                 </div>
-            </div>
-        </div>
-        <div class="row no-gutters">
-            <!-- Left Column (Contact Info) -->
-            <div class="col-lg-5 d-flex flex-column justify-content-center align-items-center bg-gradient-brand-color text-warning p-5 order-lg-2">
-                <ul class="list-unstyled">
-                    <li class="mb-4 text-center">
-                        <img src="{% static 'imgs/mail.png' %}" alt="Contact Image" class="img-fluid email-image">
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Right Column (Contact Form) -->
-            <div class="col-lg-7 d-flex flex-column justify-content-center p-5 order-lg-1">
+                <p class="mb-4 text-muted" data-translate="contact_form_desc">Have questions or suggestions? Fill out the form below, and we'll get back to you shortly.</p>
                 <form id="contactForm" class="contact-form form-validate" novalidate>
-                    <div class="row">
-                        <div class="col-sm-12 mb-3">
-                            <div class="form-floating mb-4">
-                                <input type="text" id="name" class="form-control" name="name" required>
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" id="name" class="form-control" name="name" placeholder="Your Name" required>
                                 <label class="form-label" for="name" data-translate="your_name">Your Name</label>
                             </div>
                         </div>
-                        <div class="col-sm-6 mb-3">
-                            <div class="form-floating mb-4">
-                                <input type="email" id="email" class="form-control" name="email" required>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="email" id="email" class="form-control" name="email" placeholder="Your Email" required>
                                 <label class="form-label" for="email" data-translate="your_email">Your Email</label>
                             </div>
                         </div>
-                        <div class="col-sm-6 mb-3">
-                            <div class="form-floating mb-4">
-                                <input type="tel" id="phone" class="form-control" name="phone">
-                                <label class="form-label" for="phone" data-translate="your_phone">Your Phone Number</label>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <input type="tel" id="phone" class="form-control" name="phone" placeholder="Your Phone Number">
+                                <label class="form-label" for="phone" data-translate="your_phone">Your Phone (Optional)</label>
                             </div>
                         </div>
-                        <div class="col-sm-12 mb-3">
-                            <div class="form-floating mb-4">
-                                <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea class="form-control" id="message" name="message" rows="5" placeholder="How can we help?" required style="height: 150px;"></textarea>
                                 <label class="form-label" for="message" data-translate="how_can_we_help">How can we help?</label>
                             </div>
                         </div>
-                        <div class="col-sm-12 mb-3 mt-5">
-                            <button type="submit" class="btn btn-primary btn-block py-3" data-translate="send_button">Send</button>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary btn-lg w-100" data-translate="send_button">Send Message</button>
                         </div>
                     </div>
                 </form>
+            </div>
+            <div class="col-lg-5 order-lg-2 order-1 contact-info-col d-flex flex-column justify-content-center">
+                <h3 data-translate="contact_info">Contact Information</h3>
+                <p data-translate="contact_info_desc">Reach out to us directly through phone or email.</p>
+                <p><i class="fas fa-phone fa-fw"></i> <a href="tel:{{company_info.phone}}">{{company_info.phone}}</a></p>
+                <p><i class="fas fa-envelope fa-fw"></i> <a href="mailto:{{company_info.email}}">{{company_info.email}}</a></p>
+                <p><i class="fab fa-facebook-f fa-fw"></i> <a href="https://www.facebook.com/share/15ossJyDXe/" target="_blank" rel="noopener noreferrer" data-translate="follow_us_fb">Follow us on Facebook</a></p>
+                <img src="{% static 'imgs/mail3.webp' %}" alt="Contact Illustration" class="img-fluid mt-4" style="max-width: 250px; opacity: 0.8; margin-left: auto; margin-right: auto;">
             </div>
         </div>
     </div>
 </section>
 
 <!-- Footer -->
-<footer class="pt-5 pb-5 mt-5 text-center text-md-start bg-footer" id="contact">
+<footer class="bg-footer text-white">
     <div class="container">
-        <div class="row pt-5 d-flex">
-            <!-- Left Column -->
-            <div class="col-md-4 mb-lg-0">
-                <div class="">
-                    <a class="navbar-brand" href="/">
-                        <img src="{{logo_url}}" alt="Logo">
+        <div class="row gy-4">
+            <div class="col-lg-4 col-md-6">
+                <a class="footer-brand" href="/">
+                    <img src="{{logo_url}}" alt="Logo">
+                </a>
+                <p class="my-3" data-translate="footer_description">{{ company_info.description|default:"Empowering learners through accessible and engaging online education." }}</p>
+                <div class="social-icons mt-3">
+                    <a href="https://www.facebook.com/share/15ossJyDXe/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                        <i class="fab fa-facebook-f"></i>
                     </a>
-                    <p class="fw-bold my-4" data-translate="footer_description">{{company_info.description}}</p>
-                    
-                    <div>
-                        <span data-translate="created_by">Created By BlueBook Team</span>
-                        <div data-translate="copyright">© 2024 - BlueBook (01095163117)</div>
-                    </div>
                 </div>
             </div>
-            <!-- Middle Column -->
-            <div class="col-md-4 mb-4 px-lg-5 text-center text-lg-start">
-                <img src="{% static 'imgs/footer/footer.png' %}" alt="Footer Image" class="img-fluid rounded">
+
+            <div class="col-lg-2 col-md-6">
+                <h5 data-translate="quick_links">Quick Links</h5>
+                <ul class="list-unstyled footer-links">
+                    <li><a href="/" data-translate="home">Home</a></li>
+                    <li><a href="{% url 'courses:levels' %}" data-translate="levels">Levels & Courses</a></li>
+                    <li><a href="#who-we-are" data-translate="who_we_are_title">Who We Are</a></li>
+                    <li><a href="#teachers" data-translate="our_teachers">Our Team</a></li>
+                </ul>
             </div>
-            <!-- Right Column -->
-            <div class="col-md-4">
-                <div class="mb-4">
-                    <h5 data-translate="contact_us" class="text-primary">Contact Us</h5>
-                    <p class="fw-bold lh-lg mt-3 mb-3" data-translate="contact_us_description">We'd love to hear from you! Reach out via email or phone, and we'll get back to you soon.</p>
-                    <p>
-                        <span data-translate="phone_label">Phone:</span> 
-                        <span>{{company_info.phone}}</span>
-                    </p>
-                    <a class="btn btn-primary rounded-pill w-100" href="https://mail.google.com/mail/?view=cm&fs=1&to={{company_info.email}}" target="_blank" rel="noopener noreferrer">
-                        <span>{{company_info.email}}</span>
-                    </a>
-                    <ul class="list-unstyled d-flex justify-content-center justify-content-lg-start mt-5 gap-3">
-                        <li>
-                            <a href="https://www.facebook.com/share/15ossJyDXe/" target="_blank" rel="noopener noreferrer">
-                                <i class="fab fa-facebook-f"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h5 data-translate="support">Support</h5>
+                <ul class="list-unstyled footer-links">
+                    <li><a href="#chat" data-translate="live_chat">Live Chat</a></li>
+                    <li><a href="#contact" data-translate="contact_us">Contact Us</a></li>
+                    {% if request.user.is_authenticated %}
+                        <li><a href="{% if request.user.role == 'parent' %}{% url 'accounts:parent_dashboard' %}{% else %}{% url 'accounts:profile' %}{% endif %}" data-translate="profile">My Profile</a></li>
+                    {% else %}
+                        <li><a href="{% url 'accounts:login' %}" data-translate="login">Login</a></li>
+                        <li><a href="{% url 'accounts:register' %}" data-translate="register">Register</a></li>
+                    {% endif %}
+                </ul>
             </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h5 data-translate="contact_info">Contact Info</h5>
+                <ul class="list-unstyled footer-contact-info">
+                    <li class="d-flex align-items-start mb-2">
+                        <i class="fas fa-phone mt-1"></i>
+                        <span><a href="tel:{{company_info.phone}}">{{company_info.phone}}</a></span>
+                    </li>
+                    <li class="d-flex align-items-start">
+                        <i class="fas fa-envelope mt-1"></i>
+                        <span><a href="mailto:{{company_info.email}}">{{company_info.email}}</a></span>
+                    </li>
+                </ul>
+                <a class="btn btn-primary rounded-pill mt-3 d-block" href="https://mail.google.com/mail/?view=cm&fs=1&to={{company_info.email}}" target="_blank" rel="noopener noreferrer">
+                    <i class="fas fa-paper-plane me-2"></i> <span data-translate="send_email">Send us an Email</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-bottom text-center">
+            <span data-translate="created_by">Created By BlueBook Team</span> |
+            <span >© "{{current_year}}" - BlueBook (01095163117)</span>
         </div>
     </div>
 </footer>
 
+
+
+
 <script>
-    // Video player controls
-    document.addEventListener('DOMContentLoaded', function() {
-        const videoCover = document.getElementById('video-cover');
-        const playPauseButton = document.getElementById('play-pause-button');
-        const playIcon = document.getElementById('play-icon');
-        const videoPlayer = document.getElementById('video-player');
+  document.addEventListener('DOMContentLoaded', function() {
+      // Navbar transparency on scroll
+      const navbar = document.querySelector('.navbar');
+      if (navbar && navbar.classList.contains('fixed-top')) {
+          const changeNavbarBg = () => {
+              if (window.scrollY > 50) {
+                  navbar.style.backgroundColor = 'var(--white-color)';
+                  navbar.classList.remove('navbar-dark', 'bg-transparent');
+                  navbar.classList.add('navbar-light'); // Assuming light background needs light text
+              } else {
+                  navbar.style.backgroundColor = 'transparent';
+                  navbar.classList.remove('navbar-light');
+                  navbar.classList.add('navbar-dark', 'bg-transparent');
+              }
+          };
+          window.addEventListener('scroll', changeNavbarBg);
+          changeNavbarBg(); // Initial check
+      }
 
-        playPauseButton.addEventListener('click', function() {
-            if (videoPlayer.paused || videoPlayer.ended) {
-                videoCover.style.display = 'none';
-                videoPlayer.style.display = 'block';
-                videoPlayer.play();
-                playIcon.classList.replace('fa-play', 'fa-pause');
-            } else {
-                videoPlayer.pause();
-                playIcon.classList.replace('fa-pause', 'fa-play');
-            }
-        });
 
-        videoPlayer.addEventListener('ended', function() {
-            videoCover.style.display = 'block';
-            videoPlayer.style.display = 'none';
-            playIcon.classList.replace('fa-pause', 'fa-play');
-        });
+      // Video player controls
+      const videoCover = document.getElementById('video-cover');
+      const playPauseButton = document.getElementById('play-pause-button');
+      const playIcon = document.getElementById('play-icon');
+      const videoPlayer = document.getElementById('video-player');
 
-        // Teacher slider
-        const slider = document.querySelector(".teacher-slider");
-        const teacherprevArrow = document.getElementById("teacherprevArrow");
-        const teachernextArrow = document.getElementById("teachernextArrow");
-      
-        teacherprevArrow.addEventListener("click", () => {
-            slider.scrollBy({ left: -250, behavior: "smooth" });
-        });
-      
-        teachernextArrow.addEventListener("click", () => {
-            slider.scrollBy({ left: 250, behavior: "smooth" });
-        });
+      if (playPauseButton && videoPlayer) {
+          playPauseButton.addEventListener('click', function() {
+              if (videoPlayer.paused || videoPlayer.ended) {
+                  if(videoCover) videoCover.style.display = 'none';
+                  videoPlayer.style.display = 'block';
+                  playPauseButton.style.display = 'none'; // Hide button when playing
+                  videoPlayer.play();
+                  // playIcon.classList.replace('fa-play', 'fa-pause'); // Not needed if button hides
+              }
+          });
 
-        // Chat functionality
-        const lastRoom = localStorage.getItem('lastChatRoom');
-        const homeLastRoomContainer = document.getElementById('homeLastRoomContainer');
-        
-        if (lastRoom) {
-            try {
-                const roomData = JSON.parse(lastRoom);
-                homeLastRoomContainer.style.display = 'block';
-                
-                document.getElementById('homeJoinLastRoomBtn').addEventListener('click', function() {
-                    window.location.href = `/chat/rooms/${roomData.code}/`;
-                });
-            } catch (e) {
-                console.error('Error parsing last room data:', e);
-                localStorage.removeItem('lastChatRoom');
-            }
+          videoPlayer.addEventListener('play', function() {
+              if(videoCover) videoCover.style.display = 'none';
+              if(playPauseButton) playPauseButton.style.display = 'none';
+          });
+
+          videoPlayer.addEventListener('pause', function() {
+              if(playPauseButton) {
+                  playPauseButton.style.display = 'flex';
+                  playIcon.classList.replace('fa-pause', 'fa-play');
+              }
+          });
+
+          videoPlayer.addEventListener('ended', function() {
+              if(videoCover) videoCover.style.display = 'block';
+              videoPlayer.style.display = 'none';
+              if(playPauseButton) {
+                  playPauseButton.style.display = 'flex';
+                  playIcon.classList.replace('fa-pause', 'fa-play');
+              }
+          });
+      }
+
+    // Teacher slider
+    const slider = document.querySelector(".teacher-slider");
+    const teacherprevArrow = document.getElementById("teacherprevArrow");
+    const teachernextArrow = document.getElementById("teachernextArrow");
+
+    if (slider && teacherprevArrow && teachernextArrow) {
+        const scrollAmount = () => {
+            const itemWidth = slider.querySelector('.slider-item')?.offsetWidth || 300;
+            return itemWidth; // Scroll by one item width
         }
 
-        // Handle chat button click
-        document.getElementById('homeChatButton').addEventListener('click', async function() {
-            const csrfToken = document.getElementById('csrf_token')?.value;
-            const button = this;
-            
-            if (!csrfToken) {
-                console.error('CSRF token not found');
-                alert('An error occurred. Please refresh the page and try again.');
-                return;
-            }
-            
-            const originalButtonContent = button.innerHTML;
-            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Creating chat...';
-            button.disabled = true;
-
-            try {
-                const response = await fetch('/chat/rooms/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken,
-                    },
-                    body: JSON.stringify({}),
-                });
-
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-                const data = await response.json();
-                localStorage.setItem('lastChatRoom', JSON.stringify({
-                    code: data.code,
-                    timestamp: new Date().toISOString()
-                }));
-                
-                button.innerHTML = originalButtonContent;
-                button.disabled = false;
-                
-                await new Promise(resolve => setTimeout(resolve, 200));
-                window.location.href = `/chat/rooms/${data.code}/`;
-                
-            } catch (error) {
-                console.error('Error creating room:', error);
-                button.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i> Error - Try Again';
-                setTimeout(() => {
-                    button.innerHTML = originalButtonContent;
-                    button.disabled = false;
-                }, 2000);
-            }
+        teacherprevArrow.addEventListener("click", () => {
+            slider.scrollBy({ left: -scrollAmount(), behavior: "smooth" });
         });
+
+        teachernextArrow.addEventListener("click", () => {
+            slider.scrollBy({ left: scrollAmount(), behavior: "smooth" });
+        });
+
+        // Optional: Hide/show arrows based on scroll position
+        const updateArrows = () => {
+            teacherprevArrow.disabled = slider.scrollLeft <= 0;
+            teachernextArrow.disabled = slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 10; // Add tolerance
+        };
+        slider.addEventListener('scroll', updateArrows);
+        updateArrows(); // Initial check
+    }
+
+
+      // Chat functionality
+      const lastRoom = localStorage.getItem('lastChatRoom');
+      const homeLastRoomContainer = document.getElementById('homeLastRoomContainer');
+      const homeChatButton = document.getElementById('homeChatButton');
+      const csrfTokenInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+
+      if (lastRoom && homeLastRoomContainer) {
+          try {
+              const roomData = JSON.parse(lastRoom);
+              const timestamp = new Date(roomData.timestamp);
+              const now = new Date();
+              const hoursDiff = (now - timestamp) / (1000 * 60 * 60);
+
+              // Only show "continue" if the room is less than, say, 24 hours old
+              if (hoursDiff < 24) {
+                  homeLastRoomContainer.style.display = 'block';
+                  const joinBtn = document.getElementById('homeJoinLastRoomBtn');
+                  if(joinBtn) {
+                      joinBtn.addEventListener('click', function() {
+                          window.location.href = `/chat/rooms/${roomData.code}/`;
+                      });
+                  }
+              } else {
+                  localStorage.removeItem('lastChatRoom'); // Expired room
+              }
+          } catch (e) {
+              console.error('Error parsing last room data:', e);
+              localStorage.removeItem('lastChatRoom');
+          }
+      }
+
+      if (homeChatButton && csrfTokenInput) {
+          homeChatButton.addEventListener('click', async function() {
+              const csrfToken = csrfTokenInput.value;
+              const button = this;
+              const buttonText = button.querySelector('span');
+              const buttonIcon = button.querySelector('i');
+              const originalIconClass = buttonIcon ? buttonIcon.className : 'fas fa-comments me-2';
+              const originalText = buttonText ? buttonText.textContent : 'Start Live Chat';
+
+              if (!csrfToken) {
+                  console.error('CSRF token not found');
+                  alert('An error occurred initiating chat. Please refresh the page and try again.');
+                  return;
+              }
+
+              button.disabled = true;
+              if (buttonIcon) buttonIcon.className = 'fas fa-spinner fa-spin me-2';
+              
+
+              try {
+                  const response = await fetch('/chat/rooms/', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                          'X-CSRFToken': csrfToken,
+                          'Accept': 'application/json',
+                      },
+                      body: JSON.stringify({}), // Sending empty body as per likely requirement
+                  });
+
+                  if (!response.ok) {
+                      let errorMsg = `HTTP error! status: ${response.status}`;
+                      try {
+                          const errorData = await response.json();
+                          errorMsg = errorData.detail || errorData.error || JSON.stringify(errorData);
+                      } catch (e) { /* Ignore if response is not JSON */ }
+                      throw new Error(errorMsg);
+                  }
+
+                  const data = await response.json();
+
+                  if (!data.code) {
+                      throw new Error("Received invalid response from server (missing room code).");
+                  }
+
+                  localStorage.setItem('lastChatRoom', JSON.stringify({
+                      code: data.code,
+                      timestamp: new Date().toISOString()
+                  }));
+
+                  // Optional: Show success briefly before redirecting
+                  if (buttonIcon) buttonIcon.className = 'fas fa-check me-2';
+                  await new Promise(resolve => setTimeout(resolve, 500)); // Short delay
+
+                  window.location.href = `/chat/rooms/${data.code}/`;
+
+              } catch (error) {
+                  console.error('Error creating room:', error);
+                  if (buttonIcon) buttonIcon.className = 'fas fa-exclamation-triangle me-2';
+                  // Restore button after a delay
+                  setTimeout(() => {
+                      if (buttonIcon) buttonIcon.className = originalIconClass;
+                      if (buttonText) buttonText.textContent = originalText;
+                      button.disabled = false;
+                  }, 3000);
+              }
+          });
+      } else {
+          if (!homeChatButton) console.error("Chat button #homeChatButton not found.");
+          if (!csrfTokenInput) console.error("CSRF token input not found.");
+      }
+
+      // Basic form validation feedback (optional, MDB might handle this)
+      const forms = document.querySelectorAll('.form-validate');
+      Array.from(forms).forEach(form => {
+          form.addEventListener('submit', event => {
+              if (!form.checkValidity()) {
+                  event.preventDefault();
+                  event.stopPropagation();
+              }
+              form.classList.add('was-validated');
+          }, false);
+      });
+
+      // Example: Contact form submission (replace with your actual AJAX handler)
+      const contactForm = document.getElementById('contactForm');
+      if (contactForm) {
+          contactForm.addEventListener('submit', function(event) {
+              event.preventDefault();
+              if (!contactForm.checkValidity()) {
+                  event.stopPropagation();
+                  contactForm.classList.add('was-validated');
+                  return;
+              }
+              // Add your AJAX form submission logic here
+              console.log('Contact form submitted (add AJAX call here)');
+              alert('Thank you for your message! (This is a demo - form not sent)');
+              contactForm.reset();
+              contactForm.classList.remove('was-validated');
+          });
+      }
+
+  });
+
+
+
+
+
+
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all needed elements
+        const sliderContainer = document.querySelector('.teacher-slider-container');
+        const slider = document.querySelector('.teacher-slider');
+        const prevArrow = document.getElementById('teacherPrevArrow');
+        const nextArrow = document.getElementById('teacherNextArrow');
+        const items = document.querySelectorAll('.slider-item');
+        
+        // Debug info
+        console.log("Elements found:", {
+            sliderContainer: !!sliderContainer,
+            slider: !!slider,
+            prevArrow: !!prevArrow,
+            nextArrow: !!nextArrow,
+            itemCount: items.length
+        });
+        
+        // Only proceed if we have all necessary elements
+        if (sliderContainer && slider && prevArrow && nextArrow && items.length > 0) {
+            // Track current position
+            let currentPosition = 0;
+            
+            // Calculate how many items can be visible at once based on container width
+            const getVisibleCount = () => {
+                const containerWidth = sliderContainer.clientWidth;
+                const itemWidth = items[0].offsetWidth;
+                return Math.floor(containerWidth / itemWidth);
+            };
+            
+            // Calculate maximum scroll position
+            const getMaxScrollPosition = () => {
+                return Math.max(0, items.length - getVisibleCount());
+            };
+            
+            // Move slide to specific position
+            const moveSlider = (position) => {
+                // Constrain position to valid range
+                position = Math.max(0, Math.min(position, getMaxScrollPosition()));
+                currentPosition = position;
+                
+                // Calculate translation distance based on item width
+                const itemWidth = items[0].offsetWidth;
+                const translateX = -position * itemWidth;
+                
+                // Apply transform to slider
+                slider.style.transform = `translateX(${translateX}px)`;
+                
+                // Update button states
+                updateButtonStates();
+                
+                // Debug info
+                console.log(`Moved to position ${position}, translateX: ${translateX}px`);
+            };
+            
+            // Update button states
+            const updateButtonStates = () => {
+                prevArrow.disabled = currentPosition <= 0;
+                nextArrow.disabled = currentPosition >= getMaxScrollPosition();
+                
+                prevArrow.style.opacity = prevArrow.disabled ? "0.5" : "1";
+                nextArrow.style.opacity = nextArrow.disabled ? "0.5" : "1";
+            };
+            
+            // Add click event listeners
+            prevArrow.addEventListener('click', function() {
+                console.log("Prev button clicked");
+                moveSlider(currentPosition - 1);
+            });
+            
+            nextArrow.addEventListener('click', function() {
+                console.log("Next button clicked");
+                moveSlider(currentPosition + 1);
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                // Recalculate positions on window resize
+                moveSlider(currentPosition);
+            });
+            
+            // Initialize states
+            updateButtonStates();
+        } else {
+            console.error("Some teacher slider elements are missing");
+        }
     });
 </script>
 
+
+
 {% endblock content %}
+
+
+

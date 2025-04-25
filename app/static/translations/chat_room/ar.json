@@ -1,0 +1,8 @@
+{
+  "chatRoomHeader": "غرفة الدردشة:",
+  "typeMessagePlaceholder": "اكتب رسالتك...",
+  "typeMessageAriaLabel": "اكتب رسالتك",
+  "sendButton": "إرسال",
+  "endChatButton": "إنهاء الدردشة",
+  "chatEndedMessage": "تم إنهاء الدردشة. جاري التحويل..."
+}

@@ -1,0 +1,18 @@
+{
+  "assignments_for_label": "التكاليف لـ",
+  "create_assignment_button": "إنشاء تكليف",
+  "title_label": "العنوان",
+  "created_label": "تم الإنشاء",
+  "due_date_label": "تاريخ الاستحقاق",
+  "status_label": "الحالة",
+  "actions_label": "الإجراءات",
+  "closed_label": "مغلق",
+  "open_label": "مفتوح",
+  "view_button": "عرض",
+  "confirm_deletion_heading": "تأكيد الحذف",
+  "confirm_deletion_message": "هل أنت متأكد من رغبتك في حذف التكليف",
+  "cancel_button": "إلغاء",
+  "delete_button": "حذف",
+  "no_assignments_message": "لم يتم إنشاء أي تكاليف لهذه المحاضرة حتى الآن.",
+  "create_first_assignment_link": "إنشاء أول تكليف"
+}

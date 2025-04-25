@@ -12,5 +12,7 @@
     "logout": "Logout",
     "register": "Register",
     "login": "Login",
+    "logeneral_libraryin": "General Library",
+    "customer_service": " Customer Service",
     "ask_for_meet": "ask for free guide"
 }

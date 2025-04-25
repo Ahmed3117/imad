@@ -1,0 +1,18 @@
+{
+  "back_to_group_button": "العودة إلى المجموعة",
+  "grades_report_for_label": "تقرير الدرجات لـ",
+  "study_group_label": "مجموعة الدراسة:",
+  "average_grade_label": "معدل الدرجات:",
+  "assignment_label": "التكليف",
+  "lecture_label": "المحاضرة",
+  "submitted_at_label": "تم التسليم في",
+  "grade_label": "الدرجة",
+  "percentage_label": "النسبة المئوية",
+  "feedback_label": "ملاحظات",
+  "not_submitted_label": "لم يتم التسليم",
+  "not_graded_label": "لم يتم التقييم",
+  "not_available_label": "غير متاح",
+  "no_assignments_completed_message": "لم يتم إكمال أي تكاليف حتى الآن.",
+  "grade_distribution_label": "توزيع الدرجات",
+  "completion_status_label": "حالة الإنجاز"
+}

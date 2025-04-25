@@ -6,10 +6,11 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from .forms import ContactForm
 from django.core.mail import EmailMessage
+from django.utils import timezone
 
 def home(request):
     language = request.GET.get('lang', 'en')  # Default to 'en' if no language is specified
-
+    current_year = timezone.now().year
     # Fetch and translate company info
     company_info = CompanyInfo.objects.last()
     company_info_translation = CompanyInfoTranslation.objects.filter(company_info=company_info, language=language).first()
@@ -49,7 +50,8 @@ def home(request):
         'logo_url': logo_url,
         'teachers': translated_teachers,
         # 'social_accounts': social_accounts,
-        'company_info': company_info
+        'company_info': company_info,
+        'current_year': current_year
     }
     return render(request, 'about/home.html', context)
 

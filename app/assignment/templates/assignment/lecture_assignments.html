@@ -1,14 +1,19 @@
 {% extends 'base.html' %}
 
+{% load custom_filters %}
+{% block translationFolder %}data-translation-folder="lecture_assignments"{% endblock %}
+{% block title %}Assignments List{% endblock %}
+
+
 {% block content %}
 <div class="container mt-5">
     <div class="card">
         <div class="card-header bg-primary text-white">
             <div class="d-flex justify-content-between align-items-center">
-                <h2>Assignments for {{ lecture.title }}</h2>
+                <h2><span data-translate="assignments_for_label"></span> {{ lecture.title }}</h2>
                 {% if is_teacher %}
                 <a href="{% url 'assignment:assignment_create' lecture.pk %}" class="btn btn-success">
-                    <i class="fas fa-plus"></i> Create Assignment
+                    <i class="fas fa-plus"></i> <span data-translate="create_assignment_button"></span>
                 </a>
                 {% endif %}
             </div>
@@ -19,11 +24,11 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Title</th>
-                            <th>Created</th>
-                            <th>Due Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th><span data-translate="title_label"></span></th>
+                            <th><span data-translate="created_label"></span></th>
+                            <th><span data-translate="due_date_label"></span></th>
+                            <th><span data-translate="status_label"></span></th>
+                            <th><span data-translate="actions_label"></span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -38,15 +43,15 @@
                             <td>{{ assignment.due_at|date:"SHORT_DATETIME_FORMAT" }}</td>
                             <td>
                                 {% if assignment.is_past_due %}
-                                    <span class="badge badge-danger">Closed</span>
+                                    <span class="badge badge-danger"><span data-translate="closed_label"></span></span>
                                 {% else %}
-                                    <span class="badge badge-success">Open</span>
+                                    <span class="badge badge-success"><span data-translate="open_label"></span></span>
                                 {% endif %}
                             </td>
                             <td>
                                 <a href="{% url 'assignment:assignment_detail' assignment.pk %}"
                                    class="btn btn-sm btn-info">
-                                    <i class="fas fa-eye"></i> View
+                                    <i class="fas fa-eye"></i> <span data-translate="view_button"></span>
                                 </a>
                             </td>
                         </tr>
@@ -56,15 +61,15 @@
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="deleteModalLabel{{ assignment.pk }}">Confirm Deletion</h5>
+                                        <h5 class="modal-title" id="deleteModalLabel{{ assignment.pk }}"><span data-translate="confirm_deletion_heading"></span></h5>
                                         <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        Are you sure you want to delete the assignment "{{ assignment.title }}"?
+                                        <span data-translate="confirm_deletion_message"></span> "{{ assignment.title }}"?
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Cancel</button>
-                                        <a href="{% url 'assignment:assignment_delete' assignment.pk %}" class="btn btn-danger">Delete</a>
+                                        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal"><span data-translate="cancel_button"></span></button>
+                                        <a href="{% url 'assignment:assignment_delete' assignment.pk %}" class="btn btn-danger"><span data-translate="delete_button"></span></a>
                                     </div>
                                 </div>
                             </div>
@@ -75,10 +80,10 @@
             </div>
             {% else %}
             <div class="alert alert-info">
-                No assignments have been created for this lecture yet.
+                <span data-translate="no_assignments_message"></span>
                 {% if is_teacher %}
                 <a href="{% url 'assignment:assignment_create' lecture.pk %}" class="alert-link">
-                    Create the first assignment
+                    <span data-translate="create_first_assignment_link"></span>
                 </a>
                 {% endif %}
             </div>
@@ -87,3 +92,4 @@
     </div>
 </div>
 {% endblock %}
+

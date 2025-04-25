@@ -1,0 +1,15 @@
+{
+  "assignment_header": "Edit Assignment",
+  "title_label": "Title",
+  "title_error": "Please provide a title for the assignment.",
+  "description_label": "Description",
+  "description_error": "Please provide assignment description.",
+  "attachment_label": "Attachment",
+  "current_file": "Current file:",
+  "due_date_label": "Due Date",
+  "due_date_error": "Please select a due date.",
+  "max_grade_label": "Max Grade",
+  "max_grade_error": "Please enter maximum grade.",
+  "cancel_button": "Cancel",
+  "save_button": "Save Assignment"
+}

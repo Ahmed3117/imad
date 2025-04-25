@@ -1,0 +1,15 @@
+{
+  "assignment_header": "تعديل التكليف",
+  "title_label": "العنوان",
+  "title_error": "الرجاء تقديم عنوان للتكليف.",
+  "description_label": "الوصف",
+  "description_error": "الرجاء تقديم وصف التكليف.",
+  "attachment_label": "المرفق",
+  "current_file": "الملف الحالي:",
+  "due_date_label": "تاريخ الاستحقاق",
+  "due_date_error": "الرجاء تحديد تاريخ الاستحقاق.",
+  "max_grade_label": "الدرجة القصوى",
+  "max_grade_error": "الرجاء إدخال الدرجة القصوى.",
+  "cancel_button": "إلغاء",
+  "save_button": "حفظ التكليف"
+}

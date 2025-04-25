@@ -1,0 +1,8 @@
+{
+  "chatRoomHeader": "Chat Room:",
+  "typeMessagePlaceholder": "Type your message...",
+  "typeMessageAriaLabel": "Type your message",
+  "sendButton": "Send",
+  "endChatButton": "End Chat",
+  "chatEndedMessage": "The chat has been ended. Redirecting..."
+}

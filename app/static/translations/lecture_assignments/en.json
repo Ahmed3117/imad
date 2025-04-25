@@ -1,0 +1,18 @@
+{
+  "assignments_for_label": "Assignments for",
+  "create_assignment_button": "Create Assignment",
+  "title_label": "Title",
+  "created_label": "Created",
+  "due_date_label": "Due Date",
+  "status_label": "Status",
+  "actions_label": "Actions",
+  "closed_label": "Closed",
+  "open_label": "Open",
+  "view_button": "View",
+  "confirm_deletion_heading": "Confirm Deletion",
+  "confirm_deletion_message": "Are you sure you want to delete the assignment",
+  "cancel_button": "Cancel",
+  "delete_button": "Delete",
+  "no_assignments_message": "No assignments have been created for this lecture yet.",
+  "create_first_assignment_link": "Create the first assignment"
+}
