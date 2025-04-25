@@ -31,6 +31,7 @@ TOKEN_URL = "https://zoom.us/oauth/token"
 MEETING_URL = "https://api.zoom.us/v2/users/me/meetings"
 BASE_URL = "https://nabbiuwny.com"
 
+
 INSTALLED_APPS = [
     'admin_interface',
     'colorfield',
@@ -47,6 +48,8 @@ INSTALLED_APPS = [
     #'carts',
     #'orders',
     'subscriptions',
+    'library',
+    'assignment',
     # 'appointments',
     # 'exams',
     "crispy_forms",
@@ -55,6 +58,8 @@ INSTALLED_APPS = [
     # 'payments',
     # 'freemeet',
     'ckeditor',
+    'channels',
+    'chat',
 ]
 
 ASGI_APPLICATION = 'project.asgi.application'
@@ -121,6 +126,19 @@ DATABASES = {
 }
 
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
+
+
+
+LANGUAGE_CODE = 'en'
+LANGUAGES = [
+    ('en', 'English'),
+    ('ar', 'Arabic'),
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -201,7 +219,8 @@ ADMIN_ORDERING = (
     )),
     ('accounts', (
         'User', 'ParentStudent',
-        'TeacherInfo', 'TeacherInfoTranslation'
+        'TeacherInfo', 'TeacherInfoTranslation',
+        'TeacheroomAccount'
     )),
     # ('freemeet', ('FreeMeet',)),
     ('courses', (
@@ -210,7 +229,10 @@ ADMIN_ORDERING = (
         'Course', 'CourseTranslation',
         # 'LevelContent', 'LevelContentTranslation'
     )),
-    ('subscriptions', ('StudyGroup','JoinRequest','Lecture')),
+    ('library', (
+        'CourseLibrary', 'MyLibrary',
+    )),
+    ('subscriptions', ('StudyGroup','JoinRequest','Lecture','StudyGroupResource')),
     # ('appointments', ('TeacherAvailability', 'Appointment')),
     # ('exams', ('Exam', 'Question', 'Option', 'ExamResult')),
     # ('orders', ('Order', 'OrderItem')),
