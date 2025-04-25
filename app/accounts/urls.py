@@ -28,7 +28,7 @@ urlpatterns = [
     path('mark-visited/<int:lecture_id>/', views.mark_lecture_visited, name='mark_lecture_visited'),
     path('add_note/<int:lecture_id>/', views.add_lecture_note, name='add_lecture_note'),
 
-
+    path('delete-shared-resource/', views.delete_shared_resource, name='delete_shared_resource'),
 
 
 ]

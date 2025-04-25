@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block translationFolder %}data-translation-folder="chat_room"{% endblock %}
+{% block title %}chat_room{% endblock %}
+
+{% block content %}
+    
+    <style>
+        .message-bubble {
+            max-width: 75%;
+            padding: 1rem 1.25rem;
+            border-radius: 1.15rem;
+            margin-bottom: 1rem;
+        }
+        .user-message {
+            background: #14a44d;
+            color: white;
+            margin-right: auto;
+        }
+        .agent-message {
+            background: #3b71ca;
+            color: white;
+            margin-left: auto;
+        }
+        .chat-timestamp {
+            font-size: 0.75rem;
+            color: #9fa6b2;
+            margin: 0.25rem 0;
+        }
+    </style>
+
+    <div class="container py-5" style="max-width: 800px;">
+        <div class="card shadow-5 rounded-7 overflow-hidden" >
+            <div class="card-header bg-primary text-white py-3">
+                <h2 class="h4 mb-0"><i class="fas fa-comments me-2"></i><span data-translate="chatRoomHeader">Chat Room:</span> {{ room_code }}</h2>
+            </div>
+
+            <!-- Chat Messages Container -->
+            <div class="card-body p-0 bg-secondary" >
+                <div id="chatBox" class="p-4" style="height: 300px; overflow-y: auto; background: #f8f9fa;">
+                    <!-- Messages will be inserted here -->
+                </div>
+
+                <!-- Chat Controls -->
+                <div id="chatControls" class="p-4 bg-white">
+                    <div class="input-group mb-3 shadow-2 rounded-4">
+                        <input type="text" id="messageInput"
+                               class="form-control form-control-lg rounded-start-4"
+                               placeholder="Type your message..."
+                               aria-label="Type your message">
+                        <button onclick="sendMessage()"
+                                class="btn btn-primary px-4 rounded-end-4">
+                            <i class="fas fa-paper-plane me-2"></i><span data-translate="sendButton">Send</span>
+                        </button>
+                    </div>
+
+                    <div class="d-grid">
+                        <button onclick="endChat()"
+                                class="btn btn-danger btn-lg shadow-2 rounded-4">
+                            <i class="fas fa-phone-slash me-2"></i><span data-translate="endChatButton">End Chat</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ended Message Alert -->
+                <div id="endedMessage" class="alert alert-danger m-4 text-center shadow-2 rounded-4"
+                     style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span class="fw-bold" data-translate="chatEndedMessage">The chat has been ended. Redirecting...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const roomCode = "{{ room_code }}";
+        var csrfToken = "{{ csrf_token }}";
+        var isAgent = {{ is_agent|lower }};
+        var chatEnded = false;
+
+        // Function to create message element with MDB styling
+        function createMessageElement(messageData) {
+            const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const container = document.createElement('div');
+            container.innerHTML = `
+                <div class="chat-timestamp text-center">${timestamp}</div>
+                <div class="message-bubble ${messageData.is_agent ? 'agent-message' : 'user-message'}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">${messageData.sender}</span>
+                        <i class="fas ${messageData.is_agent ? 'fa-headset' : 'fa-user'} ms-2"></i>
+                    </div>
+                    <div class="mt-1">${messageData.text}</div>
+                </div>
+            `;
+            return container;
+        }
+
+        // Fetch existing messages when the page loads
+        async function loadMessages() {
+            try {
+                const response = await fetch(`/chat/rooms/${roomCode}/messages/`);
+                if (!response.ok) throw new Error('Failed to load messages');
+
+                const messages = await response.json();
+                const chatBox = document.getElementById('chatBox');
+
+                messages.forEach(message => {
+                    const messageElement = createMessageElement({
+                        sender: message.sender,
+                        text: message.text,
+                        is_agent: message.is_agent
+                    });
+                    chatBox.appendChild(messageElement);
+                });
+
+                chatBox.scrollTop = chatBox.scrollHeight;
+            } catch (error) {
+                console.error('Error loading messages:', error);
+            }
+        }
+
+        // WebSocket for real-time messaging
+        const chatSocket = new WebSocket(
+            `ws://${window.location.host}/ws/chat/${roomCode}/`
+        );
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+
+            if (data.type === 'chat_ended') {
+                chatEnded = true;
+                handleChatEnded(data, true);
+            } else if (data.type === 'error') {
+                const chatBox = document.getElementById('chatBox');
+                const errorElement = document.createElement('div');
+                errorElement.className = 'alert alert-warning mt-2';
+                errorElement.textContent = data.message;
+                chatBox.appendChild(errorElement);
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                if (data.message.includes('no longer exists')) {
+                    handleChatEnded({}, true);
+                }
+            } else {
+                const chatBox = document.getElementById('chatBox');
+                const messageElement = createMessageElement({
+                    sender: data.sender,
+                    text: data.message,
+                    is_agent: data.is_agent
+                });
+                chatBox.appendChild(messageElement);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        };
+
+        chatSocket.onclose = function(e) {
+            if (!chatEnded) handleChatEnded({}, true);
+        };
+
+        chatSocket.onerror = function(e) {
+            if (!chatEnded) handleChatEnded({}, true);
+        };
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+
+            if (message && chatSocket.readyState === WebSocket.OPEN) {
+                chatSocket.send(JSON.stringify({'message': message}));
+                messageInput.value = '';
+            }
+        }
+
+        async function endChat() {
+            if (chatEnded) return;
+
+            try {
+                const response = await fetch(`/chat/rooms/${roomCode}/end/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                    },
+                });
+
+                if (response.ok && chatSocket.readyState === WebSocket.OPEN) {
+                    chatSocket.send(JSON.stringify({'type': 'end_chat'}));
+                }
+            } catch (error) {
+                console.error('Error ending chat:', error);
+            }
+        }
+
+        function handleChatEnded(data, immediateRedirect = false) {
+            chatEnded = true;
+            document.getElementById('chatControls').style.display = 'none';
+            document.getElementById('endedMessage').style.display = 'block';
+
+            const chatBox = document.getElementById('chatBox');
+            const endMessage = document.createElement('div');
+            endMessage.className = 'alert alert-warning text-center my-3';
+            endMessage.innerHTML = `
+                <i class="fas fa-exclamation-circle me-2"></i>
+                ${data.ended_by ? `Chat ended by ${data.is_agent ? 'Agent' : 'User'} ${data.ended_by}` : 'The chat has been ended'}
+            `;
+            chatBox.appendChild(endMessage);
+
+            setTimeout(() => {
+                window.location.href = isAgent ? "/chat/dashboard/" : "/chat/contact/";
+            }, immediateRedirect ? 500 : 3000);
+        }
+
+        // Event listeners
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Initial setup
+        (async function initialize() {
+            await loadMessages();
+            setupRoomStatusCheck();
+        })();
+
+        function setupRoomStatusCheck() {
+            const checkInterval = setInterval(async () => {
+                if (chatEnded) {
+                    clearInterval(checkInterval);
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/chat/rooms/${roomCode}/status/`);
+                    if (!response.ok) handleChatEnded({}, true);
+                } catch (error) {
+                    console.error('Error checking room status:', error);
+                }
+            }, 2000);
+
+            window.addEventListener('beforeunload', () => clearInterval(checkInterval));
+        }
+    </script>
+
+{% endblock %}

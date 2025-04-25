@@ -1,0 +1,456 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow-lg">
+        <!-- Assignment Header -->
+        <div class="card-header bg-primary text-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="h4 mb-1">
+                        <i class="fas fa-tasks me-2"></i>{{ assignment.title }}
+                    </h2>
+                    <p class="mb-0 small opacity-75">
+                        <i class="fas fa-book me-1"></i>Lecture: {{ assignment.lecture.title }}
+                    </p>
+                </div>
+                {% if is_teacher %}
+                <div class="btn-group">
+                    <a href="{% url 'assignment:assignment_edit' assignment.pk %}" 
+                       class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit me-1"></i>Edit
+                    </a>
+                    <button type="button" class="btn btn-danger btn-sm" 
+                            data-mdb-toggle="modal" data-mdb-target="#deleteAssignmentModal">
+                        <i class="fas fa-trash me-1"></i>Delete
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Assignment Details -->
+        <div class="card-body">
+            <div class="mb-4">
+                <h4 class="h5 text-primary mb-3">
+                    <i class="fas fa-info-circle me-2"></i>Description
+                </h4>
+                <div class="ps-4">
+                    <p class="mb-3">{{ assignment.description }}</p>
+                    
+                    <div class="d-flex flex-wrap gap-4 mb-3">
+                        <div>
+                            <span class="badge bg-secondary me-2">
+                                <i class="far fa-clock me-1"></i>Due:
+                            </span>
+                            <span>{{ assignment.due_at|date:"M j, Y H:i" }}</span>
+                        </div>
+                        <div>
+                            <span class="badge bg-secondary me-2">
+                                <i class="fas fa-star-half-alt me-1"></i>Max Grade:
+                            </span>
+                            <span>{{ assignment.max_grade }}</span>
+                        </div>
+                    </div>
+                    
+                    {% if assignment.attachment %}
+                    <div>
+                        <span class="badge bg-secondary me-2">
+                            <i class="fas fa-paperclip me-1"></i>Attachment:
+                        </span>
+                        <a href="{{ assignment.attachment.url }}" target="_blank" 
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-download me-1"></i>Download
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if is_teacher %}
+            <!-- Teacher View -->
+            <div class="mt-5">
+                <h4 class="h5 text-primary mb-3 border-bottom pb-2">
+                    <i class="fas fa-users me-2"></i>Student Submissions
+                </h4>
+                
+                {% if student_answers %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Student</th>
+                                <th>Submitted</th>
+                                <th>Answer</th>
+                                <th>Grade</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for answer in student_answers %}
+                            <tr id="answer-row-{{ answer.pk }}">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm me-2">
+                                            <div class="avatar-title bg-light rounded-circle">
+                                                <i class="fas fa-user text-primary"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">{{ answer.student.get_name }}</h6>
+                                            <small class="text-muted">{{ answer.student.email }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <small>{{ answer.submitted_at|date:"M j, H:i" }}</small>
+                                </td>
+                                <td>
+                                    <div class="text-truncate" style="max-width: 200px;">
+                                        {{ answer.answer_text|truncatewords:10 }}
+                                    </div>
+                                    {% if answer.attachment %}
+                                    <div class="mt-1">
+                                        <a href="{{ answer.attachment.url }}" target="_blank" 
+                                           class="btn btn-xs btn-outline-primary btn-sm">
+                                            <i class="fas fa-file-download me-1"></i>File
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <input type="number" 
+                                               class="form-control form-control-sm grade-input" 
+                                               style="width: 70px;" 
+                                               value="{{ answer.grade|default:'' }}" 
+                                               min="0" 
+                                               max="{{ assignment.max_grade }}"
+                                               data-answer-id="{{ answer.pk }}">
+                                        <span class="ms-1">/ {{ assignment.max_grade }}</span>
+                                    </div>
+                                    <div class="mt-1">
+                                        <textarea class="form-control form-control-sm feedback-input" 
+                                                  rows="1" 
+                                                  placeholder="Feedback..."
+                                                  data-answer-id="{{ answer.pk }}">{{ answer.teacher_feedback|default:'' }}</textarea>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-success save-grade-btn" 
+                                            data-answer-id="{{ answer.pk }}">
+                                        <i class="fas fa-save me-1"></i>Save
+                                    </button>
+                                    <div class="grade-status small mt-1" id="grade-status-{{ answer.pk }}"></div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No student submissions yet.
+                </div>
+                {% endif %}
+            </div>
+
+            {% else %}
+            <!-- Student View -->
+            <div class="mt-5">
+                <h4 class="h5 text-primary mb-3 border-bottom pb-2">
+                    <i class="fas fa-user-edit me-2"></i>My Submission
+                </h4>
+                
+                {% if student_answer %}
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-0">
+                                    <i class="far fa-calendar-check me-2"></i>
+                                    Submitted on {{ student_answer.submitted_at|date:"M j, Y H:i" }}
+                                </h5>
+                                {% if student_answer.updated_at != student_answer.submitted_at %}
+                                <small class="text-muted">
+                                    Last updated: {{ student_answer.updated_at|date:"M j, Y H:i" }}
+                                </small>
+                                {% endif %}
+                            </div>
+                            {% if can_edit %}
+                            <div class="btn-group">
+                                <a href="{% url 'assignment:edit_answer' student_answer.pk %}" 
+                                   class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit me-1"></i>Edit
+                                </a>
+                                <button type="button" class="btn btn-danger btn-sm" 
+                                        data-mdb-toggle="modal" data-mdb-target="#deleteAnswerModal">
+                                    <i class="fas fa-trash me-1"></i>Delete
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6 class="text-muted">Answer:</h6>
+                            <div class="p-3 bg-light rounded">
+                                {{ student_answer.answer_text|linebreaks }}
+                            </div>
+                        </div>
+                        
+                        {% if student_answer.attachment %}
+                        <div class="mb-3">
+                            <h6 class="text-muted">Attachment:</h6>
+                            <a href="{{ student_answer.attachment.url }}" target="_blank" 
+                               class="btn btn-outline-primary">
+                                <i class="fas fa-file-download me-1"></i>Download File
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        <button type="button" class="btn btn-primary" 
+                                data-mdb-toggle="modal" data-mdb-target="#gradeModal">
+                            <i class="fas fa-chart-bar me-1"></i>View Grade
+                        </button>
+                    </div>
+                </div>
+                {% elif can_submit %}
+                <div class="alert alert-info">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-info-circle fa-2x me-3"></i>
+                        <div>
+                            <h5 class="alert-heading">No Submission Yet</h5>
+                            <p class="mb-2">You haven't submitted an answer for this assignment.</p>
+                            <a href="{% url 'assignment:submit_answer' assignment.pk %}" 
+                               class="btn btn-success">
+                                <i class="fas fa-plus me-1"></i>Submit Answer
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-danger">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-circle fa-2x me-3"></i>
+                        <div>
+                            <h5 class="alert-heading">Submission Closed</h5>
+                            <p class="mb-0">This assignment is past due and can no longer be submitted.</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Delete Assignment Modal -->
+<div class="modal fade" id="deleteAssignmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-mdb-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to permanently delete this assignment?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    This action cannot be undone and will delete all associated student submissions.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+                <a href="{% url 'assignment:assignment_delete' assignment.pk %}" class="btn btn-danger">
+                    <i class="fas fa-trash me-1"></i>Delete Assignment
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Answer Modal -->
+<div class="modal fade" id="deleteAnswerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-mdb-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete your answer submission?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    This action cannot be undone.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grade View Modal -->
+<div class="modal fade" id="gradeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-chart-bar me-2"></i>My Grade
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-mdb-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% if student_answer.grade is not None %}
+                <div class="text-center mb-4">
+                    <div class="grade-display" style="font-size: 3rem; font-weight: bold; color: #4CAF50;">
+                        {{ student_answer.grade }}<small style="font-size: 1.5rem; color: #6c757d;">/{{ assignment.max_grade }}</small>
+                    </div>
+                    <div class="progress mt-2" style="height: 10px;">
+                        <div class="progress-bar bg-success" 
+                             role="progressbar" 
+                             style="width: {% widthratio student_answer.grade assignment.max_grade 100 %}%" 
+                             aria-valuenow="{{ student_answer.grade }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="{{ assignment.max_grade }}">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">
+                            <i class="fas fa-comment me-2"></i>Teacher Feedback
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        {% if student_answer.teacher_feedback %}
+                            {{ student_answer.teacher_feedback|linebreaks }}
+                        {% else %}
+                            <p class="text-muted">No feedback provided</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle fa-2x mb-3"></i>
+                    <h5>Not Graded Yet</h5>
+                    <p class="mb-0">Your submission is still being reviewed by the teacher.</p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-mdb-dismiss="modal">
+                    <i class="fas fa-check me-1"></i>Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Save grade functionality
+    $('.save-grade-btn').click(function() {
+        const answerId = $(this).data('answer-id');
+        const gradeInput = $(`.grade-input[data-answer-id="${answerId}"]`);
+        const feedbackInput = $(`.feedback-input[data-answer-id="${answerId}"]`);
+        const statusDiv = $(`#grade-status-${answerId}`);
+        
+        const grade = gradeInput.val();
+        const feedback = feedbackInput.val();
+        
+        if (grade === '') {
+            statusDiv.html('<div class="alert alert-danger p-2">Please enter a grade</div>');
+            return;
+        }
+        
+        statusDiv.html('<div class="alert alert-info p-2">Saving...</div>');
+        
+        $.ajax({
+            url: "{% url 'assignment:grade_answer' 0 %}".replace('0', answerId),
+            type: 'POST',
+            data: {
+                'grade': grade,
+                'feedback': feedback,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                if (response.success) {
+                    statusDiv.html('<div class="alert alert-success p-2">Grade saved!</div>');
+                } else {
+                    statusDiv.html(`<div class="alert alert-danger p-2">${response.error}</div>`);
+                }
+                
+                setTimeout(function() {
+                    statusDiv.fadeOut();
+                }, 3000);
+            },
+            error: function(xhr) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    statusDiv.html(`<div class="alert alert-danger p-2">${response.error}</div>`);
+                } catch {
+                    statusDiv.html('<div class="alert alert-danger p-2">Error saving grade</div>');
+                }
+            }
+        });
+    });
+    
+    // Grade input validation
+    $('.grade-input').on('change', function() {
+        const maxGrade = parseInt('{{ assignment.max_grade }}');
+        const value = parseInt($(this).val()) || 0;
+        
+        if (value > maxGrade) {
+            $(this).val(maxGrade);
+        } else if (value < 0) {
+            $(this).val(0);
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .grade-display {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    .grade-input, .feedback-input {
+        transition: all 0.3s ease;
+    }
+    .grade-input:focus, .feedback-input:focus {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        border-color: #86b7fe;
+    }
+</style>
+{% endblock %}

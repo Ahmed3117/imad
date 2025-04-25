@@ -6,7 +6,6 @@ from threading import local
 from .middleware import get_current_request
 
 
-
 class Level(models.Model):
     name = models.CharField(max_length=200)
 
@@ -39,6 +38,7 @@ class Course(models.Model):
         
         # Return a string with level, track, and name
         return f"{level_name} | {track_name} | {self.name}"
+
 
 
 #-----------------------translation models-----------------------------#

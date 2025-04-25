@@ -23,8 +23,19 @@
         <h5 class="card-title text-primary text-center mb-3 fw-bold">{{ course.name }}</h5>
 
         <!-- Course Description -->
-        <div class="card card-bg px-3 mb-3 w-100 text-center">
-            <p class="text-muted mb-0">{{ course.description }}</p>
+        <div class="card card-bg px-3 mb-3 w-100 text-center description-container">
+            <div class="short-desc">{{ course.description|truncatechars:100 }}</div>
+            <div class="full-desc" style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease;">
+                {{ course.description }}
+            </div>
+            
+            <!-- Toggle Button -->
+            <div class="text-center mt-2">
+                <button class="toggle-desc-btn btn btn-link text-primary p-0 small fw-bold">
+                    <span class="show-more">Show More <i class="fas fa-chevron-down ms-1"></i></span>
+                    <span class="show-less" style="display: none;">Show Less <i class="fas fa-chevron-up ms-1"></i></span>
+                </button>
+            </div>
         </div>
 
         <!-- Add to Cart / Login Button -->
@@ -47,6 +58,54 @@
         </div>
     </div>
 </div>
+
+<style>
+    .description-container {
+        position: relative;
+    }
+    
+    .full-desc {
+        background: white;
+    }
+    
+    .toggle-desc-btn {
+        text-decoration: none;
+    }
+    
+    .toggle-desc-btn:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButtons = document.querySelectorAll('.toggle-desc-btn');
+    
+    toggleButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const container = this.closest('.description-container');
+            const fullDesc = container.querySelector('.full-desc');
+            const shortDesc = container.querySelector('.short-desc');
+            const showMore = container.querySelector('.show-more');
+            const showLess = container.querySelector('.show-less');
+            
+            if (fullDesc.style.maxHeight === '0px' || !fullDesc.style.maxHeight) {
+                // Expand
+                fullDesc.style.maxHeight = fullDesc.scrollHeight + 'px';
+                showMore.style.display = 'none';
+                showLess.style.display = 'inline';
+                shortDesc.style.display = 'none';
+            } else {
+                // Collapse
+                fullDesc.style.maxHeight = '0';
+                showMore.style.display = 'inline';
+                showLess.style.display = 'none';
+                shortDesc.style.display = 'block';
+            }
+        });
+    });
+});
+</script>
 
 
 

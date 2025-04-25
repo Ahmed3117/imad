@@ -31,54 +31,147 @@
 </style>
 
 
-<!-- Add this inside the lecture loop in your template -->
+
+
 <div class="container mt-5">
-    <!-- Add Lecture Form (Teacher Only) -->
+
+    <!-- assignments report button -->
+    <div class="text-end mb-3">
+        {% if request.user.role == "teacher" %}
+        <a href="{% url 'assignment:studygroup_grades' study_group.id %}" class="btn btn-secondary text-light" data-translate="assignment_report">Assignments Report</a>
+        {% else %}
+        <a href="{% url 'assignment:student_grades' study_group.id request.user.id %}" class="btn btn-secondary text-light" data-translate="assignment_report">Assignments Report</a>
+        {% endif %}
+    </div>
+    
+
+    <!-- Shared Resources Section - Now Collapsible -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center" 
+             data-mdb-toggle="collapse" 
+             data-mdb-target="#sharedResourcesCollapse"
+             aria-expanded="true"
+             aria-controls="sharedResourcesCollapse"
+             style="cursor: pointer;">
+            <h5 class="mb-0">
+                <i class="fas fa-share-alt me-2"></i>
+                <span data-translate="shared_resources">Shared Resources</span>
+            </h5>
+            <i class="fas fa-chevron-down toggle-icon"></i>
+        </div>
+        <div class="collapse show" id="sharedResourcesCollapse">
+            <div class="card-body">
+                {% if shared_resources %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th data-translate="resource">Resource</th>
+                                    <th data-translate="course">Course</th>
+                                    <th data-translate="shared_by">Shared By</th>
+                                    <th data-translate="actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for resource in shared_resources %}
+                                    <tr>
+                                        <td>
+                                            <i class="fas fa-file me-2"></i>
+                                            {{ resource.resource.file.name|slice:"courseslibraries/:" }}
+                                        </td>
+                                        <td>{{ resource.resource.course.name }}</td>
+                                        <td>{{ resource.shared_by.username }}</td>
+                                        <td>
+                                            <a href="{{ resource.resource.file.url }}" 
+                                            class="btn btn-sm btn-primary" 
+                                            target="_blank"
+                                            data-translate="download">
+                                                <i class="fas fa-download"></i> Download
+                                            </a>
+                                            {% if user_role == 'teacher' and resource.shared_by == request.user %}
+                                                <button class="btn btn-sm btn-danger delete-resource-btn" 
+                                                        data-resource-id="{{ resource.id }}"
+                                                        data-translate="delete">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info mb-0" data-translate="no_shared_resources">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No resources have been shared with this study group yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Add Lecture Form (Teacher Only) - Now Collapsible -->
     {% if user_role == 'teacher' %}
     <div class="card mb-4 shadow-sm" style="background-color: #f2fdfa;">
-        <div class="card-body">
-            <form id="add-lecture-form" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="hidden" name="add_lecture" value="1">
-                <div class="row g-3">
-                    <div class="col-md-5">
-                        <div class="form-floating">
-                            <input type="text" id="{{ lecture_form.title.id_for_label }}" name="title" class="form-control" value="{{ lecture_form.title.value|default:'' }}" required>
-                            <label class="form-label" for="{{ lecture_form.title.id_for_label }}" data-translate="title">Title</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-floating">
-                            <input type="number" id="{{ lecture_form.duration.id_for_label }}" name="duration" class="form-control" value="{{ lecture_form.duration.value|default:60 }}" max="300" min="10" required>
-                            <label class="form-label" for="{{ lecture_form.duration.id_for_label }}" data-translate="duration">Duration (minutes)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating">
-                            <select id="{{ lecture_form.schedule.id_for_label }}" name="schedule" class="form-select" required>
-                                {% for value, label in lecture_form.schedule.field.choices %}
-                                    <option value="{{ value }}" {% if lecture_form.schedule.value == value %}selected{% endif %}>{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                            <label class="form-label" for="{{ lecture_form.schedule.id_for_label }}" data-translate="schedule">Schedule</label>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-floating">
-                            <textarea id="{{ lecture_form.description.id_for_label }}" name="description" class="form-control" rows="3" required>{{ lecture_form.description.value|default:'' }}</textarea>
-                            <label class="form-label" for="{{ lecture_form.description.id_for_label }}" data-translate="description">Description</label>
-                        </div>
-                    </div>
-                    <div class="col-12 text-end">
-                        <button type="submit" id="add-lecture-button" class="btn btn-primary btn-block btn-rounded">
-                            <span id="button-text" data-translate="add_lecture">Add Lecture</span>
-                            <div id="loading-spinner" class="spinner-border spinner-border-sm d-none" role="status">
-                                <span class="visually-hidden" data-translate="loading">Loading...</span>
+        <div class="card-header d-flex justify-content-between align-items-center" 
+             data-mdb-toggle="collapse" 
+             data-mdb-target="#addLectureFormCollapse"
+             aria-expanded="true"
+             aria-controls="addLectureFormCollapse"
+             style="cursor: pointer; background-color: #d1f7ed;">
+            <h5 class="mb-0">
+                <i class="fas fa-plus-circle me-2"></i>
+                <span data-translate="add_lecture">Add New Lecture</span>
+            </h5>
+            <i class="fas fa-chevron-down toggle-icon"></i>
+        </div>
+        <div class="collapse show" id="addLectureFormCollapse">
+            <div class="card-body">
+                <form id="add-lecture-form" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="add_lecture" value="1">
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <div class="form-floating">
+                                <input type="text" id="{{ lecture_form.title.id_for_label }}" name="title" class="form-control" value="{{ lecture_form.title.value|default:'' }}" required>
+                                <label class="form-label" for="{{ lecture_form.title.id_for_label }}" data-translate="title">Title</label>
                             </div>
-                        </button>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating">
+                                <input type="number" id="{{ lecture_form.duration.id_for_label }}" name="duration" class="form-control" value="{{ lecture_form.duration.value|default:60 }}" max="300" min="10" required>
+                                <label class="form-label" for="{{ lecture_form.duration.id_for_label }}" data-translate="duration">Duration (minutes)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <select id="{{ lecture_form.schedule.id_for_label }}" name="schedule" class="form-select" required>
+                                    {% for value, label in lecture_form.schedule.field.choices %}
+                                        <option value="{{ value }}" {% if lecture_form.schedule.value == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label class="form-label" for="{{ lecture_form.schedule.id_for_label }}" data-translate="schedule">Schedule</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <textarea id="{{ lecture_form.description.id_for_label }}" name="description" class="form-control" rows="3" required>{{ lecture_form.description.value|default:'' }}</textarea>
+                                <label class="form-label" for="{{ lecture_form.description.id_for_label }}" data-translate="description">Description</label>
+                            </div>
+                        </div>
+                        <div class="col-12 text-end">
+                            <button type="submit" id="add-lecture-button" class="btn btn-primary btn-block btn-rounded">
+                                <span id="button-text" data-translate="add_lecture">Add Lecture</span>
+                                <div id="loading-spinner" class="spinner-border spinner-border-sm d-none" role="status">
+                                    <span class="visually-hidden" data-translate="loading">Loading...</span>
+                                </div>
+                            </button>
+                        </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
     {% endif %}
@@ -119,10 +212,12 @@
                                     {{ lecture_data.lecture.created|date:"m/d/Y" }}
                                 </div>
                                 {% if lecture_data.lecture.live_link %}
-                                <div class="live-session">
-                                    <i class="fas fa-video me-1 text-primary"></i>
-                                    <a href="{{ lecture_data.lecture.live_link }}" class="btn btn-sm btn-primary px-3 ripple-surface live-link" data-translate="join_live_session">Join Live Session</a>
-                                </div>
+                                    {% if not lecture_data.lecture.is_finished %}
+                                    <div class="live-session">
+                                        <i class="fas fa-video me-1 text-primary"></i>
+                                        <a href="{{ lecture_data.lecture.live_link }}" class="btn btn-sm btn-primary px-3 ripple-surface live-link" data-translate="join_live_session">Join Live Session</a>
+                                    </div>
+                                    {% endif %}
                                 {% endif %}
                             </div>
 
@@ -164,6 +259,7 @@
                                         <button class="btn btn-success mark-finished-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="mark_as_finished">Mark as Finished</button>
                                         {% endif %}
                                         <button class="btn btn-danger delete-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="delete">Delete</button>
+                                        <a class="btn btn-dark " href="{% url "assignment:lecture_assignments"  lecture_data.lecture.id %}"  data-translate="assignment">Aassignment</a>
                                         <!-- Note Button and Modal -->
                                         {% if not lecture_data.note %}
                                         <button type="button" class="btn btn-secondary text-light mt-3" data-mdb-toggle="modal" data-mdb-target="#noteModal{{ lecture_data.lecture.id }}" data-translate="add_note">Add Note</button>
@@ -173,6 +269,7 @@
                                     </div>
                                 {% endif %}
                                 {% if user_role == 'student' %}
+                                    <a class="btn btn-dark " href="{% url "assignment:student_assignment_list"  lecture_data.lecture.id %}"  data-translate="assignment">Aassignment</a>
                                     <!-- Note Button and Modal -->
                                     {% if not lecture_data.note %}
                                     <button type="button" class="btn btn-secondary text-light mt-3" data-mdb-toggle="modal" data-mdb-target="#noteModal{{ lecture_data.lecture.id }}" data-translate="add_note">Add Note</button>
@@ -198,6 +295,7 @@
                                                 <label for="note{{ lecture_data.lecture.id }}" class="form-label" data-translate="note">Note</label>
                                                 <textarea class="form-control" id="note{{ lecture_data.lecture.id }}" name="note" rows="3" required></textarea>
                                             </div>
+                                            
                                             {% if user_role == 'student' %}
                                             <div class="mb-3">
                                                 <label for="rating{{ lecture_data.lecture.id }}" class="form-label" data-translate="rating">Rating</label>
@@ -210,8 +308,46 @@
                                                 </select>
                                             </div>
                                             {% endif %}
+                                            
+                                            {% if user_role == 'teacher' %}
+                                            <div class="mb-3">
+                                                <label for="lecture_status{{ lecture_data.lecture.id }}" class="form-label" data-translate="lecture_status">Lecture Status</label>
+                                                <select class="form-select" id="lecture_status{{ lecture_data.lecture.id }}" name="lecture_status" required>
+                                                    <option value="completed" data-translate="completed">Completed Successfully</option>
+                                                    <option value="student_delayed" data-translate="student_delayed">Delayed by Student</option>
+                                                    <option value="teacher_delayed" data-translate="teacher_delayed">Delayed by Teacher</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="mb-3" id="delayReasonContainer{{ lecture_data.lecture.id }}" style="display: none;">
+                                                <label for="delay_reason{{ lecture_data.lecture.id }}" class="form-label" data-translate="delay_reason">Delay Reason</label>
+                                                <textarea class="form-control" id="delay_reason{{ lecture_data.lecture.id }}" name="delay_reason" rows="2"></textarea>
+                                            </div>
+                                            {% endif %}
+                                            
                                             <button type="submit" class="btn btn-primary" data-translate="submit">Submit</button>
                                         </form>
+                                        
+                                        <script>
+                                            document.addEventListener('DOMContentLoaded', function() {
+                                                // Show/hide delay reason based on status selection
+                                                const statusSelect = document.getElementById('lecture_status{{ lecture_data.lecture.id }}');
+                                                const reasonContainer = document.getElementById('delayReasonContainer{{ lecture_data.lecture.id }}');
+                                                
+                                                if (statusSelect && reasonContainer) {
+                                                    statusSelect.addEventListener('change', function() {
+                                                        if (this.value === 'student_delayed' || this.value === 'teacher_delayed') {
+                                                            reasonContainer.style.display = 'block';
+                                                        } else {
+                                                            reasonContainer.style.display = 'none';
+                                                        }
+                                                    });
+                                                    
+                                                    // Trigger change event on load in case a delayed status is preselected
+                                                    statusSelect.dispatchEvent(new Event('change'));
+                                                }
+                                            });
+                                        </script>
                                     </div>
                                 </div>
                             </div>
@@ -235,6 +371,35 @@
 
 <!-- Toast Container -->
 <div class="toast-wrapper position-fixed top-0 end-0 p-3" style="z-index: 1055;" id="toast-container"></div>
+
+
+
+
+<!-- Add some JavaScript to handle the toggle icon rotation -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle Shared Resources toggle
+        const sharedResourcesHeader = document.querySelector('.card-header[data-mdb-target="#sharedResourcesCollapse"]');
+        if (sharedResourcesHeader) {
+            sharedResourcesHeader.addEventListener('click', function() {
+                const icon = this.querySelector('.toggle-icon');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+            });
+        }
+
+        // Handle Add Lecture Form toggle (if it exists)
+        const addLectureHeader = document.querySelector('.card-header[data-mdb-target="#addLectureFormCollapse"]');
+        if (addLectureHeader) {
+            addLectureHeader.addEventListener('click', function() {
+                const icon = this.querySelector('.toggle-icon');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+            });
+        }
+    });
+</script>
+
 
 
 <!-- JavaScript for Dynamic Actions -->
@@ -559,9 +724,43 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Ensure the form action is set correctly (though it should already be set in the template)
                 noteForm.action = noteForm.action.replace('0', lectureId);
             });
+    });
+
+    // Handle shared resource deletion
+    document.querySelectorAll('.delete-resource-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const resourceId = this.dataset.resourceId;
+            if (!confirm('Are you sure you want to delete this shared resource?')) return;
+            
+            try {
+                const response = await fetch(`{% url 'accounts:delete_shared_resource' %}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        resource_id: resourceId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    this.closest('tr').remove();
+                    showToast('Resource deleted successfully', 'success');
+                } else {
+                    throw new Error(data.message || 'Failed to delete resource');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast(error.message, 'danger');
+            }
         });
+    });
 
 });
+
 
 
 

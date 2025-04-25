@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block translationFolder %}data-translation-folder="dashboard"{% endblock %}
+{% block title %}dashboard{% endblock %}
+
+{% block content %}
+    <style>
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 992px) {
+            .rooms-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .rooms-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <div class="container my-4" style="max-width: 1200px;">
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+            <h2 class="text-primary fw-medium" data-translate="dashboardTitle">Chat Rooms</h2>
+            <div class="btn-group" role="group">
+                <button class="btn btn-outline-primary btn-rounded active" data-filter="all" data-translate="allRooms">All Rooms</button>
+                <button class="btn btn-outline-primary btn-rounded" data-filter="active" data-translate="activeRooms">Active Rooms</button>
+                <button class="btn btn-outline-primary btn-rounded" data-filter="opened" data-translate="openedRooms">Opened Rooms</button>
+            </div>
+        </div>
+
+        <div class="rooms-grid" id="roomsList">
+            <!-- Rooms will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel" data-translate="confirmAction">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" data-translate="confirmMessage">
+                    Are you sure you want to end this chat?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal" data-translate="cancelButton">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmEndChat" data-translate="endChatButton">End Chat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        var csrfToken = "{{ csrf_token }}";
+        var isAgent = {{ is_agent|lower }};
+        var currentRoomCode = null;
+
+        const chatSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/rooms/'
+        );
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            if (data.type === 'room_deleted') {
+                removeRoomFromUI(data.room_code); // Remove specific room for all clients
+            } else if (data.type === 'room_created') {
+                addRoomToUI(data.room);
+            } else if (data.type === 'room_status') {
+                updateRoomStatus(data.room_code, data.status);
+            }
+        };
+
+        function addRoomToUI(room) {
+            const roomsList = document.getElementById('roomsList');
+            const roomHtml = `
+                <div class="room-card card shadow-2-strong" data-room="${room.code}" data-status="${room.status}">
+                    <div class="card-body p-4 border-bottom">
+                        <h3 class="card-title fs-4 fw-medium">Room ${room.code}</h3>
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="badge ${room.status === 'opened' ? 'bg-primary' : room.status === 'active' ? 'bg-success' : 'bg-warning'} rounded-pill">
+                                ${room.status}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-footer p-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="mb-0 text-muted">Last updated: ${new Date().toLocaleTimeString()}</p>
+                        </div>
+                        <div class="d-flex gap-3 w-100">
+                            <button onclick="openRoom('${room.code}')" 
+                                    class="btn ${room.status === 'opened' ? 'btn-outline-primary' : 'btn-primary'} btn-rounded w-100">
+                                Open ${room.status === 'opened' ? '✓' : ''}
+                            </button>
+                            <button onclick="showConfirmationModal('${room.code}')" 
+                                    class="btn btn-danger btn-rounded w-100">End Chat</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            roomsList.insertAdjacentHTML('afterbegin', roomHtml);
+            filterRooms(); // Ensure new room respects current filter
+        }
+
+        function removeRoomFromUI(roomCode) {
+            const roomElement = document.querySelector(`.room-card[data-room="${roomCode}"]`);
+            if (roomElement) {
+                roomElement.remove();
+                checkEmptyState(); // Check if we need to show empty state
+            }
+        }
+
+        function checkEmptyState() {
+            const roomsList = document.getElementById('roomsList');
+            if (roomsList.children.length === 0) {
+                roomsList.innerHTML = `
+                    <div class="card shadow-2-strong p-5 text-center bg-light">
+                        <h3 class="text-muted mb-3" data-translate="noRooms">No chat rooms available</h3>
+                        <p class="text-muted" data-translate="createRoom">Create a new chat room to start</p>
+                    </div>
+                `;
+            }
+        }
+
+        function updateRoomStatus(roomCode, status) {
+            const roomElement = document.querySelector(`.room-card[data-room="${roomCode}"]`);
+            if (roomElement) {
+                const statusElement = roomElement.querySelector('.badge');
+                statusElement.className = `badge ${status === 'opened' ? 'bg-primary' : status === 'active' ? 'bg-success' : 'bg-warning'} rounded-pill`;
+                statusElement.innerText = status;
+
+                const openButton = roomElement.querySelector('.btn-primary, .btn-outline-primary');
+                if (status === 'opened') {
+                    openButton.classList.remove('btn-primary');
+                    openButton.classList.add('btn-outline-primary');
+                    openButton.innerHTML = 'Open ✓';
+                } else {
+                    openButton.classList.remove('btn-outline-primary');
+                    openButton.classList.add('btn-primary');
+                    openButton.innerHTML = 'Open';
+                }
+
+                roomElement.setAttribute('data-status', status);
+                filterRooms();
+            }
+        }
+
+        async function openRoom(roomCode) {
+            chatSocket.send(JSON.stringify({
+                'type': 'open_room',
+                'room_code': roomCode
+            }));
+            window.location.href = `/chat/rooms/${roomCode}/`;
+        }
+
+        async function endChat(roomCode) {
+            try {
+                const response = await fetch(`/chat/rooms/${roomCode}/end/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                    },
+                });
+
+                if (response.ok) {
+                    // Remove the room from this client's UI immediately
+                    removeRoomFromUI(roomCode);
+                    // Notify other clients via WebSocket
+                    chatSocket.send(JSON.stringify({
+                        'type': 'room_deleted',
+                        'room_code': roomCode
+                    }));
+                } else {
+                    alert('Failed to end the chat room.');
+                }
+            } catch (error) {
+                console.error('Error ending chat:', error);
+                alert('An error occurred while ending the chat.');
+            }
+        }
+
+        function showConfirmationModal(roomCode) {
+            currentRoomCode = roomCode;
+            const modal = new mdb.Modal(document.getElementById('confirmationModal'));
+            modal.show();
+        }
+
+        document.getElementById('confirmEndChat').addEventListener('click', async function() {
+            if (currentRoomCode) {
+                await endChat(currentRoomCode);
+                const modalElement = document.getElementById('confirmationModal');
+                const modal = mdb.Modal.getInstance(modalElement);
+                modal.hide();
+                currentRoomCode = null;
+            }
+        });
+
+        function filterRooms() {
+            const filterButtons = document.querySelectorAll('.btn-group .btn');
+            let activeFilter = 'all';
+
+            filterButtons.forEach(button => {
+                if (button.classList.contains('active')) {
+                    activeFilter = button.dataset.filter;
+                }
+            });
+
+            const roomCards = document.querySelectorAll('.room-card');
+            roomCards.forEach(card => {
+                const shouldShow = activeFilter === 'all' ||
+                    (activeFilter === 'active' && card.dataset.status === 'active') ||
+                    (activeFilter === 'opened' && card.dataset.status === 'opened');
+                card.style.display = shouldShow ? 'block' : 'none';
+            });
+        }
+
+        function setupFilterButtons() {
+            const filterButtons = document.querySelectorAll('.btn-group .btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    filterRooms();
+                });
+            });
+        }
+
+        async function loadRooms() {
+            try {
+                const response = await fetch('/chat/rooms/', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                });
+                if (!response.ok) {
+                    console.error('Failed to load rooms:', response.statusText);
+                    return;
+                }
+                const rooms = await response.json();
+                const roomsList = document.getElementById('roomsList');
+                
+                if (rooms.length === 0) {
+                    roomsList.innerHTML = `
+                        <div class="card shadow-2-strong p-5 text-center bg-light">
+                            <h3 class="text-muted mb-3" data-translate="noRooms">No chat rooms available</h3>
+                            <p class="text-muted" data-translate="createRoom">Create a new chat room to start</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                roomsList.innerHTML = rooms.map(room => `
+                    <div class="room-card card shadow-2-strong" data-room="${room.code}" data-status="${room.status}">
+                        <div class="card-body p-4 border-bottom">
+                            <h3 class="card-title fs-4 fw-medium">Room ${room.code}</h3>
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="badge ${room.status === 'opened' ? 'bg-primary' : room.status === 'active' ? 'bg-success' : 'bg-warning'} rounded-pill">
+                                    ${room.status}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-footer p-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="mb-0 text-muted">Last updated: ${new Date().toLocaleTimeString()}</p>
+                            </div>
+                            <div class="d-flex gap-3 w-100">
+                                <button onclick="openRoom('${room.code}')" 
+                                        class="btn ${room.status === 'opened' ? 'btn-outline-primary' : 'btn-primary'} btn-rounded w-100">
+                                    Open ${room.status === 'opened' ? '✓' : ''}
+                                </button>
+                                <button onclick="showConfirmationModal('${room.code}')" 
+                                        class="btn btn-danger btn-rounded w-100">End Chat</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                setupFilterButtons();
+                filterRooms();
+            } catch (error) {
+                console.error('Error loading rooms:', error);
+            }
+        }
+
+        loadRooms();
+        setupFilterButtons();
+    </script>
+{% endblock %}
+
+
+

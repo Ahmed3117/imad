@@ -1,0 +1,356 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block translationFolder %}data-translation-folder="library"{% endblock %}
+{% block title %}Library{% endblock %}
+
+{% block content %}
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        .search-bar {
+            max-width: 400px;
+        }
+        .filter-dropdown {
+            max-width: 300px;
+        }
+        #shareActionsContainer {
+            transition: all 0.3s ease;
+        }
+    </style>
+
+    <div class="container py-5">
+        <!-- Header -->
+        <h1 class="text-center mb-4" style="color: #4f4f4f;">Course Library</h1>
+
+        <!-- Search and Filter Form -->
+        <form method="GET" action="{% url 'library:course_library' %}" id="filterForm">
+            <div class="row mb-4">
+                <!-- Search Bar with Button -->
+                <div class="col-md-6 mb-3">
+                    <div class="input-group search-bar">
+                        <input type="text" class="form-control" name="search" placeholder="Enter course title" 
+                               value="{{ search_query }}" id="searchInput">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+                <!-- Course Filter -->
+                <div class="col-md-6 mb-3">
+                    <div class="input-group filter-dropdown">
+                        <span class="input-group-text bg-primary text-white">
+                            <i class="fas fa-filter"></i>
+                        </span>
+                        <select class="form-select" name="course" id="courseFilter">
+                            <option value="">All Courses</option>
+                            {% for course in courses %}
+                                <option value="{{ course.id }}" {% if selected_course == course.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ course.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Libraries Table -->
+        <div class="card">
+            <div class="card-body">
+                <div class="mb-3" id="shareActionsContainer" style="display: none;">
+                    <button id="generalShareBtn" class="btn btn-success btn-sm">
+                        <i class="fas fa-share me-1"></i> Share Selected (<span id="selectedCount">0</span>)
+                    </button>
+                </div>
+                {% if libraries %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="bg-primary text-white">
+                                <tr>
+                                    <th scope="col"><input type="checkbox" id="selectAllResources"></th>
+                                    <th scope="col">Course</th>
+                                    <th scope="col">File</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for library in libraries %}
+                                    <tr>
+                                        <td><input type="checkbox" class="resource-checkbox" value="{{ library.id }}"></td>
+                                        <td>{{ library.course.name }}</td>
+                                        <td>{{ library.file.name|slice:"courseslibraries/:" }}</td>
+                                        <td>
+                                            <a href="{{ library.file.url }}" class="btn btn-sm btn-primary" target="_blank">
+                                                <i class="fas fa-download"></i> Download
+                                            </a>
+                                            <button class="btn btn-sm btn-success share-btn" disabled>
+                                                <i class="fas fa-share"></i> Share
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-center text-muted">No libraries found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="shareModalLabel">Share Resources</h5>
+                    <button type="button" class="btn-close btn-close-white" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <select class="form-select" id="filterCourse">
+                                <option value="">Filter by Course</option>
+                                {% for course in courses %}
+                                    <option value="{{ course.id }}">{{ course.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="selectAllGroups"></th>
+                                    <th>Study Group</th>
+                                    <th>Course</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studyGroupsList">
+                                <!-- Will be populated via fetch -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="confirmShare">Share Selected</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize variables
+            let selectedResources = [];
+            const generalShareBtn = document.getElementById('generalShareBtn');
+            const filterCourse = document.getElementById('filterCourse');
+            const studyGroupsList = document.getElementById('studyGroupsList');
+            const selectAllGroups = document.getElementById('selectAllGroups');
+            const confirmShareBtn = document.getElementById('confirmShare');
+            const selectAllResources = document.getElementById('selectAllResources');
+            const resourceCheckboxes = document.getElementsByClassName('resource-checkbox');
+            const shareBtns = document.getElementsByClassName('share-btn');
+            const shareModal = document.getElementById('shareModal');
+        
+            // Initialize MDB Modal
+            let mdbModal;
+            if (typeof mdb !== 'undefined') {
+                mdbModal = new mdb.Modal(shareModal);
+            } else {
+                console.error('MDB is not loaded');
+                // Fallback to Bootstrap if available
+                if (typeof bootstrap !== 'undefined') {
+                    mdbModal = new bootstrap.Modal(shareModal);
+                }
+            }
+        
+            // Update selection UI function
+            function updateSelectionUI() {
+                const shareActionsContainer = document.getElementById('shareActionsContainer');
+                const selectedCount = document.getElementById('selectedCount');
+        
+                // Update count display
+                if (selectedCount) {
+                    selectedCount.textContent = selectedResources.length;
+                }
+        
+                // Show/hide share actions
+                if (shareActionsContainer) {
+                    shareActionsContainer.style.display = selectedResources.length > 0 ? 'block' : 'none';
+                }
+        
+                // Update individual share buttons
+                Array.from(shareBtns).forEach(btn => {
+                    const rowCheckbox = btn.closest('tr').querySelector('.resource-checkbox');
+                    if (selectedResources.length === 1 && rowCheckbox.checked) {
+                        btn.disabled = false;
+                    } else {
+                        btn.disabled = true;
+                    }
+                });
+        
+                // Enable/disable general share button
+                generalShareBtn.disabled = selectedResources.length === 0;
+            }
+        
+            // Resource selection handling
+            Array.from(resourceCheckboxes).forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const resourceId = this.value;
+                    if (this.checked) {
+                        if (!selectedResources.includes(resourceId)) {
+                            selectedResources.push(resourceId);
+                        }
+                    } else {
+                        selectedResources = selectedResources.filter(id => id !== resourceId);
+                    }
+                    updateSelectionUI();
+                });
+            });
+        
+            // Select all resources
+            if (selectAllResources) {
+                selectAllResources.addEventListener('change', function() {
+                    const isChecked = this.checked;
+                    Array.from(resourceCheckboxes).forEach(checkbox => {
+                        checkbox.checked = isChecked;
+                        const event = new Event('change');
+                        checkbox.dispatchEvent(event);
+                    });
+                });
+            }
+        
+            // General share button click
+            if (generalShareBtn) {
+                generalShareBtn.addEventListener('click', function() {
+                    if (selectedResources.length === 0) return;
+                    loadStudyGroups();
+                    if (mdbModal) mdbModal.show();
+                });
+            }
+        
+            // Individual share buttons
+            Array.from(shareBtns).forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const resourceId = this.closest('tr').querySelector('.resource-checkbox').value;
+                    selectedResources = [resourceId];
+                    loadStudyGroups();
+                    if (mdbModal) mdbModal.show();
+                });
+            });
+        
+            // Course filter change
+            if (filterCourse) {
+                filterCourse.addEventListener('change', loadStudyGroups);
+            }
+        
+            // Select all groups
+            if (selectAllGroups) {
+                selectAllGroups.addEventListener('change', function() {
+                    const groupCheckboxes = document.getElementsByClassName('group-checkbox');
+                    Array.from(groupCheckboxes).forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                });
+            }
+        
+            // Confirm share
+            if (confirmShareBtn) {
+                confirmShareBtn.addEventListener('click', function() {
+                    const groupCheckboxes = document.querySelectorAll('.group-checkbox:checked');
+                    const groupIds = Array.from(groupCheckboxes).map(checkbox => checkbox.value);
+        
+                    if (groupIds.length === 0) {
+                        alert('Please select at least one study group');
+                        return;
+                    }
+        
+                    const formData = new FormData();
+                    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                    selectedResources.forEach(id => formData.append('resource_ids', id));
+                    groupIds.forEach(id => formData.append('studygroup_ids', id));
+        
+                    fetch("{% url 'library:share_resources' %}", {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            alert('Resources shared successfully');
+                            if (mdbModal) mdbModal.hide();
+                            // Clear selections
+                            selectedResources = [];
+                            Array.from(resourceCheckboxes).forEach(cb => cb.checked = false);
+                            document.getElementById('shareActionsContainer').style.display = 'none';
+                            document.getElementById('selectAllResources').checked = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while sharing');
+                    });
+                });
+            }
+        
+            // Load study groups function
+            async function loadStudyGroups() {
+                const courseId = filterCourse.value;
+                studyGroupsList.innerHTML = '<tr><td colspan="3" class="text-center py-3"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></tr>';
+        
+                try {
+                    const response = await fetch(`{% url 'library:get_study_groups' %}?course_id=${courseId}`);
+                    const data = await response.json();
+        
+                    if (!response.ok) {
+                        throw new Error(data.error || 'Failed to load study groups');
+                    }
+        
+                    let html = '';
+                    if (data.length > 0) {
+                        data.forEach(group => {
+                            html += `
+                                <tr>
+                                    <td><input type="checkbox" class="group-checkbox" value="${group.id}"></td>
+                                    <td>${group.name}</td>
+                                    <td>${group.capacity} students</td>
+                                </tr>
+                            `;
+                        });
+                    } else {
+                        html = '<tr><td colspan="3" class="text-center py-3">No study groups found for this course</td></tr>';
+                    }
+                    studyGroupsList.innerHTML = html;
+                } catch (error) {
+                    studyGroupsList.innerHTML = `
+                        <tr>
+                            <td colspan="3" class="text-center py-3 text-danger">
+                                ${error.message}
+                            </td>
+                        </tr>
+                    `;
+                    console.error('Error:', error);
+                }
+            }
+        
+            // Course filter form submission
+            document.getElementById('courseFilter')?.addEventListener('change', function() {
+                document.getElementById('filterForm').submit();
+            });
+        });
+        
+    </script>
+{% endblock %}
+

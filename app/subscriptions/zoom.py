@@ -9,10 +9,13 @@ import pytz
 import logging
 import re
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
-ACCOUNT_ID = settings.ACCOUNT_ID
-CLIENT_ID = settings.CLIENT_ID
-CLIENT_SECRET = settings.CLIENT_SECRET
+from accounts.models import TeacheroomAccount
+
+# ACCOUNT_ID = settings.ACCOUNT_ID
+# CLIENT_ID = settings.CLIENT_ID
+# CLIENT_SECRET = settings.CLIENT_SECRET
 TOKEN_URL = settings.TOKEN_URL
 MEETING_URL = settings.MEETING_URL
 
@@ -20,17 +23,14 @@ MEETING_URL = settings.MEETING_URL
 
 logger = logging.getLogger(__name__)
 
-def get_access_token():
-    print("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
-    print(f"{CLIENT_ID}:{CLIENT_SECRET}")
-    print("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
-    auth = f"{CLIENT_ID}:{CLIENT_SECRET}"
+def get_access_token(client_id, client_secret, account_id):
+    auth = f"{client_id}:{client_secret}"
     encoded_auth = base64.b64encode(auth.encode()).decode()
     headers = {
         "Authorization": f"Basic {encoded_auth}",
         "Content-Type": "application/x-www-form-urlencoded",
     }
-    data = {"grant_type": "account_credentials", "account_id": ACCOUNT_ID}
+    data = {"grant_type": "account_credentials", "account_id": account_id}
     
     response = requests.post(TOKEN_URL, headers=headers, data=data)
     
@@ -38,7 +38,6 @@ def get_access_token():
         return response.json().get("access_token")
     else:
         raise Exception(f"Error fetching access token: {response.text}")
-
 
 def validate_inputs(topic, agenda, duration, date_str, time_str, timezone):
     errors = []
@@ -58,110 +57,98 @@ def validate_inputs(topic, agenda, duration, date_str, time_str, timezone):
 
 @csrf_exempt
 def create_zoom_meeting(request):
-    print("kkkkkkkkkkkkkkkkkkkkkkkk")
-    if request.method == 'POST':
-        try:
-            
-            topic = request.POST.get('topic')
-            date_str = request.POST.get('date')  
-            time_str = request.POST.get('time')
-            duration = request.POST.get('duration')
-            agenda = request.POST.get('agenda')
-            timezone = "Africa/Cairo"
-            host_video = True
-            participant_video = False
-            audio = "voip"
-            auto_recording = "cloud"
-            waiting_room = False
-            join_before_host = True
-            mute_upon_entry = False
-            approval_type = 2
-            closed_caption = True
-            registrants_email_notification = True
-            
-            # Validate inputs
-            errors = validate_inputs(topic, agenda, duration, date_str, time_str, timezone)
-            if errors:
-                return JsonResponse({'errors': errors}, status=400)
-            
-            # Convert date and time to UTC
-            local_timezone = pytz.timezone(timezone)
-            local_datetime = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
-            local_datetime = local_timezone.localize(local_datetime)
-            utc_datetime = local_datetime.astimezone(pytz.utc)
-            
-            # Ensure the date is in the future
-            # if utc_datetime <= datetime.now(pytz.utc) - timedelta(minutes=1):
-            #     return JsonResponse({'error': 'Meeting time must be in the future'}, status=400)
-            
-            # Prepare Zoom meeting creation data
-            meeting_data = {
-                "topic": topic,
-                "agenda": agenda,
-                "type": 2,  # Scheduled meeting
-                "start_time": utc_datetime.isoformat(),
-                "duration": int(duration),
-                "timezone": timezone,
-                # "password": generate_secure_password(),  # Generate a secure password
-                "settings": {
-                    "host_video": host_video,
-                    "participant_video": participant_video,
-                    "audio": audio,
-                    "auto_recording": auto_recording,
-                    "waiting_room": waiting_room,
-                    "join_before_host": join_before_host,
-                    "mute_upon_entry": mute_upon_entry,
-                    "approval_type": approval_type,
-                    "closed_caption": closed_caption,
-                    "registrants_email_notification": registrants_email_notification
-                    },
-            }
-            
-            # Step 2: Get Access Token
-            access_token = get_access_token()
-            
-            headers = {
-                "Authorization": f"Bearer {access_token}",
-                "Content-Type": "application/json",
-            }
-            
-            # Make the API request to create the meeting
-            response = requests.post(MEETING_URL, headers=headers, data=json.dumps(meeting_data))
-            
-            if response.status_code == 201:
-                meeting_info = response.json()
-                logger.info(f"Meeting created successfully: {meeting_info}")
-                return JsonResponse({
-                    'meeting_url': meeting_info['join_url'],
-                    'start_time': meeting_info['start_time'],
-                    'agenda': meeting_info['agenda'],
-                    'password': meeting_info['password']
-                })
-            elif response.status_code == 400:
-                error_message = response.json().get('message', 'Bad Request')
-                logger.error(f"Bad Request: {error_message}")
-                return JsonResponse({'error': error_message}, status=400)
-            elif response.status_code == 404:
-                logger.error("User does not exist.")
-                return JsonResponse({'error': 'User does not exist.'}, status=404)
-            elif response.status_code == 429:
-                logger.error("Too many requests, please try again later.")
-                return JsonResponse({'error': 'Too many requests, please try again later.'}, status=429)
-            else:
-                logger.error(f"Unexpected error: {response.text}")
-                return JsonResponse({'error': 'An unexpected error occurred.'}, status=response.status_code)
-        
-        except Exception as e:
-            logger.error(f"Error creating meeting: {str(e)}")
-            return JsonResponse({'error': str(e)}, status=400)
-    else:
+    print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+
+    if request.method != 'POST':
         return JsonResponse({'error': 'Invalid request method'}, status=400)
 
+    try:
+        client_id = request.POST.get('client_id')
+        client_secret = request.POST.get('client_secret')
+        account_id = request.POST.get('account_id')
+        topic = request.POST.get('topic')
+        date_str = request.POST.get('date')
+        time_str = request.POST.get('time')
+        duration = request.POST.get('duration')
+        agenda = request.POST.get('agenda')
+        timezone = "Africa/Cairo"
+
+        errors = validate_inputs(topic, agenda, duration, date_str, time_str, timezone)
+        if errors:
+            return JsonResponse({'errors': errors}, status=400)
+
+        local_timezone = pytz.timezone(timezone)
+        local_datetime = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
+        local_datetime = local_timezone.localize(local_datetime)
+        utc_datetime = local_datetime.astimezone(pytz.utc)
+
+        meeting_data = {
+            "topic": topic,
+            "agenda": agenda,
+            "type": 2,
+            "start_time": utc_datetime.isoformat(),
+            "duration": int(duration),
+            "timezone": timezone,
+            "settings": {
+                "host_video": True,
+                "participant_video": False,
+                "audio": "voip",
+                "auto_recording": "cloud",
+                "waiting_room": False,
+                "join_before_host": True,
+                "mute_upon_entry": False,
+                "approval_type": 2,
+                "closed_caption": True,
+                "registrants_email_notification": True
+            },
+        }
+
+        access_token = get_access_token(
+            client_id,
+            client_secret,
+            account_id
+        )
+
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json",
+        }
+
+        response = requests.post(MEETING_URL, headers=headers, data=json.dumps(meeting_data))
+
+        if response.status_code == 201:
+            meeting_info = response.json()
+            return JsonResponse({
+                'meeting_url': meeting_info['join_url'],
+                'start_time': meeting_info['start_time'],
+                'agenda': meeting_info['agenda'],
+                'password': meeting_info['password']
+            })
+        elif response.status_code == 400:
+            error_message = response.json().get('message', 'Bad Request')
+            return JsonResponse({'error': error_message}, status=400)
+        elif response.status_code == 404:
+            return JsonResponse({'error': 'User does not exist.'}, status=404)
+        elif response.status_code == 429:
+            return JsonResponse({'error': 'Too many requests, please try again later.'}, status=429)
+        else:
+            return JsonResponse({'error': 'An unexpected error occurred.'}, status=response.status_code)
+
+    except Exception as e:
+        logger.error(f"Error creating meeting: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=400)
+
 def get_meeting_status(request, meeting_id):
-    """
-    Fetches the current status of a Zoom meeting (waiting, in_meeting, ended).
-    """
-    access_token = get_access_token()
+    try:
+        teacher_zoom_account = TeacheroomAccount.objects.get(user=request.user)
+        access_token = get_access_token(
+            teacher_zoom_account.client_id,
+            teacher_zoom_account.client_secret,
+            teacher_zoom_account.account_id
+        )
+    except TeacheroomAccount.DoesNotExist:
+        return JsonResponse({"error": "Teacher Zoom account not found"}, status=404)
+
     headers = {"Authorization": f"Bearer {access_token}"}
     url = f"https://api.zoom.us/v2/meetings/{meeting_id}"
 
@@ -169,30 +156,31 @@ def get_meeting_status(request, meeting_id):
 
     if response.status_code == 200:
         data = response.json()
-        # Assuming 'status' is provided in the response and can be 'waiting', 'in_meeting', or 'ended'
         status = data.get("status", "unknown")
         return JsonResponse({"status": status})
 
     return JsonResponse({"error": "Meeting not found"}, status=404)
 
-# get_meeting_participants
 def get_meeting_participants(meeting_id):
-    print("ccccccccccc")
-    print(meeting_id)
-    print("ccccccccccc")
-    access_token = get_access_token()
+    try:
+        teacher_zoom_account = TeacheroomAccount.objects.get(user=request.user)
+        access_token = get_access_token(
+            teacher_zoom_account.client_id,
+            teacher_zoom_account.client_secret,
+            teacher_zoom_account.account_id
+        )
+    except TeacheroomAccount.DoesNotExist:
+        raise Exception("Teacher Zoom account not found")
+
     headers = {"Authorization": f"Bearer {access_token}"}
     url = f"https://api.zoom.us/v2/past_meetings/{meeting_id}/participants"
+    
     response = requests.get(url, headers=headers)
-    print("--------------------------")
-    print(response.json())
-    print("--------------------------")
     
     if response.status_code == 200:
         return response.json().get("participants", [])
     else:
         raise Exception(f"Error fetching participants: {response.text}")
-
 
 
 

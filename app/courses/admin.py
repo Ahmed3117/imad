@@ -1,4 +1,6 @@
 from django.contrib import admin
+
+from library.models import CourseLibrary, MyLibrary
 from .models import (
     CourseTranslation, Level, LevelTranslation, Track, Course, TrackTranslation,
 )
@@ -14,6 +16,12 @@ class TrackTranslationInline(admin.TabularInline):
 class CourseTranslationInline(admin.TabularInline):
     model = CourseTranslation
     extra = 1
+
+class CourseLibraryInline(admin.TabularInline):
+    model = CourseLibrary
+    extra = 1
+
+
 
 @admin.register(Level)
 class LevelAdmin(admin.ModelAdmin):
@@ -33,7 +41,7 @@ class TrackAdmin(admin.ModelAdmin):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    inlines = [CourseTranslationInline]
+    inlines = [CourseTranslationInline, CourseLibraryInline]
     list_display = ('name', 'level', 'track')
     search_fields = ('name', 'description')
     list_filter = ('level', 'track')

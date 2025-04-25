@@ -17,6 +17,7 @@
                         <span>Home</span>
                     </a>
                 </li>
+                
                 {% if request.user.role == "admin" or request.user.is_superuser %}
                 <li class="nav-item px-2 ">
                     <a class="nav-link text-primary" aria-current="page" href="{% url 'accounts:track_lectures' %}" data-translate="track_lectures">
@@ -24,6 +25,26 @@
                     </a>
                 </li>
                 {% endif %}
+                {% if request.user.role == "admin" or request.user.is_superuser or request.user.role == "teacher" %}
+                <li class="nav-item px-2 ">
+                    <a class="nav-link text-primary" aria-current="page" href="{% url 'library:course_library' %}" data-translate="general_library">
+                        <span>General library</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if request.user.is_superuser %}
+                <li class="nav-item px-2">
+                    <a class="nav-link" href="{% url "chat:dashboard" %}" data-translate="dashboard">
+                        <span>Customer Service</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item px-2">
+                    <a class="nav-link" href="{% url "chat:contact" %}" data-translate="">
+                        <span>Customer Service</span>
+                    </a>
+                </li> 
+            {% endif %}
                 <!-- <li class="nav-item px-2">
                     <a class="nav-link active" aria-current="page" href="{% url 'about:about_us' %}" data-translate="aboutus">
                         <span>About Us</span>

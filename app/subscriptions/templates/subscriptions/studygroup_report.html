@@ -1,0 +1,479 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold">Study Group Report: <span class="text-primary">{{ group }}</span></h1>
+        <a href="/a_d_m_i_n/subscriptions/studygroup/" class="btn btn-outline-secondary waves-effect">
+            <i class="fas fa-arrow-left me-2"></i> Back to Admin
+        </a>
+    </div>
+
+    <!-- Basic Information Card -->
+    <div class="card mb-4 shadow-1-strong">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row align-items-stretch">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <p><strong><i class="fas fa-book me-2 text-primary"></i>Course:</strong> {{ group.course }}</p>
+                    <p class="mb-0"><strong><i class="fas fa-chalkboard-teacher me-2 text-primary"></i>Teacher:</strong>
+                        {% if group.teacher.name %}
+                            {{ group.teacher.name }}
+                        {% else %}
+                            {{ group.teacher.username }}
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <p><strong><i class="fas fa-users me-2 text-primary"></i>Students:</strong> <span class="badge bg-primary rounded-pill">{{ group.students.count }}</span></p>
+                    <p class="mb-0"><strong><i class="fas fa-dollar-sign me-2 text-primary"></i>Join Price:</strong> ${{ group.join_price }}</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow-0 border h-100">
+                         <div class="card-header py-2 bg-light">
+                            <h6 class="mb-0 text-muted"><i class="far fa-calendar-alt me-2"></i>Schedule</h6>
+                        </div>
+                        <div class="card-body p-0">
+                            {% if group.group_times.all %}
+                                <ul class="list-group list-group-flush">
+                                    {% for time in group.group_times.all %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-3 py-2">
+                                           <span><i class="far fa-calendar-day me-2"></i>{{ time.get_day_display }}</span>
+                                           <span class="fw-bold text-primary">{{ time.time|time:"g:i A" }}</span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-muted p-3 mb-0">No schedule available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-light bg-info mb-3 shadow-1-strong">
+                <div class="card-body text-center">
+                    <h1 class="display-4 mb-0 text-light">{{ total_lectures }}</h1>
+                    <p class="text-light mt-2 mb-0"><i class="fas fa-list-ol me-2"></i>Total Lectures</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-light bg-success mb-3 shadow-1-strong">
+                <div class="card-body text-center">
+                    <h1 class="display-4 mb-0 text-light">{{ finished_lectures }}</h1>
+                    <p class="text-light mt-2 mb-0"><i class="fas fa-check-circle me-2"></i>Completed Lectures</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-light bg-warning mb-3 shadow-1-strong">
+                 <div class="card-body text-center">
+                    <h1 class="display-4 mb-0 text-light">
+                        {% if avg_group_rating %}
+                           {{ avg_group_rating|floatformat:1 }}<i class="fas fa-star fa-xs ms-1" style="font-size: 0.5em; vertical-align: super;"></i>
+                        {% else %}
+                           N/A
+                        {% endif %}
+                    </h1>
+                    <p class="text-light mt-2 mb-0 "><i class="fas fa-star-half-alt me-2"></i>Average Group Rating</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lectures Table -->
+    <div class="card mb-4 shadow-1-strong">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-book-reader me-2"></i>Lectures Summary</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th scope="col">Title</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Status</th>
+                            <th scope="col" class="text-center">Notes</th>
+                            <th scope="col" class="text-center">Rating</th>
+                            <th scope="col" class="text-center">Teacher Feedback</th>
+                            <th scope="col" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lecture in lectures %}
+                        <tr>
+                            <td>{{ lecture.title }}</td>
+                            <td>{{ lecture.live_link_date|date:"M d, Y" }}</td>
+                            <td>
+                                <span class="badge rounded-pill
+                                    {% if lecture.is_finished %}badge-success
+                                    {% else %}badge-warning{% endif %}">
+                                    <i class="fas {% if lecture.is_finished %}fa-check-circle{% else %}fa-clock{% endif %} me-1"></i>
+                                    {% if lecture.is_finished %}Finished{% else %}Pending{% endif %}
+                                </span>
+                            </td>
+                             <td class="text-center">
+                                <span class="badge bg-secondary rounded-pill">{{ lecture.note_count }}</span>
+                            </td>
+                            <td class="text-center">
+                                {% if lecture.avg_rating %}
+                                <span class="badge bg-primary rounded-pill d-inline-flex align-items-center">
+                                    {{ lecture.avg_rating|floatformat:1 }}
+                                    <i class="fas fa-star fa-xs ms-1"></i>
+                                </span>
+                                {% else %}<span class="text-muted">N/A</span>{% endif %}
+                            </td>
+                           <td class="text-center">
+                                {% if lecture.teacher_status %}
+                                <span class="badge rounded-pill badge-info"><i class="fas fa-check me-1"></i>Submitted</span>
+                                {% else %}
+                                <span class="badge rounded-pill badge-light text-dark"><i class="fas fa-hourglass-half me-1"></i>Pending</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-primary btn-floating btn-sm" data-mdb-ripple-init data-mdb-tooltip-init title="View Details"
+                                        data-mdb-toggle="modal" data-mdb-target="#lectureModal{{ lecture.id }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">No lectures found for this group.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assignments Table -->
+    <div class="card mb-4 shadow-1-strong">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Assignments Report</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th rowspan="2">Student</th>
+                            {% for assignment in assignments %}
+                            <th colspan="2" class="text-center">
+                                <a href="{% url 'assignment:assignment_detail' assignment.pk %}" class="text-white">
+                                    {{ assignment.title|truncatechars:15 }}
+                                </a>
+                                <br>
+                                <small class="text-muted">{{ assignment.due_at|date:"M d" }}</small>
+                            </th>
+                            {% endfor %}
+                            <th rowspan="2" class="text-center">Average</th>
+                        </tr>
+                        <tr>
+                            {% for assignment in assignments %}
+                            <th class="text-center">Grade</th>
+                            <th class="text-center">Max</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student_data in report_data %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'assignment:student_grades' group.pk student_data.student.pk %}"
+                                   class="text-primary">
+                                    {{ student_data.student.get_name }}
+                                </a>
+                            </td>
+                            {% for assignment_data in student_data.assignments %}
+                            <td class="text-center {% if assignment_data.grade is None %}text-muted{% endif %}">
+                                {% if assignment_data.answer %}
+                                    {% if assignment_data.grade is not None %}
+                                        {{ assignment_data.grade }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-danger">×</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">{{ assignment_data.assignment.max_grade }}</td>
+                            {% endfor %}
+                            <td class="text-center font-weight-bold
+                                {% if student_data.average_grade %}
+                                    {% if student_data.average_grade >= 80 %}text-success
+                                    {% elif student_data.average_grade >= 50 %}text-warning
+                                    {% else %}text-danger
+                                    {% endif %}
+                                {% endif %}">
+                                {{ student_data.average_grade|floatformat:1|default:"-" }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="font-weight-bold">
+                            <td>Average</td>
+                            {% for assignment in assignments %}
+                            <td colspan="2" class="text-center">
+                                {% widthratio assignment.average_grade assignment.max_grade 100 as percentage %}
+                                {{ assignment.average_grade|default:"-" }}
+                                ({{ percentage|default:"0" }}%)
+                            </td>
+                            {% endfor %}
+                            <td class="text-center">
+                                {{ overall_average|floatformat:1|default:"-" }}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="mt-4">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">Grading Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="gradeDistributionChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">Completion Status</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="completionChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    {% for lecture in lectures %}
+    <div class="modal fade" id="lectureModal{{ lecture.id }}" tabindex="-1" aria-labelledby="lectureModalLabel{{ lecture.id }}" aria-hidden="true" data-mdb-backdrop="static" data-mdb-keyboard="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="lectureModalLabel{{ lecture.id }}">
+              <i class="fas fa-book-open me-2"></i>Lecture Details: {{ lecture.title }}
+            </h5>
+            <button type="button" class="btn-close btn-close-white " data-mdb-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <p><strong class="text-primary"><i class="far fa-calendar-alt me-2"></i>Date:</strong> {{ lecture.live_link_date|date:"M d, Y H:i" }}</p>
+                <p class="mb-md-0"><strong class="text-primary"><i class="far fa-clock me-2"></i>Duration:</strong> {{ lecture.duration }} minutes</p>
+              </div>
+              <div class="col-md-6">
+                <p><strong class="text-primary"><i class="fas fa-info-circle me-2"></i>Status:</strong>
+                  <span class="badge rounded-pill {% if lecture.is_finished %}badge-success{% else %}badge-warning{% endif %}">
+                    {% if lecture.is_finished %}<i class="fas fa-check-circle me-1"></i>Completed{% else %}<i class="fas fa-clock me-1"></i>Pending{% endif %}
+                  </span>
+                </p>
+                {% if lecture.is_finished and lecture.finished_date %}
+                <p class="mb-0"><strong class="text-primary"><i class="far fa-calendar-check me-2"></i>Completed:</strong> {{ lecture.finished_date|date:"M d, Y H:i" }}</p>
+                {% endif %}
+              </div>
+            </div>
+
+            <hr>
+
+            <div class="mb-3">
+              <h5 class="text-primary"><i class="fas fa-align-left me-2"></i>Description</h5>
+              <p class="text-muted">{{ lecture.description|default:"No description provided."|linebreaksbr }}</p>
+            </div>
+
+             <hr>
+
+            <div class="mb-3">
+              <h5 class="text-primary"><i class="fas fa-paperclip me-2"></i>Files</h5>
+              {% if lecture.files.exists %}
+              <ul class="list-group list-group-light">
+                {% for file in lecture.files.all %}
+                <li class="list-group-item d-flex justify-content-between align-items-center px-3">
+                  <div>
+                    <i class="far fa-file-alt me-2 text-primary"></i>
+                    <a href="{{ file.file.url }}" target="_blank" class="text-decoration-none text-dark">{{ file.file.name|cut:"courseslibraries/" }}</a>
+                  </div>
+                  <span class="badge bg-light text-dark rounded-pill">{{ file.file.size|filesizeformat }}</span>
+                </li>
+                {% endfor %}
+              </ul>
+              {% else %}
+              <p class="text-muted fst-italic">No files attached.</p>
+              {% endif %}
+            </div>
+
+             <hr>
+
+            <div class="mb-0">
+              <h5 class="text-primary"><i class="fas fa-comments me-2"></i>Feedback & Notes</h5>
+              {% if lecture.notes.exists %}
+              <div class="accordion accordion-flush mt-3" id="notesAccordion{{ lecture.id }}">
+                {% for note in lecture.notes.all %}
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="noteHeading{{ note.id }}">
+                    <button data-mdb-ripple-init class="accordion-button collapsed" type="button" data-mdb-toggle="collapse"
+                            data-mdb-target="#noteCollapse{{ note.id }}" aria-expanded="false"
+                            aria-controls="noteCollapse{{ note.id }}">
+                      <i class="fas fa-user-circle me-2 {% if note.user.userprofile.role == 'teacher' %}text-info{% else %}text-success{% endif %}"></i>
+                      {{ note.user.get_full_name|default:note.user.username }} ({{ note.user.userprofile.get_role_display }}) - {{ note.created_at|date:"M d, Y" }}
+                      {% if note.rating %}
+                       <span class="badge bg-primary rounded-pill ms-auto me-3 d-inline-flex align-items-center">
+                           {{ note.rating }} <i class="fas fa-star fa-xs ms-1"></i>
+                        </span>
+                      {% endif %}
+                    </button>
+                  </h2>
+                  <div id="noteCollapse{{ note.id }}" class="accordion-collapse collapse"
+                       aria-labelledby="noteHeading{{ note.id }}" data-mdb-parent="#notesAccordion{{ lecture.id }}">
+                    <div class="accordion-body">
+                      {% if note.user.userprofile.role == 'teacher' and note.lecture_status %}
+                       <p><strong>Teacher Status Update:</strong>
+                        <span class="badge rounded-pill
+                          {% if note.lecture_status == 'completed' %}badge-success
+                          {% elif note.lecture_status == 'student_delayed' %}badge-warning
+                          {% elif note.lecture_status == 'teacher_delayed' %}badge-danger
+                          {% else %} badge-secondary {% endif %}">
+                           <i class="fas
+                            {% if note.lecture_status == 'completed' %}fa-check-circle
+                            {% elif note.lecture_status == 'student_delayed' %}fa-user-clock
+                            {% elif note.lecture_status == 'teacher_delayed' %}fa-stopwatch
+                            {% endif %} me-1"></i>
+                          {{ note.get_lecture_status_display }}
+                        </span>
+                      </p>
+                      {% if note.delay_reason %}
+                      <p><strong>Reason:</strong> <span class="text-muted">{{ note.delay_reason }}</span></p>
+                      {% endif %}
+                      <hr class="my-2">
+                      {% endif %}
+
+                      <p class="mb-1">{{ note.note|linebreaksbr }}</p>
+                      <small class="text-muted d-block text-end">
+                        <i class="far fa-clock me-1"></i>Posted on {{ note.created_at|date:"M d, Y H:i" }}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              {% else %}
+              <p class="text-muted fst-italic mt-3">No feedback available for this lecture.</p>
+              {% endif %}
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary text-light" data-mdb-ripple-init data-mdb-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+    <!-- Include JSON data using json_script -->
+    <script type="application/json" id="gradeDistributionData">
+        {{ grade_distribution|safe }}
+    </script>
+    <script type="application/json" id="completionStatusData">
+        {{ completion_status|safe }}
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Parse JSON data
+        const gradeDistributionData = JSON.parse(document.getElementById('gradeDistributionData').textContent);
+        const completionStatusData = JSON.parse(document.getElementById('completionStatusData').textContent);
+
+        // Grade Distribution Chart
+        const gradeCtx = document.getElementById('gradeDistributionChart').getContext('2d');
+        new Chart(gradeCtx, {
+            type: 'bar',
+            data: {
+                labels: ['90-100%', '80-89%', '70-79%', '60-69%', '50-59%', 'Below 50%'],
+                datasets: [{
+                    label: 'Number of Students',
+                    data: gradeDistributionData,
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.7)',
+                        'rgba(40, 167, 69, 0.5)',
+                        'rgba(255, 193, 7, 0.5)',
+                        'rgba(255, 193, 7, 0.7)',
+                        'rgba(220, 53, 69, 0.5)',
+                        'rgba(220, 53, 69, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(220, 53, 69, 1)',
+                        'rgba(220, 53, 69, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+
+        // Completion Status Chart
+        const completionCtx = document.getElementById('completionChart').getContext('2d');
+        new Chart(completionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed', 'Partially Completed', 'Not Started'],
+                datasets: [{
+                    data: completionStatusData,
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.7)',
+                        'rgba(255, 193, 7, 0.7)',
+                        'rgba(220, 53, 69, 0.7)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    });
+    </script>
+</div>
+{% endblock %}
+

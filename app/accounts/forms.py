@@ -22,3 +22,6 @@ class LectureNoteForm(forms.ModelForm):
             'note': forms.Textarea(attrs={'rows': 3}),
             'rating': forms.NumberInput(attrs={'min': 1, 'max': 5}),
         }
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields['rating'].required = False

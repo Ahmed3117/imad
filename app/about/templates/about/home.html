@@ -27,12 +27,32 @@
             </a>
         </li>
         {% if request.user.role == "admin" or request.user.is_superuser %}
-                <li class="nav-item px-2">
-                    <a class="nav-link " aria-current="page" href="{% url 'accounts:track_lectures' %}" data-translate="track_lectures">
+                <li class="nav-item px-2 ">
+                    <a class="nav-link text-primary" aria-current="page" href="{% url 'accounts:track_lectures' %}" data-translate="track_lectures">
                         <span>Track Lectures</span>
                     </a>
                 </li>
-        {% endif %}
+                {% endif %}
+                {% if request.user.role == "admin" or request.user.is_superuser or request.user.role == "teacher" %}
+                <li class="nav-item px-2 ">
+                    <a class="nav-link text-primary" aria-current="page" href="{% url 'library:course_library' %}" data-translate="general_library">
+                        <span>General library</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if request.user.is_superuser %}
+                <li class="nav-item px-2">
+                    <a class="nav-link" href="{% url "chat:dashboard" %}" data-translate="dashboard">
+                        <span>Customer Service</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item px-2">
+                    <a class="nav-link" href="{% url "chat:contact" %}" data-translate="">
+                        <span>Customer Service</span>
+                    </a>
+                </li> 
+            {% endif %}
         <!-- <li class="nav-item px-2">
             <a class="nav-link" href="{% url 'about:about_us' %}" data-translate="aboutus">
             <span>About Us</span>
@@ -118,17 +138,17 @@
 </div>
 </div>
 
-<!-- features -->
+<!-- Features Section -->
 <section class="features-section py-6 my-5">
     <div class="container">
         <div class="row justify-content-center"></div>
-            <div class=" text-center mb-5">
+            <div class="text-center mb-5">
                 <h2 class="display-5 fw-bold mb-3 text-gradient" data-translate="learning_journey">Start Your Learning Journey</h2>
                 <p class="lead text-muted" data-translate="platform_features">Discover the key features that make our e-learning platform stand out</p>
             </div>
         </div>
-        <div class="container ">
-            <div class="container row ">
+        <div class="container">
+            <div class="container row">
                 <div class="col-md-6 col-lg-3 mb-4">
                     <div class="feature-card card h-100 border-0 transform-hover">
                         <div class="card-body d-flex flex-column align-items-center text-center p-4">
@@ -220,45 +240,194 @@
 </section>
 
 <!-- Video Section -->
-<section class="video-section pt-5 mt-4" id='whoarewe'>
+<section class="video-section py-5 " style="background-color:rgb(228 161 27 / 64%)" id="video">
     <div class="container">
-        <div class="row align-items-center">
-            <!-- Left Column (Text) -->
-            <div class="col-lg-6 my-3">
-                <div class="col-md-6 mb-4 text-start justify-content-start">
-                    <img src="{% static 'imgs/bg/a1.png' %}" alt="Footer Image" class="img-fluid rounded">
+        <div class="row align-items-center g-4">
+            <!-- Left Column (Video) -->
+            <div class="col-lg-6">
+                <div class="video-container position-relative rounded-3 overflow-hidden shadow-lg" style="max-width: 600px; margin: 0 auto;">
+                    <!-- Cover Image -->
+                    <img src="{% static 'imgs/bg/a1.png' %}" alt="Video Cover" class="img-fluid w-100" style="aspect-ratio: 16/9; object-fit: cover;" id="video-cover">
+
+                    <!-- Play/Pause Button -->
+                    <button id="play-pause-button" class="btn btn-primary rounded-circle position-absolute top-50 start-50 translate-middle" 
+                            style="width: 70px; height: 70px; background-color: rgba(255, 255, 255, 0.9); border: none; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-play" id="play-icon" style="font-size: 28px; color: #000;"></i>
+                    </button>
+
+                    <!-- Video -->
+                    <video id="video-player" class="w-100" style="display: none; aspect-ratio: 16/9; object-fit: cover;">
+                        <source src="{% static 'videos/nab.mp4' %}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
                 </div>
-                <!-- <h6 class="display-6 fw-bold mb-3 text-primary my-2" data-translate="track_and_courses">Our Mission</h6> -->
-                <p class="fw-bold mb-5 " style="color: var(--second-description-color);" data-translate="video_section_description">
-                </p>
             </div>
 
-            <div class="col-lg-6 my-3">
-                <div class="video-container my-3">
-                    <div class="ratio ratio-16x9">
-                        <iframe
-                            src="https://www.youtube.com/embed/{{ company_info.video}}"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen
-                            class="rounded">
-                        </iframe>
-                        <!-- <img src="{% static 'imgs/shipment/3.jpg' %}" 
-                             alt="Video Thumbnail" 
-                             class="video-thumbnail"
-                             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; cursor: pointer;"
-                             onclick="this.style.display='none'; this.nextElementSibling.src += '?autoplay=1'"> -->
+            <!-- Right Column (Text) -->
+            <div class="col-lg-6">
+                <div class="ps-lg-4">
+                    <h2 class="display-5 fw-bold mb-4 text-primary">Discover Our Platform</h2>
+                    <p class="lead text-muted mb-4">
+                        Watch our introductory video to learn more about our innovative e-learning platform and how it can help you achieve your educational goals.
+                    </p>
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-check-circle text-primary fa-2x"></i>
+                        </div>
+                        <p class="mb-0">High-quality video lectures from expert instructors</p>
+                    </div>
+                    <div class="d-flex align-items-center my-3">
+                        <div class="me-3">
+                            <i class="fas fa-check-circle text-primary fa-2x"></i>
+                        </div>
+                        <p class="mb-0">Interactive learning materials and resources</p>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-check-circle text-primary fa-2x"></i>
+                        </div>
+                        <p class="mb-0">Flexible learning at your own pace</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <style>
+        .video-section {
+            background: linear-gradient(to right, rgba(var(--main-color-rgb), 0.03), rgba(var(--sub-color-rgb), 0.03));
+        }
+        .video-container {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .video-container:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        #play-pause-button {
+            transition: all 0.2s ease;
+        }
+        #play-pause-button:hover {
+            transform: scale(1.1);
+        }
+    </style>
 </section>
 
+<!-- Chat Section -->
+<section class="chat-section py-5 bg-warning text-white " id="chat">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <!-- Left Column (Text) -->
+            <div class="col-lg-6 order-lg-1 order-2">
+                <div class="pe-lg-4">
+                    <h2 class="display-5 fw-bold mb-4 text-primary">Connect With Our Team</h2>
+                    
+                    <div class="mb-4">
+                        <p class="lead text-light mb-3">
+                            Have questions or need support? Our team is here to help you 24/7.
+                        </p>
+                        <p class="lead text-light">
+                            Get instant answers to your questions through our live chat system.
+                        </p>
+                    </div>
+                    
+                    <!-- Chat Button -->
+                    <div class="d-grid gap-3">
+                        <button id="homeChatButton" class="btn btn-primary btn-lg py-3">
+                            <i class="fas fa-comments me-2"></i> Start Live Chat
+                        </button>
+                        
+                        <!-- Last Room Card (hidden by default) -->
+                        <div id="homeLastRoomContainer" class="mb-4" style="display: none;">
+                            <div class="card border-0 shadow-sm hover-shadow transition-all bg-light text-dark">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="text-primary fw-medium mb-1">Continue Your Conversation</h6>
+                                            <p class="text-muted small mb-0">Pick up where you left off</p>
+                                        </div>
+                                        <button id="homeJoinLastRoomBtn" class="btn btn-sm btn-outline-primary rounded-pill">
+                                            <i class="fas fa-arrow-right me-1"></i> Join
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column (Image) -->
+            <div class="col-lg-6 order-lg-2 order-1">
+                <div class="text-center">
+                    <img src="{% static 'imgs/bg/chat.png' %}" alt="Chat Support" class="img-fluid rounded-3" style="max-height: 400px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .chat-section {
+            background: linear-gradient(135deg, rgba(var(--main-color-rgb), 0.8), rgba(var(--sub-color-rgb), 0.8)), url('{% static "imgs/bg/chat-bg.jpg" %}');
+            background-size: cover;
+            background-position: center;
+        }
+        .hover-shadow {
+            transition: all 0.3s ease;
+        }
+        .hover-shadow:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+        }
+    </style>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-card p-4 rounded-3 bg-white shadow-sm">
+                    <h3 class="display-4 fw-bold text-primary">500+</h3>
+                    <p class="text-muted mb-0">Active Students</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-card p-4 rounded-3 bg-white shadow-sm">
+                    <h3 class="display-4 fw-bold text-primary">50+</h3>
+                    <p class="text-muted mb-0">Expert Teachers</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-card p-4 rounded-3 bg-white shadow-sm">
+                    <h3 class="display-4 fw-bold text-primary">100+</h3>
+                    <p class="text-muted mb-0">Courses Available</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-card p-4 rounded-3 bg-white shadow-sm">
+                    <h3 class="display-4 fw-bold text-primary">24/7</h3>
+                    <p class="text-muted mb-0">Support Available</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(var(--main-color-rgb), 0.1) !important;
+        }
+    </style>
+</section>
 
 {% if teachers %}
 <!-- Our Teachers -->
- <section class="container teachers-section" id="teachers">
-    <div class="card p-3"  style="width: 100%; border-radius: 15px;">
+<section class="container teachers-section py-5" id="teachers">
+    <div class="card p-3 shadow-sm" style="width: 100%; border-radius: 15px;">
         <!-- Form Header -->
         <div class="form-header text-center mb-4">
             <div class="header-container">
@@ -268,11 +437,10 @@
                 </div>
                 <div class="header-content">
                     <h3 class="header-title" data-translate="our_teachers">OUR Team</h3>
-                    
                 </div>
             </div>
         </div>
-        <p class="fw-bold section-subtitle text-center mb-5" data-translate="meet_our_teachers" style="font-family: 'SomarRounded', sans-serif; color: var(--description-color); font-size: 1.25rem;">Meet our exceptional teachers who inspire and guide learners:</p>
+        <p class="fw-bold section-subtitle text-center mb-5" data-translate="meet_our_teachers">Meet our exceptional teachers who inspire and guide learners:</p>
         <div class="teacher-slider d-flex overflow-auto position-relative" style="padding-bottom: 20px;">
             {% for teacher in teachers %}
             <div class="slider-item flex-shrink-0 me-3" style="width: 300px; transition: transform 0.3s ease-in-out;">
@@ -286,23 +454,23 @@
 
                     <!-- Teacher Name -->
                     <div class="text-center mt-3">
-                        <h5 class="text-dark mb-0" style="font-family: 'DG-Trika', sans-serif; color: var(--main-color); font-size: 1.5rem;">{{ teacher.teacher.name }}</h5>
+                        <h5 class="text-dark mb-0">{{ teacher.teacher.name }}</h5>
                     </div>
 
                     <!-- Teacher Title -->
                     <div class="text-center mt-2">
-                        <span class="text-primary fw-bold" style="font-family: 'SomarRounded', sans-serif; color: var(--sub-color); font-size: 1.25rem;">{{ teacher.specialization }}</span>
+                        <span class="text-primary fw-bold">{{ teacher.specialization }}</span>
                     </div>
 
                     <!-- Card Body (Description) -->
                     <div class="card-body text-center">
-                        <p class="fw-bold text-muted small" style="font-family: 'SomarRounded', sans-serif; color: var(--description-color);">{{ teacher.bio }}</p>
+                        <p class="fw-bold text-muted small">{{ teacher.bio }}</p>
                     </div>
 
                     <!-- Card Footer (View Profile Button) -->
                     {% if teacher.profile_link %}
                     <div class="card-footer bg-light border-top d-flex justify-content-center">
-                        <a href="{{ teacher.profile_link }}" class="btn btn-primary btn-sm" data-translate="view_profile" style="background-color: var(--main-color); border-color: var(--main-color); transition: background-color 0.3s ease-in-out;">View Profile</a>
+                        <a href="{{ teacher.profile_link }}" class="btn btn-primary btn-sm" data-translate="view_profile">View Profile</a>
                     </div>
                     {% endif %}
                 </div>
@@ -311,10 +479,10 @@
         </div>
         <!-- Arrows -->
         <div class="d-flex justify-content-between mt-4">
-            <button id="teacherprevArrow" class="btn btn-outline-primary btn-floating" style="border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: background-color 0.3s ease-in-out;">
+            <button id="teacherprevArrow" class="btn btn-outline-primary btn-floating">
                 <i class="fas fa-chevron-left"></i>
             </button>
-            <button id="teachernextArrow" class="btn btn-outline-primary btn-floating" style="border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: background-color 0.3s ease-in-out;">
+            <button id="teachernextArrow" class="btn btn-outline-primary btn-floating">
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
@@ -323,109 +491,95 @@
 {% endif %}
 
 <!-- Contact Section -->
-<section class="container pt-5" id="contact">
-    
-       
-        <div class="card p-4 shadow-lg"  style="width: 100%; border-radius: 15px;">
-            <!-- Form Header -->
-            <div class="form-header text-center mb-4">
-                <div class="header-container">
-                    <div class="diagonal-layer"></div>
-                    <div class="floating-icon">
-                        <i class="fas fa-envelope"></i>
-                    </div>
-                    <div class="header-content">
-                        <h3 class="header-title" data-translate="get_in_touch">Get in Touch</h3>
-                        
-                    </div>
+<section class="container py-5" id="contact">
+    <div class="card p-4 shadow-lg" style="width: 100%; border-radius: 15px;">
+        <!-- Form Header -->
+        <div class="form-header text-center mb-4">
+            <div class="header-container">
+                <div class="diagonal-layer"></div>
+                <div class="floating-icon">
+                    <i class="fas fa-envelope"></i>
                 </div>
-            </div>
-            <div class="row no-gutters">
-                <!-- Left Column (Contact Info) -->
-                <div class="col-lg-5 d-flex flex-column justify-content-center align-items-center bg-gradient-brand-color text-warning p-5 order-lg-2">
-                    
-                    <ul class="list-unstyled">
-                        <!-- <li class="mb-4 d-flex align-items-center">
-                            <i class="fas fa-envelope fa-2x me-3"></i>
-                            <span class="fw-bold">{{company_info.email}}</span>
-                        </li>
-                        <li class="mb-4 d-flex align-items-center">
-                            <i class="fas fa-phone fa-2x me-3"></i>
-                            <span class="fw-bold">{{company_info.phone}}</span>
-                        </li> -->
-                        <li class="mb-4 text-center">
-                            <img src="{% static 'imgs/mail.png' %}" alt="Contact Image" class="img-fluid email-image ">
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Right Column (Contact Form) -->
-                <div class="col-lg-7 d-flex flex-column justify-content-center p-5 order-lg-1">
-                    
-                    <form id="contactForm" class="contact-form form-validate" novalidate>
-                        <div class="row">
-                            <div class="col-sm-12 mb-3">
-                                <div class="form-floating mb-4">
-                                    <input type="text" id="name" class="form-control" name="name" required>
-                                    <label class="form-label" for="name" data-translate="your_name">Your Name</label>
-                                </div>
-                            </div>
-                            <div class="col-sm-6 mb-3">
-                                <div class="form-floating mb-4">
-                                    <input type="email" id="email" class="form-control" name="email" required>
-                                    <label class="form-label" for="email" data-translate="your_email">Your Email</label>
-                                </div>
-                            </div>
-                            <div class="col-sm-6 mb-3">
-                                <div class="form-floating mb-4">
-                                    <input type="tel" id="phone" class="form-control" name="phone">
-                                    <label class="form-label" for="phone" data-translate="your_phone">Your Phone Number</label>
-                                </div>
-                            </div>
-                            <div class="col-sm-12 mb-3">
-                                <div class="form-floating mb-4">
-                                    <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
-                                    <label class="form-label" for="message" data-translate="how_can_we_help">How can we help?</label>
-                                </div>
-                            </div>
-                            <div class="col-sm-12 mb-3 mt-5">
-                                <button type="submit" class="btn btn-primary btn-block py-3" data-translate="send_button">Send</button>
-                            </div>
-                        </div>
-                    </form>
+                <div class="header-content">
+                    <h3 class="header-title" data-translate="get_in_touch">Get in Touch</h3>
                 </div>
             </div>
         </div>
-    
+        <div class="row no-gutters">
+            <!-- Left Column (Contact Info) -->
+            <div class="col-lg-5 d-flex flex-column justify-content-center align-items-center bg-gradient-brand-color text-warning p-5 order-lg-2">
+                <ul class="list-unstyled">
+                    <li class="mb-4 text-center">
+                        <img src="{% static 'imgs/mail.png' %}" alt="Contact Image" class="img-fluid email-image">
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Right Column (Contact Form) -->
+            <div class="col-lg-7 d-flex flex-column justify-content-center p-5 order-lg-1">
+                <form id="contactForm" class="contact-form form-validate" novalidate>
+                    <div class="row">
+                        <div class="col-sm-12 mb-3">
+                            <div class="form-floating mb-4">
+                                <input type="text" id="name" class="form-control" name="name" required>
+                                <label class="form-label" for="name" data-translate="your_name">Your Name</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="form-floating mb-4">
+                                <input type="email" id="email" class="form-control" name="email" required>
+                                <label class="form-label" for="email" data-translate="your_email">Your Email</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="form-floating mb-4">
+                                <input type="tel" id="phone" class="form-control" name="phone">
+                                <label class="form-label" for="phone" data-translate="your_phone">Your Phone Number</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 mb-3">
+                            <div class="form-floating mb-4">
+                                <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+                                <label class="form-label" for="message" data-translate="how_can_we_help">How can we help?</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 mb-3 mt-5">
+                            <button type="submit" class="btn btn-primary btn-block py-3" data-translate="send_button">Send</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </section>
 
 <!-- Footer -->
-<footer class="pt-5 pb-5 mt-5 text-center text-md-start bg-footer " id="contact">
+<footer class="pt-5 pb-5 mt-5 text-center text-md-start bg-footer" id="contact">
     <div class="container">
         <div class="row pt-5 d-flex">
             <!-- Left Column -->
             <div class="col-md-4 mb-lg-0">
                 <div class="">
-                    <a class="navbar-brand" href="/" >
-                        <img src="{{logo_url}}" alt="Logo" >
+                    <a class="navbar-brand" href="/">
+                        <img src="{{logo_url}}" alt="Logo">
                     </a>
                     <p class="fw-bold my-4" data-translate="footer_description">{{company_info.description}}</p>
                     
                     <div>
                         <span data-translate="created_by">Created By BlueBook Team</span>
-                        <div data-translate="copyright" >© 2024 - BlueBook (01095163117)</div>
+                        <div data-translate="copyright">© 2024 - BlueBook (01095163117)</div>
                     </div>
                 </div>
             </div>
             <!-- Middle Column -->
-            <div class="col-md-4 mb-4 px-lg-5 text-center text-lg-start ">
+            <div class="col-md-4 mb-4 px-lg-5 text-center text-lg-start">
                 <img src="{% static 'imgs/footer/footer.png' %}" alt="Footer Image" class="img-fluid rounded">
             </div>
             <!-- Right Column -->
             <div class="col-md-4">
                 <div class="mb-4">
                     <h5 data-translate="contact_us" class="text-primary">Contact Us</h5>
-                    <p class="fw-bold lh-lg mt-3 mb-3" data-translate="contact_us_description">We’d love to hear from you! Reach out via email or phone, and we'll get back to you soon.</p>
+                    <p class="fw-bold lh-lg mt-3 mb-3" data-translate="contact_us_description">We'd love to hear from you! Reach out via email or phone, and we'll get back to you soon.</p>
                     <p>
                         <span data-translate="phone_label">Phone:</span> 
                         <span>{{company_info.phone}}</span>
@@ -439,54 +593,119 @@
                                 <i class="fab fa-facebook-f"></i>
                             </a>
                         </li>
-                        {% comment %} <li>
-                            <a href="{{ company_info.twitter }}" target="_blank" rel="noopener noreferrer">
-                                <i class="fab fa-twitter"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ company_info.instagram }}" target="_blank" rel="noopener noreferrer">
-                                <i class="fab fa-instagram"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ company_info.linkedin }}" target="_blank" rel="noopener noreferrer">
-                                <i class="fab fa-linkedin-in"></i>
-                            </a>
-                        </li> {% endcomment %}
                     </ul>
                 </div>
             </div>
         </div>
-        
     </div>
-
-
 </footer>
 
+<script>
+    // Video player controls
+    document.addEventListener('DOMContentLoaded', function() {
+        const videoCover = document.getElementById('video-cover');
+        const playPauseButton = document.getElementById('play-pause-button');
+        const playIcon = document.getElementById('play-icon');
+        const videoPlayer = document.getElementById('video-player');
 
-    <script>
+        playPauseButton.addEventListener('click', function() {
+            if (videoPlayer.paused || videoPlayer.ended) {
+                videoCover.style.display = 'none';
+                videoPlayer.style.display = 'block';
+                videoPlayer.play();
+                playIcon.classList.replace('fa-play', 'fa-pause');
+            } else {
+                videoPlayer.pause();
+                playIcon.classList.replace('fa-pause', 'fa-play');
+            }
+        });
 
-        // our teachers
-        document.addEventListener("DOMContentLoaded", () => {
-            const slider = document.querySelector(".teacher-slider");
-            const teacherprevArrow = document.getElementById("teacherprevArrow");
-            const teachernextArrow = document.getElementById("teachernextArrow");
-          
-            teacherprevArrow.addEventListener("click", () => {
-              slider.scrollBy({ left: -250, behavior: "smooth" });
-            });
-          
-            teachernextArrow.addEventListener("click", () => {
-              slider.scrollBy({ left: 250, behavior: "smooth" });
-            });
-          });
+        videoPlayer.addEventListener('ended', function() {
+            videoCover.style.display = 'block';
+            videoPlayer.style.display = 'none';
+            playIcon.classList.replace('fa-pause', 'fa-play');
+        });
+
+        // Teacher slider
+        const slider = document.querySelector(".teacher-slider");
+        const teacherprevArrow = document.getElementById("teacherprevArrow");
+        const teachernextArrow = document.getElementById("teachernextArrow");
+      
+        teacherprevArrow.addEventListener("click", () => {
+            slider.scrollBy({ left: -250, behavior: "smooth" });
+        });
+      
+        teachernextArrow.addEventListener("click", () => {
+            slider.scrollBy({ left: 250, behavior: "smooth" });
+        });
+
+        // Chat functionality
+        const lastRoom = localStorage.getItem('lastChatRoom');
+        const homeLastRoomContainer = document.getElementById('homeLastRoomContainer');
         
-    </script>
+        if (lastRoom) {
+            try {
+                const roomData = JSON.parse(lastRoom);
+                homeLastRoomContainer.style.display = 'block';
+                
+                document.getElementById('homeJoinLastRoomBtn').addEventListener('click', function() {
+                    window.location.href = `/chat/rooms/${roomData.code}/`;
+                });
+            } catch (e) {
+                console.error('Error parsing last room data:', e);
+                localStorage.removeItem('lastChatRoom');
+            }
+        }
+
+        // Handle chat button click
+        document.getElementById('homeChatButton').addEventListener('click', async function() {
+            const csrfToken = document.getElementById('csrf_token')?.value;
+            const button = this;
+            
+            if (!csrfToken) {
+                console.error('CSRF token not found');
+                alert('An error occurred. Please refresh the page and try again.');
+                return;
+            }
+            
+            const originalButtonContent = button.innerHTML;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Creating chat...';
+            button.disabled = true;
+
+            try {
+                const response = await fetch('/chat/rooms/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: JSON.stringify({}),
+                });
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const data = await response.json();
+                localStorage.setItem('lastChatRoom', JSON.stringify({
+                    code: data.code,
+                    timestamp: new Date().toISOString()
+                }));
+                
+                button.innerHTML = originalButtonContent;
+                button.disabled = false;
+                
+                await new Promise(resolve => setTimeout(resolve, 200));
+                window.location.href = `/chat/rooms/${data.code}/`;
+                
+            } catch (error) {
+                console.error('Error creating room:', error);
+                button.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i> Error - Try Again';
+                setTimeout(() => {
+                    button.innerHTML = originalButtonContent;
+                    button.disabled = false;
+                }, 2000);
+            }
+        });
+    });
+</script>
 
 {% endblock content %}
-
-
-
-
-

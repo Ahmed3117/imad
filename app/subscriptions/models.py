@@ -6,6 +6,8 @@ from django.utils import timezone
 from django.conf import settings
 from datetime import timedelta
 from django.core.validators import MaxValueValidator,MinValueValidator
+from library.models import CourseLibrary
+
 
 class StudyGroup(models.Model):
     CAPACITY_CHOICES = [
@@ -16,22 +18,54 @@ class StudyGroup(models.Model):
         (20, '20'),
     ]
 
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='study_groups')
-    capacity = models.IntegerField(choices=CAPACITY_CHOICES, null=True, blank=True)
-    teacher = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'}, related_name='teaching_groups')
+    name = models.CharField(
+        max_length=100,
+        blank=True
+    )
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name='study_groups'
+    )
+    capacity = models.IntegerField(
+        choices=CAPACITY_CHOICES,
+        null=True,
+        blank=True
+    )
+    teacher = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        limit_choices_to={'role': 'teacher'},
+        related_name='teaching_groups'
+    )
     number_of_expected_lectures = models.PositiveIntegerField()
     join_price = models.DecimalField(max_digits=8, decimal_places=2)
-    students = models.ManyToManyField(User, limit_choices_to={'role': 'student'}, related_name='study_groups', blank=True, null=True)
+    students = models.ManyToManyField(
+        User,
+        limit_choices_to={'role': 'student'},
+        related_name='study_groups',
+        blank=True
+    )
+
+    def save(self, *args, **kwargs):
+    # First save to get the pk
+        super().save(*args, **kwargs)
+        
+        # Then set the name if it's not already set
+        if not self.name:
+            self.name = f"Group-{self.pk}"
+            # Save again with the updated name, but avoid recursive calls
+            super().save(update_fields=['name'])
 
     def __str__(self):
         # Safely get level name (should always exist due to CASCADE)
-        level_name = self.course.level.name if self.course and self.course.level else "No Level"
+        level_name = self.course.level.name if self.course and self.course.level else ""
         
         # Safely get track name (could be null)
-        track_name = self.course.track.name if self.course and self.course.track else "No Track"
+        track_name = self.course.track.name if self.course and self.course.track else ""
         
-        # Construct the string with fallbacks
-        return f"{level_name} | {track_name} | {self.course.name} | {self.teacher.username} | {self.capacity}"
+        # Construct the string with fallbacks 
+        return f"{self.name} | {level_name} | {track_name} | {self.course.name} | {self.teacher.name or self.teacher.username }" 
     
 class GroupTime(models.Model):
     DAY_CHOICES = [
@@ -69,7 +103,7 @@ class Lecture(models.Model):
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     group = models.ForeignKey(StudyGroup, on_delete=models.CASCADE, related_name='lectures')
-    live_link = models.URLField(blank=True, null=True) # created zoom link
+    live_link = models.URLField(blank=True, null=True)  # created zoom link
     live_link_date = models.DateTimeField(blank=True, null=True)
     duration = models.IntegerField(default=60, validators=[MaxValueValidator(300), MinValueValidator(10)])
     is_finished = models.BooleanField(default=False)
@@ -86,8 +120,32 @@ class Lecture(models.Model):
         meeting_id = last_segment.split('?')[0]
         return meeting_id
 
+    def get_status_display(self):
+        """Returns a human-readable status with color coding"""
+        teacher_note = self.notes.filter(user__userprofile__role='teacher').first()
+        if teacher_note:
+            return {
+                'text': teacher_note.get_lecture_status_display(),
+                'class': 'success' if teacher_note.lecture_status == 'completed' 
+                        else 'warning' if teacher_note.lecture_status == 'student_delayed' 
+                        else 'danger'
+            }
+        return {'text': 'Pending Review', 'class': 'secondary'}
+
+    def get_average_rating(self):
+        """Returns the average rating from student notes"""
+        result = self.notes.filter(rating__isnull=False).aggregate(Avg('rating'))
+        return result['rating__avg'] or 0
+
+    def get_rating_count(self):
+        """Returns the number of ratings submitted"""
+        return self.notes.filter(rating__isnull=False).count()
+
     def __str__(self):
         return f"Lecture: {self.title} for {self.group}"
+
+    class Meta:
+        ordering = ['-live_link_date']
 
 class LectureFile(models.Model):
     lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE, related_name='files')
@@ -96,12 +154,29 @@ class LectureFile(models.Model):
     def __str__(self):
         return f"File for Lecture: {self.lecture.title}"
 
-
 class LectureNote(models.Model):
+    LECTURE_STATUS_CHOICES = [
+        ('completed', 'Completed Successfully'),
+        ('student_delayed', 'Delayed or not attendeded by Student'),
+        ('teacher_delayed', 'Delayed or not attendeded by Teacher'),
+    ]
+    
     lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE, related_name='notes')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     note = models.TextField()
-    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True)
+    rating = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)], 
+        null=True, 
+        blank=True
+    )
+    lecture_status = models.CharField(
+        max_length=20,
+        choices=LECTURE_STATUS_CHOICES,
+        default='completed',
+        null=True,
+        blank=True
+    )
+    delay_reason = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -109,6 +184,25 @@ class LectureNote(models.Model):
 
     def __str__(self):
         return f"Note for {self.lecture.title} by {self.user.username}"
+
+class StudyGroupResource(models.Model):
+    studygroup = models.ForeignKey(StudyGroup, on_delete=models.CASCADE)
+    resource = models.ForeignKey(CourseLibrary, on_delete=models.CASCADE)
+    shared_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    shared_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('studygroup', 'resource')
+    
+    def __str__(self):
+        return f"{self.studygroup.course.name} | {self.resource.file.name}"
+
+
+
+
+
+
+
 
 
 
