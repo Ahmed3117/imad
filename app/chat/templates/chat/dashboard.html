@@ -64,7 +64,7 @@
         var currentRoomCode = null;
 
         const chatSocket = new WebSocket(
-            'ws://' + window.location.host + '/ws/rooms/'
+            'wss://' + window.location.host + '/ws/rooms/'
         );
 
         chatSocket.onmessage = function(e) {
