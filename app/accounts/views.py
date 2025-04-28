@@ -510,33 +510,6 @@ def add_lecture_note(request, lecture_id):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @login_required
 def add_lecture(request, study_group_id):
     study_group = get_object_or_404(StudyGroup, id=study_group_id)
@@ -622,13 +595,6 @@ def create_zoom_meeting(title, description, duration, date, time, timezone='Afri
     except Exception as e:
         print(f"Error creating Zoom meeting: {str(e)}")
         return None
-
-
-
-
-
-
-
 
 
 
