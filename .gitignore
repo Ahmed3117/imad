@@ -1,3 +1,5 @@
+credentials.json 
+token.json 
 app/db.sqlite3 
 app/payments/__pycache__
 app/payments/migrations/__pycache__
