@@ -1,139 +1,116 @@
-<div class="card h-100 border-0 overflow-hidden shadow-lg"
-     data-group-id="{{ group.id }}"
-     style="transition: all 0.3s ease; border-radius: 1.5rem; background: linear-gradient(135deg, #ffffff 0%, #f8f9fc 100%);">
+<div class="card h-100 border-0 shadow-sm bg-gradient" 
+     data-group-id="{{ group.id }}" 
+     style="transition: all 0.3s ease; border-radius: 1rem; background: linear-gradient(135deg, #ffffff, #f8f9fc); width: 18rem;">
 
   <!-- Card Header with Image -->
-  <div class="position-relative ">
+  <div class="position-relative">
     {% if group.course_image %}
-    <div class="text-center mt-2  position-relative z-index-1 hover-scale">
+    <div class="text-center mt-2 position-relative z-index-1 hover-scale">
       <div class="image-wrapper position-relative mx-auto">
-        <img src="{{ group.course_image }}"
-             alt="{{ group.course_name }}"
-             class="img-fluid rounded-circle mb-3"
-             style="width: 120px; height: 120px; object-fit: cover; border: 5px solid #fff;
-                    transition: transform 0.3s ease; box-shadow: 0 10px 28px rgba(255,105,180,0.20);">
-        <div class="circle-decoration position-absolute w-100 h-100 rounded-circle"></div>
+        <img src="{{ group.course_image }}" 
+             alt="{{ group.course_name }}" 
+             class="img-fluid rounded-circle shadow-sm" 
+             style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #fff; transition: transform 0.3s ease;">
       </div>
     </div>
     {% endif %}
 
-    <!-- Capacity Badge -->
-    <div class="position-absolute top-0 end-0 m-2">
-      <div class="badge bg-warning text-light fw-bold px-3 py-2 shadow-sm rounded-pill d-flex align-items-center" style="font-size: 0.85rem;"> <!-- Slightly smaller -->
-        <i class="fas fa-user-friends me-1" style="font-size: 0.8em;"></i> <!-- Smaller icon -->
+    <!-- Capacity Badge (Top-Right) -->
+    <div class="position-absolute top-0 end-0 m-1">
+      <span class="badge bg-warning text-light fw-bold px-2 py-1 shadow-sm rounded-pill d-flex align-items-center" style="font-size: 0.7rem;">
+        <i class="fas fa-user-friends me-1" style="font-size: 0.8em;"></i>
         <span>{{ group.capacity }}</span>
         <span class="ms-1 small" data-translate="seats">seats</span>
-      </div>
+      </span>
+    </div>
+
+    <!-- Lectures Badge (Top-Left) -->
+    <div class="position-absolute top-0 start-0 m-1">
+      <span class="badge bg-info text-light fw-bold px-2 py-1 shadow-sm rounded-pill d-flex align-items-center" style="font-size: 0.7rem;">
+        <i class="fas fa-book-open me-1" style="font-size: 0.8em;"></i>
+        <span>{{ group.number_of_expected_lectures }}</span>
+        <span class="ms-1 small" data-translate="lectures">lectures</span>
+      </span>
     </div>
   </div>
 
   <!-- Card Body -->
-  <div class="card-body mt-0 pt-0"> 
+  <div class="card-body py-2 px-3">
     <!-- Course Title -->
-    <h4 class="card-title text-center fw-bold mb-2 text-gradient-pink-purple"> <!-- Changed to h4 -->
+    <h5 class="card-title text-center fw-bold mb-1 text-gradient-pink-purple" style="font-size: 1rem;">
       {{ group.course_name }}
-      <div class="title-underline mx-auto mt-2"></div>
-    </h4>
+      <div class="title-underline mx-auto mt-1"></div>
+    </h5>
 
     <!-- Course Description -->
-    <div class="card-text text-muted mb-0 text-center lh-sm px-xl-3 position-relative"
-         style="font-size: 0.9rem; min-height: 50px;"> <!-- Reduced font size and min height -->
-      <div class="quote-icon left"><i class="fas fa-quote-left text-pink"></i></div>
-      {{ group.course_description }}
-      <div class="quote-icon right"><i class="fas fa-quote-right text-pink"></i></div>
+    <div class="card-text text-muted mb-2 text-center lh-sm px-2 position-relative" style="font-size: 0.8rem; min-height: 40px;">
+      <span class="description-preview" id="description-{{ group.id }}">
+        {{ group.course_description|slice:":50" }}...
+      </span>
+      <span class="description-full d-none" id="description-full-{{ group.id }}">
+        {{ group.course_description }}
+      </span>
+      <a href="javascript:void(0);" class="text-decoration-none text-primary fw-bold show-more-toggle" 
+         onclick="toggleDescription('{{ group.id }}')"
+         id="toggle-btn-{{ group.id }}" style="font-size: 0.75rem;">
+        Show more
+      </a>
     </div>
 
     <!-- Course Details Grid -->
-    <div class="d-grid mb-0 mt-2"> <!-- Reduced margins -->
-      <div class="detail-item bg-soft-pink rounded-pill py-1 "> <!-- Added padding -->
-        <i class="fas fa-chalkboard-teacher text-info me-2"></i>
-        <span class="fw-medium text-dark small">{{ group.teacher }}</span> 
-      </div>
-      <div class="detail-item bg-soft-blue rounded-pill py-1 "> <!-- Added padding -->
-        <i class="fas fa-book-open text-info me-2"></i>
-        <span class="fw-medium text-dark small"> 
-          <span data-translate="lectures">{{ group.number_of_expected_lectures }}</span>
-          <span class="text-muted ms-1">lectures</span>
-        </span>
+    <div class="d-grid gap-1 mb-2">
+      <div class="detail-item bg-light-pink rounded-pill py-1 px-2 d-flex align-items-center">
+        <i class="fas fa-chalkboard-teacher text-info me-1"></i>
+        <span class="fw-medium text-dark small" style="font-size: 0.75rem;">{{ group.teacher }}</span>
       </div>
     </div>
 
     <!-- Schedule Section -->
-    <div class="mb-1 mt-2">
-      <h6 class="fw-bold text-uppercase mb-2 d-flex align-items-center" style="font-size: 0.85rem;">
-        <i class="fas fa-calendar-alt me-2 bg-primary"></i> <span data-translate="schedule">Schedule</span>
+    <div class="mb-2">
+      <h6 class="fw-bold text-uppercase mb-1 text-primary d-flex align-items-center" style="font-size: 0.8rem;">
+        <i class="fas fa-calendar-alt me-1"></i> <span data-translate="schedule">Schedule</span>
       </h6>
       <ul class="list-unstyled mb-0 schedule-list">
         {% for group_time in group.group_times %}
-        <li class="d-flex align-items-center mb-1 py-1"> 
-          <i class="fas fa-clock me-2 text-purple" style="font-size: 0.8em;"></i> 
-          <span class="d-flex gap-2 align-items-center">
-            <i class="fw-medium rounded-pill me-0 text-info"></i>
-            <span class="badge text-dark small px-0 mx-0" data-translate="{{ group_time.get_day_display }}"> 
-              {{ group_time.get_day_display }}
-            </span>
-            <span class="text-dark small">⏰ {{ group_time.time }}</span>
-          </span>
+        <li class="d-flex align-items-center mb-1 py-1 px-2 bg-light rounded-3 shadow-sm">
+          <i class="fas fa-clock me-2 text-purple"></i>
+          <span class="text-dark small" style="font-size: 0.75rem;">{{ group_time.get_day_display }} ⏰ {{ group_time.time }}</span>
         </li>
         {% empty %}
-        <li class="text-muted small">🎉 Schedule coming soon!</li>
+        <li class="text-muted small" style="font-size: 0.75rem;">🎉 Schedule coming soon!</li>
         {% endfor %}
       </ul>
     </div>
 
     <!-- Action Button -->
-    <div class="action-section mt-auto pt-2"> 
-      <a class="btn btn-primary rounded-pill w-100 fw-bold py-2 shadow-sm hover-scale small" 
-         data-group-id="{{ group.id }}"
-         href="{% url 'accounts:lectures' group.id %}"
-         style="transition: all 0.3s ease;">
-        <i class="fas fa-magic me-2"></i>
-        <span data-translate="start">Start Magic ✨</span>
+    <div class="action-section mt-auto">
+      <a href="{% url 'accounts:lectures' group.id %}" 
+         class="btn btn-primary rounded-pill w-100 fw-bold py-2 shadow-sm hover-scale" 
+         style="font-size: 0.8rem;">
+        <i class="fas fa-magic me-1"></i> 
+        <span data-translate="start">Start ✨</span>
       </a>
     </div>
   </div>
-
 </div>
 
-<style>
+<script>
+  function toggleDescription(groupId) {
+    const preview = document.getElementById(`description-${groupId}`);
+    const fullDescription = document.getElementById(`description-full-${groupId}`);
+    const toggleBtn = document.getElementById(`toggle-btn-${groupId}`);
 
-
-  .title-underline {
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(90deg, #ff7eb3, #7a6fff);
-  }
-
-  .quote-icon {
-    position: absolute;
-    opacity: 0.3;
-    &.left { left: -5px; top: -8px; }
-    &.right { right: -5px; bottom: -8px; }
-  }
-
-  .schedule-list li {
-    transition: all 0.2s ease;
-    &:hover {
-      transform: translateX(5px);
-      background: rgba(255,255,255,0.5);
+    if (preview.classList.contains('d-none')) {
+      preview.classList.remove('d-none');
+      fullDescription.classList.add('d-none');
+      toggleBtn.textContent = 'Show more';
+    } else {
+      preview.classList.add('d-none');
+      fullDescription.classList.remove('d-none');
+      toggleBtn.textContent = 'Show less';
     }
   }
+</script>
 
-  .circle-decoration {
-    top: 0;
-    left: 0;
-    border: 2px dashed rgba(255, 126, 179, 0.3);
-    animation: rotate 20s linear infinite;
-  }
 
-  @keyframes rotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
 
-  .shadow-hover:hover{
-        box-shadow: 0 12px 32px rgba(255,105,180,0.20);
-  }
-
-  
-</style>

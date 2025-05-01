@@ -137,7 +137,6 @@
                                     <div class="mt-1">
                                         <textarea class="form-control form-control-sm feedback-input"
                                                   rows="1"
-                                                  placeholder="<span data-translate='feedback_placeholder'></span>"
                                                   data-answer-id="{{ answer.pk }}">{{ answer.teacher_feedback|default:'' }}</textarea>
                                     </div>
                                 </td>
@@ -364,73 +363,6 @@
         </div>
     </div>
 </div>
-
-
-<script>
-    $(document).ready(function() {
-        // Save grade functionality
-        $('.save-grade-btn').click(function() {
-            const answerId = $(this).data('answer-id');
-            const gradeInput = $(`.grade-input[data-answer-id="${answerId}"]`);
-            const feedbackInput = $(`.feedback-input[data-answer-id="${answerId}"]`);
-            const statusDiv = $(`#grade-status-${answerId}`);
-            
-            const grade = gradeInput.val();
-            const feedback = feedbackInput.val();
-            
-            if (grade === '') {
-                statusDiv.html('<div class="alert alert-danger p-2">Please enter a grade</div>');
-                return;
-            }
-            
-            statusDiv.html('<div class="alert alert-info p-2">Saving...</div>');
-            
-            $.ajax({
-                url: "{% url 'assignment:grade_answer' 0 %}".replace('0', answerId),
-                type: 'POST',
-                data: {
-                    'grade': grade,
-                    'feedback': feedback,
-                    'csrfmiddlewaretoken': '{{ csrf_token }}'
-                },
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                success: function(response) {
-                    if (response.success) {
-                        statusDiv.html('<div class="alert alert-success p-2">Grade saved!</div>');
-                    } else {
-                        statusDiv.html(`<div class="alert alert-danger p-2">${response.error}</div>`);
-                    }
-                    
-                    setTimeout(function() {
-                        statusDiv.fadeOut();
-                    }, 3000);
-                },
-                error: function(xhr) {
-                    try {
-                        const response = JSON.parse(xhr.responseText);
-                        statusDiv.html(`<div class="alert alert-danger p-2">${response.error}</div>`);
-                    } catch {
-                        statusDiv.html('<div class="alert alert-danger p-2">Error saving grade</div>');
-                    }
-                }
-            });
-        });
-        
-        // Grade input validation
-        $('.grade-input').on('change', function() {
-            const maxGrade = parseInt('{{ assignment.max_grade }}');
-            const value = parseInt($(this).val()) || 0;
-            
-            if (value > maxGrade) {
-                $(this).val(maxGrade);
-            } else if (value < 0) {
-                $(this).val(0);
-            }
-        });
-    });
-</script>
     
 <style>
     .grade-display {
@@ -455,7 +387,71 @@
     }
 </style>
 
-
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Save grade functionality using fetch API
+        document.querySelectorAll('.save-grade-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const answerId = this.getAttribute('data-answer-id');
+                const gradeInput = document.querySelector(`.grade-input[data-answer-id="${answerId}"]`);
+                const feedbackInput = document.querySelector(`.feedback-input[data-answer-id="${answerId}"]`);
+                const statusDiv = document.getElementById(`grade-status-${answerId}`);
+    
+                const grade = gradeInput.value;
+                const feedback = feedbackInput.value;
+    
+                if (grade === '') {
+                    statusDiv.innerHTML = '<div class="alert alert-danger p-2">Please enter a grade</div>';
+                    return;
+                }
+    
+                statusDiv.innerHTML = '<div class="alert alert-info p-2">Saving...</div>';
+    
+                const url = "{% url 'assignment:grade_answer' 0 %}".replace('0', answerId);
+                const csrfToken = '{{ csrf_token }}';
+    
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ grade: grade, feedback: feedback })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        statusDiv.innerHTML = '<div class="alert alert-success p-2">Grade saved!</div>';
+                    } else {
+                        statusDiv.innerHTML = `<div class="alert alert-danger p-2">${data.error}</div>`;
+                    }
+    
+                    setTimeout(function() {
+                        statusDiv.style.display = 'none';
+                    }, 3000);
+                })
+                .catch(error => {
+                    statusDiv.innerHTML = '<div class="alert alert-danger p-2">Error saving grade</div>';
+                    console.error('Error:', error);
+                });
+            });
+        });
+    
+        // Grade input validation
+        document.querySelectorAll('.grade-input').forEach(input => {
+            input.addEventListener('change', function() {
+                const maxGrade = parseInt('{{ assignment.max_grade }}');
+                const value = parseInt(this.value) || 0;
+    
+                if (value > maxGrade) {
+                    this.value = maxGrade;
+                } else if (value < 0) {
+                    this.value = 0;
+                }
+            });
+        });
+    }); 
+</script>
 
 {% endblock %}
-

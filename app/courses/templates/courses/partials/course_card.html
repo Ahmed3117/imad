@@ -78,34 +78,49 @@
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const toggleButtons = document.querySelectorAll('.toggle-desc-btn');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ensure the script works for dynamically loaded content as well
+        const initializeToggleDescription = () => {
+            const toggleButtons = document.querySelectorAll('.toggle-desc-btn');
     
-    toggleButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const container = this.closest('.description-container');
-            const fullDesc = container.querySelector('.full-desc');
-            const shortDesc = container.querySelector('.short-desc');
-            const showMore = container.querySelector('.show-more');
-            const showLess = container.querySelector('.show-less');
-            
-            if (fullDesc.style.maxHeight === '0px' || !fullDesc.style.maxHeight) {
-                // Expand
-                fullDesc.style.maxHeight = fullDesc.scrollHeight + 'px';
-                showMore.style.display = 'none';
-                showLess.style.display = 'inline';
-                shortDesc.style.display = 'none';
-            } else {
-                // Collapse
-                fullDesc.style.maxHeight = '0';
-                showMore.style.display = 'inline';
-                showLess.style.display = 'none';
-                shortDesc.style.display = 'block';
-            }
-        });
+            toggleButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const container = this.closest('.description-container');
+                    const fullDesc = container.querySelector('.full-desc');
+                    const shortDesc = container.querySelector('.short-desc');
+                    const showMore = container.querySelector('.show-more');
+                    const showLess = container.querySelector('.show-less');
+    
+                    if (!fullDesc || !shortDesc || !showMore || !showLess) {
+                        console.error("Missing required elements for toggle functionality.");
+                        return;
+                    }
+    
+                    // Toggle visibility
+                    if (fullDesc.style.maxHeight === '0px' || !fullDesc.style.maxHeight) {
+                        // Expand the full description
+                        fullDesc.style.maxHeight = fullDesc.scrollHeight + 'px';
+                        showMore.style.display = 'none';
+                        showLess.style.display = 'inline';
+                        shortDesc.style.display = 'none';
+                    } else {
+                        // Collapse the full description
+                        fullDesc.style.maxHeight = '0';
+                        showMore.style.display = 'inline';
+                        showLess.style.display = 'none';
+                        shortDesc.style.display = 'block';
+                    }
+                });
+            });
+        };
+    
+        // Initialize the functionality on page load
+        initializeToggleDescription();
+    
+        // Optional: Reinitialize for dynamically loaded content
+        document.addEventListener('DOMNodeInserted', initializeToggleDescription);
     });
-});
-</script>
+    </script>
 
 
 

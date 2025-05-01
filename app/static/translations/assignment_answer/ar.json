@@ -1,5 +1,5 @@
 {
-  "answer_header": "{{ action }} الإجابة عن",
+  "answer_header": " الإجابة عن",
   "answer_text_label": "نص الإجابة",
   "answer_text_error": "الرجاء تقديم إجابتك.",
   "attachment_label": "المرفق",
