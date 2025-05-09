@@ -247,16 +247,21 @@
                 data-mdb-parent="#lecturesAccordion"
             >
                 <div class="accordion-body p-lg-4 p-3"> {# Responsive Padding #}
-                    <p class="text-muted mb-4 lecture-description" data-translate="lecture_description">
+                    <span class="text-muted lecture-description fw-bold" data-translate="lecture_description">
+                       
+                    </span>
+                    <span class="text-muted  lecture-description ms-3" >
                         {{ lecture_data.lecture.description|default:"No description provided." }}
-                    </p>
+                    </span>
+                    
     
                     {# Responsive Row for Date & Live Link #}
                     <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center mb-4 gap-3 border-bottom pb-3">
-                        <div class="date-info text-muted small" data-translate="created_on">
+                        <div class="date-info text-muted small" >
                             <i class="far fa-calendar-alt me-1 fa-fw"></i>
                             <strong data-translate="created">Created:</strong>
-                            {{ lecture_data.lecture.created_at|date:"M d, Y" }} {# Standard Django date filter #}
+                            
+                            {{ lecture_data.lecture.created }} 
                         </div>
     
                         {% if lecture_data.lecture.live_link and not lecture_data.lecture.is_finished %}
