@@ -34,7 +34,7 @@
   "assignments": "Assignments",
   "finished": "Finished",
   "lecture_description": "Lecture Description",
-  "created_on": "Created on:",
+  "created": "Created on:",
   "join_live_session": "Join Live Session",
   "no_lectures": "No lectures available for this study group yet."
 }

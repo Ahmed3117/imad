@@ -4,509 +4,871 @@
 {% block translationFolder %}data-translation-folder="lectures"{% endblock %}
 {% block title %}Lectures{% endblock %}
 
-
 {% block content %}
 
 <style>
-    .active-lecture{
-        background-color: #fff0f0; /* light red background */
-        border-left: 4px solid #28a745; /* red border */
-    }
-    
-    .active-lecture .accordion-button {
-        color: #28a745; /* red text */
+    /* Global Styling */
+    :root {
+        --primary-color: #1a73e8;
+        --secondary-color: #4a5568;
+        --accent-color: #34c759;
+        --background-color: #f7fafc;
+        --card-background: #ffffff;
+        --border-color: #e2e8f0;
+        --text-color: #2d3748;
+        --muted-text-color: #718096;
+        --danger-color: #e53e3e;
     }
 
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: var(--text-color);
+        background-color: var(--background-color);
+        line-height: 1.6;
+    }
 
-    .finished-lecture {
-        background-color: #f0fff0; /* light green background */
-        border-left: 4px solid #dc3545; /* green border */
+    /* Sidebar Styling */
+    .sidebar {
+        position: fixed;
+        top: 70px; /* Assuming navbar height */
+        left: 0;
+        width: 280px;
+        height: calc(100vh - 70px); /* Adjust based on navbar height */
+        background-color: var(--card-background);
+        border-right: 1px solid var(--border-color);
+        overflow-y: auto;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
-    
-    .finished-lecture .accordion-button {
-        color: #dc3545; /* green text */
+    .sidebar.hidden {
+        transform: translateX(-280px);
     }
-    .lecture-accordion .accordion-button:not(.collapsed) {
-        /* Example: Subtle highlight for the open item's button */
-        /* background-color: rgba(0, 0, 0, 0.03); */
+    .sidebar-toggle {
+        position: fixed;
+        top: 80px; /* Adjust for vertical alignment */
+        left: 290px; /* Initial position next to sidebar */
+        z-index: 1001;
+        background-color: var(--primary-color);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
-    .lecture-accordion .finished-lecture .accordion-button {
-       /* Style for finished lecture header - e.g., slightly muted */
-       opacity: 0.75;
+    .sidebar-toggle.hidden {
+        left: 16px; /* Position when sidebar is hidden */
     }
-    /* Add a subtle left border indicator for state */
-    .lecture-accordion .active-lecture > .accordion-header {
-        border-left: 4px solid var(--mdb-primary, #3b71ca); /* MDB Primary */
+    .sidebar-toggle:hover {
+        transform: scale(1.05);
+        background-color: #1557b0; /* Darker shade for hover */
     }
-    .lecture-accordion .finished-lecture > .accordion-header {
-       border-left: 4px solid var(--mdb-secondary, #9fa6b2); /* MDB Secondary */
+    .sidebar-toggle:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.3);
     }
-    /* Ensure header border aligns with item */
-    .lecture-accordion .accordion-header {
-        border-top-left-radius: inherit;
-        border-bottom-left-radius: inherit;
+
+    /* Vertical Tabs */
+    .nav-tabs {
+        border: none;
+        padding: 1.5rem 0; /* More padding around tabs */
     }
-    /* Style for file list items */
+    .nav-tabs .nav-item {
+        margin-bottom: 0.5rem;
+    }
+    .nav-tabs .nav-link {
+        color: var(--text-color);
+        border: none;
+        border-left: 4px solid transparent;
+        border-radius: 0 8px 8px 0; /* Rounded corners on one side */
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        background-color: transparent;
+        text-decoration: none;
+    }
+    .nav-tabs .nav-link:hover {
+        background-color: #edf2f7; /* Light gray hover */
+        border-left-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+    .nav-tabs .nav-link.active {
+        background: linear-gradient(90deg, var(--accent-color), #48bb78); /* Green gradient for active */
+        border-left-color: var(--accent-color);
+        color: #fff;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .nav-tabs .nav-link.finished {
+        border-left-color: var(--danger-color);
+        color: var(--danger-color);
+        opacity: 0.9;
+    }
+    .nav-tabs .nav-link.section-tab {
+        background-color: #e2e8f0; /* Different background for section tabs */
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        color: var(--primary-color);
+        padding: 0.5rem 1.5rem;
+        border-left: 4px solid var(--primary-color);
+        border-radius: 0 8px 8px 0;
+        margin-top: 0.5rem; /* Space above section tabs */
+    }
+    .nav-tabs .nav-link.section-tab:hover {
+        background-color: #cbd5e0;
+    }
+    .nav-tabs .nav-link.section-tab.active {
+        background: linear-gradient(90deg, var(--primary-color), #63b3ed); /* Blue gradient for active section */
+        color: #fff;
+        border-left-color: var(--primary-color);
+    }
+    .nav-tabs .badge {
+        font-size: 0.7rem;
+        margin-left: auto;
+        background-color: var(--secondary-color);
+        color: #fff;
+    }
+    .nav-tabs .nav-link:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.3);
+    }
+
+    /* Main Content */
+    .main-content {
+        margin-left: 280px;
+        padding: 2.5rem;
+        transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        min-height: calc(100vh - 70px); /* Adjust based on navbar height */
+        background-color: var(--background-color);
+    }
+    .main-content.full-width {
+        margin-left: 0;
+    }
+    .tab-pane {
+        display: none; /* Hidden by default */
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .tab-pane.active {
+        display: block; /* Show active tab */
+        opacity: 1;
+        animation: fadeIn 0.3s ease-in;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* Card Styling */
+    .content-card {
+        border: none;
+        border-radius: 12px;
+        background-color: var(--card-background);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .content-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+    .content-card-header {
+        background: none;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .content-card-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin: 0;
+    }
+
+    /* File List */
     .file-list-item {
-        background-color: rgba(0, 0, 0, 0.03);
-        transition: background-color 0.2s ease-in-out;
+        background-color: #edf2f7;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        transition: background-color 0.2s ease, transform 0.2s ease;
     }
     .file-list-item:hover {
-        background-color: rgba(0, 0, 0, 0.06);
+        background-color: #e2e8f0;
+        transform: translateX(2px);
     }
     .file-icon-wrapper {
         width: 40px;
         height: 40px;
-        flex-shrink: 0; /* Prevent icon shrinking */
-        background-color: rgba(var(--mdb-secondary-rgb), 0.1); /* Use MDB color variable */
+        border-radius: 50%;
+        background-color: var(--border-color); /* Icon background */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
     }
-    /* Ensure action buttons wrap nicely */
+
+    /* Button Group */
     .lecture-actions .btn-group-actions {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.5rem; /* Spacing between buttons */
+        gap: 0.75rem;
         align-items: center;
     }
-    .modal-rating-select option {
-        padding: 5px; /* Add some padding to star options */
+    .btn-sm {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    .btn-sm:hover {
+        transform: translateY(-1px);
+    }
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    .btn-primary:hover {
+        background-color: #1557b0;
+        border-color: #1557b0;
+    }
+    .btn-danger {
+        background-color: var(--danger-color);
+        border-color: var(--danger-color);
+    }
+    .btn-danger:hover {
+        background-color: #c53030;
+        border-color: #c53030;
+    }
+    .btn:focus {
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.3);
+    }
+
+    /* Form Styling */
+    .form-floating label {
+        color: var(--muted-text-color);
+        font-size: 0.9rem;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        border-color: var(--border-color);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+    }
+    .input-group-sm .form-control { /* For file upload */
+        border-radius: 8px 0 0 8px;
+    }
+    .input-group-sm .btn { /* For file upload */
+        border-radius: 0 8px 8px 0;
+    }
+    
+    /* Table Styling */
+    .table {
+        background-color: var(--card-background);
+        border-radius: 8px; /* Rounded corners for table */
+        overflow: hidden; /* Clip content to rounded corners */
+    }
+    .table thead th {
+        background-color: #edf2f7; /* Light header for table */
+        color: var(--text-color);
+        font-weight: 600;
+    }
+    .table tbody tr:hover {
+        background-color: #f7fafc; /* Subtle hover for table rows */
+    }
+
+    /* Toast Styling */
+    .toast {
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+
+    /* Responsive Adjustments */
+    @media (max-width: 992px) { /* Medium devices (tablets, less than 992px) */
+        .sidebar {
+            width: 240px;
+        }
+        .sidebar.hidden {
+            transform: translateX(-240px);
+        }
+        .sidebar-toggle {
+            left: 250px;
+        }
+        .sidebar-toggle.hidden {
+            left: 16px;
+        }
+        .main-content {
+            margin-left: 240px;
+        }
+        .main-content.full-width {
+            margin-left: 0;
+        }
+    }
+
+    @media (max-width: 576px) { /* Small devices (landscape phones, less than 576px) */
+        .sidebar {
+            width: 100%; /* Full width on small screens */
+            transform: translateX(0); /* Show by default if not explicitly hidden by JS logic */
+        }
+        .sidebar.hidden {
+             transform: translateX(-100%); /* Slide out completely */
+        }
+        .sidebar-toggle {
+            left: 16px; /* Always on left for small screens */
+        }
+        .sidebar-toggle.hidden {
+            left: 16px; /* Stays if sidebar is hidden */
+        }
+        .main-content {
+            margin-left: 0; /* No margin when sidebar might overlay or be hidden */
+            padding: 1.5rem; /* Reduced padding */
+        }
+        .content-card {
+            padding: 1.5rem;
+        }
+        .content-card-title {
+            font-size: 1.5rem;
+        }
     }
 </style>
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<div class="container mt-5">
+<div class="container-fluid">
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
 
-    <!-- Assignments Report Button -->
-    <div class="text-end mb-3">
-        {% if request.user.role == "teacher" %}
-        <a href="{% url 'assignment:studygroup_grades' study_group.id %}" class="btn btn-secondary text-light" data-translate="assignment_report">Assignments Report</a>
-        {% else %}
-        <a href="{% url 'assignment:student_grades' study_group.id request.user.id %}" class="btn btn-secondary text-light" data-translate="assignment_report">Assignments Report</a>
-        {% endif %}
-    </div>
-
-    <!-- Shared Resources Section - Now Collapsible -->
-    <div class="card mb-4 shadow-sm">
-        <div class="card-header bg-primary text-light d-flex justify-content-between align-items-center"
-             data-mdb-toggle="collapse"
-             data-mdb-target="#sharedResourcesCollapse"
-             aria-expanded="true"
-             aria-controls="sharedResourcesCollapse"
-             style="cursor: pointer;"
-             id="sharedResourcesHeader">
-            <h5 class="mb-0 text-light">
-                <i class="fas fa-share-alt me-2"></i>
-                <span data-translate="shared_resources">Shared Resources</span>
-            </h5>
-            <i class="fas fa-chevron-down toggle-icon"></i>
-        </div>
-        <div class="collapse show" id="sharedResourcesCollapse">
-            <div class="card-body">
-                {% if shared_resources %}
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th data-translate="resource">Resource</th>
-                                    <th data-translate="course">Course</th>
-                                    <th data-translate="shared_by">Shared By</th>
-                                    <th data-translate="actions">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for resource in shared_resources %}
-                                    <tr>
-                                        <td>
-                                            <i class="fas fa-file me-2"></i>
-                                            {{ resource.resource.file.name|slice:"courseslibraries/:" }}
-                                        </td>
-                                        <td>{{ resource.resource.course.name }}</td>
-                                        <td>{{ resource.shared_by.username }}</td>
-                                        <td>
-                                            <a href="{{ resource.resource.file.url }}"
-                                            class="btn btn-sm btn-primary"
-                                            target="_blank"
-                                            data-translate="download">
-                                                <i class="fas fa-download"></i> Download
-                                            </a>
-                                            {% if user_role == 'teacher' and resource.shared_by == request.user %}
-                                                <button class="btn btn-sm btn-danger delete-resource-btn"
-                                                        data-resource-id="{{ resource.id }}"
-                                                        data-translate="delete">
-                                                    <i class="fas fa-trash"></i> Delete
-                                                </button>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% else %}
-                    <div class="alert alert-info mb-0" data-translate="no_shared_resources">
-                        <i class="fas fa-info-circle me-2"></i>
-                        No resources have been shared with this study group yet.
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    {% if user_role == 'teacher' %}
-    <div class="card mb-4 shadow-sm " >
-        <div class="card-header d-flex justify-content-between align-items-center bg-primary"
-             data-mdb-toggle="collapse"
-             data-mdb-target="#addLectureFormCollapse"
-             aria-expanded="true" 
-             aria-controls="addLectureFormCollapse"
-             style="cursor: pointer; "
-             id="addLectureHeader"> 
-            <h5 class="mb-0 text-light">
-                <i class="fas fa-plus-circle me-2"></i>
-                <span data-translate="add_lecture">Add New Lecture</span>
-            </h5>
-            <i class="fas fa-chevron-down toggle-icon"></i> 
-        </div>
-        <div class="collapse show" id="addLectureFormCollapse">
-            <div class="card-body">
-                <form id="add-lecture-form" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <input type="hidden" name="add_lecture" value="1">
-                    <div class="row g-3">
-                        <div class="col-md-5">
-                            <div class="form-floating">
-                                <input type="text" id="{{ lecture_form.title.id_for_label }}" name="title" class="form-control" value="{{ lecture_form.title.value|default:'' }}" required>
-                                <label class="form-label" for="{{ lecture_form.title.id_for_label }}" data-translate="title">Title</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-floating">
-                                <input type="number" id="{{ lecture_form.duration.id_for_label }}" name="duration" class="form-control" value="{{ lecture_form.duration.value|default:60 }}" max="300" min="10" required>
-                                <label class="form-label" for="{{ lecture_form.duration.id_for_label }}" data-translate="duration">Duration (minutes)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating">
-                                <select id="{{ lecture_form.schedule.id_for_label }}" name="schedule" class="form-select" required>
-                                    {% for value, label in lecture_form.schedule.field.choices %}
-                                        <option value="{{ value }}" {% if lecture_form.schedule.value == value %}selected{% endif %}>{{ label }}</option>
-                                    {% endfor %}
-                                </select>
-                                <label class="form-label" for="{{ lecture_form.schedule.id_for_label }}" data-translate="schedule">Schedule</label>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-floating">
-                                <textarea id="{{ lecture_form.description.id_for_label }}" name="description" class="form-control" rows="3" required>{{ lecture_form.description.value|default:'' }}</textarea>
-                                <label class="form-label" for="{{ lecture_form.description.id_for_label }}" data-translate="description">Description</label>
-                            </div>
-                        </div>
-                        <div class="col-12 text-end">
-                            <button type="submit" id="add-lecture-button" class="btn btn-primary btn-block btn-rounded">
-                                <span id="button-text" data-translate="add_lecture">Add Lecture</span>
-                                <div id="loading-spinner" class="spinner-border spinner-border-sm d-none" role="status">
-                                    <span class="visually-hidden" data-translate="loading">Loading...</span>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Lectures List with MDB Accordion -->
-    {% if lectures_with_files %}
-
-    
-    <div class="accordion lecture-accordion" id="lecturesAccordion">
-        {% for lecture_data in lectures_with_files %}
-        <div class="accordion-item lecture-item shadow-sm mb-3 border rounded-1 {% if lecture_data.lecture.is_finished %}finished-lecture{% else %}active-lecture{% endif %}" data-lecture-id="{{ lecture_data.lecture.id }}">
-            <h2 class="accordion-header" id="heading{{ forloop.counter }}">
-                <button
-                    class="accordion-button collapsed fw-medium"
-                    type="button"
-                    data-mdb-collapse-init {# MDB Attribute #}
-                    data-mdb-toggle="collapse"
-                    data-mdb-target="#collapse{{ forloop.counter }}"
-                    aria-expanded="false"
-                    aria-controls="collapse{{ forloop.counter }}"
-                >
-                    <i class="fas fa-book-reader me-2 text-primary fa-fw"></i>
-                    <span class="me-auto" data-translate="lecture_title">{{ lecture_data.lecture.title }}</span> {# Pushes badge right #}
-    
+    <!-- Sidebar with Vertical Tabs -->
+    <div class="sidebar" id="sidebar">
+        <ul class="nav nav-tabs flex-column" id="lectureTabs">
+            <!-- Shared Resources Tab -->
+            <li class="nav-item">
+                <a class="nav-link section-tab {% if not lectures_with_files %}active{% endif %}"
+                   href="#shared-resources"
+                   role="tab"
+                   aria-label="Shared Resources">
+                    <i class="fas fa-share-alt me-2"></i>
+                    <span data-translate="shared_resources">Shared Resources</span>
+                </a>
+            </li>
+            <!-- Add Lecture Tab (Teacher Only) -->
+            {% if user_role == 'teacher' %}
+            <li class="nav-item">
+                <a class="nav-link section-tab"
+                   href="#add-lecture"
+                   role="tab"
+                   aria-label="Add Lecture">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    <span data-translate="add_lecture">Add Lecture</span>
+                </a>
+            </li>
+            {% endif %}
+            <!-- Separator -->
+            <li class="nav-item">
+                <hr class="my-2 mx-3" style="border-color: var(--border-color);">
+            </li>
+            <!-- Lecture Tabs -->
+            {% for lecture_data in lectures_with_files %}
+            <li class="nav-item">
+                <a class="nav-link {% if forloop.first and lectures_with_files %}active{% endif %} {% if lecture_data.lecture.is_finished %}finished{% endif %}"
+                   href="#lecture-{{ lecture_data.lecture.id }}"
+                   data-lecture-id="{{ lecture_data.lecture.id }}"
+                   role="tab"
+                   aria-label="{{ lecture_data.lecture.title }}">
+                    <i class="fas fa-book-reader me-2"></i>
+                    {{ lecture_data.lecture.title|truncatechars:20 }}
                     {% if lecture_data.lecture.is_finished %}
-                        <span class="badge rounded-pill bg-secondary ms-2" data-translate="finished">Finished</span>
+                        <span class="badge rounded-pill" data-translate="finished">Finished</span>
                     {% endif %}
-                </button>
-            </h2>
-            <div
-                id="collapse{{ forloop.counter }}"
-                class="accordion-collapse collapse"
-                aria-labelledby="heading{{ forloop.counter }}"
-                data-mdb-parent="#lecturesAccordion"
-            >
-                <div class="accordion-body p-lg-4 p-3"> {# Responsive Padding #}
-                    <span class="text-muted lecture-description fw-bold" data-translate="lecture_description">
-                       
-                    </span>
-                    <span class="text-muted  lecture-description ms-3" >
-                        {{ lecture_data.lecture.description|default:"No description provided." }}
-                    </span>
-                    
-    
-                    {# Responsive Row for Date & Live Link #}
-                    <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center mb-4 gap-3 border-bottom pb-3">
-                        <div class="date-info text-muted small" >
-                            <i class="far fa-calendar-alt me-1 fa-fw"></i>
-                            <strong data-translate="created">Created:</strong>
-                            
-                            {{ lecture_data.lecture.created }} 
-                        </div>
-    
-                        {% if lecture_data.lecture.live_link and not lecture_data.lecture.is_finished %}
-                        <div class="live-session text-sm-end mt-2 mt-sm-0"> {# Align right on small+ screens #}
-                            <a href="{{ lecture_data.lecture.live_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary px-3 rounded-pill" data-mdb-ripple-init> {# MDB Ripple #}
-                                <i class="fas fa-video me-1"></i>
-                                <span data-translate="join_live_session">Join Live Session</span>
-                            </a>
-                        </div>
-                        {% endif %}
-                    </div>
-    
-                    <!-- Files Section -->
-                    <div class="lecture-files mt-3">
-                        <h6 class="mb-3 text-muted fw-bold text-uppercase small" data-translate="files">
-                            <i class="fas fa-paperclip me-2 fa-fw"></i> <span>Files</span>
-                        </h6>
-                        
-                        <ul class="list-unstyled mb-0" id="file-list-{{ lecture_data.lecture.id }}">
-                            {% for file in lecture_data.files %}
-                            <li class="d-flex align-items-center p-2 mb-2 file-list-item rounded-1 position-relative" data-file-id="{{ file.id }}" id="file-item-{{ file.id }}">
-                                <div class="file-icon-wrapper rounded-circle d-flex align-items-center justify-content-center me-3">
-                                    <i class="far fa-file-alt text-secondary fs-5"></i>
-                                </div>
-                                <div class="file-info flex-grow-1">
-                                    <a href="{{ file.file.url }}" target="_blank" rel="noopener noreferrer" class="text-dark fw-medium stretched-link text-decoration-none">
-                                        {{ file.file.name|split:"/"|last }}
-                                    </a>
-                                </div>
-                                {% if user_role == 'teacher' %}
-                                    <button class="btn btn-outline-danger btn-sm delete-file-btn ms-2 flex-shrink-0 position-relative z-index-1 rounded-circle p-0" style="width: 30px; height: 30px; z-index:1050;" data-file-id="{{ file.id }}" title="Delete file" data-mdb-ripple-init data-mdb-ripple-color="dark">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                {% endif %}
-                            </li>
-                            {% endfor %}
-                            
-                            {% if not lecture_data.files %}
-                            <li id="no-files-message">
-                                <p class="text-muted small fst-italic" data-translate="no_files">No files uploaded yet.</p>
-                            </li>
-                            {% endif %}
-                        </ul>
+                </a>
+            </li>
+            {% empty %}
+            <li class="nav-item" {% if lectures_with_files %}style="display:none;"{% endif %}> {# Hide if there are lectures, show if no lectures #}
+                <span class="nav-link disabled" data-translate="no_lectures">No Lectures Available</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
 
-                        <!-- Add File Form (Teacher Only) -->
-                        {% if user_role == 'teacher' %}
-                        <form class="mt-3 file-upload-form" data-lecture-id="{{ lecture_data.lecture.id }}" method="POST" action="." enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <div class="input-group input-group-sm">
-                                <input type="file" name="file" class="form-control" multiple aria-label="Upload file" required>
-                                <button type="submit" class="btn btn-outline-primary upload-button" data-mdb-ripple-init>
-                                    <i class="fas fa-upload me-1"></i> <span data-translate="upload_files">Upload</span>
-                                </button>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Assignments Report Button -->
+        <div class="text-end mb-4">
+            {% if request.user.role == "teacher" %}
+            <a href="{% url 'assignment:studygroup_grades' study_group.id %}" class="btn btn-sm btn-secondary text-light btn-rounded" data-translate="assignment_report">Assignments Report</a>
+            {% else %}
+            <a href="{% url 'assignment:student_grades' study_group.id request.user.id %}" class="btn btn-sm btn-secondary text-light btn-rounded" data-translate="assignment_report">Assignments Report</a>
+            {% endif %}
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="lectureTabContent">
+            <!-- Shared Resources Content -->
+            <div class="tab-pane {% if not lectures_with_files %}active{% endif %}" id="shared-resources" role="tabpanel">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h5 class="content-card-title" data-translate="shared_resources">Shared Resources</h5>
+                    </div>
+                    <div class="content-card-body">
+                        {% if shared_resources %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th data-translate="resource">Resource</th>
+                                            <th data-translate="course">Course</th>
+                                            <th data-translate="shared_by">Shared By</th>
+                                            <th data-translate="actions">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for resource in shared_resources %}
+                                            <tr>
+                                                <td>
+                                                    <i class="fas fa-file me-2"></i>
+                                                    {{ resource.resource.file.name|slice:"courseslibraries/:" }}
+                                                </td>
+                                                <td>{{ resource.resource.course.name }}</td>
+                                                <td>{{ resource.shared_by.username }}</td>
+                                                <td>
+                                                    <a href="{{ resource.resource.file.url }}"
+                                                       class="btn btn-sm btn-primary btn-rounded"
+                                                       target="_blank"
+                                                       >
+                                                        <i class="fas fa-download"></i> 
+                                                    </a>
+                                                    {% if user_role == 'teacher' and resource.shared_by == request.user %}
+                                                        <button class="btn btn-sm btn-danger btn-rounded delete-resource-btn"
+                                                                data-resource-id="{{ resource.id }}"
+                                                                >
+                                                            <i class="fas fa-trash"></i> 
+                                                        </button>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="spinner-container" style="display: none;">
-                                <div class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                                <span>Wait, file is uploading...</span>
+                        {% else %}
+                            <div class="alert alert-info mb-0" data-translate="no_shared_resources">
+                                <i class="fas fa-info-circle me-2"></i>
+                                No resources have been shared with this study group yet.
                             </div>
-                        </form>
-                        
                         {% endif %}
                     </div>
-    
-                    <!-- Actions Section -->
-                    <div class="lecture-actions mt-4 pt-3 border-top">
-                        <div class="btn-group-actions"> {# Custom class for flex wrap defined in CSS #}
-                            {% if user_role == 'teacher' %}
-                                <button class="btn btn-sm btn-warning edit-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-mdb-ripple-init data-translate="edit">Edit</button>
-                                <button class="btn btn-sm btn-secondary reschedule-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-mdb-ripple-init data-translate="reschedule">Reschedule</button>
-                                {% if not lecture_data.lecture.is_finished %}
-                                <button class="btn btn-sm btn-success mark-finished-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-mdb-ripple-init data-translate="mark_as_finished">Mark Finished</button>
-                                {% endif %}
-                                <a class="btn btn-sm btn-dark" href="{% url 'assignment:lecture_assignments' lecture_data.lecture.id %}" data-mdb-ripple-init data-translate="assignments">Assignments</a>
-                                <!-- Note Button Trigger -->
-                                <button type="button" class="btn btn-sm {% if lecture_data.note %}btn-info{% else %}btn-info{% endif %}" data-mdb-toggle="modal" data-mdb-target="#noteModal{{ lecture_data.lecture.id }}" data-mdb-ripple-init>
-                                    <i class="far fa-comment-alt me-1"></i> <span data-translate="add_note">Feedback</span> {% if lecture_data.note %}<span class="badge bg-success rounded-pill ms-1 p-1"></span>{% endif %}
-                                </button>
-                                <button class="btn btn-sm btn-danger delete-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-mdb-ripple-init data-translate="delete">Delete</button>
-    
-                            {% elif user_role == 'student' %}
-                                <a class="btn btn-sm btn-dark" href="{% url 'assignment:student_assignment_list' lecture_data.lecture.id %}" data-mdb-ripple-init data-translate="view_assignments">View Assignments</a>
-                                <!-- Note Button Trigger -->
-                                <button type="button" class="btn btn-sm {% if lecture_data.note %}btn-info{% else %}btn-info{% endif %}" data-mdb-toggle="modal" data-mdb-target="#noteModal{{ lecture_data.lecture.id }}" data-mdb-ripple-init>
-                                    <i class="far fa-comment-alt me-1"></i> <span data-translate="add_note_and_rating">Add Note & Rating</span> {% if lecture_data.note %}<span class="badge bg-success rounded-pill ms-1 p-1" title="Note added"></span>{% endif %}
-                                </button>
-                            {% endif %}
-                        </div>
-                    </div>
-    
-                </div> {# End accordion-body #}
-            </div> {# End accordion-collapse #}
-        </div> {# End accordion-item #}
-    
-        <!-- Note Modal -->
-        <div class="modal fade" id="noteModal{{ lecture_data.lecture.id }}" tabindex="-1" aria-labelledby="noteModalLabel{{ lecture_data.lecture.id }}" aria-hidden="true" data-mdb-backdrop="static" data-mdb-keyboard="false">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <form method="POST" action="{% url 'accounts:add_lecture_note' lecture_data.lecture.id %}" id="noteForm{{ lecture_data.lecture.id }}">
-                        {% csrf_token %}
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="noteModalLabel{{ lecture_data.lecture.id }}" data-translate="lecture_feedback">
-                                <i class="far fa-comment-dots me-2"></i>Lecture Feedback
-                            </h5>
-                            <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label for="note{{ lecture_data.lecture.id }}" class="form-label small text-muted" data-translate="your_note">Your Note:</label>
-                                <textarea class="form-control" id="note{{ lecture_data.lecture.id }}" name="note" rows="4" required></textarea>
-                            </div>
-    
-                            {% if user_role == 'student' %}
-                            <div class="mb-3">
-                                <label for="rating{{ lecture_data.lecture.id }}" class="form-label small text-muted" data-translate="your_rating">Your Rating:</label>
-                                <select class="form-select modal-rating-select" id="rating{{ lecture_data.lecture.id }}" name="rating" required>
-                                    <option value="" disabled selected data-translate="select_rating">Select rating...</option>
-                                    <option value="1">⭐ (Poor)</option>
-                                    <option value="2">⭐⭐</option>
-                                    <option value="3">⭐⭐⭐ (Average)</option>
-                                    <option value="4">⭐⭐⭐⭐</option>
-                                    <option value="5">⭐⭐⭐⭐⭐ (Excellent)</option>
-                                </select>
-                            </div>
-                            {% endif %}
-    
-                            {% if user_role == 'teacher' %}
-                            <div class="mb-3">
-                                <label for="lecture_status{{ lecture_data.lecture.id }}" class="form-label small text-muted" data-translate="lecture_status">Lecture Status:</label>
-                                <select class="form-select" id="lecture_status{{ lecture_data.lecture.id }}" name="lecture_status" required>
-                                    <option value="completed" data-translate="completed">Completed Successfully</option>
-                                    <option value="student_delayed" data-translate="student_delayed">Delayed by Student</option>
-                                    <option value="teacher_delayed" data-translate="teacher_delayed">Delayed by Teacher</option>
-                                </select>
-                            </div>
-    
-                            {# JS Toggled field #}
-                            <div class="mb-3" id="delayReasonContainer{{ lecture_data.lecture.id }}" style="display: none;">
-                                <label for="delay_reason{{ lecture_data.lecture.id }}" class="form-label small text-muted" data-translate="delay_reason">Reason for Delay:</label>
-                                <textarea class="form-control" id="delay_reason{{ lecture_data.lecture.id }}" name="delay_reason" rows="2"></textarea>
-                            </div>
-                            {% endif %}
-                        </div>
-                        <div class="modal-footer justify-content-between">
-                            <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal" data-mdb-ripple-init data-translate="cancel">Cancel</button>
-                            <button type="submit" class="btn btn-primary" data-mdb-ripple-init data-translate="submit_feedback">Submit Feedback</button>
-                        </div>
-                    </form> {# End Form #}
                 </div>
             </div>
-        </div>
-    
-        {# JS for teacher's modal delay reason (remains the same logic) #}
-        {% if user_role == 'teacher' %}
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const modalElement = document.getElementById('noteModal{{ lecture_data.lecture.id }}');
-                if (modalElement) {
-                    const statusSelect = modalElement.querySelector('#lecture_status{{ lecture_data.lecture.id }}');
-                    const reasonContainer = modalElement.querySelector('#delayReasonContainer{{ lecture_data.lecture.id }}');
-                    const reasonTextarea = modalElement.querySelector('#delay_reason{{ lecture_data.lecture.id }}');
-                    if (statusSelect && reasonContainer && reasonTextarea) {
-                        const toggleReason = () => {
-                            const isDelayed = statusSelect.value === 'student_delayed' || statusSelect.value === 'teacher_delayed';
-                            reasonContainer.style.display = isDelayed ? 'block' : 'none';
-                            reasonTextarea.required = isDelayed;
-                            if (!isDelayed) {
-                                reasonTextarea.value = '';
-                            }
-                        };
-                        statusSelect.addEventListener('change', toggleReason);
-                        toggleReason(); // Initial check
-                    }
-                }
-            });
-        </script>
-        {% endif %}
-    
-        {% empty %}
-            <div class="alert alert-secondary text-center" role="alert" data-translate="no_lectures">
-                <i class="fas fa-info-circle me-2"></i> There are no lectures scheduled for this course yet.
+
+            <!-- Add Lecture Content (Teacher Only) -->
+            {% if user_role == 'teacher' %}
+            <div class="tab-pane" id="add-lecture" role="tabpanel">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h5 class="content-card-title" data-translate="add_lecture">Add New Lecture</h5>
+                    </div>
+                    <div class="content-card-body">
+                        <form id="add-lecture-form" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="add_lecture" value="1">
+                            <div class="row g-3">
+                                <div class="col-md-5">
+                                    <div class="form-floating">
+                                        <input type="text" id="{{ lecture_form.title.id_for_label }}" name="title" class="form-control" value="{{ lecture_form.title.value|default:'' }}" required>
+                                        <label class="form-label" for="{{ lecture_form.title.id_for_label }}" data-translate="title">Title</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <input type="number" id="{{ lecture_form.duration.id_for_label }}" name="duration" class="form-control" value="{{ lecture_form.duration.value|default:60 }}" max="300" min="10" required>
+                                        <label class="form-label" for="{{ lecture_form.duration.id_for_label }}" data-translate="duration">Duration (minutes)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <select id="{{ lecture_form.schedule.id_for_label }}" name="schedule" class="form-select" required>
+                                            {% for value, label in lecture_form.schedule.field.choices %}
+                                                <option value="{{ value }}" {% if lecture_form.schedule.value == value %}selected{% endif %}>{{ label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="form-label" for="{{ lecture_form.schedule.id_for_label }}" data-translate="schedule">Schedule</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-floating">
+                                        <textarea id="{{ lecture_form.description.id_for_label }}" name="description" class="form-control" rows="3" required>{{ lecture_form.description.value|default:'' }}</textarea>
+                                        <label class="form-label" for="{{ lecture_form.description.id_for_label }}" data-translate="description">Description</label>
+                                    </div>
+                                </div>
+                                <div class="col-12 text-end">
+                                    <button type="submit" id="add-lecture-button" class="btn btn-primary btn-rounded">
+                                        <span id="button-text" data-translate="add_lecture">Add Lecture</span>
+                                        <div id="loading-spinner" class="spinner-border spinner-border-sm d-none" role="status">
+                                            <span class="visually-hidden" data-translate="loading">Loading...</span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-        {% endfor %}
-    </div>
-    
-    <!-- Make sure MDB JS is loaded in your base template for data-mdb-* attributes to work -->
-    {% else %}
-        <div class="alert alert-light alert-dismissible fade show text-center mt-4">
-            <i class="fas fa-info-circle me-2"></i>
-            <p class="mb-0" data-translate="no_lectures">No lectures available for this study group yet.</p>
-            <button type="button" class="btn-close" data-mdb-dismiss="alert" aria-label="Close"></button>
+            {% endif %}
+
+            <!-- Lecture Contents -->
+            {% for lecture_data in lectures_with_files %}
+            <div class="tab-pane {% if forloop.first and lectures_with_files %}active{% endif %}" id="lecture-{{ lecture_data.lecture.id }}" role="tabpanel">
+                <div class="content-card">
+                    <div class="content-card-header d-flex justify-content-between align-items-center">
+                        <h5 class="content-card-title">
+                            {{ lecture_data.lecture.title }}
+                            {% if lecture_data.lecture.is_finished %}
+                                <span class="badge bg-secondary rounded-pill ms-2" data-translate="finished">Finished</span>
+                            {% endif %}
+                        </h5>
+                        {% if lecture_data.lecture.live_link and not lecture_data.lecture.is_finished %}
+                            <a href="{{ lecture_data.lecture.live_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary btn-rounded">
+                                <i class="fas fa-video me-1"></i>
+                                <span data-translate="join_live_session">Join Live</span>
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div class="content-card-body">
+                        <!-- Description -->
+                        <p class="text-muted mb-3">
+                            <strong data-translate="lecture_description">Description:</strong>
+                            {{ lecture_data.lecture.description|default:"No description provided." }}
+                        </p>
+                        <!-- Created Date -->
+                        <p class="text-muted small mb-4">
+                            <i class="far fa-calendar-alt me-1"></i>
+                            <strong data-translate="created">Created:</strong>
+                            {{ lecture_data.lecture.created }}
+                        </p>
+                        <!-- Files Section -->
+                        <div class="lecture-files mb-4">
+                            <h6 class="text-muted fw-bold text-uppercase small mb-3" data-translate="files">
+                                <i class="fas fa-paperclip me-2"></i> Files
+                            </h6>
+                            <ul class="list-unstyled mb-0" id="file-list-{{ lecture_data.lecture.id }}">
+                                {% for file in lecture_data.files %}
+                                <li class="file-list-item d-flex align-items-center" data-file-id="{{ file.id }}" id="file-item-{{ file.id }}">
+                                    <div class="file-icon-wrapper">
+                                        <i class="far fa-file-alt text-secondary fs-6"></i>
+                                    </div>
+                                    <div class="file-info flex-grow-1">
+                                        <a href="{{ file.file.url }}" target="_blank" rel="noopener noreferrer" class="text-dark text-decoration-none">
+                                            {{ file.file.name|split:"/"|last }}
+                                        </a>
+                                    </div>
+                                    {% if user_role == 'teacher' %}
+                                        <button class="btn btn-outline-danger btn-sm delete-file-btn ms-2" data-file-id="{{ file.id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                                {% if not lecture_data.files %}
+                                <li id="no-files-message-{{ lecture_data.lecture.id }}"> {# Unique ID per lecture #}
+                                    <p class="text-muted small fst-italic" data-translate="no_files">No files uploaded yet.</p>
+                                </li>
+                                {% endif %}
+                            </ul>
+                            <!-- Add File Form (Teacher Only) -->
+                            {% if user_role == 'teacher' %}
+                            <form class="mt-3 file-upload-form" data-lecture-id="{{ lecture_data.lecture.id }}" method="POST" action="." enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="input-group input-group-sm">
+                                    <input type="file" name="file" class="form-control" multiple aria-label="Upload file" required>
+                                    <button type="submit" class="btn btn-outline-primary upload-button">
+                                        <i class="fas fa-upload me-1"></i> <span data-translate="upload_files">Upload</span>
+                                    </button>
+                                </div>
+                                <div class="spinner-container d-none mt-2">
+                                    <div class="spinner-border spinner-border-sm" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <span class="ms-2">Uploading...</span>
+                                </div>
+                            </form>
+                            {% endif %}
+                        </div>
+                        <!-- Actions Section -->
+                        <div class="lecture-actions">
+                            <div class="btn-group-actions">
+                                {% if user_role == 'teacher' %}
+                                    <button class="btn btn-sm btn-warning edit-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="edit">Edit</button>
+                                    <button class="btn btn-sm btn-secondary reschedule-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="reschedule">Reschedule</button>
+                                    {% if not lecture_data.lecture.is_finished %}
+                                    <button class="btn btn-sm btn-success mark-finished-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="mark_as_finished">Mark Finished</button>
+                                    {% endif %}
+                                    <a class="btn btn-sm btn-dark btn-rounded" href="{% url 'assignment:lecture_assignments' lecture_data.lecture.id %}" data-translate="assignments">Assignments</a>
+                                    {% if not lecture_data.note %}
+                                    <button type="button" class="btn btn-sm btn-info" data-mdb-toggle="modal" data-mdb-target="#noteModal{{ lecture_data.lecture.id }}">
+                                        <i class="far fa-comment-alt me-1"></i> <span data-translate="add_note">Feedback</span>
+                                        
+                                    </button>
+                                    {% endif %}
+                                    <button class="btn btn-sm btn-danger btn-rounded delete-lecture-btn" data-lecture-id="{{ lecture_data.lecture.id }}" data-translate="delete">Delete</button>
+                                {% elif user_role == 'student' %}
+                                    <a class="btn btn-sm btn-dark btn-rounded" href="{% url 'assignment:student_assignment_list' lecture_data.lecture.id %}" data-translate="view_assignments">View Assignments</a>
+                                    <button type="button" class="btn btn-sm btn-info btn-rounded" data-mdb-toggle="modal" data-mdb-target="#noteModal{{ lecture_data.lecture.id }}">
+                                        <i class="far fa-comment-alt me-1"></i> <span data-translate="add_note_and_rating">Add Note & Rating</span>
+                                        
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Note Modal -->
+                <div class="modal fade" id="noteModal{{ lecture_data.lecture.id }}" tabindex="-1" aria-labelledby="noteModalLabel{{ lecture_data.lecture.id }}" aria-hidden="true" data-mdb-backdrop="static" data-mdb-keyboard="false">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <form method="POST" action="{% url 'accounts:add_lecture_note' lecture_data.lecture.id %}" id="noteForm{{ lecture_data.lecture.id }}">
+                                {% csrf_token %}
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="noteModalLabel{{ lecture_data.lecture.id }}" data-translate="lecture_feedback">
+                                        <i class="far fa-comment-dots me-2"></i>Lecture Feedback
+                                    </h5>
+                                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label for="note{{ lecture_data.lecture.id }}" class="form-label small text-muted" data-translate="your_note">Your Note:</label>
+                                        <textarea class="form-control" id="note{{ lecture_data.lecture.id }}" name="note" rows="4" required></textarea>
+                                    </div>
+                                    {% if user_role == 'student' %}
+                                    <div class="mb-3">
+                                        <label for="rating{{ lecture_data.lecture.id }}" class="form-label small text-muted" data-translate="your_rating">Your Rating:</label>
+                                        <select class="form-select" id="rating{{ lecture_data.lecture.id }}" name="rating" required>
+                                            <option value="" disabled selected data-translate="select_rating">Select rating...</option>
+                                            <option value="1">⭐ (Poor)</option>
+                                            <option value="2">⭐⭐</option>
+                                            <option value="3">⭐⭐⭐ (Average)</option>
+                                            <option value="4">⭐⭐⭐⭐</option>
+                                            <option value="5">⭐⭐⭐⭐⭐ (Excellent)</option>
+                                        </select>
+                                    </div>
+                                    {% endif %}
+                                    {% if user_role == 'teacher' %}
+                                    <div class="mb-3">
+                                        <label for="lecture_status{{ lecture_data.lecture.id }}" class="form-label small text-muted" data-translate="lecture_status">Lecture Status:</label>
+                                        <select class="form-select" id="lecture_status{{ lecture_data.lecture.id }}" name="lecture_status" required>
+                                            <option value="completed" data-translate="completed">Completed Successfully</option>
+                                            <option value="student_delayed" data-translate="student_delayed">Delayed by Student</option>
+                                            <option value="teacher_delayed" data-translate="teacher_delayed">Delayed by Teacher</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3" id="delayReasonContainer{{ lecture_data.lecture.id }}" style="display: none;">
+                                        <label for="delay_reason{{ lecture_data.lecture.id }}" class="form-label small text-muted" data-translate="delay_reason">Reason for Delay:</label>
+                                        <textarea class="form-control" id="delay_reason{{ lecture_data.lecture.id }}" name="delay_reason" rows="2"></textarea>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="modal-footer justify-content-between">
+                                    <button type="button" class="btn btn-secondary btn-rounded" data-mdb-dismiss="modal" data-translate="cancel">Cancel</button>
+                                    <button type="submit" class="btn btn-primary btn-rounded" data-translate="submit_feedback">Submit Feedback</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% if user_role == 'teacher' %}
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const modalElement = document.getElementById('noteModal{{ lecture_data.lecture.id }}');
+                        if (modalElement) {
+                            const statusSelect = modalElement.querySelector('#lecture_status{{ lecture_data.lecture.id }}');
+                            const reasonContainer = modalElement.querySelector('#delayReasonContainer{{ lecture_data.lecture.id }}');
+                            const reasonTextarea = modalElement.querySelector('#delay_reason{{ lecture_data.lecture.id }}');
+                            if (statusSelect && reasonContainer && reasonTextarea) {
+                                const toggleReason = () => {
+                                    const isDelayed = statusSelect.value === 'student_delayed' || statusSelect.value === 'teacher_delayed';
+                                    reasonContainer.style.display = isDelayed ? 'block' : 'none';
+                                    reasonTextarea.required = isDelayed;
+                                    if (!isDelayed) reasonTextarea.value = '';
+                                };
+                                statusSelect.addEventListener('change', toggleReason);
+                                toggleReason(); // Call on load
+                            }
+                        }
+                    });
+                </script>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <!-- Fallback Content -->
+            {% if not lectures_with_files and not debates and not user_role == 'teacher' and not shared_resources %}
+            <div class="tab-pane active" id="no-content" role="tabpanel">
+                <div class="content-card">
+                    <div class="content-card-body">
+                        <div class="alert alert-secondary text-center" role="alert" data-translate="no_lectures">
+                            <i class="fas fa-info-circle me-2"></i> There are no lectures or resources available for this study group yet.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
-    {% endif %}
-    
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-wrapper position-fixed top-0 end-0 p-3" style="z-index: 1055;" id="toast-container"></div>
 </div>
 
-
-<!-- Toast Container -->
-<div class="toast-wrapper position-fixed top-0 end-0 p-3" style="z-index: 1055;" id="toast-container"></div>
-
-<!-- Add some JavaScript to handle the toggle icon rotation -->
+<!-- Consolidated JavaScript -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Handle Shared Resources toggle
-        const sharedResourcesHeader = document.querySelector('.card-header[data-mdb-target="#sharedResourcesCollapse"]');
-        if (sharedResourcesHeader) {
-            sharedResourcesHeader.addEventListener('click', function() {
-                const icon = this.querySelector('.toggle-icon');
-                icon.classList.toggle('fa-chevron-down');
-                icon.classList.toggle('fa-chevron-up');
-            });
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded. Initializing sidebar, tabs, and dynamic actions.');
+
+    // Sidebar Toggle
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const mainContent = document.getElementById('mainContent');
+    let isSidebarHidden = localStorage.getItem('sidebarHidden') === 'true';
+
+    const toggleSidebar = () => {
+        isSidebarHidden = !isSidebarHidden;
+        if (sidebar) sidebar.classList.toggle('hidden', isSidebarHidden);
+        if (sidebarToggle) sidebarToggle.classList.toggle('hidden', isSidebarHidden);
+        if (mainContent) mainContent.classList.toggle('full-width', isSidebarHidden);
+        if (sidebarToggle) sidebarToggle.innerHTML = `<i class="fas fa-${isSidebarHidden ? 'bars' : 'times'}"></i>`;
+        localStorage.setItem('sidebarHidden', isSidebarHidden);
+        console.log('Sidebar toggled. Hidden:', isSidebarHidden);
+    };
+
+    if (sidebar && sidebarToggle && mainContent) {
+        if (isSidebarHidden) {
+            sidebar.classList.add('hidden');
+            sidebarToggle.classList.add('hidden');
+            mainContent.classList.add('full-width');
+            sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        } else {
+            sidebar.classList.remove('hidden');
+            sidebarToggle.classList.remove('hidden');
+            mainContent.classList.remove('full-width');
+            sidebarToggle.innerHTML = '<i class="fas fa-times"></i>';
+        }
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        console.log('Sidebar initialized. Hidden:', isSidebarHidden);
+    }
+
+
+    // --- CORRECTED TAB NAVIGATION ---
+    const showTab = (targetId) => {
+        console.log('Attempting to show tab:', targetId);
+
+        const currentTabLinks = document.querySelectorAll('#lectureTabs .nav-link');
+        const currentTabPanes = document.querySelectorAll('#lectureTabContent .tab-pane');
+
+        currentTabLinks.forEach(link => link.classList.remove('active'));
+        currentTabPanes.forEach(pane => pane.classList.remove('active'));
+
+        const targetTabLink = Array.from(currentTabLinks).find(link => link.getAttribute('href') === `#${targetId}`);
+        if (targetTabLink) {
+            targetTabLink.classList.add('active');
+            console.log('Activated tab link:', targetTabLink.textContent.trim());
+        } else {
+            console.warn('No tab link found for target:', targetId, 'among current links:', currentTabLinks);
         }
 
-        // Handle Add Lecture Form toggle (if it exists)
-        const addLectureHeader = document.querySelector('.card-header[data-mdb-target="#addLectureFormCollapse"]');
-        if (addLectureHeader) {
-            addLectureHeader.addEventListener('click', function() {
-                const icon = this.querySelector('.toggle-icon');
-                icon.classList.toggle('fa-chevron-down');
-                icon.classList.toggle('fa-chevron-up');
-            });
+        const targetTabPane = document.getElementById(targetId);
+        if (targetTabPane) {
+            targetTabPane.classList.add('active');
+            console.log('Activated tab pane:', targetId);
+        } else {
+            console.error('No tab pane found for ID:', targetId);
         }
-    });
-</script>
+    };
+
+    const lectureTabsContainer = document.getElementById('lectureTabs');
+    if (lectureTabsContainer) {
+        lectureTabsContainer.addEventListener('click', function(e) {
+            const clickedTabLink = e.target.closest('.nav-link');
+            
+            if (clickedTabLink && this.contains(clickedTabLink)) {
+                const href = clickedTabLink.getAttribute('href');
+                if (href && href.startsWith('#')) {
+                    e.preventDefault();
+                    const targetId = href.substring(1);
+                    console.log('Tab clicked (delegated):', targetId);
+                    showTab(targetId);
+                } else if (href && href !== "#" && !href.startsWith('javascript:')) {
+                    // Allow normal navigation for non-hash, non-js links
+                } else {
+                    e.preventDefault(); 
+                    console.warn('Clicked .nav-link has an invalid or non-tab href:', clickedTabLink);
+                }
+            }
+        });
+    } else {
+        console.error('#lectureTabs container not found for event delegation.');
+    }
+
+    const initiallyActiveTabLink = document.querySelector('#lectureTabs .nav-link.active');
+    if (initiallyActiveTabLink) {
+        const href = initiallyActiveTabLink.getAttribute('href');
+        if (href && href.startsWith('#')) {
+            const targetId = href.substring(1);
+            console.log('Initial active tab found by class:', targetId);
+            showTab(targetId);
+        }
+    } else {
+        console.warn('No initial active tab found by class. Trying first available tab.');
+        const allTabsInContainer = document.querySelectorAll('#lectureTabs .nav-link');
+        if (allTabsInContainer.length > 0) {
+            const firstTabHref = allTabsInContainer[0].getAttribute('href');
+            if (firstTabHref && firstTabHref.startsWith('#')) {
+                const firstTabId = firstTabHref.substring(1);
+                console.log('Activating first available tab:', firstTabId);
+                showTab(firstTabId);
+            } else {
+                 console.error('First available tab has no valid href for tab functionality.', allTabsInContainer[0]);
+            }
+        } else {
+            console.warn('No tabs found at all in #lectureTabs for initial activation.');
+        }
+    }
+    // --- END OF CORRECTED TAB NAVIGATION ---
 
 
-
-<!-- JavaScript for Dynamic Actions -->
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Initialize MDB Collapse
+    // Initialize MDB Components (only for collapse, modals are handled by data-mdb-toggle)
     const collapses = document.querySelectorAll('[data-mdb-collapse-init]');
     collapses.forEach(collapse => {
-        new mdb.Collapse(collapse, { toggle: false });
+        if (typeof mdb !== 'undefined' && mdb.Collapse) {
+            new mdb.Collapse(collapse, { toggle: false });
+        }
     });
+    
 
-    // Function to show toast
+    // Toast Function
     function showToast(message, type = 'success') {
         const toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            console.error('Toast container not found!');
+            alert(message); 
+            return;
+        }
         const toastClass = type === 'success' ? 'bg-success text-white' : 'bg-danger text-white';
         const iconClass = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
-
         const toastHtml = `
-            <div class="toast align-items-center ${toastClass} border-0 m-1" role="alert" aria-live="assertive" aria-atomic="true" style="max-width: 350px;">
+            <div class="toast align-items-center ${toastClass} border-0 m-1" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="d-flex">
                     <div class="toast-body">
                         <i class="${iconClass} me-2"></i> ${message}
@@ -514,192 +876,237 @@ document.addEventListener('DOMContentLoaded', function () {
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-mdb-dismiss="toast" aria-label="Close"></button>
                 </div>
             </div>`;
-
         toastContainer.insertAdjacentHTML('beforeend', toastHtml);
         const toastEl = toastContainer.lastElementChild;
-        const toastInstance = new mdb.Toast(toastEl, { autohide: true, delay: 5000 });
-        toastInstance.show();
 
-        toastEl.addEventListener('hidden.mdb.toast', function () {
-            toastEl.remove();
-        });
+        if (typeof mdb !== 'undefined' && mdb.Toast) { 
+            const toastInstance = new mdb.Toast(toastEl, { autohide: true, delay: 5000 });
+            toastInstance.show();
+            toastEl.addEventListener('hidden.mdb.toast', () => toastEl.remove());
+        } else if (typeof bootstrap !== 'undefined' && bootstrap.Toast) { 
+            const toastInstance = new bootstrap.Toast(toastEl, { autohide: true, delay: 5000 });
+            toastInstance.show();
+            toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+            const closeButton = toastEl.querySelector('[data-mdb-dismiss="toast"], [data-bs-dismiss="toast"]'); // MDB or BS
+            if(closeButton) {
+                closeButton.addEventListener('click', () => toastInstance.hide());
+            }
+        } else { 
+            console.warn("MDB or Bootstrap Toast component not found. Toast may not autohide or close correctly.");
+            setTimeout(() => { if (toastEl) toastEl.remove(); }, 5000);
+        }
     }
 
     // Add Lecture
     const addLectureForm = document.getElementById('add-lecture-form');
     const addLectureButton = document.getElementById('add-lecture-button');
-    const buttonText = document.getElementById('button-text');
-    const loadingSpinner = document.getElementById('loading-spinner');
+    
+    if (addLectureForm && addLectureButton) {
+        const buttonText = addLectureButton.querySelector('#button-text');
+        const loadingSpinner = addLectureButton.querySelector('#loading-spinner');
 
-    if (addLectureForm) {
         addLectureForm.addEventListener('submit', function (e) {
             e.preventDefault();
+            console.log('Adding lecture...');
             const formData = new FormData(this);
-
-            // Disable the button and show the spinner
             addLectureButton.disabled = true;
-            buttonText.classList.add('d-none');
-            loadingSpinner.classList.remove('d-none');
+            if(buttonText) buttonText.classList.add('d-none');
+            if(loadingSpinner) loadingSpinner.classList.remove('d-none');
 
             fetch(`{% url 'accounts:add_lecture' study_group_id=study_group.id %}`, {
                 method: 'POST',
                 body: formData,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Add lecture response status:', response.status);
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
-                    
-                    // Clear the form or update the UI as needed
                     addLectureForm.reset();
                     showToast(data.message, 'success');
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1000);
+                    setTimeout(() => location.reload(), 1000);
                 } else {
-                    showToast('Error: ' + data.message, 'error');
+                    showToast('Error adding lecture: ' + (data.message || 'Unknown error'), 'error');
                 }
             })
-            .catch(error => showToast('Error adding lecture: ' + error, 'error'))
+            .catch(error => {
+                console.error('Add lecture error:', error);
+                showToast('Error adding lecture: ' + error.message, 'error');
+            })
             .finally(() => {
-                // Re-enable the button and hide the spinner
                 addLectureButton.disabled = false;
-                buttonText.classList.remove('d-none');
-                loadingSpinner.classList.add('d-none');
+                if(buttonText) buttonText.classList.remove('d-none');
+                if(loadingSpinner) loadingSpinner.classList.add('d-none');
             });
         });
     }
-    
+
+
     // File Upload
     document.querySelectorAll('.file-upload-form').forEach(form => {
         form.addEventListener('submit', function (e) {
             e.preventDefault();
             const lectureId = this.getAttribute('data-lecture-id');
+            console.log('Uploading files for lecture:', lectureId);
+            if (!lectureId) {
+                showToast('Error: Lecture ID is missing', 'error');
+                return;
+            }
             const fileInput = this.querySelector('input[type="file"]');
             const formData = new FormData(this);
             const uploadButton = this.querySelector('.upload-button');
             const spinnerContainer = this.querySelector('.spinner-container');
 
-            // Show spinner and hide upload button
-            spinnerContainer.style.display = 'block';
-            uploadButton.style.display = 'none';
+            if (spinnerContainer) spinnerContainer.classList.remove('d-none');
+            if (uploadButton) uploadButton.style.display = 'none';
 
             fetch(`{% url 'accounts:add_lecture_files' lecture_id=0 %}`.replace('0', lectureId), {
                 method: 'POST',
                 body: formData,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('File upload response status:', response.status);
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     const fileList = document.getElementById(`file-list-${lectureId}`);
+                    if (fileList) {
+                        const noFilesMsg = fileList.querySelector(`#no-files-message-${lectureId}`);
+                        if (noFilesMsg) noFilesMsg.remove();
 
-                    // Remove "No files" message if it exists
-                    const noFilesMsg = fileList.querySelector('[data-translate="no_files"]');
-                    if (noFilesMsg) {
-                        noFilesMsg.remove();
+                        data.files.forEach(file => {
+                            const fileItem = `
+                                <li class="file-list-item d-flex align-items-center" data-file-id="${file.id}" id="file-item-${file.id}">
+                                    <div class="file-icon-wrapper">
+                                        <i class="far fa-file-alt text-secondary fs-6"></i>
+                                    </div>
+                                    <div class="file-info flex-grow-1">
+                                        <a href="${file.url}" target="_blank" rel="noopener noreferrer" class="text-dark text-decoration-none">
+                                            ${file.name}
+                                        </a>
+                                    </div>
+                                    {% if user_role == 'teacher' %}
+                                    <button class="btn btn-outline-danger btn-sm delete-file-btn ms-2" data-file-id="${file.id}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </li>`;
+                            fileList.insertAdjacentHTML('beforeend', fileItem);
+                        });
                     }
-
-                    data.files.forEach(file => {
-                        const fileItem = `
-                            <li class="d-flex align-items-center p-2 mb-2 file-list-item rounded-1 position-relative" data-file-id="${file.id}">
-                                <div class="file-icon-wrapper rounded-circle d-flex align-items-center justify-content-center me-3">
-                                    <i class="far fa-file-alt text-secondary fs-5"></i>
-                                </div>
-                                <div class="file-info flex-grow-1">
-                                    <a href="${file.url}" target="_blank" rel="noopener noreferrer" class="text-dark fw-medium stretched-link text-decoration-none">
-                                        ${file.name}
-                                    </a>
-                                </div>
-                                <button class="btn btn-outline-danger btn-sm delete-file-btn ms-2 flex-shrink-0 position-relative z-index-1 rounded-circle p-0" style="width: 30px; height: 30px; z-index:1050" data-file-id="${file.id}" title="Delete file">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </li>`;
-                        fileList.insertAdjacentHTML('beforeend', fileItem);
-                    });
-                    fileInput.value = '';
+                    if (fileInput) fileInput.value = ''; 
                     showToast(data.message, 'success');
                 } else {
-                    showToast('Error uploading files: ' + data.message, 'error');
+                    showToast('Error uploading files: ' + (data.message || 'Unknown error'), 'error');
                 }
-
-                // Hide spinner and show upload button
-                spinnerContainer.style.display = 'none';
-                uploadButton.style.display = 'block';
             })
             .catch(error => {
-                showToast('Error uploading files: ' + error, 'error');
-                // Hide spinner and show upload button
-                spinnerContainer.style.display = 'none';
-                uploadButton.style.display = 'block';
+                console.error('File upload error:', error);
+                showToast('Error uploading files: ' + error.message, 'error');
+            })
+            .finally(() => {
+                if (spinnerContainer) spinnerContainer.classList.add('d-none');
+                if (uploadButton) uploadButton.style.display = 'block';
             });
         });
     });
 
-
-    // Edit Lecture
+    // Edit Lecture (simplified, assuming reload on success)
     document.querySelectorAll('.edit-lecture-btn').forEach(btn => {
         btn.addEventListener('click', function () {
             const lectureId = this.getAttribute('data-lecture-id');
-            const accordionItem = this.closest('.lecture-item');
-            const title = accordionItem.querySelector('.accordion-button').textContent.trim().replace(/^.*?open me-2\}\s*/, '');
-            const description = accordionItem.querySelector('.lecture-description') ? accordionItem.querySelector('.lecture-description').textContent : '';
+            console.log('Editing lecture:', lectureId);
+            if (!lectureId) {
+                showToast('Error: Lecture ID is missing', 'error');
+                return;
+            }
+            const card = this.closest('.content-card');
+            if (!card) return;
+            const titleElement = card.querySelector('.content-card-title');
+            const title = titleElement ? titleElement.childNodes[0].textContent.trim() : '';
+            const descriptionElement = card.querySelector('.content-card-body p strong[data-translate="lecture_description"]');
+            const description = descriptionElement ? descriptionElement.parentElement.textContent.replace(descriptionElement.textContent, '').trim() : '';
 
             const formHtml = `
-                <form class="edit-lecture-form px-4 py-3" data-lecture-id="${lectureId}">
+                <form class="edit-lecture-form p-3" data-lecture-id="${lectureId}">
                     {% csrf_token %}
-                    <div class="form-outline mb-3">
-                        <input type="text" name="title" class="form-control" value="${title}" required>
+                    <div class="mb-3">
                         <label class="form-label">Title</label>
+                        <input type="text" name="title" class="form-control" value="${title}" required>
                     </div>
-                    <div class="form-outline mb-3">
-                        <textarea name="description" class="form-control" rows="3">${description}</textarea>
+                    <div class="mb-3">
                         <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="3">${description}</textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Save</button>
-                    <button type="button" class="btn btn-secondary cancel-edit">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-rounded">Save</button>
+                    <button type="button" class="btn btn-secondary btn-rounded cancel-edit">Cancel</button>
                 </form>`;
-            accordionItem.querySelector('.accordion-body').innerHTML = formHtml;
+            
+            const cardBody = card.querySelector('.content-card-body');
+            const originalBodyContent = cardBody.innerHTML; // Save to restore on cancel
+            cardBody.innerHTML = formHtml;
 
-            const editForm = accordionItem.querySelector('.edit-lecture-form');
+            // For MDB Floating Labels (if you use form-outline, they need reinitialization)
+            // cardBody.querySelectorAll('.form-outline').forEach((formOutline) => {
+            //   if (typeof mdb !== 'undefined' && mdb.Input) new mdb.Input(formOutline).init();
+            // });
+
+
+            const editForm = cardBody.querySelector('.edit-lecture-form');
             editForm.addEventListener('submit', function (e) {
                 e.preventDefault();
                 const formData = new FormData(this);
-                
-                // Log form data for debugging
-                for (let [key, value] of formData.entries()) {
-                    console.log(`${key}: ${value}`);
-                }
 
                 fetch(`{% url 'accounts:update_lecture' lecture_id=0 %}`.replace('0', lectureId), {
                     method: 'POST',
                     body: formData,
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Edit lecture response status:', response.status);
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
-                        location.reload();
                         showToast(data.message, 'success');
+                        setTimeout(() => location.reload(), 1000); // Reload to see changes
                     } else {
-                        showToast('Error: ' + data.message, 'error');
+                        showToast('Error updating lecture: ' + (data.message || 'Unknown error'), 'error');
+                        cardBody.innerHTML = originalBodyContent; // Restore on error
                     }
                 })
-                .catch(error => showToast('Error updating lecture: ' + error, 'error'));
+                .catch(error => {
+                    console.error('Edit lecture error:', error);
+                    showToast('Error updating lecture: ' + error.message, 'error');
+                    cardBody.innerHTML = originalBodyContent; // Restore on error
+                });
             });
 
-            editForm.querySelector('.cancel-edit').addEventListener('click', function () {
-                location.reload();
+            editForm.querySelector('.cancel-edit').addEventListener('click', () => {
+                cardBody.innerHTML = originalBodyContent; // Restore original content
+                // Re-attach original listeners if they were removed, or simply reload:
+                // location.reload(); // Simpler, but full page reload
             });
         });
     });
+
 
     // Delete Lecture
     document.querySelectorAll('.delete-lecture-btn').forEach(btn => {
         btn.addEventListener('click', function () {
             if (!confirm('Are you sure you want to delete this lecture?')) return;
             const lectureId = this.getAttribute('data-lecture-id');
-            const accordionItem = this.closest('.accordion-item');
+            console.log('Deleting lecture:', lectureId);
+            if (!lectureId) {
+                showToast('Error: Lecture ID is missing', 'error');
+                return;
+            }
+            const lecturePane = document.getElementById(`lecture-${lectureId}`);
+            const navLinkItem = document.querySelector(`#lectureTabs .nav-link[href="#lecture-${lectureId}"]`)?.parentElement;
 
             fetch(`{% url 'accounts:delete_lecture' lecture_id=0 %}`.replace('0', lectureId), {
                 method: 'POST',
@@ -708,25 +1115,69 @@ document.addEventListener('DOMContentLoaded', function () {
                     'X-CSRFToken': '{{ csrf_token }}'
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Delete lecture response status:', response.status);
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
-                    accordionItem.remove();
+                    if (lecturePane) lecturePane.remove();
+                    if (navLinkItem) navLinkItem.remove();
+                    
+                    const currentActiveLink = document.querySelector('#lectureTabs .nav-link.active');
+                    if (!currentActiveLink || currentActiveLink.getAttribute('href') === `#lecture-${lectureId}`) {
+                        const remainingLectureSpecificTabs = document.querySelectorAll('#lectureTabs .nav-link[data-lecture-id]');
+                        if (remainingLectureSpecificTabs.length > 0) {
+                            showTab(remainingLectureSpecificTabs[0].getAttribute('href').substring(1));
+                        } else {
+                            const sharedResourcesTabLink = document.querySelector('#lectureTabs .nav-link[href="#shared-resources"]');
+                            if (sharedResourcesTabLink) {
+                                showTab('shared-resources');
+                            } else {
+                                const addLectureTabLink = document.querySelector('#lectureTabs .nav-link[href="#add-lecture"]');
+                                if (addLectureTabLink) {
+                                    showTab('add-lecture');
+                                } else {
+                                     console.warn("No suitable tab to activate after deletion.");
+                                     const lectureTabContent = document.getElementById('lectureTabContent');
+                                     if (lectureTabContent && lectureTabContent.children.length === 0) {
+                                         lectureTabContent.innerHTML = `<div class="tab-pane active"><div class="content-card"><div class="alert alert-info">No content available.</div></div></div>`;
+                                     }
+                                }
+                            }
+                        }
+                    }
+                    // Show/hide "No Lectures Available" message
+                    const noLecturesMessageLi = document.querySelector('#lectureTabs .nav-link.disabled[data-translate="no_lectures"]')?.parentElement;
+                    const lectureSpecificTabsExist = document.querySelectorAll('#lectureTabs .nav-link[data-lecture-id]').length > 0;
+                    if (noLecturesMessageLi) {
+                        noLecturesMessageLi.style.display = lectureSpecificTabsExist ? 'none' : '';
+                    }
+
                     showToast(data.message, 'success');
                 } else {
-                    showToast('Error: ' + data.message, 'error');
+                    showToast('Error deleting lecture: ' + (data.message || 'Unknown error'), 'error');
                 }
             })
-            .catch(error => showToast('Error deleting lecture: ' + error, 'error'));
+            .catch(error => {
+                console.error('Delete lecture error:', error);
+                showToast('Error deleting lecture: ' + error.message, 'error');
+            });
         });
     });
+
 
     // Reschedule Lecture
     document.querySelectorAll('.reschedule-lecture-btn').forEach(btn => {
         btn.addEventListener('click', function () {
             if (!confirm('Are you sure you want to reschedule this lecture to now?')) return;
             const lectureId = this.getAttribute('data-lecture-id');
-            const accordionItem = this.closest('.accordion-item');
+            console.log('Rescheduling lecture:', lectureId);
+            if (!lectureId) {
+                showToast('Error: Lecture ID is missing', 'error');
+                return;
+            }
+            const card = this.closest('.content-card');
 
             fetch(`{% url 'accounts:reschedule_lecture' lecture_id=0 %}`.replace('0', lectureId), {
                 method: 'POST',
@@ -735,80 +1186,103 @@ document.addEventListener('DOMContentLoaded', function () {
                     'X-CSRFToken': '{{ csrf_token }}'
                 }
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const liveSessionDiv = accordionItem.querySelector('.live-session') || document.createElement('div');
-                    if (!liveSessionDiv.classList.contains('live-session')) {
-                        liveSessionDiv.classList.add('live-session');
-                        accordionItem.querySelector('.d-flex').appendChild(liveSessionDiv);
-                    }
-                    liveSessionDiv.innerHTML = `
-                        <i class="fas fa-video me-1 text-primary"></i>
-                        <a href="${data.live_link}" class="btn btn-sm btn-primary px-3 ripple-surface live-link">Join Live Session</a>`;
-                    showToast(data.message, 'success');
-                } else {
-                    showToast('Error: ' + data.message, 'error');
-                }
-            })
-            .catch(error => showToast('Error rescheduling lecture: ' + error, 'error'));
-        });
-    });
-
-    // Delete File
-    document.querySelectorAll('.delete-file-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (!confirm('Are you sure you want to delete this file?')) return;
-            
-            const fileId = this.getAttribute('data-file-id');
-            const fileItem = this.closest('.file-list-item');
-            // Get lecture ID before removing the item
-            const lectureId = this.closest('.lecture-files').querySelector('.file-upload-form')?.dataset?.lectureId;
-
-            fetch(`{% url 'accounts:delete_lecture_file' file_id=0 %}`.replace('0', fileId), {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            })
             .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
+                console.log('Reschedule lecture response status:', response.status);
                 return response.json();
             })
             .then(data => {
                 if (data.success) {
-                    if (fileItem) {
-                        fileItem.remove();
-                        
-                        // Only try to show "no files" message if we have a lectureId
-                        if (lectureId) {
-                            const fileList = document.getElementById(`file-list-${lectureId}`);
-                            if (fileList && fileList.querySelectorAll('.file-list-item').length === 0) {
-                                fileList.innerHTML = `
-                                    <li id="no-files-message">
-                                        <p class="text-muted small fst-italic" data-translate="no_files">No files uploaded yet.</p>
-                                    </li>
-                                `;
+                    if (card) {
+                        const header = card.querySelector('.content-card-header');
+                        if (header) {
+                            let liveButton = header.querySelector('a.btn-primary[href*="live_link"]'); // Be more specific
+                            if (!liveButton) {
+                                liveButton = document.createElement('a');
+                                liveButton.className = 'btn btn-sm btn-primary btn-rounded';
+                                liveButton.setAttribute('target', '_blank');
+                                liveButton.setAttribute('rel', 'noopener noreferrer');
+                                header.appendChild(liveButton); // Append, not replace, other header content
                             }
+                            liveButton.href = data.live_link;
+                            liveButton.innerHTML = '<i class="fas fa-video me-1"></i> <span data-translate="join_live_session">Join Live</span>';
                         }
                     }
                     showToast(data.message, 'success');
                 } else {
-                    throw new Error(data.message || 'Failed to delete file');
+                    showToast('Error rescheduling lecture: ' + (data.message || 'Unknown error'), 'error');
                 }
             })
             .catch(error => {
-                showToast('Error deleting file: ' + error.message, 'error');
-                console.error('Delete error:', error);
+                console.error('Reschedule lecture error:', error);
+                showToast('Error rescheduling lecture: ' + error.message, 'error');
             });
         });
     });
+    
+    // Define handleDeleteFileClick for dynamic elements
+    function handleDeleteFileClick(event) {
+        const button = event.currentTarget; 
+        if (!confirm('Are you sure you want to delete this file?')) return;
+        const fileId = button.getAttribute('data-file-id');
+        console.log('Deleting file:', fileId);
+        if (!fileId) {
+            showToast('Error: File ID is missing', 'error');
+            return;
+        }
+        const fileItem = button.closest('.file-list-item');
+        const lectureId = fileItem?.closest('.lecture-files')?.querySelector('.file-upload-form')?.getAttribute('data-lecture-id');
+
+
+        fetch(`{% url 'accounts:delete_lecture_file' file_id=0 %}`.replace('0', fileId), {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if(fileItem) fileItem.remove();
+                if (lectureId) {
+                    const fileList = document.getElementById(`file-list-${lectureId}`);
+                    if (fileList && fileList.querySelectorAll('.file-list-item').length === 0) {
+                        // Ensure no-files-message has a unique ID if multiple lists exist
+                        fileList.innerHTML = `<li id="no-files-message-${lectureId}"><p class="text-muted small fst-italic" data-translate="no_files">No files uploaded yet.</p></li>`;
+                    }
+                }
+                showToast(data.message, 'success');
+            } else {
+                showToast('Error deleting file: ' + (data.message || 'Unknown error'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Delete file error:', error);
+            showToast('Error deleting file: ' + error.message, 'error');
+        });
+    }
+
+    // Event delegation for delete file buttons
+    document.getElementById('lectureTabContent').addEventListener('click', function(e) {
+        const deleteButton = e.target.closest('.delete-file-btn');
+        if (deleteButton && this.contains(deleteButton)) {
+            handleDeleteFileClick({currentTarget: deleteButton});
+        }
+    });
+
 
     // Mark Lecture as Finished
     document.querySelectorAll('.mark-finished-btn').forEach(btn => {
         btn.addEventListener('click', function () {
             const lectureId = this.getAttribute('data-lecture-id');
+            console.log('Marking lecture as finished:', lectureId);
+            if (!lectureId) {
+                showToast('Error: Lecture ID is missing', 'error');
+                return;
+            }
+            const card = this.closest('.content-card');
+            const navLink = document.querySelector(`.nav-link[data-lecture-id="${lectureId}"]`);
+
             fetch(`{% url 'accounts:mark_lecture_as_finished' lecture_id=0 %}`.replace('0', lectureId), {
                 method: 'POST',
                 headers: {
@@ -816,173 +1290,99 @@ document.addEventListener('DOMContentLoaded', function () {
                     'X-CSRFToken': '{{ csrf_token }}'
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Mark finished response status:', response.status);
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
-                    const accordionHeader = this.closest('.accordion-item').querySelector('.accordion-header');
-                    const accordionButton = accordionHeader.querySelector('.accordion-button');
-                    
-                    // Add the finished class to the header
-                    accordionHeader.classList.add('finished-lecture');
-                    
-                    // Add the finished badge if it doesn't exist
-                    if (!accordionButton.querySelector('.badge')) {
-                        const badge = document.createElement('span');
-                        badge.className = 'badge bg-danger ms-2';
-                        badge.textContent = 'Finished';
-                        accordionButton.appendChild(badge);
+                    if (navLink) {
+                         navLink.classList.add('finished');
+                         if (!navLink.querySelector('.badge[data-translate="finished"]')) {
+                            const finishedBadgeHtml = `<span class="badge rounded-pill" data-translate="finished">Finished</span>`;
+                            navLink.insertAdjacentHTML('beforeend', finishedBadgeHtml);
+                         }
                     }
-                    
+                    if (card) {
+                        let titleBadge = card.querySelector('.content-card-title .badge[data-translate="finished"]');
+                        if (!titleBadge) {
+                            titleBadge = document.createElement('span');
+                            titleBadge.className = 'badge bg-secondary rounded-pill ms-2';
+                            titleBadge.setAttribute('data-translate', 'finished');
+                            titleBadge.textContent = 'Finished'; // Or use a translation function
+                            card.querySelector('.content-card-title')?.appendChild(titleBadge);
+                        }
+                        const liveButton = card.querySelector('.content-card-header a.btn-primary[href*="live_link"]');
+                        if (liveButton) liveButton.remove();
+                        const markFinishedButton = card.querySelector('.mark-finished-btn[data-lecture-id="' + lectureId + '"]');
+                        if (markFinishedButton) markFinishedButton.remove();
+                    }
                     showToast(data.message, 'success');
                 } else {
-                    showToast('Error: ' + data.message, 'error');
+                    showToast('Error marking lecture as finished: ' + (data.message || 'Unknown error'), 'error');
                 }
             })
-            .catch(error => showToast('Error marking lecture as finished: ' + error, 'error'));
+            .catch(error => {
+                console.error('Mark finished error:', error);
+                showToast('Error marking lecture as finished: ' + error.message, 'error');
+            });
         });
     });
 
-    // File Size Formatting
-    function formatFileSize(bytes) {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    // Shared Resource Deletion
+    // Use event delegation if the table can be dynamically updated elsewhere
+    const sharedResourcesTableBody = document.querySelector('#shared-resources table tbody');
+    if (sharedResourcesTableBody) {
+        sharedResourcesTableBody.addEventListener('click', async function(e){
+            const deleteButton = e.target.closest('.delete-resource-btn');
+            if (deleteButton && this.contains(deleteButton)) {
+                const resourceId = deleteButton.getAttribute('data-resource-id');
+                console.log('Deleting shared resource:', resourceId);
+                if (!resourceId) {
+                    showToast('Error: Resource ID is missing', 'error');
+                    return;
+                }
+                if (!confirm('Are you sure you want to delete this shared resource?')) return;
+
+                try {
+                    const response = await fetch(`{% url 'accounts:delete_shared_resource' %}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ resource_id: resourceId })
+                    });
+                    console.log('Delete resource response status:', response.status);
+                    const data = await response.json();
+                    if (data.status === 'success' || data.success) { // Allow both 'status' and 'success' keys
+                        deleteButton.closest('tr').remove();
+                        showToast(data.message || 'Resource deleted successfully', 'success');
+                         // Check if table is empty now
+                        if (sharedResourcesTableBody.children.length === 0) {
+                            const cardBody = sharedResourcesTableBody.closest('.content-card-body');
+                            if (cardBody) {
+                                cardBody.innerHTML = `<div class="alert alert-info mb-0" data-translate="no_shared_resources">
+                                                        <i class="fas fa-info-circle me-2"></i>
+                                                        No resources have been shared with this study group yet.
+                                                      </div>`;
+                            }
+                        }
+                    } else {
+                        showToast(data.message || 'Failed to delete resource', 'error');
+                    }
+                } catch (error) {
+                    console.error('Delete resource error:', error);
+                    showToast('Error deleting resource: ' + error.message, 'error');
+                }
+            }
+        });
     }
 
 
-
-    const noteButtons = document.querySelectorAll('[data-mdb-toggle="modal"][data-mdb-target^="noteModal"]');
-        noteButtons.forEach(button => {
-            button.addEventListener('click', event => {
-                const lectureId = button.getAttribute('data-lecture-id');
-                const modal = document.querySelector(button.getAttribute('data-mdb-target'));
-                const noteForm = modal.querySelector('form');
-                // Ensure the form action is set correctly (though it should already be set in the template)
-                noteForm.action = noteForm.action.replace('0', lectureId);
-            });
-    });
-
-    // Handle shared resource deletion
-    document.querySelectorAll('.delete-resource-btn').forEach(btn => {
-        btn.addEventListener('click', async function() {
-            const resourceId = this.dataset.resourceId;
-            if (!confirm('Are you sure you want to delete this shared resource?')) return;
-            
-            try {
-                const response = await fetch(`{% url 'accounts:delete_shared_resource' %}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    body: JSON.stringify({
-                        resource_id: resourceId
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.status === 'success') {
-                    this.closest('tr').remove();
-                    showToast('Resource deleted successfully', 'success');
-                } else {
-                    throw new Error(data.message || 'Failed to delete resource');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showToast(error.message, 'danger');
-            }
-        });
-    });
-
+    console.log("All event listeners and initializations complete.");
 });
 </script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-    
-        // --- Configuration for Collapsible Sections ---
-        // Add entries here for any new collapsible sections you create
-        const collapsibleSections = [
-            {
-                headerId: 'sharedResourcesHeader',
-                collapseId: 'sharedResourcesCollapse',
-                storageKey: 'sharedResourcesCollapsed'
-            },
-            {
-                headerId: 'addLectureHeader',
-                collapseId: 'addLectureFormCollapse',
-                storageKey: 'addLectureFormCollapsed'
-            }
-            // Add more sections like this:
-            // { headerId: 'anotherHeaderId', collapseId: 'anotherCollapseId', storageKey: 'anotherCollapsedStateKey' }
-        ];
-    
-        // --- Generic Function to Update Toggle Icon ---
-        const updateToggleIcon = (iconElement, isCollapsing) => {
-            if (!iconElement) return; // Safety check if icon isn't found
-            if (isCollapsing) {
-                // It's going to be hidden (or is hidden) -> show 'up' arrow
-                iconElement.classList.remove('fa-chevron-down');
-                iconElement.classList.add('fa-chevron-up');
-            } else {
-                // It's going to be shown (or is shown) -> show 'down' arrow
-                iconElement.classList.remove('fa-chevron-up');
-                iconElement.classList.add('fa-chevron-down');
-            }
-        };
-    
-        // --- Loop through each configured section and apply logic ---
-        collapsibleSections.forEach(section => {
-            const headerElement = document.getElementById(section.headerId);
-            const collapseElement = document.getElementById(section.collapseId);
-            const toggleIconElement = headerElement ? headerElement.querySelector('.toggle-icon') : null;
-    
-            // Check if elements exist before proceeding
-            if (!headerElement || !collapseElement || !toggleIconElement) {
-                console.warn(`Could not find all elements for collapsible section:`, section);
-                return; // Skip this section if elements are missing
-            }
-    
-            // --- Set Initial State on Page Load ---
-            const isCollapsedInitially = localStorage.getItem(section.storageKey) === 'true';
-    
-            if (isCollapsedInitially) {
-                // If localStorage says collapsed, ensure it is (remove 'show')
-                collapseElement.classList.remove('show');
-                updateToggleIcon(toggleIconElement, true); // Set icon to 'up'
-                headerElement.setAttribute('aria-expanded', 'false');
-            } else {
-                // If localStorage says expanded (or no value), ensure it has 'show'
-                // Note: Only add if not already present, though add() is safe
-                if (!collapseElement.classList.contains('show')) {
-                     collapseElement.classList.add('show');
-                }
-                updateToggleIcon(toggleIconElement, false); // Set icon to 'down'
-                headerElement.setAttribute('aria-expanded', 'true');
-            }
-    
-            // --- Listen for MDB/Bootstrap Collapse Events ---
-    
-            // Event listener for AFTER it has been shown (expanded)
-            collapseElement.addEventListener('shown.bs.collapse', function () {
-                localStorage.setItem(section.storageKey, 'false'); // It's now expanded
-                updateToggleIcon(toggleIconElement, false);       // Update icon to 'down'
-                headerElement.setAttribute('aria-expanded', 'true'); // Sync aria
-            });
-    
-            // Event listener for AFTER it has been hidden (collapsed)
-            collapseElement.addEventListener('hidden.bs.collapse', function () {
-                localStorage.setItem(section.storageKey, 'true'); // It's now collapsed
-                updateToggleIcon(toggleIconElement, true);        // Update icon to 'up'
-                headerElement.setAttribute('aria-expanded', 'false'); // Sync aria
-            });
-        });
-    
-    });
-    </script>
-
 
 {% endblock %}

@@ -28,6 +28,7 @@ import requests
 from django import forms
 from django.db.models import Avg, Count
 from django.utils.timezone import now
+import time
 # Set up logging
 logger = logging.getLogger(__name__)
 
@@ -510,6 +511,68 @@ def add_lecture_note(request, lecture_id):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def create_zoom_meeting(title, description, duration, date, start_time, timezone='Africa/Cairo', user=None):
+    if not user or not user.is_authenticated:
+        return None
+
+    try:
+        teacher_zoom_account = TeacheroomAccount.objects.get(user=user)
+    except TeacheroomAccount.DoesNotExist:
+        return None
+
+    zoom_data = {
+        'topic': title,
+        'agenda': description,
+        'duration': duration,
+        'date': date.strftime('%Y-%m-%d'),
+        'time': start_time.strftime('%H:%M'),
+        'timezone': timezone,
+        'client_id': teacher_zoom_account.client_id,
+        'client_secret': teacher_zoom_account.client_secret,
+        'account_id': teacher_zoom_account.account_id
+    }
+
+    max_attempts = 5
+    attempt = 0
+
+    while attempt < max_attempts:
+        try:
+            response = requests.post(
+                f'{BASE_URL}/subscriptions/create-meeting/',
+                data=zoom_data
+            )
+            if response.status_code == 200:
+                return response.json().get('meeting_url')
+
+            print(f"Attempt {attempt + 1} failed with status code {response.status_code}")
+
+        except Exception as e:
+            print(f"Attempt {attempt + 1} failed with error: {str(e)}")
+
+        attempt += 1
+        if attempt < max_attempts:
+            import time  # Ensure the correct time module is used
+            time.sleep(1)
+
+    print(f"Failed to create meeting after {max_attempts} attempts")
+    return None
+
 @login_required
 def add_lecture(request, study_group_id):
     study_group = get_object_or_404(StudyGroup, id=study_group_id)
@@ -545,6 +608,7 @@ def add_lecture(request, study_group_id):
         return JsonResponse({'success': False, 'message': 'Invalid form data: ' + str(form.errors)})
     return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
 
+
 @login_required
 def reschedule_lecture(request, lecture_id):
     lecture = get_object_or_404(Lecture, id=lecture_id)
@@ -564,52 +628,20 @@ def reschedule_lecture(request, lecture_id):
         return JsonResponse({'success': False, 'message': 'Failed to reschedule Zoom meeting'})
     return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
 
-def create_zoom_meeting(title, description, duration, date, time, timezone='Africa/Cairo', user=None):
-    if not user or not user.is_authenticated:
-        return None
-    
-    try:
-        teacher_zoom_account = TeacheroomAccount.objects.get(user=user)
-    except TeacheroomAccount.DoesNotExist:
-        return None
 
-    zoom_data = {
-        'topic': title,
-        'agenda': description,
-        'duration': duration,
-        'date': date.strftime('%Y-%m-%d'),
-        'time': time.strftime('%H:%M'),
-        'timezone': timezone,
-        'client_id': teacher_zoom_account.client_id,
-        'client_secret': teacher_zoom_account.client_secret,
-        'account_id': teacher_zoom_account.account_id
-    }
-    
-    max_attempts = 5
-    attempt = 0
-    
-    while attempt < max_attempts:
-        try:
-            response = requests.post(
-                f'{BASE_URL}/subscriptions/create-meeting/',
-                data=zoom_data
-            )
-            if response.status_code == 200:
-                return response.json().get('meeting_url')
-            
-            # If not successful, log and retry
-            print(f"Attempt {attempt + 1} failed with status code {response.status_code}")
-            
-        except Exception as e:
-            print(f"Attempt {attempt + 1} failed with error: {str(e)}")
-        
-        attempt += 1
-        if attempt < max_attempts:
-            # Wait for a short time before retrying (you can adjust the delay)
-            time.sleep(1)
-    
-    print(f"Failed to create meeting after {max_attempts} attempts")
-    return None
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
