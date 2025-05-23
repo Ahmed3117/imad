@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+    </style>
+
+    <div class="container py-5">
+        <h1 class="text-center mb-4" style="color: #4f4f4f;">Edit Course Resource</h1>
+
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="course" class="form-label">Course</label>
+                        <select class="form-select" id="course" name="course" required>
+                            <option value="">Select a course</option>
+                            {% for course in courses %}
+                                <option value="{{ course.id }}" {% if course.id == library.course.id %}selected{% endif %}>
+                                    {{ course.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="category" class="form-label">Category (Optional)</label>
+                        <select class="form-select" id="category" name="category">
+                            <option value="">No Category</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" {% if category.id == library.category.id %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="file" class="form-label">Replace File (Optional)</label>
+                        <input type="file" class="form-control" id="file" name="file">
+                        <small class="form-text text-muted">Current file: {{ library.file.name|slice:"courseslibraries/:" }}</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Resource</button>
+                    <a href="{% url 'library:course_library' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

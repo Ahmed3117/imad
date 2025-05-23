@@ -21,7 +21,7 @@
   "reschedule": "Reschedule",
   "mark_as_finished": "Mark as Finished",
   "assignment": "Assignment",
-  "add_note": "Add Note",
+  "add_note": "Add Note $ Finish",
   "note_added": "Note Added",
   "note": "Note",
   "rating": "Rating",
@@ -35,6 +35,6 @@
   "finished": "Finished",
   "lecture_description": "Lecture Description",
   "created": "Created on:",
-  "join_live_session": "Join Live Session",
+  "join_session": "Join Session",
   "no_lectures": "No lectures available for this study group yet."
 }

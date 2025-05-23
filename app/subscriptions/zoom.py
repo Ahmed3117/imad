@@ -62,8 +62,6 @@ def validate_inputs(topic, agenda, duration, date_str, time_str, timezone):
 
 @csrf_exempt
 def create_zoom_meeting(request):
-    print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Invalid request method'}, status=400)
 
@@ -76,22 +74,28 @@ def create_zoom_meeting(request):
         time_str = request.POST.get('time')
         duration = request.POST.get('duration')
         agenda = request.POST.get('agenda')
+        is_shared = request.POST.get('is_shared', 'false').lower() == 'true'
         timezone = "Africa/Cairo"
 
         errors = validate_inputs(topic, agenda, duration, date_str, time_str, timezone)
         if errors:
             return JsonResponse({'errors': errors}, status=400)
 
-        local_timezone = pytz.timezone(timezone)
-        local_datetime = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
-        local_datetime = local_timezone.localize(local_datetime)
-        utc_datetime = local_datetime.astimezone(pytz.utc)
+        # For shared accounts (temporary links), create an instant meeting
+        if is_shared:
+            meeting_type = 1  # Instant meeting
+            start_time = None  # Not needed for instant meetings
+        else:
+            meeting_type = 2  # Scheduled meeting
+            local_timezone = pytz.timezone(timezone)
+            local_datetime = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
+            local_datetime = local_timezone.localize(local_datetime)
+            start_time = local_datetime.astimezone(pytz.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
         meeting_data = {
             "topic": topic,
             "agenda": agenda,
-            "type": 2,
-            "start_time": utc_datetime.isoformat(),
+            "type": meeting_type,
             "duration": int(duration),
             "timezone": timezone,
             "settings": {
@@ -107,6 +111,10 @@ def create_zoom_meeting(request):
                 "registrants_email_notification": True
             },
         }
+
+        # Only add start_time for scheduled meetings
+        if not is_shared and start_time:
+            meeting_data["start_time"] = start_time
 
         access_token = get_access_token(
             client_id,
@@ -125,7 +133,7 @@ def create_zoom_meeting(request):
             meeting_info = response.json()
             return JsonResponse({
                 'meeting_url': meeting_info['join_url'],
-                'start_time': meeting_info['start_time'],
+                'start_time': meeting_info.get('start_time', ''),
                 'agenda': meeting_info['agenda'],
                 'password': meeting_info['password']
             })
@@ -142,6 +150,7 @@ def create_zoom_meeting(request):
     except Exception as e:
         logger.error(f"Error creating meeting: {str(e)}")
         return JsonResponse({'error': str(e)}, status=400)
+
 
 
 

@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% block content %}
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .error-message {
+            color: red;
+            display: none;
+        }
+    </style>
+
+    <div class="container py-5">
+        <h1 class="text-center mb-4" style="color: #4f4f4f;">Add Course Resources</h1>
+
+        <div class="card">
+            <div class="card-body">
+                <form id="addLibraryForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="course" class="form-label">Course</label>
+                        <select class="form-select" id="course" name="course" required>
+                            <option value="">Select a course</option>
+                            {% for course in courses %}
+                                <option value="{{ course.id }}">{{ course.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="category" class="form-label">Category (Optional)</label>
+                        <div class="input-group">
+                            <select class="form-select" id="category" name="category">
+                                <option value="">No Category</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="button" class="btn btn-outline-primary" data-mdb-toggle="modal" data-mdb-target="#addCategoryModal">
+                                <i class="fas fa-plus"></i> Add Category
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="files" class="form-label">Upload Files</label>
+                        <input type="file" class="form-control" id="files" name="files" multiple required>
+                    </div>
+                    <div id="errorMessage" class="error-message"></div>
+                    <button type="submit" class="btn btn-primary">Upload Resources</button>
+                    <a href="{% url 'library:course_library' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
+                    <button type="button" class="btn-close btn-close-white" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCategoryForm">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="categoryName" class="form-label">Category Name</label>
+                            <input type="text" class="form-control" id="categoryName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoryDescription" class="form-label">Description (Optional)</label>
+                            <textarea class="form-control" id="categoryDescription" name="description"></textarea>
+                        </div>
+                        <div id="categoryError" class="error-message"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveCategory">Save Category</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addLibraryForm = document.getElementById('addLibraryForm');
+            const addCategoryForm = document.getElementById('addCategoryForm');
+            const categorySelect = document.getElementById('category');
+            const errorMessage = document.getElementById('errorMessage');
+            const categoryError = document.getElementById('categoryError');
+            const saveCategoryBtn = document.getElementById('saveCategory');
+            const addCategoryModal = document.getElementById('addCategoryModal');
+
+            let mdbModal;
+            if (typeof mdb !== 'undefined') {
+                mdbModal = new mdb.Modal(addCategoryModal);
+            } else if (typeof bootstrap !== 'undefined') {
+                mdbModal = new bootstrap.Modal(addCategoryModal);
+            }
+
+            // Handle category creation
+            saveCategoryBtn?.addEventListener('click', function() {
+                const formData = new FormData(addCategoryForm);
+                categoryError.style.display = 'none';
+
+                fetch("{% url 'library:create_library_category' %}", {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Add new category to select dropdown
+                        const newOption = document.createElement('option');
+                        newOption.value = data.category.id;
+                        newOption.textContent = data.category.name;
+                        categorySelect.insertBefore(newOption, categorySelect.children[1]); // Insert after "No Category"
+                        categorySelect.value = data.category.id; // Select the new category
+                        mdbModal.hide();
+                        addCategoryForm.reset();
+                    } else {
+                        categoryError.textContent = data.error;
+                        categoryError.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    categoryError.textContent = 'An error occurred while creating the category';
+                    categoryError.style.display = 'block';
+                    console.error('Error:', error);
+                });
+            });
+
+            // Handle form submission
+            addLibraryForm?.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const formData = new FormData(addLibraryForm);
+                errorMessage.style.display = 'none';
+
+                fetch("{% url 'library:add_course_library' %}", {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(data.message);
+                        window.location.href = "{% url 'library:course_library' %}";
+                    } else {
+                        errorMessage.textContent = data.error;
+                        errorMessage.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    errorMessage.textContent = 'An error occurred while uploading files';
+                    errorMessage.style.display = 'block';
+                    console.error('Error:', error);
+                });
+            });
+        });
+    </script>
+{% endblock %}

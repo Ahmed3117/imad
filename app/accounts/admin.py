@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import TeacherInfoTranslation, TeacheroomAccount, User, StudentProfile
+
+from subscriptions.models import LectureVisitHistory
+from .models import TeacherInfoTranslation, TeacheroomAccount, User, StudentProfile, ZoomAccount
 
 # Inline admin for StudentProfile
 class StudentProfileInline(admin.StackedInline):
@@ -48,6 +50,46 @@ class CustomUserAdmin(UserAdmin):
                 # return [StudentProfileInline]
             return [StudentProfileInline]
         return []
+
+
+@admin.register(ZoomAccount)
+class ZoomAccountAdmin(admin.ModelAdmin):
+    list_display = ('id', 'account_id', 'is_available_display', 'client_id_masked', 'client_secret_masked')
+    list_filter = ('account_id',)
+    search_fields = ('account_id', 'client_id')
+    readonly_fields = ('is_available_display',)
+    fieldsets = (
+        (None, {
+            'fields': ('account_id', 'client_id', 'client_secret')
+        }),
+        ('Tokens', {
+            'fields': ('secret_token', 'verification_token')
+        }),
+        ('Status', {
+            'fields': ('is_available_display',)
+        }),
+    )
+
+    def is_available_display(self, obj):
+        return obj.is_available()
+    is_available_display.boolean = True
+    is_available_display.short_description = 'Available'
+
+    def client_id_masked(self, obj):
+        return f"{obj.client_id[:4]}...{obj.client_id[-4:]}"
+    client_id_masked.short_description = 'Client ID'
+
+    def client_secret_masked(self, obj):
+        return f"{obj.client_secret[:4]}...{obj.client_secret[-4:]}"
+    client_secret_masked.short_description = 'Client Secret'
+
+
+@admin.register(LectureVisitHistory)
+class LectureVisitHistoryAdmin(admin.ModelAdmin):
+    list_display = ('lecture', 'user', 'visited_at')
+    list_filter = ('lecture__group', 'user')
+    search_fields = ('lecture__title', 'user__username')
+    date_hierarchy = 'visited_at'
 
 # Admin for ParentProfile
 # @admin.register(ParentProfile)

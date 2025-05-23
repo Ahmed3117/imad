@@ -1,13 +1,14 @@
-import datetime
+from datetime import datetime, timedelta
 import json
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login,logout,authenticate
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.hashers import make_password
 from django.utils.timezone import now
+from library.models import LibraryCategory
 from project.settings import BASE_URL
 from subscriptions.models import GroupTime, Lecture, LectureFile, LectureNote, StudyGroup, StudyGroupResource
-from .models import TeacherInfo, TeacheroomAccount, User, StudentProfile
+from .models import TeacherInfo, TeacheroomAccount, User, StudentProfile, ZoomAccount
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -433,7 +434,10 @@ def study_group_lectures(request, study_group_id):
     # Get shared resources for this study group
     shared_resources = StudyGroupResource.objects.filter(
         studygroup=study_group
-    ).select_related('resource', 'resource__course', 'shared_by')
+    ).select_related('resource', 'resource__course', 'resource__category', 'shared_by')
+
+    # Get all categories for filtering
+    categories = LibraryCategory.objects.all()
 
     lecture_form = LectureForm(study_group=study_group) if request.user.role == 'teacher' else None
     file_form = LectureFileForm() if request.user.role == 'teacher' else None
@@ -443,6 +447,7 @@ def study_group_lectures(request, study_group_id):
         'study_group': study_group,
         'lectures_with_files': lectures_with_files,
         'shared_resources': shared_resources,
+        'categories': categories,  # Add categories to context
         'lecture_form': lecture_form,
         'file_form': file_form,
         'note_form': note_form,
@@ -527,26 +532,51 @@ def add_lecture_note(request, lecture_id):
 
 
 
-def create_zoom_meeting(title, description, duration, date, start_time, timezone='Africa/Cairo', user=None):
+from django.utils import timezone as django_timezone
+import pytz
+
+def create_zoom_meeting(title, description, duration, date, start_time, timezone_str='Africa/Cairo', user=None):
     if not user or not user.is_authenticated:
-        return None
+        return None, None, "User not authenticated"
 
     try:
+        # First try to use the teacher's own account
         teacher_zoom_account = TeacheroomAccount.objects.get(user=user)
+        zoom_data = {
+            'topic': title,
+            'agenda': description,
+            'duration': duration,
+            'date': date.strftime('%Y-%m-%d'),
+            'time': start_time.strftime('%H:%M'),
+            'timezone': timezone_str,
+            'client_id': teacher_zoom_account.client_id,
+            'client_secret': teacher_zoom_account.client_secret,
+            'account_id': teacher_zoom_account.account_id,
+            'is_shared': False
+        }
+        is_owner_link = True
+        zoom_account = None
     except TeacheroomAccount.DoesNotExist:
-        return None
-
-    zoom_data = {
-        'topic': title,
-        'agenda': description,
-        'duration': duration,
-        'date': date.strftime('%Y-%m-%d'),
-        'time': start_time.strftime('%H:%M'),
-        'timezone': timezone,
-        'client_id': teacher_zoom_account.client_id,
-        'client_secret': teacher_zoom_account.client_secret,
-        'account_id': teacher_zoom_account.account_id
-    }
+        # If teacher doesn't have their own account, try to use a shared one
+        zoom_account = ZoomAccount.get_available_account()
+        if not zoom_account:
+            return None, None, "No available Zoom accounts"
+        
+        # For shared accounts, we'll create an instant meeting
+        now = django_timezone.now()
+        zoom_data = {
+            'topic': title,
+            'agenda': description,
+            'duration': duration,
+            'date': now.strftime('%Y-%m-%d'),  # Current date for the API
+            'time': now.strftime('%H:%M'),     # Current time for the API
+            'timezone': timezone_str,
+            'client_id': zoom_account.client_id,
+            'client_secret': zoom_account.client_secret,
+            'account_id': zoom_account.account_id,
+            'is_shared': True
+        }
+        is_owner_link = False
 
     max_attempts = 5
     attempt = 0
@@ -558,20 +588,22 @@ def create_zoom_meeting(title, description, duration, date, start_time, timezone
                 data=zoom_data
             )
             if response.status_code == 200:
-                return response.json().get('meeting_url')
+                meeting_url = response.json().get('meeting_url')
+                return meeting_url, zoom_account, None
 
             print(f"Attempt {attempt + 1} failed with status code {response.status_code}")
+            print(f"Response: {response.text}")
 
         except Exception as e:
             print(f"Attempt {attempt + 1} failed with error: {str(e)}")
 
         attempt += 1
         if attempt < max_attempts:
-            import time  # Ensure the correct time module is used
+            import time
             time.sleep(1)
 
     print(f"Failed to create meeting after {max_attempts} attempts")
-    return None
+    return None, None, "Failed to create meeting"
 
 @login_required
 def add_lecture(request, study_group_id):
@@ -588,13 +620,13 @@ def add_lecture(request, study_group_id):
 
             schedule = form.cleaned_data['schedule']
             if schedule == 'NOW':
-                live_link = create_zoom_meeting(
+                live_link, zoom_account, error = create_zoom_meeting(
                     lecture.title, lecture.description, lecture.duration,
                     timezone.now(), timezone.now(), user=request.user
                 )
             else:
                 group_time = GroupTime.objects.get(id=int(schedule))
-                live_link = create_zoom_meeting(
+                live_link, zoom_account, error = create_zoom_meeting(
                     lecture.title, lecture.description, lecture.duration,
                     timezone.now(), group_time.time, user=request.user
                 )
@@ -602,31 +634,99 @@ def add_lecture(request, study_group_id):
             if live_link:
                 lecture.live_link = live_link
                 lecture.live_link_date = timezone.now()
+                lecture.is_owner_link = zoom_account is None
+                lecture.zoom_account = zoom_account
+                if zoom_account:  # For temporary links
+                    lecture.link_valid_until = timezone.now() + timedelta(hours=2)
                 lecture.save()
                 return JsonResponse({'success': True, 'message': 'Lecture added successfully'})
-            return JsonResponse({'success': False, 'message': 'Failed to create Zoom meeting'})
+            return JsonResponse({'success': False, 'message': error or 'Failed to create Zoom meeting'})
         return JsonResponse({'success': False, 'message': 'Invalid form data: ' + str(form.errors)})
     return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
 
+import logging
+logger = logging.getLogger(__name__)
 
 @login_required
 def reschedule_lecture(request, lecture_id):
     lecture = get_object_or_404(Lecture, id=lecture_id)
     if request.user.role != 'teacher' or lecture.group.teacher != request.user:
+        logger.warning(f"Unauthorized reschedule attempt by {request.user}")
         return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
 
     if request.method == 'POST':
-        live_link = create_zoom_meeting(
-            lecture.title, lecture.description, lecture.duration,
-            timezone.now(), timezone.now(), user=request.user
-        )
-        if live_link:
+        try:
+            logger.info(f"Rescheduling lecture {lecture_id} for user {request.user}")
+            
+            # Release any previously used shared account
+            if lecture.zoom_account:
+                logger.debug(f"Releasing zoom account {lecture.zoom_account.id}")
+                lecture.zoom_account = None
+                lecture.link_valid_until = None
+            
+            # Prepare meeting data
+            now = timezone.now()
+            logger.debug(f"Creating meeting for {now}")
+            
+            # Create new meeting
+            live_link, zoom_account, error = create_zoom_meeting(
+                lecture.title, 
+                lecture.description, 
+                lecture.duration,
+                now.date(),  # Pass date object
+                now.time(),  # Pass time object
+                user=request.user
+            )
+            
+            if not live_link:
+                logger.error(f"Failed to create Zoom meeting: {error}")
+                return JsonResponse({
+                    'success': False,
+                    'message': error or 'Failed to create Zoom meeting'
+                }, status=400)
+            
+            # Update lecture with new meeting info
             lecture.live_link = live_link
-            lecture.live_link_date = timezone.now()
+            lecture.live_link_date = now
+            lecture.is_owner_link = zoom_account is None
+            lecture.zoom_account = zoom_account
+            if zoom_account:
+                lecture.link_valid_until = now + timedelta(hours=2)
             lecture.save()
-            return JsonResponse({'success': True, 'message': 'Lecture rescheduled successfully', 'live_link': live_link})
-        return JsonResponse({'success': False, 'message': 'Failed to reschedule Zoom meeting'})
-    return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
+            
+            logger.info(f"Successfully rescheduled lecture {lecture_id}")
+            return JsonResponse({
+                'success': True,
+                'message': 'Lecture rescheduled successfully',
+                'live_link': live_link,
+                'is_owner_link': lecture.is_owner_link,
+                'valid_until': lecture.link_valid_until.isoformat() if lecture.link_valid_until else None
+            })
+            
+        except Exception as e:
+            logger.exception(f"Error rescheduling lecture {lecture_id}")
+            return JsonResponse({
+                'success': False,
+                'message': f'An error occurred: {str(e)}'
+            }, status=500)
+    
+    logger.warning(f"Invalid request method {request.method} for lecture {lecture_id}")
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request method'
+    }, status=400)
+
+@login_required
+def check_link_valid(request, lecture_id):
+    lecture = get_object_or_404(Lecture, id=lecture_id)
+    if request.user not in [lecture.group.teacher, *lecture.group.students.all()]:
+        return JsonResponse({'valid': False}, status=403)
+    
+    return JsonResponse({
+        'valid': lecture.is_link_valid(),
+        'is_owner_link': lecture.is_owner_link,
+        'valid_until': lecture.link_valid_until.isoformat() if lecture.link_valid_until else None
+    })
 
 
 
@@ -641,9 +741,27 @@ def reschedule_lecture(request, lecture_id):
 
 
 
-
-
-
+@login_required
+def visit_lecture_link(request, lecture_id):
+    lecture = get_object_or_404(Lecture, id=lecture_id)
+    
+    # Verify the user is the teacher of this lecture's group
+    if request.user != lecture.group.teacher:
+        return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
+    
+    # Verify the link is valid
+    if not lecture.live_link or (not lecture.is_owner_link and not lecture.is_link_valid()):
+        return JsonResponse({'success': False, 'message': 'This session link is not available'}, status=400)
+    
+    # Record the visit
+    lecture.record_visit(request.user)
+    
+    return JsonResponse({
+        'success': True,
+        'url': lecture.live_link,
+        'is_owner_link': lecture.is_owner_link,
+        'valid_until': lecture.link_valid_until.isoformat() if lecture.link_valid_until else None
+    })
 
 # mark lecture as finished
 @login_required
@@ -715,26 +833,30 @@ def delete_lecture(request, lecture_id):
 @login_required
 def add_lecture_files(request, lecture_id):
     lecture = get_object_or_404(Lecture, id=lecture_id)
+
     if request.user.role != 'teacher' or lecture.group.teacher != request.user:
         return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
 
     if request.method == 'POST':
         files = request.FILES.getlist('file')
         uploaded_files = []
+
         for file in files:
-            lecture_file = LectureFile(lecture=lecture, file=file)
-            lecture_file.save()
+            lecture_file = LectureFile.objects.create(lecture=lecture, file=file)
             uploaded_files.append({
-                'name': lecture_file.file.name.split('/')[-1],
+                'id': lecture_file.id,  # <-- This is what was missing!
+                'name': lecture_file.file.name.split('/')[-1],  # Just the filename
                 'url': lecture_file.file.url,
                 'size': lecture_file.file.size,
             })
+
         return JsonResponse({
             'success': True,
-            'message': 'Files uploaded successfully',
+            'message': 'Files uploaded successfully.',
             'files': uploaded_files
         })
-    return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
+
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
 
 # Delete a file
 @login_required
