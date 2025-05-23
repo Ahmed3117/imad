@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import User
+from accounts.models import ZoomAccount
 from courses.models import Course
 import requests
 from django.utils import timezone
@@ -33,7 +33,7 @@ class StudyGroup(models.Model):
         blank=True
     )
     teacher = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         limit_choices_to={'role': 'teacher'},
         related_name='teaching_groups'
@@ -41,7 +41,7 @@ class StudyGroup(models.Model):
     number_of_expected_lectures = models.PositiveIntegerField()
     join_price = models.DecimalField(max_digits=8, decimal_places=2)
     students = models.ManyToManyField(
-        User,
+        settings.AUTH_USER_MODEL,
         limit_choices_to={'role': 'student'},
         related_name='study_groups',
         blank=True
@@ -85,8 +85,17 @@ class GroupTime(models.Model):
     def __str__(self):
         return f"{self.get_day_display()} | {self.time}"
 
+class StudyGroupReport(models.Model):
+    study_group = models.ForeignKey(StudyGroup, on_delete=models.CASCADE, related_name='reports')
+    last_reported_date = models.DateField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['study_group']
+
+
 class JoinRequest(models.Model):
-    student = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'student'}, related_name='join_requests')
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={'role': 'student'}, related_name='join_requests')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='join_requests')
     group = models.ForeignKey(StudyGroup, on_delete=models.CASCADE, related_name='join_requests', blank=True, null=True)
 
@@ -105,6 +114,10 @@ class Lecture(models.Model):
     group = models.ForeignKey(StudyGroup, on_delete=models.CASCADE, related_name='lectures')
     live_link = models.URLField(blank=True, null=True)  # created zoom link
     live_link_date = models.DateTimeField(blank=True, null=True)
+    is_owner_link = models.BooleanField(default=False) 
+    zoom_account = models.ForeignKey(ZoomAccount, on_delete=models.SET_NULL, 
+                                   null=True, blank=True, related_name='temporary_links')
+    link_valid_until = models.DateTimeField(blank=True, null=True) 
     duration = models.IntegerField(default=60, validators=[MaxValueValidator(300), MinValueValidator(10)])
     is_finished = models.BooleanField(default=False)
     is_visited = models.BooleanField(default=False)
@@ -120,6 +133,29 @@ class Lecture(models.Model):
         meeting_id = last_segment.split('?')[0]
         return meeting_id
 
+    def is_link_valid(self):
+        """Check if the link is still valid"""
+        if self.is_owner_link:
+            return True  # Owner links don't expire
+        if not self.link_valid_until:
+            return False
+        return timezone.now() < self.link_valid_until
+    
+    def get_link_status(self):
+        """Get link status for display"""
+        if not self.live_link:
+            return "no_link"
+        if self.is_owner_link:
+            return "owner_link"
+        return "temp_link_valid" if self.is_link_valid() else "temp_link_expired"
+
+    def record_visit(self, user):
+        """Record a visit to this lecture's Zoom link"""
+        if user.role == 'teacher' and user == self.group.teacher:
+            LectureVisitHistory.objects.create(lecture=self, user=user)
+            return True
+        return False
+    
     def get_status_display(self):
         """Returns a human-readable status with color coding"""
         teacher_note = self.notes.filter(user__userprofile__role='teacher').first()
@@ -147,6 +183,19 @@ class Lecture(models.Model):
     class Meta:
         ordering = ['-live_link_date']
 
+class LectureVisitHistory(models.Model):
+    lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE, related_name='visit_history')
+    visited_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Track which teacher clicked the link
+    
+    class Meta:
+        verbose_name_plural = "Lecture Visit History"
+        ordering = ['-visited_at']
+    
+    def __str__(self):
+        return f"{self.user.username} visited {self.lecture.title} at {self.visited_at}"
+
+
 class LectureFile(models.Model):
     lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE, related_name='files')
     file = models.FileField(upload_to='lecture_files/')
@@ -162,7 +211,7 @@ class LectureNote(models.Model):
     ]
     
     lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE, related_name='notes')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     note = models.TextField()
     rating = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)], 
@@ -188,7 +237,7 @@ class LectureNote(models.Model):
 class StudyGroupResource(models.Model):
     studygroup = models.ForeignKey(StudyGroup, on_delete=models.CASCADE)
     resource = models.ForeignKey(CourseLibrary, on_delete=models.CASCADE)
-    shared_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    shared_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     shared_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:

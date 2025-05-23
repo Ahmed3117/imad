@@ -1,3 +1,4 @@
+import os
 from django import forms
 from .models import Assignment, StudentAnswer
 
@@ -42,20 +43,24 @@ class AssignmentForm(forms.ModelForm):
 class StudentAnswerForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields:
-            self.fields[field].widget.attrs.update({
-                'class': 'form-control',
-            })
-            if field == 'answer_text':
-                self.fields[field].widget.attrs.update({
+        
+        # Set common attributes for all fields
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+            
+            # Custom attributes for specific fields
+            if field_name == 'answer_text':
+                field.widget.attrs.update({
                     'rows': 5,
                     'class': 'form-control md-textarea',
                     'placeholder': 'Type your answer here...'
                 })
-            elif field == 'attachment':
-                self.fields[field].widget.attrs.update({
+            elif field_name == 'attachment':
+                field.widget.attrs.update({
                     'class': 'form-control-file',
+                    'accept': '.pdf,.doc,.docx,.txt',  # Specify allowed file types
                 })
+                field.help_text = 'Maximum file size: 5MB (Allowed: PDF, Word, Text)'
 
     class Meta:
         model = StudentAnswer
@@ -64,6 +69,25 @@ class StudentAnswerForm(forms.ModelForm):
             'answer_text': 'Your Answer',
             'attachment': 'Supporting Files'
         }
+
+    def clean_attachment(self):
+        attachment = self.cleaned_data.get('attachment')
+        if attachment:
+            # Validate file size (5MB max)
+            if attachment.size > 5 * 1024 * 1024:
+                raise forms.ValidationError("File size exceeds 5MB limit.")
+            
+            # Validate file extension
+            valid_extensions = ['.pdf', '.doc', '.docx', '.txt']
+            ext = os.path.splitext(attachment.name)[1].lower()
+            if ext not in valid_extensions:
+                raise forms.ValidationError(
+                    "Unsupported file type. Please upload PDF, Word, or Text files."
+                )
+        return attachment
+
+
+
 
 class GradeAssignmentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -86,3 +110,5 @@ class GradeAssignmentForm(forms.ModelForm):
             'grade': 'Grade (Max: {{ assignment.max_grade }})',
             'teacher_feedback': 'Feedback'
         }
+
+

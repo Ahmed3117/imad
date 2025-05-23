@@ -21,7 +21,7 @@
   "reschedule": "إعادة جدولة",
   "mark_as_finished": "وضع علامة كمنتهي",
   "assignment": "الواجب",
-  "add_note": "إضافة ملاحظة",
+  "add_note": "إضافة ملاحظة $ إنهاء",
   "note_added": "تمت إضافة الملاحظة",
   "note": "ملاحظة",
   "rating": "التقييم",
@@ -34,7 +34,7 @@
   "assignments": "الواجبات",
   "finished": "منتهي",
   "lecture_description": "وصف المحاضرة",
-  "created_on": "أنشئت في:",
-  "join_live_session": "انضم إلى الجلسة المباشرة",
+  "created": "أنشئت في:",
+  "join_session": "انضم إلى الجلسة ",
   "no_lectures": "لا توجد محاضرات متاحة لهذه المجموعة الدراسية حتى الآن."
 }

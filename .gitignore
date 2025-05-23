@@ -40,3 +40,8 @@ app/subscriptions/__pycache__/
 app/orders/__pycache__/
 app/freemeet/__pycache__/
 app/freemeet/migrations/__pycache__/
+subscriptions/credentials.json
+subscriptions/token.json
+app/media
+project/settings.py
+

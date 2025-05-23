@@ -29,7 +29,7 @@ CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
 TOKEN_URL = "https://zoom.us/oauth/token"
 MEETING_URL = "https://api.zoom.us/v2/users/me/meetings"
 # BASE_URL = "https://nabbiuwny.com"
-BASE_URL = "http://192.168.8.8:8800"
+BASE_URL = "http://127.0.0.1:8800"
 
 INSTALLED_APPS = [
     'admin_interface',
@@ -43,19 +43,12 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'about.apps.AboutConfig',
     'courses.apps.CoursesConfig',
-    #'loves',
-    #'carts',
-    #'orders',
     'subscriptions',
     'library',
     'assignment',
-    # 'appointments',
-    # 'exams',
     "crispy_forms",
     "crispy_bootstrap5",
     'rest_framework',
-    # 'payments',
-    # 'freemeet',
     'ckeditor',
     'channels',
     'chat',
@@ -225,7 +218,7 @@ ADMIN_ORDERING = (
     ('accounts', (
         'User', 'ParentStudent',
         'TeacherInfo', 'TeacherInfoTranslation',
-        'TeacheroomAccount'
+        'TeacheroomAccount','ZoomAccount'
     )),
     # ('freemeet', ('FreeMeet',)),
     ('courses', (
@@ -237,7 +230,7 @@ ADMIN_ORDERING = (
     ('library', (
         'CourseLibrary', 'MyLibrary',
     )),
-    ('subscriptions', ('StudyGroup','JoinRequest','Lecture','StudyGroupResource')),
+    ('subscriptions', ('StudyGroup','JoinRequest','Lecture','StudyGroupResource','LectureVisitHistory')),
     # ('appointments', ('TeacherAvailability', 'Appointment')),
     # ('exams', ('Exam', 'Question', 'Option', 'ExamResult')),
     # ('orders', ('Order', 'OrderItem')),

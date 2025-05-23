@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block translationFolder %}data-translation-folder="studygroup_report"{% endblock %}
 {% block title %}Studygroup Report{% endblock %}
+{% load i18n %}
 
 {% block content %}
 <div class="container mt-4">
@@ -12,6 +13,46 @@
         </a>
     </div>
 
+    <!-- Date Filter Form -->
+    <div class="card mb-4 shadow-1-strong">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-filter me-2"></i><span data-translate="filterByDate"></span></h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="start_date" class="form-label"><span data-translate="startDate"></span></label>
+                    <input type="date" name="start_date" id="start_date" class="form-control"
+                           value="{{ form.start_date.value|default_if_none:'' }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="end_date" class="form-label"><span data-translate="endDate"></span></label>
+                    <input type="date" name="end_date" id="end_date" class="form-control"
+                           value="{{ form.end_date.value|default_if_none:'' }}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100"><span data-translate="applyFilter"></span></button>
+                </div>
+                <div class="col-md-2">
+                    <a href="?" class="btn btn-secondary w-100"><i class="fas fa-undo me-2"></i><span data-translate="reset"></span></a>
+                </div>
+            </form>
+            {% if last_reported_date %}
+                <p class="mt-3 mb-0"><strong><span data-translate="lastReportedDate"></span>:</strong> {{ last_reported_date|date:"M d, Y" }}</p>
+            {% endif %}
+            <form method="post" class="mt-3">
+                {% csrf_token %}
+                <input type="hidden" name="start_date" value="{{ form.start_date.value|default_if_none:'' }}">
+                <input type="hidden" name="end_date" value="{{ form.end_date.value|default_if_none:'' }}">
+                <button type="submit" name="save_last_reported_date" class="btn btn-success">
+                    <i class="fas fa-save me-2"></i><span data-translate="saveLastReportedDate"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    
+    <!-- Rest of the template remains unchanged -->
     <!-- Basic Information Card -->
     <div class="card mb-4 shadow-1-strong">
         <div class="card-header bg-primary text-white">
@@ -60,7 +101,7 @@
 
     <!-- Statistics Cards -->
     <div class="row mb-4">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card text-light bg-info mb-3 shadow-1-strong">
                 <div class="card-body text-center">
                     <h1 class="display-4 mb-0 text-light">{{ total_lectures }}</h1>
@@ -68,7 +109,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card text-light bg-success mb-3 shadow-1-strong">
                 <div class="card-body text-center">
                     <h1 class="display-4 mb-0 text-light">{{ finished_lectures }}</h1>
@@ -76,7 +117,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card text-light bg-warning mb-3 shadow-1-strong">
                  <div class="card-body text-center">
                     <h1 class="display-4 mb-0 text-light">
@@ -86,7 +127,15 @@
                            <span data-translate="notAvailable"></span>
                         {% endif %}
                     </h1>
-                    <p class="text-light mt-2 mb-0 "><i class="fas fa-star-half-alt me-2"></i><span data-translate="averageGroupRating"></span></p>
+                    <p class="text-light mt-2 mb-0"><i class="fas fa-star-half-alt me-2"></i><span data-translate="averageGroupRating"></span></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-light bg-secondary mb-3 shadow-1-strong">
+                <div class="card-body text-center">
+                    <h1 class="display-4 mb-0 text-light">{{ total_visits }}</h1>
+                    <p class="text-light mt-2 mb-0"><i class="fas fa-eye me-2"></i><span data-translate="totalVisits"></span></p>
                 </div>
             </div>
         </div>
@@ -105,6 +154,7 @@
                             <th scope="col"><span data-translate="title"></span></th>
                             <th scope="col"><span data-translate="date"></span></th>
                             <th scope="col"><span data-translate="status"></span></th>
+                            <th scope="col" class="text-center"><span data-translate="visits"></span></th>
                             <th scope="col" class="text-center"><span data-translate="notes"></span></th>
                             <th scope="col" class="text-center"><span data-translate="rating"></span></th>
                             <th scope="col" class="text-center"><span data-translate="teacherFeedback"></span></th>
@@ -124,7 +174,13 @@
                                     {% if lecture.is_finished %}<span data-translate="finished"></span>{% else %}<span data-translate="pending"></span>{% endif %}
                                 </span>
                             </td>
-                             <td class="text-center">
+                            <td class="text-center">
+                                <button type="button" class="btn btn-primary btn-sm" 
+                                    data-mdb-toggle="modal" data-mdb-target="#visitDetailsModal{{ lecture.id }}">
+                                    <i class="fas fa-list"></i> <span data-translate="details"></span> ({{ lecture.visit_count }})
+                                </button>
+                            </td>
+                            <td class="text-center">
                                 <span class="badge bg-secondary rounded-pill">{{ lecture.note_count }}</span>
                             </td>
                             <td class="text-center">
@@ -151,11 +207,42 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-4"><span data-translate="noLecturesFound"></span></td>
+                            <td colspan="8" class="text-center text-muted py-4"><span data-translate="noLecturesFound"></span></td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visit Statistics Section -->
+    <div class="card mb-4 shadow-1-strong">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i><span data-translate="visitStatistics"></span></h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h6 class="mb-0"><span data-translate="visitsByDay"></span></h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="visitsByDayChart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0"><span data-translate="visitsByHour"></span></h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="visitsByHourChart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -271,6 +358,7 @@
 
     <!-- Modals -->
     {% for lecture in lectures %}
+    <!-- Lecture Details Modal -->
     <div class="modal fade" id="lectureModal{{ lecture.id }}" tabindex="-1" aria-labelledby="lectureModalLabel{{ lecture.id }}" aria-hidden="true" data-mdb-backdrop="static" data-mdb-keyboard="true">
       <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
@@ -278,7 +366,7 @@
             <h5 class="modal-title" id="lectureModalLabel{{ lecture.id }}">
               <i class="fas fa-book-open me-2"></i><span data-translate="lectureDetails"></span>: {{ lecture.title }}
             </h5>
-            <button type="button" class="btn-close btn-close-white " data-mdb-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn-close btn-close-white" data-mdb-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <div class="row mb-3">
@@ -391,6 +479,64 @@
         </div>
       </div>
     </div>
+
+    <!-- Visit Details Modal -->
+    <div class="modal fade" id="visitDetailsModal{{ lecture.id }}" tabindex="-1" aria-labelledby="visitDetailsModalLabel{{ lecture.id }}" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="visitDetailsModalLabel{{ lecture.id }}">
+              <i class="fas fa-eye me-2"></i><span data-translate="visitDetails"></span>: {{ lecture.title }}
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-mdb-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th><span data-translate="user"></span></th>
+                    <th><span data-translate="visitTime"></span></th>
+                    {% comment %} <th><span data-translate="durationSinceLastVisit"></span></th> {% endcomment %}
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for visit in lecture.visit_history.all|dictsort:"visited_at" %}
+                  <tr>
+                    <td>
+                      <i class="fas fa-user-circle me-2 {% if visit.user.role == 'teacher' %}text-info{% else %}text-success{% endif %}"></i>
+                      {{ visit.user.get_full_name|default:visit.user.username }}
+                    </td>
+                    <td>{{ visit.visited_at|date:"M d, Y H:i" }}</td>
+                    {% comment %} <td>
+                      {% if forloop.first %}
+                        <span class="text-muted"><span data-translate="firstVisit"></span></span>
+                      {% else %}
+                        {% with prev_visit=lecture.visit_history.all|dictsort:"visited_at"|slice:forloop.counter0|last %}
+                          {% with duration=visit.visited_at|timesince:prev_visit.visited_at %}
+                            {{ duration }}
+                          {% endwith %}
+                        {% endwith %}
+                      {% endif %}
+                    </td> {% endcomment %}
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="3" class="text-center text-muted py-3">
+                      <span data-translate="noVisitsFound"></span>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal"><span data-translate="close"></span></button>
+          </div>
+        </div>
+      </div>
+    </div>
     {% endfor %}
 
     <!-- Include JSON data using json_script -->
@@ -400,6 +546,15 @@
     <script type="application/json" id="completionStatusData">
         {{ completion_status|safe }}
     </script>
+    <script type="application/json" id="visitDayLabels">
+        {{ visit_day_labels|safe }}
+    </script>
+    <script type="application/json" id="visitDayCounts">
+        {{ visit_day_counts|safe }}
+    </script>
+    <script type="application/json" id="visitHourCounts">
+        {{ visit_hour_counts|safe }}
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
@@ -407,15 +562,18 @@
         // Parse JSON data
         const gradeDistributionData = JSON.parse(document.getElementById('gradeDistributionData').textContent);
         const completionStatusData = JSON.parse(document.getElementById('completionStatusData').textContent);
+        const visitDayLabels = JSON.parse(document.getElementById('visitDayLabels').textContent);
+        const visitDayCounts = JSON.parse(document.getElementById('visitDayCounts').textContent);
+        const visitHourCounts = JSON.parse(document.getElementById('visitHourCounts').textContent);
 
         // Grade Distribution Chart
         const gradeCtx = document.getElementById('gradeDistributionChart').getContext('2d');
         new Chart(gradeCtx, {
             type: 'bar',
             data: {
-                labels: ['90-100%', '80-89%', '70-79%', '60-69%', '50-59%', '<span data-translate="below50"></span>'],
+                labels: ['90-100%', '80-89%', '70-79%', '60-69%', '50-59%', 'below50'],
                 datasets: [{
-                    label: '<span data-translate="numberOfStudents"></span>',
+                    label: 'numberOfStudents',
                     data: gradeDistributionData,
                     backgroundColor: [
                         'rgba(40, 167, 69, 0.7)',
@@ -454,7 +612,7 @@
         new Chart(completionCtx, {
             type: 'doughnut',
             data: {
-                labels: ['<span data-translate="completed"></span>', '<span data-translate="partiallyCompleted"></span>', '<span data-translate="notStarted"></span>'],
+                labels: ['completed', 'partiallyCompleted', 'notStarted'],
                 datasets: [{
                     data: completionStatusData,
                     backgroundColor: [
@@ -474,9 +632,73 @@
                 }
             }
         });
+
+        // Visits by Day Chart
+        const visitsByDayCtx = document.getElementById('visitsByDayChart').getContext('2d');
+        new Chart(visitsByDayCtx, {
+            type: 'line',
+            data: {
+                labels: visitDayLabels,
+                datasets: [{
+                    label: '<span data-translate="visits"></span>',
+                    data: visitDayCounts,
+                    backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                    borderColor: 'rgba(13, 110, 253, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+
+        // Visits by Hour Chart
+        const visitsByHourCtx = document.getElementById('visitsByHourChart').getContext('2d');
+        new Chart(visitsByHourCtx, {
+            type: 'bar',
+            data: {
+                labels: Array.from({length: 24}, (_, i) => i + ':00'),
+                datasets: [{
+                    label: '<span data-translate="visits"></span>',
+                    data: visitHourCounts,
+                    backgroundColor: 'rgba(25, 135, 84, 0.7)',
+                    borderColor: 'rgba(25, 135, 84, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
     });
     </script>
 </div>
 {% endblock %}
-
-

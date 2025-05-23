@@ -1,10 +1,61 @@
 {% extends 'base.html' %}
-{% load custom_filters %}
+{% load static %}
+
 {% block translationFolder %}data-translation-folder="assignment_answer"{% endblock %}
-{% block title %}Assignment Answer{% endblock %}
+{% block title %}{{ action }} Assignment Answer{% endblock %}
+
 
 
 {% block content %}
+
+<style>
+    .md-textarea {
+        min-height: 150px;
+        resize: vertical;
+    }
+    
+    .file-upload-container {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+    
+    .file-upload-label {
+        display: block;
+        padding: 0.5rem 1rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        background-color: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .file-upload-label:hover {
+        background-color: #e9ecef;
+    }
+    
+    .file-input {
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+    
+    .file-name {
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .existing-file {
+        margin-top: 0.5rem;
+    }
+</style>
+
+
+
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-10 col-lg-8">
@@ -12,7 +63,7 @@
                 <div class="card-header bg-primary text-white py-3">
                     <h2 class="h4 mb-0">
                         <i class="fas fa-edit me-2"></i>
-                        <span data-translate="answer_header"></span> {{ assignment.title }}
+                        {{ action }} Answer: {{ assignment.title }}
                     </h2>
                 </div>
                 <div class="card-body p-4">
@@ -20,41 +71,52 @@
                         {% csrf_token %}
 
                         <!-- Answer Text -->
-                        <div class="md-form mb-4">
-                            <label for="{{ form.answer_text.id_for_label }}" class="form-label active">
-                                <i class="fas fa-pencil-alt me-2"></i><span data-translate="answer_text_label"></span>
+                        <div class="mb-4">
+                            <label for="{{ form.answer_text.id_for_label }}" class="form-label">
+                                <i class="fas fa-pencil-alt me-2"></i>{{ form.answer_text.label }}
                             </label>
                             {{ form.answer_text }}
                             <div class="invalid-feedback">
-                                <span data-translate="answer_text_error"></span>
+                                Please provide a valid answer.
                             </div>
                             {% if form.answer_text.errors %}
-                            <div class="text-danger small mt-1">
-                                {{ form.answer_text.errors }}
-                            </div>
+                                <div class="text-danger small mt-1">
+                                    {{ form.answer_text.errors }}
+                                </div>
                             {% endif %}
                         </div>
 
                         <!-- File Attachment -->
                         <div class="mb-4">
-                            <label class="form-label">
-                                <i class="fas fa-paperclip me-2"></i><span data-translate="attachment_label"></span>
+                            <label class="form-label d-block">
+                                <i class="fas fa-paperclip me-2"></i>{{ form.attachment.label }}
                             </label>
-                            <div class="file-upload-wrapper">
-                                {{ form.attachment }}
+                            <div class="file-upload-container">
+                                <label class="file-upload-label">
+                                    <span id="file-upload-text">Choose file</span>
+                                    {{ form.attachment }}
+                                </label>
+                                <div id="file-name" class="file-name"></div>
                             </div>
+                            <small class="form-text text-muted">{{ form.attachment.help_text }}</small>
+                            
                             {% if form.instance.attachment %}
-                            <div class="mt-2">
-                                <span class="text-muted small"><span data-translate="current_file"></span></span>
-                                <a href="{{ form.instance.attachment.url }}" target="_blank" class="ms-2">
-                                    <i class="fas fa-file-download me-1"></i>{{ form.instance.attachment.name|truncatechars:30 }}
-                                </a>
-                            </div>
+                                <div class="existing-file mt-2">
+                                    <span class="text-muted small">Current file:</span>
+                                    <a href="{{ form.instance.attachment.url }}" target="_blank" class="ms-2">
+                                        <i class="fas fa-file-download me-1"></i>
+                                        {{ form.instance.attachment.name }}
+                                    </a>
+                                    <a href="?remove_file=true" class="ms-2 text-danger" title="Remove file">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                </div>
                             {% endif %}
+                            
                             {% if form.attachment.errors %}
-                            <div class="text-danger small mt-1">
-                                {{ form.attachment.errors }}
-                            </div>
+                                <div class="text-danger small mt-1">
+                                    {{ form.attachment.errors }}
+                                </div>
                             {% endif %}
                         </div>
 
@@ -62,10 +124,10 @@
                         <div class="d-flex justify-content-between mt-4">
                             <a href="{% url 'assignment:student_assignment_list' assignment.lecture.pk %}"
                                class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left me-2"></i><span data-translate="cancel_button"></span>
+                                <i class="fas fa-arrow-left me-2"></i>Cancel
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-2"></i><span data-translate="submit_button"></span>
+                                <i class="fas fa-save me-2"></i>{{ action }}
                             </button>
                         </div>
                     </form>
@@ -76,64 +138,55 @@
 </div>
 
 
-<style>
-    .md-form textarea {
-        min-height: 150px;
-        resize: vertical;
-    }
-    .file-upload-wrapper {
-        position: relative;
-        margin-bottom: 1rem;
-    }
-    .file-upload-wrapper input[type="file"] {
-        opacity: 0;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        width: 100%;
-        height: 100%;
-        cursor: pointer;
-    }
-    .file-upload-wrapper .file-upload-mask {
-        display: block;
-        padding: 0.5rem 1rem;
-        border: 1px solid #ced4da;
-        border-radius: 0.25rem;
-        background-color: #f8f9fa;
-    }
-    .file-upload-wrapper:hover .file-upload-mask {
-        background-color: #e9ecef;
-    }
-</style>
 
 <script>
-    // Example starter JavaScript for disabling form submissions if there are invalid fields
-    (function() {
-        'use strict';
-        window.addEventListener('load', function() {
-            // Fetch all the forms we want to apply custom Bootstrap validation styles to
-            var forms = document.getElementsByClassName('needs-validation');
-            // Loop over them and prevent submission
-            var validation = Array.prototype.filter.call(forms, function(form) {
-                form.addEventListener('submit', function(event) {
-                    if (form.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
+    document.addEventListener('DOMContentLoaded', function() {
+        // Form validation
+        const forms = document.querySelectorAll('.needs-validation');
+        forms.forEach(form => {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    
+        // File input display
+        const fileInputs = document.querySelectorAll('.file-upload-container input[type="file"]');
+        fileInputs.forEach(input => {
+            const fileNameDisplay = input.closest('.file-upload-container').querySelector('#file-name');
+            const fileUploadText = input.closest('.file-upload-container').querySelector('#file-upload-text');
+            
+            input.addEventListener('change', function() {
+                if (this.files && this.files.length > 0) {
+                    const fileName = this.files[0].name;
+                    fileUploadText.textContent = 'File selected';
+                    if (fileNameDisplay) {
+                        fileNameDisplay.textContent = fileName;
                     }
-                    form.classList.add('was-validated');
-                }, false);
+                } else {
+                    fileUploadText.textContent = 'Choose file';
+                    if (fileNameDisplay) {
+                        fileNameDisplay.textContent = '';
+                    }
+                }
             });
-        }, false);
-    })();
+        });
+    
+        // Confirm file removal
+        const removeFileLinks = document.querySelectorAll('a[href*="remove_file=true"]');
+        removeFileLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (!confirm('Are you sure you want to remove this file?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    });
 </script>
 
 
 
 {% endblock %}
-
-
-
-
-

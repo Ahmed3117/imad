@@ -29,6 +29,9 @@ urlpatterns = [
     path('add_note/<int:lecture_id>/', views.add_lecture_note, name='add_lecture_note'),
 
     path('delete-shared-resource/', views.delete_shared_resource, name='delete_shared_resource'),
+    path('check-link-valid/<int:lecture_id>/', views.check_link_valid, name='check_link_valid'),
+    path('lecture/<int:lecture_id>/visit/', views.visit_lecture_link, name='visit_lecture_link'),
+
 
 
 ]
