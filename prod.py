@@ -220,7 +220,7 @@ ADMIN_ORDERING = (
     ('accounts', (
         'User', 'ParentStudent',
         'TeacherInfo', 'TeacherInfoTranslation',
-        'TeacheroomAccount'
+        'TeacheroomAccount','ZoomAccount', 
     )),
     # ('freemeet', ('FreeMeet',)),
     ('courses', (
