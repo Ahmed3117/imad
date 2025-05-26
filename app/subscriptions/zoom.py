@@ -83,7 +83,7 @@ def create_zoom_meeting(request):
 
         # For shared accounts (temporary links), create an instant meeting
         if is_shared:
-            meeting_type = 1  # Instant meeting
+            meeting_type = 2  # Instant meeting
             start_time = None  # Not needed for instant meetings
         else:
             meeting_type = 2  # Scheduled meeting
