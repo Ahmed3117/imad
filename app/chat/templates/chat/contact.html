@@ -17,6 +17,14 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
+        /* Notification badge styles */
+        .badge-notification {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+        }
     </style>
 
     <div class="d-flex justify-content-center align-items-center min-vh-100 bg-light" style="padding: 1rem;">
@@ -29,9 +37,13 @@
                             <div>
                                 <h5 class="text-primary fw-medium mb-1"><span data-translate="continueConversationHeader"></span></h5>
                             </div>
-                            <button id="joinLastRoomBtn" class="btn btn-sm btn-primary">
-                                <i class="fas fa-comments me-1"></i> <span data-translate="joinNowButton"></span>
-                            </button>
+                            <div class="position-relative">
+                                <!-- Notification badge for unread messages -->
+                                <span id="unreadBadge" class="badge rounded-pill badge-notification bg-danger" style="display: none;">0</span>
+                                <button id="joinLastRoomBtn" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-comments me-1"></i> <span data-translate="joinNowButton"></span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -61,19 +73,40 @@
         </div>
     </div>
     
-
+    <!-- Store unread count in local storage -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Check for existing room in localStorage
             const lastRoom = localStorage.getItem('lastChatRoom');
+            let roomCode = null;
+            
             if (lastRoom) {
-                const roomData = JSON.parse(lastRoom);
-                const lastRoomContainer = document.getElementById('lastRoomContainer');
-                lastRoomContainer.style.display = 'block';
-                
-                document.getElementById('joinLastRoomBtn').addEventListener('click', function() {
-                    window.location.href = `/chat/rooms/${roomData.code}/`;
-                });
+                try {
+                    const roomData = JSON.parse(lastRoom);
+                    roomCode = roomData.code;
+                    const lastRoomContainer = document.getElementById('lastRoomContainer');
+                    lastRoomContainer.style.display = 'block';
+                    
+                    document.getElementById('joinLastRoomBtn').addEventListener('click', function() {
+                        window.location.href = `/chat/rooms/${roomData.code}/`;
+                    });
+                    
+                    // First check if we have a cached unread count
+                    const cachedUnreadCount = localStorage.getItem(`user_unread_count_${roomCode}`);
+                    if (cachedUnreadCount) {
+                        console.log('Using cached unread count:', cachedUnreadCount);
+                        updateUnreadBadge(parseInt(cachedUnreadCount, 10));
+                    }
+                    
+                    // Then immediately fetch the current unread count
+                    fetchUnreadCount(roomData.code);
+                    
+                    // Finally connect to WebSocket for real-time updates
+                    connectToWebSocket(roomData.code);
+                } catch (error) {
+                    console.error('Error parsing lastChatRoom:', error);
+                    localStorage.removeItem('lastChatRoom');
+                }
             }
 
             // Handle new room creation
@@ -111,6 +144,9 @@
                         timestamp: new Date().toISOString()
                     }));
                     
+                    // Initialize unread count to 0
+                    localStorage.setItem(`user_unread_count_${data.code}`, '0');
+                    
                     // Redirect directly to the room
                     window.location.href = `/chat/rooms/${data.code}/`;
                     
@@ -120,19 +156,108 @@
                     loadingIndicator.style.display = 'none';
                 }
             });
+            
+            // Function to fetch the current unread count
+            function fetchUnreadCount(roomCode) {
+                fetch(`/chat/rooms/${roomCode}/status/`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch room status');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Room status data:', data);
+                        // For regular users, we care about user_unread_count (messages from CS/superusers)
+                        const unreadCount = data.user_unread_count || 0;
+                        updateUnreadBadge(unreadCount);
+                        
+                        // Cache the unread count in localStorage
+                        localStorage.setItem(`user_unread_count_${roomCode}`, unreadCount.toString());
+                    })
+                    .catch(error => {
+                        console.error('Error fetching room status:', error);
+                        // If API fails, try to use cached count
+                        const cachedUnreadCount = localStorage.getItem(`user_unread_count_${roomCode}`);
+                        if (cachedUnreadCount) {
+                            updateUnreadBadge(parseInt(cachedUnreadCount, 10));
+                        }
+                    });
+            }
+            
+            // Function to connect to WebSocket for unread notifications
+            function connectToWebSocket(roomCode) {
+                // Check if room code exists
+                if (!roomCode) return;
+                
+                // Connect to the chat WebSocket
+                const chatSocket = new WebSocket(
+                    'ws://' + window.location.host + '/ws/rooms/'
+                );
+                
+                chatSocket.onmessage = function(e) {
+                    const data = JSON.parse(e.data);
+                    console.log('WebSocket message received:', data);
+                    
+                    // Handle unread count updates
+                    if (data.type === 'unread_count_update' && data.room_code === roomCode) {
+                        // For regular users, we care about user_unread (messages from CS/superusers)
+                        updateUnreadBadge(data.user_unread);
+                        
+                        // Cache the unread count in localStorage
+                        localStorage.setItem(`user_unread_count_${roomCode}`, data.user_unread.toString());
+                    }
+                };
+                
+                chatSocket.onopen = function() {
+                    console.log('WebSocket connection established for room:', roomCode);
+                };
+                
+                chatSocket.onclose = function(e) {
+                    console.log('Chat socket closed');
+                    // Reconnect after a short delay
+                    setTimeout(function() {
+                        connectToWebSocket(roomCode);
+                    }, 3000);
+                };
+                
+                chatSocket.onerror = function(e) {
+                    console.error('WebSocket error:', e);
+                };
+            }
+            
+            // Function to update the unread badge
+            function updateUnreadBadge(unreadCount) {
+                const badge = document.getElementById('unreadBadge');
+                if (badge) {
+                    console.log('Updating unread badge with count:', unreadCount);
+                    if (unreadCount > 0) {
+                        badge.textContent = unreadCount;
+                        badge.style.display = 'inline-block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            }
         });
 
         // Optional: Add cleanup for old rooms
         function cleanupOldRooms() {
             const lastRoom = localStorage.getItem('lastChatRoom');
             if (lastRoom) {
-                const roomData = JSON.parse(lastRoom);
-                const roomDate = new Date(roomData.timestamp);
-                const now = new Date();
-                const hoursDiff = Math.abs(now - roomDate) / 36e5; // hours difference
-                
-                // Remove if older than 24 hours
-                if (hoursDiff > 24) {
+                try {
+                    const roomData = JSON.parse(lastRoom);
+                    const roomDate = new Date(roomData.timestamp);
+                    const now = new Date();
+                    const hoursDiff = Math.abs(now - roomDate) / 36e5; // hours difference
+                    
+                    // Remove if older than 24 hours
+                    if (hoursDiff > 24) {
+                        localStorage.removeItem('lastChatRoom');
+                        localStorage.removeItem(`user_unread_count_${roomData.code}`);
+                    }
+                } catch (error) {
+                    console.error('Error cleaning up old rooms:', error);
                     localStorage.removeItem('lastChatRoom');
                 }
             }

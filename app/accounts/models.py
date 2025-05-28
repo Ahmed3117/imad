@@ -11,6 +11,7 @@ class User(AbstractUser):
         ('student', 'Student'),
         ('parent', 'Parent'),
         ('admin', 'Admin'),
+        ('cs', 'Customer Service'),
     ]
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='admin')
     name = models.CharField(max_length=100)
@@ -18,8 +19,6 @@ class User(AbstractUser):
     image = models.ImageField(upload_to='profiles/', blank=True, null=True)
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        # if self.role == 'parent' and not hasattr(self, 'parentprofile'):
-        #     ParentProfile.objects.create(user=self,type='dad')
 
     def __str__(self):
         return self.name if self.name else self.username
@@ -34,37 +33,25 @@ class User(AbstractUser):
 
     def get_user_phone(self):
         """Get the user's phone number based on their role."""
-        if self.role in ['parent', 'teacher']:
-            return self.phone
+        if self.role == "teacher":
+            return self.phone or None
         elif self.role == 'student':
             if self.phone:
                 return self.phone
             else:
-                # Check for related parent phone
-                parent_students = ParentStudent.objects.filter(student=self)
-                for parent_student in parent_students:
-                    parent = parent_student.parent
-                    if parent.phone:
-                        return parent.phone
-        return None  # Return None if no phone is found
+                return None
+                
+        return None  
 
     def get_user_email(self):
         """Get the user's email based on their role."""
-        if self.role in ['parent', 'teacher']:
+        if self.role == "teacher":
             return self.email
         elif self.role == 'student':
             if self.email:
                 return self.email
             else:
-                # Check for related parent email
-                parent_student = ParentStudent.objects.filter(student=self).first()
-                if parent_student:
-                    parent = parent_student.parent
-                    if parent.email:
-                        print(parent.email)
-                        return parent.email
-                else:
-                    return None
+                return None
         return None  # Return None if no email is found
 
     def get_name(self):
