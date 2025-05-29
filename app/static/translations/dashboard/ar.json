@@ -6,5 +6,10 @@
   "confirmAction": "تأكيد الإجراء",
   "confirmMessage": "هل أنت متأكد من رغبتك في إنهاء هذه الدردشة؟",
   "cancelButton": "إلغاء",
-  "endChatButton": "إنهاء الدردشة"
+  "endChatButton": "إنهاء الدردشة",
+  "roomCode": "كود الغرفة",
+    "status": "الحالة",
+    "createdAt": "تم الإنشاء في",
+    "agent": "الوكيل",
+    "actions": "الإجراءات"
 }

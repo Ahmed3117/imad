@@ -14,19 +14,19 @@
                         <span data-translate="dashboardHeader"></span>
                     </h2>
                     <!-- Room filtering buttons -->
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-outline-light active" data-filter="all">
+                    <div class="" role="group">
+                        <button type="button" class="btn btn-outline-primary active" data-filter="all">
                             <span data-translate="allRooms"></span>
                         </button>
-                        <button type="button" class="btn btn-outline-light" data-filter="active">
+                        <button type="button" class="btn btn-outline-primary" data-filter="active">
                             <span data-translate="activeRooms"></span>
                         </button>
-                        <button type="button" class="btn btn-outline-light" data-filter="opened">
+                        <button type="button" class="btn btn-outline-primary" data-filter="opened">
                             <span data-translate="openedRooms"></span>
                         </button>
-                        <button type="button" class="btn btn-outline-light" data-filter="my-rooms">
+                        {% comment %} <button type="button" class="btn btn-outline-primary" data-filter="my-rooms">
                             <span>My Rooms</span>
-                        </button>
+                        </button> {% endcomment %}
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -37,7 +37,7 @@
                                     <th scope="col" data-translate="roomCode"></th>
                                     <th scope="col" data-translate="status"></th>
                                     <th scope="col" data-translate="createdAt"></th>
-                                    <th scope="col" data-translate="agent"></th>
+                                    {% comment %} <th scope="col" data-translate="agent"></th> {% endcomment %}
                                     <th scope="col" data-translate="actions"></th>
                                 </tr>
                             </thead>
@@ -212,7 +212,7 @@
                 <td>${formattedDate}</td>
                 <td>${displayName}</td>
                 <td>
-                    <div class="btn-group" role="group">
+                    <div class="" role="group">
                         ${getActionButtons(room)}
                     </div>
                 </td>
@@ -275,7 +275,7 @@
                 
                 // Update action buttons based on new status
                 actionsCell.innerHTML = `
-                    <div class="btn-group" role="group">
+                    <div class="" role="group">
                         ${getActionButtons({code: roomCode, status: status})}
                     </div>
                 `;
