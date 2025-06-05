@@ -13,11 +13,11 @@ class GroupTimeInline(admin.TabularInline):
 
 class StudyGroupAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 
-        'course', 
-        'capacity', 
-        'teacher', 
-        'number_of_expected_lectures', 
+        'display_name',  # Changed from 'name' to 'display_name'
+        'course',
+        'capacity',
+        'teacher',
+        'number_of_expected_lectures',
         'join_price',
         'lectures_count',
         'finished_lectures_count',
@@ -28,21 +28,26 @@ class StudyGroupAdmin(admin.ModelAdmin):
     list_filter = ('capacity', 'course', 'teacher')
     filter_horizontal = ('students',)
     inlines = [GroupTimeInline]
-    
+
+    def display_name(self, obj):
+        return obj.name if obj.name else f"Group-{obj.pk}"
+    display_name.short_description = 'Name'
+    display_name.admin_order_field = 'name'  # Allows sorting by the actual name field
+
     def lectures_count(self, obj):
         return obj.lectures.count()
     lectures_count.short_description = 'Total Lectures'
-    
+
     def finished_lectures_count(self, obj):
         return obj.lectures.filter(is_finished=True).count()
     finished_lectures_count.short_description = 'Finished Lectures'
-    
+
     def average_rating(self, obj):
         avg = obj.lectures.aggregate(
             avg_rating=Avg('notes__rating', filter=Q(notes__rating__isnull=False)))
         return f"{avg['avg_rating']:.1f}" if avg['avg_rating'] else "N/A"
     average_rating.short_description = 'Avg Rating'
-    
+
     def report_button(self, obj):
         return format_html(
             '<a class="button" href="{}" target="_blank">View Full Report</a>',
