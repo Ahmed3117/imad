@@ -6,5 +6,11 @@
   "confirmAction": "Confirm Action",
   "confirmMessage": "Are you sure you want to end this chat?",
   "cancelButton": "Cancel",
-  "endChatButton": "End Chat"
+  "endChatButton": "End Chat",
+  "roomCode": "Room Code",
+    "status": "Status",
+    "createdAt": "Created At",
+    "agent": "Agent",
+    "actions": "Actions"
+
 }

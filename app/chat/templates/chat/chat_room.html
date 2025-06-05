@@ -27,9 +27,24 @@
             color: #9fa6b2;
             margin: 0.25rem 0;
         }
+        /* Notification badge styles */
+        .notification-badge {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
     </style>
 
     <div class="container py-5" style="max-width: 800px;">
+        <!-- Notification badge for unread messages -->
+        <div id="unreadNotification" class="notification-badge" style="display: none;">
+            <span class="badge rounded-pill bg-danger">
+                <i class="fas fa-bell me-1"></i>
+                <span id="unreadCount">0</span> <span data-translate="unreadMessages"></span>
+            </span>
+        </div>
+        
         <div class="card shadow-5 rounded-7 overflow-hidden">
             <div class="card-header bg-primary text-white py-3">
                 <h2 class="h4 mb-0">
@@ -49,34 +64,29 @@
                     <div class="input-group mb-3 shadow-2 rounded-4">
                         <input type="text" id="messageInput"
                                class="form-control form-control-lg rounded-start-4"
-                               
                                aria-label="<span data-translate='typeMessageAriaLabel'></span>">
-                        <button onclick="sendMessage()"
-                                class="btn btn-primary px-4 rounded-end-4">
-                            <i class="fas fa-paper-plane me-2"></i><span data-translate="sendButton"></span>
+                        <button class="btn btn-primary btn-lg rounded-end-4" id="sendButton">
+                            <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
-    
-                    <div class="d-grid">
-                        <button onclick="endChat()"
-                                class="btn btn-danger btn-lg shadow-2 rounded-4">
-                            <i class="fas fa-phone-slash me-2"></i><span data-translate="endChatButton"></span>
-                        </button>
-                    </div>
-                </div>
-    
-                <!-- Ended Message Alert -->
-                <div id="endedMessage" class="alert alert-danger m-4 text-center shadow-2 rounded-4"
-                     style="display: none;">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <span class="fw-bold" data-translate="chatEndedMessage"></span>
+                    {% if is_agent %}
+                    <button class="btn btn-danger" id="endChatButton">
+                        <i class="fas fa-times-circle me-2"></i>
+                        <span data-translate="endChat"></span>
+                    </button>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
-    
+
+    <!-- Hidden element for translations -->
+    <div style="display: none;">
+        <span id="confirmEndChatText" data-translate="confirmEndChat">Are you sure you want to end this chat?</span>
+    </div>
 
     <script>
+<<<<<<< HEAD
         const roomCode = "{{ room_code }}";
         var csrfToken = "{{ csrf_token }}";
         var isAgent = {{ is_agent|lower }};
@@ -201,48 +211,235 @@
             document.getElementById('chatControls').style.display = 'none';
             document.getElementById('endedMessage').style.display = 'block';
 
+        document.addEventListener('DOMContentLoaded', function() {
+            const roomCode = '{{ room_code }}';
+            const isAgent = {{ is_agent|yesno:"true,false" }};
             const chatBox = document.getElementById('chatBox');
-            const endMessage = document.createElement('div');
-            endMessage.className = 'alert alert-warning text-center my-3';
-            endMessage.innerHTML = `
-                <i class="fas fa-exclamation-circle me-2"></i>
-                ${data.ended_by ? `Chat ended by ${data.is_agent ? 'Agent' : 'User'} ${data.ended_by}` : 'The chat has been ended'}
-            `;
-            chatBox.appendChild(endMessage);
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            const endChatButton = document.getElementById('endChatButton');
+            const unreadNotification = document.getElementById('unreadNotification');
+            const unreadCount = document.getElementById('unreadCount');
+            
+            let userIsActive = true;
+            let localUnreadCount = 0;
+            
+            // Connect to WebSocket
+            const chatSocket = new WebSocket(
+                'ws://' + window.location.host + '/ws/chat/' + roomCode + '/'
+            );
 
-            setTimeout(() => {
-                window.location.href = isAgent ? "/chat/dashboard/" : "/chat/contact/";
-            }, immediateRedirect ? 500 : 3000);
-        }
+            chatSocket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                
+                if (data.type === 'chat_ended') {
+                    handleChatEnded(data);
+                } else if (data.type === 'error') {
+                    handleError(data);
+                } else if (data.type === 'unread_count_update') {
+                    // Handle unread count updates
+                    handleUnreadCountUpdate(data);
+                } else {
+                    // Regular chat message
+                    addMessage(data.message, data.sender, data.is_agent);
+                    
+                    // Update unread count if user is not active and message is not from current user
+                    if (!userIsActive && ((isAgent && !data.is_agent) || (!isAgent && data.is_agent))) {
+                        localUnreadCount++;
+                        updateUnreadNotification();
+                    }
+                }
+            };
 
-        // Event listeners
-        document.getElementById('messageInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
+            chatSocket.onclose = function(e) {
+                console.error('Chat socket closed unexpectedly');
+            };
+
+            // Fetch existing messages
+            fetch('/chat/rooms/' + roomCode + '/messages/')
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(msg => {
+                        addMessage(msg.text, msg.sender, msg.is_agent);
+                    });
+                    scrollToBottom();
+                });
+
+            // Send message when button is clicked
+            sendButton.addEventListener('click', sendMessage);
+
+            // Send message when Enter key is pressed
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // End chat when button is clicked
+            if (endChatButton) {
+                endChatButton.addEventListener('click', function() {
+                    // Fix: Use the hidden element or a default message if not found
+                    const confirmElement = document.getElementById('confirmEndChatText');
+                    const confirmMessage = confirmElement ? confirmElement.textContent : 'Are you sure you want to end this chat?';
+                    
+                    if (confirm(confirmMessage)) {
+                        chatSocket.send(JSON.stringify({
+                            'type': 'end_chat'
+                        }));
+                    }
+                });
+            }
+            
+            // Track user activity
+            document.addEventListener('visibilitychange', function() {
+                userIsActive = !document.hidden;
+                if (userIsActive) {
+                    // Reset local unread count when user becomes active
+                    localUnreadCount = 0;
+                    updateUnreadNotification();
+                }
+            });
+            
+            // Also track focus/blur events
+            window.addEventListener('focus', function() {
+                userIsActive = true;
+                localUnreadCount = 0;
+                updateUnreadNotification();
+            });
+            
+            window.addEventListener('blur', function() {
+                userIsActive = false;
+            });
+            
+            // Update unread notification badge
+            function updateUnreadNotification() {
+                if (localUnreadCount > 0) {
+                    unreadCount.textContent = localUnreadCount;
+                    unreadNotification.style.display = 'block';
+                } else {
+                    unreadNotification.style.display = 'none';
+                }
+            }
+            
+            // Handle unread count updates from server
+            function handleUnreadCountUpdate(data) {
+                // Only update if it's relevant to this user/room
+                if (data.room_code === roomCode) {
+                    if (isAgent) {
+                        // For agents, we care about admin_unread
+                        if (userIsActive) {
+                            // If user is active, reset local count
+                            localUnreadCount = 0;
+                        } else {
+                            // If user is not active, update local count
+                            localUnreadCount = data.admin_unread;
+                        }
+                    } else {
+                        // For regular users, we care about user_unread
+                        if (userIsActive) {
+                            // If user is active, reset local count
+                            localUnreadCount = 0;
+                        } else {
+                            // If user is not active, update local count
+                            localUnreadCount = data.user_unread;
+                        }
+                    }
+                    updateUnreadNotification();
+                }
+            }
+
+            // Function to send a message
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (message) {
+                    chatSocket.send(JSON.stringify({
+                        'message': message
+                    }));
+                    messageInput.value = '';
+                }
+            }
+
+            // Function to add a message to the chat box
+            function addMessage(message, sender, isAgentMessage) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message-bubble');
+                
+                if (isAgentMessage) {
+                    messageElement.classList.add('agent-message');
+                } else {
+                    messageElement.classList.add('user-message');
+                }
+                
+                messageElement.innerHTML = `
+                    <div>${message}</div>
+                    <div class="chat-timestamp text-end">
+                        <small>${sender} • ${new Date().toLocaleTimeString()}</small>
+                    </div>
+                `;
+                
+                chatBox.appendChild(messageElement);
+                scrollToBottom();
+            }
+
+            // Function to handle chat ended event
+            function handleChatEnded(data) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('alert', 'alert-warning', 'text-center', 'my-3');
+                messageElement.innerHTML = `
+                    <i class="fas fa-info-circle me-2"></i>
+                    <span data-translate="chatEndedBy"></span> ${data.ended_by}
+                `;
+                
+                chatBox.appendChild(messageElement);
+                scrollToBottom();
+                
+                // Disable input
+                messageInput.disabled = true;
+                sendButton.disabled = true;
+                if (endChatButton) {
+                    endChatButton.disabled = true;
+                }
+                
+                // Redirect to home after a delay
+                setTimeout(function() {
+                    window.location.href = '/';
+                }, 5000);
+            }
+
+            // Function to handle error messages
+            function handleError(data) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('alert', 'alert-danger', 'text-center', 'my-3');
+                messageElement.innerHTML = `
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    ${data.message}
+                `;
+                
+                chatBox.appendChild(messageElement);
+                scrollToBottom();
+                
+                // Disable input
+                messageInput.disabled = true;
+                sendButton.disabled = true;
+                if (endChatButton) {
+                    endChatButton.disabled = true;
+                }
+                
+                // Redirect to home after a delay
+                setTimeout(function() {
+                    window.location.href = '/';
+                }, 5000);
+            }
+
+            // Function to scroll to the bottom of the chat box
+            function scrollToBottom() {
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
         });
-
-        // Initial setup
-        (async function initialize() {
-            await loadMessages();
-            setupRoomStatusCheck();
-        })();
-
-        function setupRoomStatusCheck() {
-            const checkInterval = setInterval(async () => {
-                if (chatEnded) {
-                    clearInterval(checkInterval);
-                    return;
-                }
-
-                try {
-                    const response = await fetch(`/chat/rooms/${roomCode}/status/`);
-                    if (!response.ok) handleChatEnded({}, true);
-                } catch (error) {
-                    console.error('Error checking room status:', error);
-                }
-            }, 2000);
-
-            window.addEventListener('beforeunload', () => clearInterval(checkInterval));
-        }
     </script>
+<<<<<<< HEAD
 
 {% endblock %}
+=======
+{% endblock %}
+>>>>>>> cc428f31ae9f352f1d4e98d872e1992647e5f6e5

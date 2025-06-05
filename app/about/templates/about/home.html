@@ -115,9 +115,11 @@
         <div>
             <a href="{% url 'courses:levels' %}" class="btn btn-primary btn-lg hero-button" data-translate="hero_button">Get Started Today</a>
             {% if request.user.is_authenticated %}
-            <a href="{% if request.user.role == 'parent' %}{% url 'accounts:parent_dashboard' %}{% else %}{% url 'accounts:profile' %}{% endif %}" class="btn btn-accent btn-lg profile-button" data-translate="profile">My Profile</a>
+            <a href="{% url 'accounts:profile' %}" class="btn btn-accent btn-lg profile-button" data-translate="profile">My Profile</a>
             {% endif %}
+            {% if not request.user.is_superuser %}
             <a href="{% url 'chat:contact' %}" class="btn btn-info btn-lg hero-button" data-translate="chat_with_us">Chat with Us</a>
+            {% endif %}
         </div>
     </div>
 </div>

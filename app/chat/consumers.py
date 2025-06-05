@@ -40,6 +40,39 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
         await self.accept()
+        
+        # Reset unread count based on user type
+        user = self.scope['user']
+        is_agent = user.is_staff if user.is_authenticated else False
+        
+        if is_agent:
+            # Reset admin unread count when an admin connects to the room
+            await sync_to_async(room.reset_admin_unread)()
+            
+            # Broadcast the updated unread count to all dashboard clients
+            await self.channel_layer.group_send(
+                "rooms",
+                {
+                    'type': 'unread_count_update',
+                    'room_code': room.code,
+                    'admin_unread': 0,  # Reset to 0
+                    'user_unread': room.user_unread_count  # Keep user unread count
+                }
+            )
+        else:
+            # Reset user unread count when a user connects to the room
+            await sync_to_async(room.reset_user_unread)()
+            
+            # Broadcast the updated unread count to all dashboard clients
+            await self.channel_layer.group_send(
+                "rooms",
+                {
+                    'type': 'unread_count_update',
+                    'room_code': room.code,
+                    'admin_unread': room.admin_unread_count,  # Keep admin unread count
+                    'user_unread': 0  # Reset to 0
+                }
+            )
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
@@ -50,7 +83,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data = json.loads(text_data)
         user = self.scope['user']
-        is_agent = user.is_staff
+        is_agent = user.is_staff if user.is_authenticated else False
 
         try:
             if 'type' in data and data['type'] == 'end_chat':  # Handle end chat action
@@ -88,13 +121,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     return
                     
                 message = data['message']
+                # Create the message
                 await sync_to_async(Message.objects.create)(
                     room=room,
                     text=message,
                     sender=user if user.is_authenticated else None,
                     is_agent=is_agent
                 )
-
+                
+                # Fetch updated unread counts after message creation
+                room = await sync_to_async(Room.objects.get)(code=self.room_code)
+                
+                # Broadcast the message to the chat room
                 await self.channel_layer.group_send(
                     self.room_group_name,
                     {
@@ -102,6 +140,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'message': message,
                         'sender': user.username if user.is_authenticated else 'Anonymous',
                         'is_agent': is_agent
+                    }
+                )
+                
+                # Broadcast the updated unread counts to all dashboard clients
+                await self.channel_layer.group_send(
+                    "rooms",
+                    {
+                        'type': 'unread_count_update',
+                        'room_code': room.code,
+                        'admin_unread': room.admin_unread_count,
+                        'user_unread': room.user_unread_count
                     }
                 )
         except Room.DoesNotExist:
@@ -129,6 +178,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         
         # Explicitly close the WebSocket connection after sending the message
         await self.close(code=1000)  # Normal closure
+        
+    async def unread_count_update(self, event):
+        # Send unread count update to the client
+        await self.send(text_data=json.dumps({
+            'type': 'unread_count_update',
+            'room_code': event['room_code'],
+            'admin_unread': event['admin_unread'],
+            'user_unread': event['user_unread']
+        }))
 
 
 class RoomConsumer(AsyncWebsocketConsumer):
@@ -150,13 +208,19 @@ class RoomConsumer(AsyncWebsocketConsumer):
                     room.status = 'opened'
                     room.agent = user
                     await sync_to_async(room.save)()
+                    
+                    # Reset admin unread count when an admin opens the room
+                    await sync_to_async(room.reset_admin_unread)()
+                    
                     await self.channel_layer.group_send(
                         "rooms",
                         {
                             'type': 'room_update',
                             'room_code': room.code,
                             'status': 'opened',
-                            'agent': user.username
+                            'agent': user.username,
+                            'admin_unread': 0,  # Reset to 0
+                            'user_unread': room.user_unread_count  # Keep user unread count
                         }
                     )
         elif data['type'] == 'end_chat':  # Handle end chat action
@@ -174,12 +238,21 @@ class RoomConsumer(AsyncWebsocketConsumer):
             )
 
     async def room_update(self, event):
-        await self.send(text_data=json.dumps({
+        # Include unread counts in the room update if available
+        response = {
             'type': 'room_status',
             'room_code': event['room_code'],
             'status': event['status'],
             'agent': event['agent']
-        }))
+        }
+        
+        # Add unread counts if they exist in the event
+        if 'admin_unread' in event:
+            response['admin_unread'] = event['admin_unread']
+        if 'user_unread' in event:
+            response['user_unread'] = event['user_unread']
+            
+        await self.send(text_data=json.dumps(response))
 
     async def room_deleted(self, event):
         await self.send(text_data=json.dumps({
@@ -193,10 +266,12 @@ class RoomConsumer(AsyncWebsocketConsumer):
             'type': 'room_created',
             'room': event['room']
         }))
-
-
-
-
-
-
-
+        
+    async def unread_count_update(self, event):
+        # Send unread count update to all dashboard clients
+        await self.send(text_data=json.dumps({
+            'type': 'unread_count_update',
+            'room_code': event['room_code'],
+            'admin_unread': event['admin_unread'],
+            'user_unread': event['user_unread']
+        }))

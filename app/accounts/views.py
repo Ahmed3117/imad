@@ -744,24 +744,32 @@ def check_link_valid(request, lecture_id):
 @login_required
 def visit_lecture_link(request, lecture_id):
     lecture = get_object_or_404(Lecture, id=lecture_id)
-    
-    # Verify the user is the teacher of this lecture's group
-    if request.user != lecture.group.teacher:
+
+    # Check if user is the teacher of this lecture's group
+    is_teacher = (request.user == lecture.group.teacher)
+
+    # Check if user is a student in this lecture's study group
+    is_student = (request.user in lecture.group.students.all())
+
+    # Verify the user is either the teacher or a student in the group
+    if not (is_teacher or is_student):
         return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
-    
+
     # Verify the link is valid
     if not lecture.live_link or (not lecture.is_owner_link and not lecture.is_link_valid()):
         return JsonResponse({'success': False, 'message': 'This session link is not available'}, status=400)
-    
-    # Record the visit
-    lecture.record_visit(request.user)
-    
+
+    # Record the visit if the user is a teacher
+    if is_teacher:
+        lecture.record_visit(request.user)
+
     return JsonResponse({
         'success': True,
         'url': lecture.live_link,
         'is_owner_link': lecture.is_owner_link,
         'valid_until': lecture.link_valid_until.isoformat() if lecture.link_valid_until else None
     })
+
 
 # mark lecture as finished
 @login_required

@@ -160,7 +160,7 @@ STATIC_URL  = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-#STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Define STATIC_ROOT for collectstatic to gather files
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
