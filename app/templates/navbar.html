@@ -17,6 +17,28 @@
                     </a>
                 </li>
                 
+                {% if request.user.is_authenticated %}
+                    {% if request.user.role == "teacher" %}
+                    <li class="nav-item px-2">
+                        <a class="nav-link fw-bold" aria-current="page" href="{% url 'subscriptions:teacher_timetable' %}" data-translate="my_timetable">
+                            <i class="fas fa-calendar-alt"></i> <span>My Timetable</span>
+                        </a>
+                    </li>
+                    {% elif request.user.role == "student" %}
+                    <li class="nav-item px-2">
+                        <a class="nav-link fw-bold" aria-current="page" href="{% url 'subscriptions:student_timetable' %}" data-translate="my_schedule">
+                            <i class="fas fa-calendar-alt"></i> <span>My Schedule</span>
+                        </a>
+                    </li>
+                    {% elif request.user.role == "admin" or request.user.is_superuser %}
+                    <li class="nav-item px-2">
+                        <a class="nav-link fw-bold" aria-current="page" href="{% url 'subscriptions:admin_timetable' %}" data-translate="all_timetables">
+                            <i class="fas fa-calendar-alt"></i> <span>All Timetables</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                {% endif %}
+                
                 {% if request.user.role == "admin" or request.user.is_superuser %}
                 <li class="nav-item px-2">
                     <a class="nav-link fw-bold" aria-current="page" href="{% url 'accounts:track_lectures' %}" data-translate="track_lectures">
