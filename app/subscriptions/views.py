@@ -2,10 +2,17 @@ from django.views.generic import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Avg, Count, Q, Max
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from assignment.models import Assignment, StudentAnswer
-from subscriptions.models import LectureNote, StudyGroup
+from subscriptions.models import LectureNote, StudyGroup, GroupTime
 from collections import defaultdict
 import json
+from django.shortcuts import render
+from datetime import datetime, timedelta
+from courses.models import Course
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 
@@ -275,3 +282,172 @@ class StudyGroupReportView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 
         return context
 
+
+# Timetable/Calendar Views
+
+def teacher_timetable(request):
+    """Timetable view for teachers - shows only their groups"""
+    if not request.user.is_authenticated or request.user.role != 'teacher':
+        return redirect('accounts:login')
+    
+    # Get filter parameters
+    view_type = request.GET.get('view', 'week')  # 'day' or 'week'
+    course_id = request.GET.get('course', '')
+    selected_day = request.GET.get('day', 'MON')  # Default to Monday for day view
+    
+    # Get teacher's groups
+    groups = StudyGroup.objects.filter(teacher=request.user).select_related('course', 'course__level', 'course__track')
+    
+    # Filter by course if selected
+    if course_id:
+        groups = groups.filter(course_id=course_id)
+    
+    # Get all group times for these groups
+    group_times = GroupTime.objects.filter(group__in=groups).select_related('group', 'group__course')
+    
+    # Build timetable structure
+    days_of_week = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+    day_names = [_('Monday'), _('Tuesday'), _('Wednesday'), _('Thursday'), _('Friday'), _('Saturday'), _('Sunday')]
+    
+    if view_type == 'day':
+        # Single day view
+        day_times = group_times.filter(day=selected_day).order_by('time')
+        timetable = {selected_day: list(day_times)}
+        display_days = [(selected_day, day_names[days_of_week.index(selected_day)])]
+    else:
+        # Week view
+        timetable = {day: [] for day in days_of_week}
+        for gt in group_times.order_by('day', 'time'):
+            timetable[gt.day].append(gt)
+        display_days = list(zip(days_of_week, day_names))
+    
+    # Get unique courses for filter dropdown
+    teacher_courses = Course.objects.filter(study_groups__teacher=request.user).distinct()
+    
+    context = {
+        'timetable': timetable,
+        'display_days': display_days,
+        'view_type': view_type,
+        'selected_day': selected_day,
+        'courses': teacher_courses,
+        'selected_course': course_id,
+        'user_role': 'teacher',
+    }
+    
+    return render(request, 'subscriptions/timetable.html', context)
+
+
+def student_timetable(request):
+    """Timetable view for students - shows groups they're enrolled in"""
+    if not request.user.is_authenticated or request.user.role != 'student':
+        return redirect('accounts:login')
+    
+    # Get filter parameters
+    view_type = request.GET.get('view', 'week')
+    course_id = request.GET.get('course', '')
+    teacher_id = request.GET.get('teacher', '')
+    selected_day = request.GET.get('day', 'MON')
+    
+    # Get student's enrolled groups
+    groups = request.user.study_groups.all().select_related('course', 'course__level', 'course__track', 'teacher')
+    
+    # Filter by course if selected
+    if course_id:
+        groups = groups.filter(course_id=course_id)
+    
+    # Filter by teacher if selected
+    if teacher_id:
+        groups = groups.filter(teacher_id=teacher_id)
+    
+    # Get all group times for these groups
+    group_times = GroupTime.objects.filter(group__in=groups).select_related('group', 'group__course', 'group__teacher')
+    
+    # Build timetable structure
+    days_of_week = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+    day_names = [_('Monday'), _('Tuesday'), _('Wednesday'), _('Thursday'), _('Friday'), _('Saturday'), _('Sunday')]
+    
+    if view_type == 'day':
+        day_times = group_times.filter(day=selected_day).order_by('time')
+        timetable = {selected_day: list(day_times)}
+        display_days = [(selected_day, day_names[days_of_week.index(selected_day)])]
+    else:
+        timetable = {day: [] for day in days_of_week}
+        for gt in group_times.order_by('day', 'time'):
+            timetable[gt.day].append(gt)
+        display_days = list(zip(days_of_week, day_names))
+    
+    # Get unique courses and teachers for filter dropdowns
+    student_courses = Course.objects.filter(study_groups__students=request.user).distinct()
+    student_teachers = User.objects.filter(teaching_groups__students=request.user, role='teacher').distinct()
+    
+    context = {
+        'timetable': timetable,
+        'display_days': display_days,
+        'view_type': view_type,
+        'selected_day': selected_day,
+        'courses': student_courses,
+        'teachers': student_teachers,
+        'selected_course': course_id,
+        'selected_teacher': teacher_id,
+        'user_role': 'student',
+    }
+    
+    return render(request, 'subscriptions/timetable.html', context)
+
+
+def admin_timetable(request):
+    """Timetable view for admins - shows all groups with advanced filtering"""
+    if not request.user.is_authenticated or (request.user.role != 'admin' and not request.user.is_superuser):
+        return redirect('accounts:login')
+    
+    # Get filter parameters
+    view_type = request.GET.get('view', 'week')
+    course_id = request.GET.get('course', '')
+    teacher_id = request.GET.get('teacher', '')
+    selected_day = request.GET.get('day', 'MON')
+    
+    # Get all groups
+    groups = StudyGroup.objects.all().select_related('course', 'course__level', 'course__track', 'teacher')
+    
+    # Filter by course if selected
+    if course_id:
+        groups = groups.filter(course_id=course_id)
+    
+    # Filter by teacher if selected
+    if teacher_id:
+        groups = groups.filter(teacher_id=teacher_id)
+    
+    # Get all group times for these groups
+    group_times = GroupTime.objects.filter(group__in=groups).select_related('group', 'group__course', 'group__teacher')
+    
+    # Build timetable structure
+    days_of_week = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+    day_names = [_('Monday'), _('Tuesday'), _('Wednesday'), _('Thursday'), _('Friday'), _('Saturday'), _('Sunday')]
+    
+    if view_type == 'day':
+        day_times = group_times.filter(day=selected_day).order_by('time')
+        timetable = {selected_day: list(day_times)}
+        display_days = [(selected_day, day_names[days_of_week.index(selected_day)])]
+    else:
+        timetable = {day: [] for day in days_of_week}
+        for gt in group_times.order_by('day', 'time'):
+            timetable[gt.day].append(gt)
+        display_days = list(zip(days_of_week, day_names))
+    
+    # Get all courses and teachers for filter dropdowns
+    all_courses = Course.objects.filter(study_groups__isnull=False).distinct()
+    all_teachers = User.objects.filter(role='teacher', teaching_groups__isnull=False).distinct()
+    
+    context = {
+        'timetable': timetable,
+        'display_days': display_days,
+        'view_type': view_type,
+        'selected_day': selected_day,
+        'courses': all_courses,
+        'teachers': all_teachers,
+        'selected_course': course_id,
+        'selected_teacher': teacher_id,
+        'user_role': 'admin',
+    }
+    
+    return render(request, 'subscriptions/timetable.html', context)

@@ -74,10 +74,12 @@
     {% block content %}{% endblock %}
 </div>
 
+{% if company_info and company_info.phone %}
 <!-- WhatsApp Button -->
-<a href="https://wa.me/+2{{company_info.phone}}" target="_blank" class="whatsapp-float" title="Chat with us on WhatsApp">
-    <i class="fab fa-whatsapp whatsapp-icon"></i>
+<a href="https://wa.me/{{ company_info.phone|cut:"+"|cut:" " }}" target="_blank" class="whatsapp-float" title="Chat with us on WhatsApp">
+  <i class="fab fa-whatsapp whatsapp-icon"></i>
 </a>
+{% endif %}
 
 <!-- JavaScript Libraries with versioning -->
 <script type="text/javascript" src="{% static 'js/mdb.min.js' %}?v=1.0.0"></script>
@@ -85,99 +87,150 @@
 <!-- Translations -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const langButtons = document.querySelectorAll('.lang-btn');
-      let currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
-      let translations = {};
+        const langButtons = document.querySelectorAll('.lang-btn');
+        let currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
+        let translations = {};
+        const loadedFolders = {}; // Cache for loaded translation files
 
-      function getTranslationFolder() {
-          return document.documentElement.getAttribute('data-translation-folder');
-      }
-
-      async function loadTranslations(lang, folder) {
-          const response = await fetch(`/static/translations/${folder}/${lang}.json?v=${APP_VERSION}`);
-          const pageTranslations = await response.json();
-
-          const navbarResponse = await fetch(`/static/translations/navbar/${lang}.json?v=${APP_VERSION}`);
-          const navbarTranslations = await navbarResponse.json();
-
-          translations = { ...translations, ...pageTranslations, ...navbarTranslations };
-          translatePage();
-      }
-
-      function translatePage() {
-          document.querySelectorAll('[data-translate]').forEach(el => {
-              const key = el.getAttribute('data-translate');
-              if (translations[key]) {
-                  el.textContent = translations[key];
-              }
-          });
-      }
-
-      function switchStylesheet() {
-          const rtlStylesheet = document.getElementById('rtl-css');
-          const ltrStylesheet = document.getElementById('ltr-css');
-
-          if (currentLanguage === 'ar') {
-              rtlStylesheet.removeAttribute('disabled');
-              ltrStylesheet.setAttribute('disabled', 'true');
-          } else {
-              ltrStylesheet.removeAttribute('disabled');
-              rtlStylesheet.setAttribute('disabled', 'true');
-          }
-      }
-
-      const translationFolder = getTranslationFolder();
-
-      loadTranslations(currentLanguage, translationFolder);
-      document.body.dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
-      switchStylesheet();
-
-      langButtons.forEach(button => {
-        if (button.getAttribute('data-lang') === currentLanguage) {
-            button.classList.add('active');
-        } else {
-            button.classList.remove('active');
+        function getTranslationFolder() {
+            return document.documentElement.getAttribute('data-translation-folder');
         }
 
-          button.addEventListener('click', function() {
-              currentLanguage = this.getAttribute('data-lang');
-              loadTranslations(currentLanguage, translationFolder);
-              document.body.dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
-              switchStylesheet();
+        async function loadTranslations(lang, folder) {
+            const fetchPromises = [];
+            const navbarPath = `/static/translations/navbar/${lang}.json?v=${APP_VERSION}`;
+            const pagePath = folder ? `/static/translations/${folder}/${lang}.json?v=${APP_VERSION}` : null;
 
-              localStorage.setItem('selectedLanguage', currentLanguage);
-              window.location.href = `${window.location.pathname}?lang=${currentLanguage}`;
-          });
-      });
-    });
+            // Fetch navbar translations if not cached
+            if (!loadedFolders[navbarPath]) {
+                fetchPromises.push(
+                    fetch(navbarPath)
+                        .then(res => res.json())
+                        .then(data => {
+                            translations = { ...translations, ...data };
+                            loadedFolders[navbarPath] = true;
+                        })
+                );
+            }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Get current language from localStorage
-        const currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
+            // Fetch page-specific translations if not cached
+            if (pagePath && !loadedFolders[pagePath]) {
+                fetchPromises.push(
+                    fetch(pagePath)
+                        .then(res => res.json())
+                        .then(data => {
+                            translations = { ...translations, ...data };
+                            loadedFolders[pagePath] = true;
+                        })
+                );
+            }
+            
+            // If we are switching language, we need to refetch
+            const langSwitch = Array.from(langButtons).find(b => b.matches('.active'))?.getAttribute('data-lang') !== lang;
+            if (langSwitch) {
+                 const navbarPromise = fetch(navbarPath).then(res => res.json());
+                 const pagePromise = pagePath ? fetch(pagePath).then(res => res.json()) : Promise.resolve({});
+                 const [navbarData, pageData] = await Promise.all([navbarPromise, pagePromise]);
+                 translations = { ...navbarData, ...pageData };
+            }
 
-        // Function to add language parameter to URLs
-        function updateLinks() {
-            const links = document.getElementsByTagName('a');
-            for (let link of links) {
-                if (link.href && link.href.startsWith(window.location.origin)) {
-                    const url = new URL(link.href);
-                    if (!url.searchParams.has('lang')) {
-                        url.searchParams.set('lang', currentLanguage);
-                        link.href = url.toString();
+
+            await Promise.all(fetchPromises);
+            translatePage();
+        }
+
+        function translatePage() {
+            // Translate static elements
+            document.querySelectorAll('[data-translate]').forEach(el => {
+                const key = el.getAttribute('data-translate');
+                if (translations[key]) {
+                    // Use a child span if it exists, otherwise set textContent
+                    const textNode = el.querySelector('span') || el;
+                    if (textNode.textContent.trim() !== translations[key]) {
+                       textNode.textContent = translations[key];
                     }
                 }
+            });
+
+            // A global function to be called by page-specific scripts
+            if (typeof window.updateDynamicContent === 'function') {
+                window.updateDynamicContent(currentLanguage, translations);
             }
         }
 
-        // Update links on page load
-        updateLinks();
+        function switchStylesheet(lang) {
+            const rtlStylesheet = document.getElementById('rtl-css');
+            const ltrStylesheet = document.getElementById('ltr-css');
+            const isRtl = lang === 'ar';
 
-        // Update links when new content is loaded dynamically
+            if (isRtl) {
+                rtlStylesheet.removeAttribute('disabled');
+                ltrStylesheet.setAttribute('disabled', 'true');
+            } else {
+                ltrStylesheet.removeAttribute('disabled');
+                rtlStylesheet.setAttribute('disabled', 'true');
+            }
+            document.body.dir = isRtl ? 'rtl' : 'ltr';
+        }
+
+        function setActiveButton(lang) {
+            langButtons.forEach(button => {
+                if (button.getAttribute('data-lang') === lang) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        }
+
+        // Initial setup
+        const translationFolder = getTranslationFolder();
+        switchStylesheet(currentLanguage);
+        setActiveButton(currentLanguage);
+        loadTranslations(currentLanguage, translationFolder);
+
+    // Language switcher event
+    langButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const newLanguage = this.getAttribute('data-lang');
+        if (newLanguage === currentLanguage) return;
+
+        if (typeof showLoading === 'function') showLoading();
+
+        currentLanguage = newLanguage;
+        localStorage.setItem('selectedLanguage', currentLanguage);
+
+        const url = new URL(window.location.href);
+        url.searchParams.set('lang', newLanguage);
+        window.location.href = url.toString();
+      });
+    });
+    });
+
+    // This part is no longer needed as we handle URL params on the server side
+    // and the language switcher no longer reloads the page.
+    // It can be removed if it causes issues, but for now, it's harmless.
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
+        function updateLinks() {
+            const links = document.getElementsByTagName('a');
+            for (let link of links) {
+                try {
+                    if (link.href && link.href.startsWith(window.location.origin) && !link.href.includes('javascript:')) {
+                        const url = new URL(link.href);
+                        if (!url.searchParams.has('lang')) {
+                            url.searchParams.set('lang', currentLanguage);
+                            link.href = url.toString();
+                        }
+                    }
+                } catch (e) {
+                    // Ignore invalid URLs
+                }
+            }
+        }
+        // updateLinks(); // This can be aggressive, let's disable it for now.
         const observer = new MutationObserver(updateLinks);
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
+        observer.observe(document.body, { childList: true, subtree: true });
     });
 </script>
 

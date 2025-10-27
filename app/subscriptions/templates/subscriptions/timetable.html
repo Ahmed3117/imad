@@ -1,0 +1,624 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load timetable_filters %}
+
+{% block translationFolder %}data-translation-folder="timetable"{% endblock %}
+
+{% block title %}
+    {% if user_role == 'teacher' %}
+        My Teaching Schedule
+    {% elif user_role == 'student' %}
+        My Class Schedule
+    {% else %}
+        All Groups Timetable
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- General & Layout --- */
+    .timetable-container {
+        background: #f9fafb;
+        padding: 1.5rem 0;
+        min-height: 100vh;
+        transition: all 0.3s ease;
+    }
+
+    /* --- Loading Spinner --- */
+    #loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+    }
+    #loading-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+    .spinner {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: 9px solid;
+        border-color: var(--second-main-color);
+        border-right-color: var(--main-color);
+        animation: spinner-d3gkfq 1s infinite linear;
+    }
+    @keyframes spinner-d3gkfq {
+        to {
+            transform: rotate(1turn);
+        }
+    }
+
+    /* --- Header --- */
+    .timetable-header {
+        background: linear-gradient(135deg, var(--main-color) 0%, var(--second-main-color) 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--box-shadow-medium);
+        text-align: center;
+    }
+    .timetable-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+        color: white;
+    }
+    .timetable-header p {
+        margin: 0.4rem 0 0 0;
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+
+    /* --- Filter Section --- */
+    .filter-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--box-shadow-light);
+    }
+    .filter-controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1.5rem;
+        align-items: end;
+    }
+    .filter-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--second-main-color);
+        font-size: 0.9rem;
+    }
+    .filter-group select {
+        width: 100%;
+        padding: 0.6rem;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        background-color: #f8f9fa;
+        transition: all 0.3s;
+    }
+    .filter-group select:focus {
+        outline: none;
+        border-color: var(--main-color);
+        box-shadow: 0 0 0 4px rgba(var(--main-color-rgb), 0.15);
+        background-color: white;
+    }
+
+    /* --- View Toggle --- */
+    .view-toggle {
+        display: flex;
+        gap: 0.5rem;
+        background: #e9ecef;
+        padding: 0.3rem;
+        border-radius: 8px;
+    }
+    .view-toggle button {
+        flex: 1;
+        padding: 0.5rem 1rem;
+        border: none;
+        background: transparent;
+        color: #495057;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    .view-toggle button.active {
+        background: var(--main-color);
+        color: white;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    }
+
+    /* --- Timetable Grid --- */
+    .timetable-grid {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--box-shadow-light);
+    }
+    .timetable-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .timetable-table thead {
+        background: var(--second-main-color);
+        color: white;
+    }
+    .timetable-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 1rem;
+        border-bottom: 3px solid var(--main-color);
+    }
+    .timetable-table tbody tr {
+        border-bottom: 1px solid #e9ecef;
+    }
+    .timetable-table tbody tr:last-child {
+        border-bottom: none;
+    }
+    .timetable-table td {
+        padding: 1.5rem 1rem;
+        vertical-align: top;
+    }
+    .day-cell {
+        font-weight: 700;
+        color: var(--second-main-color);
+        font-size: 1.1rem;
+        width: 150px;
+    }
+
+    /* --- Session Cards --- */
+    .sessions-cell {
+        display: flex;
+        overflow-x: auto;
+        gap: 1rem;
+        padding: 0.5rem 1rem 1rem 1rem; /* Add horizontal padding */
+        scrollbar-width: thin;
+        scrollbar-color: var(--main-color) #f1f1f1;
+        scroll-snap-type: x mandatory; /* Enable snap scrolling */
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    }
+    .sessions-cell::-webkit-scrollbar {
+        height: 8px;
+    }
+    .sessions-cell::-webkit-scrollbar-track {
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    .sessions-cell::-webkit-scrollbar-thumb {
+        background-color: var(--main-color);
+        border-radius: 10px;
+        border: 2px solid #f8f9fa;
+    }
+    .sessions-cell::-webkit-scrollbar-thumb:hover {
+        background-color: var(--second-main-color);
+    }
+
+    .session-card {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-left: 4px solid var(--main-color);
+        padding: 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        width: 260px;
+        flex-shrink: 0;
+    }
+    .session-card:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 8px 20px rgba(var(--main-color-rgb), 0.2);
+        border-color: var(--main-color);
+    }
+    .session-card-link {
+        text-decoration: none;
+        color: inherit;
+        scroll-snap-align: start; /* Snap to the start of each card */
+    }
+    .session-card-link:hover {
+        color: inherit;
+    }
+    .session-time {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--main-color);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .session-group {
+        font-weight: 600;
+        color: var(--second-main-color);
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+    .session-info {
+        font-size: 0.85rem;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-bottom: 0.3rem;
+    }
+    .session-info i {
+        width: 15px;
+        text-align: center;
+    }
+    .badge {
+        display: inline-block;
+        padding: 0.3rem 0.7rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+    .badge-primary {
+        background: var(--sub-color);
+        color: white;
+    }
+
+    /* --- Empty State --- */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #a0aec0;
+    }
+    .empty-state i {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+        color: var(--main-color);
+        opacity: 0.6;
+    }
+    .empty-state h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: #4a5568;
+    }
+    .empty-state p {
+        font-size: 1rem;
+    }
+
+    /* --- Responsive Design --- */
+    @media (max-width: 992px) {
+        .filter-controls {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+        .sessions-cell {
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        }
+    }
+    @media (max-width: 768px) {
+        .timetable-header h1 {
+            font-size: 1.75rem;
+        }
+        .timetable-table, .timetable-table thead, .timetable-table tbody, .timetable-table th, .timetable-table td, .timetable-table tr {
+            display: block;
+        }
+        .timetable-table thead {
+            display: none;
+        }
+        .timetable-table tr {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .timetable-table td {
+            border: none;
+            position: relative;
+            padding: 0.75rem 1rem;
+        }
+        .day-cell {
+            background: var(--second-main-color);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px 8px 0 0;
+            width: auto;
+        }
+        .sessions-cell {
+            display: flex;
+            overflow-x: auto;
+            gap: 1rem;
+            padding: 0.5rem 0 1rem 0;
+        }
+    }
+    @media (max-width: 576px) {
+        .timetable-container {
+            padding: 1rem 0;
+        }
+        .timetable-header, .filter-section, .timetable-grid {
+            border-radius: 0;
+        }
+        .filter-controls {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="loading-overlay">
+    <div class="spinner"></div>
+</div>
+
+<div class="timetable-container container-fluid">
+    <!-- Header -->
+    <div class="container">
+        <div class="timetable-header">
+            <h1>
+                <i class="fas fa-calendar-alt"></i>
+                {% if user_role == 'teacher' %}
+                    <span data-translate="teacher_schedule_title">My Teaching Schedule</span>
+                {% elif user_role == 'student' %}
+                    <span data-translate="student_schedule_title">My Class Schedule</span>
+                {% else %}
+                    <span data-translate="admin_schedule_title">All Groups Timetable</span>
+                {% endif %}
+            </h1>
+            <p data-translate="weekly_overview">Weekly Schedule Overview</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-section">
+            <form method="get" id="filterForm">
+                <div class="filter-controls">
+                    <!-- View Type Toggle -->
+                    <div class="filter-group">
+                        <label data-translate="view">View</label>
+                        <div class="view-toggle">
+                            <button type="button" class="{% if view_type == 'week' %}active{% endif %}" 
+                                    onclick="changeView('week')">
+                                <i class="fas fa-calendar-week"></i> <span data-translate="week_view">Week</span>
+                            </button>
+                            <button type="button" class="{% if view_type == 'day' %}active{% endif %}" 
+                                    onclick="changeView('day')">
+                                <i class="fas fa-calendar-day"></i> <span data-translate="day_view">Day</span>
+                            </button>
+                        </div>
+                        <input type="hidden" name="view" id="viewInput" value="{{ view_type }}">
+                    </div>
+
+                    <!-- Day Filter (only for day view) -->
+                    {% if view_type == 'day' %}
+                    <div class="filter-group">
+                        <label for="daySelect"><i class="fas fa-calendar-day"></i> <span data-translate="day_label">Day</span></label>
+                        <select name="day" id="daySelect" onchange="this.form.submit()">
+                            <option value="MON" {% if selected_day == 'MON' %}selected{% endif %} data-translate="monday">Monday</option>
+                            <option value="TUE" {% if selected_day == 'TUE' %}selected{% endif %} data-translate="tuesday">Tuesday</option>
+                            <option value="WED" {% if selected_day == 'WED' %}selected{% endif %} data-translate="wednesday">Wednesday</option>
+                            <option value="THU" {% if selected_day == 'THU' %}selected{% endif %} data-translate="thursday">Thursday</option>
+                            <option value="FRI" {% if selected_day == 'FRI' %}selected{% endif %} data-translate="friday">Friday</option>
+                            <option value="SAT" {% if selected_day == 'SAT' %}selected{% endif %} data-translate="saturday">Saturday</option>
+                            <option value="SUN" {% if selected_day == 'SUN' %}selected{% endif %} data-translate="sunday">Sunday</option>
+                        </select>
+                    </div>
+                    {% endif %}
+
+                    <!-- Course Filter -->
+                    <div class="filter-group">
+                        <label for="courseSelect"><i class="fas fa-book"></i> <span data-translate="course_label">Course</span></label>
+                        <select name="course" id="courseSelect" onchange="this.form.submit()">
+                            <option value="" data-translate="all_courses">All Courses</option>
+                            {% for course in courses %}
+                                <option value="{{ course.id }}" {% if selected_course == course.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ course.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Teacher Filter (for students and admins) -->
+                    {% if user_role != 'teacher' %}
+                    <div class="filter-group">
+                        <label for="teacherSelect"><i class="fas fa-chalkboard-teacher"></i> <span data-translate="teacher_label">Teacher</span></label>
+                        <select name="teacher" id="teacherSelect" onchange="this.form.submit()">
+                            <option value="" data-translate="all_teachers">All Teachers</option>
+                            {% for teacher in teachers %}
+                                <option value="{{ teacher.id }}" {% if selected_teacher == teacher.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ teacher.get_full_name|default:teacher.username }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Timetable Grid -->
+        <div class="timetable-grid">
+            {% if timetable %}
+                <table class="timetable-table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-calendar-day"></i> <span data-translate="day_column">Day</span></th>
+                            <th><i class="fas fa-clock"></i> <span data-translate="sessions_column">Sessions</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for day_code, day_name in display_days %}
+                            <tr>
+                                <td class="day-cell">
+                                    {% if day_code == 'MON' %}
+                                        <span data-translate="monday">{{ day_name }}</span>
+                                    {% elif day_code == 'TUE' %}
+                                        <span data-translate="tuesday">{{ day_name }}</span>
+                                    {% elif day_code == 'WED' %}
+                                        <span data-translate="wednesday">{{ day_name }}</span>
+                                    {% elif day_code == 'THU' %}
+                                        <span data-translate="thursday">{{ day_name }}</span>
+                                    {% elif day_code == 'FRI' %}
+                                        <span data-translate="friday">{{ day_name }}</span>
+                                    {% elif day_code == 'SAT' %}
+                                        <span data-translate="saturday">{{ day_name }}</span>
+                                    {% elif day_code == 'SUN' %}
+                                        <span data-translate="sunday">{{ day_name }}</span>
+                                    {% else %}
+                                        {{ day_name }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if timetable|get_item:day_code %}
+                                        <div class="sessions-cell">
+                                            {% for group_time in timetable|get_item:day_code %}
+                                                <a href="{% if user_role == 'admin' %}{% url 'subscriptions:studygroup_report' group_time.group.id %}{% else %}{% url 'accounts:lectures' group_time.group.id %}{% endif %}" class="session-card-link">
+                                                    <div class="session-card">
+                                                        <div class="session-time">
+                                                            <i class="fas fa-clock"></i>
+                                                            {{ group_time.time|time:'h:i A' }}
+                                                        </div>
+                                                        <div class="session-group">
+                                                            <i class="fas fa-users"></i> {{ group_time.group.name }}
+                                                        </div>
+                                                        <div class="session-info">
+                                                            <i class="fas fa-book"></i>
+                                                            <span class="model-translatable" 
+                                                                  data-model-type="course" 
+                                                                  data-model-id="{{ group_time.group.course.id }}"
+                                                                  data-translations='{{ group_time.group.course|model_translations }}'>
+                                                                {{ group_time.group.course.name }}
+                                                            </span>
+                                                            {% if group_time.group.course.level %}
+                                                                - <span class="model-translatable" 
+                                                                        data-model-type="level" 
+                                                                        data-model-id="{{ group_time.group.course.level.id }}"
+                                                                        data-translations='{{ group_time.group.course.level|model_translations }}'>
+                                                                    {{ group_time.group.course.level.name }}
+                                                                  </span>
+                                                            {% endif %}
+                                                        </div>
+                                                        {% if user_role != 'teacher' %}
+                                                        <div class="session-info">
+                                                            <i class="fas fa-chalkboard-teacher"></i>
+                                                            {{ group_time.group.teacher.get_full_name|default:group_time.group.teacher.username }}
+                                                        </div>
+                                                        {% endif %}
+                                                        <div class="session-info">
+                                                            <i class="fas fa-user-graduate"></i>
+                                                            {{ group_time.group.students.count }} 
+                                                            {% if group_time.group.students.count == 1 %}
+                                                                <span data-translate="student">student</span>
+                                                            {% else %}
+                                                                <span data-translate="students">students</span>
+                                                            {% endif %}
+                                                            {% if group_time.group.capacity %}
+                                                                / {{ group_time.group.capacity }}
+                                                            {% endif %}
+                                                        </div>
+                                                        {% if group_time.group.course.track %}
+                                                            <span class="badge badge-primary model-translatable" 
+                                                                  data-model-type="track" 
+                                                                  data-model-id="{{ group_time.group.course.track.id }}"
+                                                                  data-translations='{{ group_time.group.course.track|model_translations }}'>
+                                                                {{ group_time.group.course.track.name }}
+                                                            </span>
+                                                        {% endif %}
+                                                    </div>
+                                                </a>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <div style="color: #a0aec0; font-style: italic; padding: 0.5rem;">
+                                            <i class="fas fa-info-circle"></i> <span data-translate="no_sessions">No sessions</span>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <h3 data-translate="no_schedule_title">No Schedule Available</h3>
+                    <p data-translate="no_schedule_message">There are no sessions scheduled for the selected filters.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function showLoading() {
+        document.getElementById('loading-overlay').classList.add('show');
+    }
+
+    function hideLoading() {
+        document.getElementById('loading-overlay').classList.remove('show');
+    }
+
+    function changeView(viewType) {
+        showLoading();
+        document.getElementById('viewInput').value = viewType;
+        document.getElementById('filterForm').submit();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show loading on form submission
+        const filterForm = document.getElementById('filterForm');
+        if (filterForm) {
+            filterForm.addEventListener('submit', showLoading);
+        }
+
+        // Hide loading when page is fully loaded
+        window.addEventListener('load', hideLoading);
+
+        // Also hide loading if the user navigates back
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                hideLoading();
+            }
+        });
+
+        // Translate model content (courses, levels, tracks)
+        function translateModels() {
+            const currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
+            const modelElements = document.querySelectorAll('.model-translatable');
+            
+            modelElements.forEach(el => {
+                const translationsData = el.getAttribute('data-translations');
+                if (translationsData) {
+                    try {
+                        const translations = JSON.parse(translationsData);
+                        if (translations[currentLanguage]) {
+                            el.textContent = translations[currentLanguage];
+                        }
+                    } catch (e) {
+                        console.error('Error parsing translations:', e);
+                    }
+                }
+            });
+        }
+
+        // Translate on page load
+        translateModels();
+
+        // Re-translate when language buttons are clicked
+        const langButtons = document.querySelectorAll('.lang-btn');
+        langButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                showLoading();
+                // Wait a bit for localStorage to update and page to reload
+                setTimeout(translateModels, 100);
+            });
+        });
+    });
+</script>
+{% endblock %}
