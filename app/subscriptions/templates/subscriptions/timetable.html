@@ -148,12 +148,13 @@
     .timetable-grid {
         background: white;
         border-radius: 12px;
-        overflow: hidden;
+        overflow: visible;
         box-shadow: var(--box-shadow-light);
     }
     .timetable-table {
         width: 100%;
         border-collapse: collapse;
+        table-layout: fixed;
     }
     .timetable-table thead {
         background: var(--second-main-color);
@@ -193,6 +194,7 @@
         scrollbar-color: var(--main-color) #f1f1f1;
         scroll-snap-type: x mandatory; /* Enable snap scrolling */
         -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        max-width: 100%;
     }
     .sessions-cell::-webkit-scrollbar {
         height: 8px;
