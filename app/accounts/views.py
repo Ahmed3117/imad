@@ -409,6 +409,8 @@ class LectureFileForm(forms.ModelForm):
 
 # Helper function to check access
 def check_study_group_access(request, study_group):
+    if request.user.role == 'admin' or request.user.is_superuser:
+        return True
     if request.user.role == 'teacher' and study_group.teacher != request.user:
         return False
     elif request.user.role == 'student' and request.user not in study_group.students.all():
@@ -751,16 +753,19 @@ def visit_lecture_link(request, lecture_id):
     # Check if user is a student in this lecture's study group
     is_student = (request.user in lecture.group.students.all())
 
-    # Verify the user is either the teacher or a student in the group
-    if not (is_teacher or is_student):
+    # Check if the user is an admin or superuser
+    is_admin = (request.user.role == 'admin' or request.user.is_superuser)
+
+    # Verify the user is the teacher, a student in the group, or an admin
+    if not (is_teacher or is_student or is_admin):
         return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
 
     # Verify the link is valid
     if not lecture.live_link or (not lecture.is_owner_link and not lecture.is_link_valid()):
         return JsonResponse({'success': False, 'message': 'This session link is not available'}, status=400)
 
-    # Record the visit if the user is a teacher
-    if is_teacher:
+    # Record the visit if the user is a teacher or admin
+    if is_teacher or is_admin:
         lecture.record_visit(request.user)
 
     return JsonResponse({

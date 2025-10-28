@@ -14,5 +14,10 @@
     "login": "Login",
     "logeneral_libraryin": "General Library",
     "customer_service": " Customer Service",
-    "ask_for_meet": "ask for free guide"
+    "ask_for_meet": "ask for free guide",
+    "my_timetable": "My Timetable",
+    "my_schedule": "My Schedule",
+    "all_timetables": "All Timetables",
+    "track_lectures": "Track Lectures",
+    "general_library": "General Library"
 }

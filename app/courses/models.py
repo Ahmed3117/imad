@@ -11,6 +11,14 @@ class Level(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def get_translated_name(self, language='en'):
+        """Get translated name for this level"""
+        try:
+            translation = self.translations.get(language=language)
+            return translation.translated_name
+        except LevelTranslation.DoesNotExist:
+            return self.name
 
 
 class Track(models.Model):
@@ -19,6 +27,14 @@ class Track(models.Model):
 
     def __str__(self):
         return f"{self.level.name} | {self.name}"
+    
+    def get_translated_name(self, language='en'):
+        """Get translated name for this track"""
+        try:
+            translation = self.translations.get(language=language)
+            return translation.translated_name
+        except TrackTranslation.DoesNotExist:
+            return self.name
 
 
 class Course(models.Model):
@@ -38,6 +54,22 @@ class Course(models.Model):
         
         # Return a string with level, track, and name
         return f"{level_name} | {track_name} | {self.name}"
+    
+    def get_translated_name(self, language='en'):
+        """Get translated name for this course"""
+        try:
+            translation = self.translations.get(language=language)
+            return translation.translated_name
+        except CourseTranslation.DoesNotExist:
+            return self.name
+    
+    def get_translated_description(self, language='en'):
+        """Get translated description for this course"""
+        try:
+            translation = self.translations.get(language=language)
+            return translation.translated_description
+        except CourseTranslation.DoesNotExist:
+            return self.description
 
 
 
