@@ -101,6 +101,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'about.context_processors.get_logo_url',
+                'about.context_processors.get_company_info',
             ],
         },
     },
@@ -164,7 +165,7 @@ STATIC_URL  = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Define STATIC_ROOT for collectstatic to gather files
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 

@@ -26,6 +26,27 @@
                     <li class="nav-item px-2">
                         <a class="nav-link fw-bold" href="#who-we-are" data-translate="who_we_are_title"><span>Who We Are</span></a>
                     </li>
+                    {% if request.user.is_authenticated %}
+                        {% if request.user.role == "teacher" %}
+                        <li class="nav-item px-2">
+                            <a class="nav-link fw-bold" aria-current="page" href="{% url 'subscriptions:teacher_timetable' %}" data-translate="my_timetable">
+                                <i class="fas fa-calendar-alt"></i> <span>My Timetable</span>
+                            </a>
+                        </li>
+                        {% elif request.user.role == "student" %}
+                        <li class="nav-item px-2">
+                            <a class="nav-link fw-bold" aria-current="page" href="{% url 'subscriptions:student_timetable' %}" data-translate="my_schedule">
+                                <i class="fas fa-calendar-alt"></i> <span>My Schedule</span>
+                            </a>
+                        </li>
+                        {% elif request.user.role == "admin" or request.user.is_superuser %}
+                        <li class="nav-item px-2">
+                            <a class="nav-link fw-bold" aria-current="page" href="{% url 'subscriptions:admin_timetable' %}" data-translate="all_timetables">
+                                <i class="fas fa-calendar-alt"></i> <span>All Timetables</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    {% endif %}
                     {% if request.user.is_superuser %}
                                 <li>
                                     <a class="nav-link fw-bold" href="{% url "chat:dashboard" %}" >
@@ -116,6 +137,19 @@
             <a href="{% url 'courses:levels' %}" class="btn btn-primary btn-lg hero-button" data-translate="hero_button">Get Started Today</a>
             {% if request.user.is_authenticated %}
             <a href="{% url 'accounts:profile' %}" class="btn btn-accent btn-lg profile-button" data-translate="profile">My Profile</a>
+            {% if request.user.role == "teacher" %}
+            <a href="{% url 'subscriptions:teacher_timetable' %}" class="btn btn-success btn-lg hero-button" data-translate="view_my_timetable">
+                <i class="fas fa-calendar-alt"></i> View My Timetable
+            </a>
+            {% elif request.user.role == "student" %}
+            <a href="{% url 'subscriptions:student_timetable' %}" class="btn btn-success btn-lg hero-button" data-translate="view_my_schedule">
+                <i class="fas fa-calendar-alt"></i> View My Schedule
+            </a>
+            {% elif request.user.role == "admin" or request.user.is_superuser %}
+            <a href="{% url 'subscriptions:admin_timetable' %}" class="btn btn-success btn-lg hero-button" data-translate="view_all_timetables">
+                <i class="fas fa-calendar-alt"></i> View All Timetables
+            </a>
+            {% endif %}
             {% endif %}
             {% if not request.user.is_superuser %}
             <a href="{% url 'chat:contact' %}" class="btn btn-info btn-lg hero-button" data-translate="chat_with_us">Chat with Us</a>

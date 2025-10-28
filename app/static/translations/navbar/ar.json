@@ -14,6 +14,10 @@
     "login": "تسجيل الدخول",
     "general_library": "المكتبة العامة",
     "customer_service": "خدمة العملاء",
-    "ask_for_meet": "طلب ارشاد مجانى"
+    "ask_for_meet": "طلب ارشاد مجانى",
+    "my_timetable": "جدولي التعليمي",
+    "my_schedule": "جدول حصصي",
+    "all_timetables": "كل الجداول",
+    "track_lectures": "تتبع المحاضرات"
 }
 
