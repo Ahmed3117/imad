@@ -154,7 +154,7 @@
     .timetable-table {
         width: 100%;
         border-collapse: collapse;
-        table-layout: fixed;
+        table-layout: auto;
     }
     .timetable-table thead {
         background: var(--second-main-color);
@@ -166,6 +166,9 @@
         font-weight: 600;
         font-size: 1rem;
         border-bottom: 3px solid var(--main-color);
+    }
+    .timetable-table th:first-child {
+        width: 150px;
     }
     .timetable-table tbody tr {
         border-bottom: 1px solid #e9ecef;
@@ -182,6 +185,7 @@
         color: var(--second-main-color);
         font-size: 1.1rem;
         width: 150px;
+        white-space: nowrap;
     }
 
     /* --- Session Cards --- */
@@ -189,12 +193,13 @@
         display: flex;
         overflow-x: auto;
         gap: 1rem;
-        padding: 0.5rem 1rem 1rem 1rem; /* Add horizontal padding */
+        padding: 0.5rem 0 1rem 0; /* Remove horizontal padding */
         scrollbar-width: thin;
         scrollbar-color: var(--main-color) #f1f1f1;
         scroll-snap-type: x mandatory; /* Enable snap scrolling */
         -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
         max-width: 100%;
+        justify-content: flex-start; /* Align items to the start */
     }
     .sessions-cell::-webkit-scrollbar {
         height: 8px;
