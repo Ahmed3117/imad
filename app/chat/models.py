@@ -44,6 +44,9 @@ class Room(models.Model):
         """Reset the user unread count when a user opens the room"""
         self.user_unread_count = 0
         self.save(update_fields=['user_unread_count'])
+        
+    class Meta:
+        app_label = 'chat'
 
 class Message(models.Model):
     room = models.ForeignKey(Room, related_name='messages', on_delete=models.CASCADE)
@@ -67,3 +70,6 @@ class Message(models.Model):
             else:
                 # If message is from user, increment admin unread count
                 self.room.increment_admin_unread()
+                
+    class Meta:
+        app_label = 'chat'

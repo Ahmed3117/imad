@@ -32,6 +32,7 @@ class Assignment(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        app_label = 'assignment'
 
 
 class StudentAnswer(models.Model):
@@ -66,3 +67,4 @@ class StudentAnswer(models.Model):
     class Meta:
         unique_together = ('assignment', 'student')
         ordering = ['-submitted_at']
+        app_label = 'assignment'

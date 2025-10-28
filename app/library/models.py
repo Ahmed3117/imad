@@ -13,6 +13,7 @@ class LibraryCategory(models.Model):
 
     class Meta:
         verbose_name_plural = "Library Categories"
+        app_label = 'library'
 
 # Update CourseLibrary model
 class CourseLibrary(models.Model):
@@ -23,6 +24,9 @@ class CourseLibrary(models.Model):
     def __str__(self):
         return f"{self.course.name} | {self.file.name} | {self.category.name if self.category else 'Uncategorized'}"
 
+    class Meta:
+        app_label = 'library'
+
 
 
 class MyLibrary(models.Model):
@@ -31,6 +35,9 @@ class MyLibrary(models.Model):
     file = models.FileField(upload_to='courseslibraries/')
     def __str__(self):
         return f"{self.user.username} | {self.course.name} | {self.file.name}"
+    
+    class Meta:
+        app_label = 'library'
     
 
 
