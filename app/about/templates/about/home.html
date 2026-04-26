@@ -8,12 +8,12 @@
 {% block content %}
 
 <!-- Hero Section -->
-<div class="hero-section">
+<div class="hero-section"{% if home_page.hero_background_image %} style="background-image: url('{{ home_page.hero_background_image.url }}');"{% endif %}>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg fixed-top " style="background-color :#0000001c !important;">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <img src="{{ logo_url }}" alt="Logo">
+                <img src="{% if logo_url %}{{ logo_url }}{% else %}{% static 'imgs/bg/l2.png' %}{% endif %}" alt="Logo">
             </a>
             <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="fas fa-bars"></i>
@@ -84,8 +84,9 @@
                                 {% endif %}
                             {% endif %}
                             <li><a class="dropdown-item" href="#teachers" data-translate="our_teachers"><span>Our Team</span></a></li>
+                            <li><a class="dropdown-item" href="#family-bundle"><span>Family Bundle</span></a></li>
                             <li><a class="dropdown-item" href="#contact" data-translate="contacts"><span>Contact</span></a></li>
-                             
+
                         </ul>
                     </li>
                     <li class="nav-item px-2 d-flex align-items-center mx-md-2">
@@ -131,10 +132,15 @@
 
     <!-- Hero Content -->
     <div class="hero-content container">
-        <h1 class="hero-title" data-translate="hero_title">Unlock Your Potential with Our E-Learning Platform</h1>
-        <p class="hero-description" data-translate="hero_description">Join thousands of learners worldwide and start your journey to success with our comprehensive courses and expert instructors.</p>
+        {% if home_page_text.hero_badge %}
+        <div class="mb-3">
+            <span class="badge bg-light text-dark px-3 py-2 rounded-pill">{{ home_page_text.hero_badge }}</span>
+        </div>
+        {% endif %}
+        <h1 class="hero-title">{{ home_page_text.hero_title }}</h1>
+        <p class="hero-description">{{ home_page_text.hero_description }}</p>
         <div>
-            <a href="{% url 'courses:levels' %}" class="btn btn-primary btn-lg hero-button" data-translate="hero_button">Get Started Today</a>
+            <a href="{% url 'courses:levels' %}" class="btn btn-primary btn-lg hero-button">{{ home_page_text.hero_primary_button_text }}</a>
             {% if request.user.is_authenticated %}
             <a href="{% url 'accounts:profile' %}" class="btn btn-accent btn-lg profile-button" data-translate="profile">My Profile</a>
             {% if request.user.role == "teacher" %}
@@ -154,65 +160,91 @@
             {% if not request.user.is_superuser %}
             <a href="{% url 'chat:contact' %}" class="btn btn-info btn-lg hero-button" data-translate="chat_with_us">Chat with Us</a>
             {% endif %}
+            {% if not request.user.is_superuser %}
+                {% if not request.user.is_authenticated or request.user.role == 'student' or request.user.role == 'parent' or request.user.role == 'cs' %}
+                <a href="#free-session" class="btn btn-free-trial btn-lg hero-button position-relative overflow-hidden" data-translate="book_free_session_btn">
+                    <i class="fas fa-gift me-2"></i>
+                    <span>Book a Free Session</span>
+                    <span class="free-trial-badge">FREE</span>
+                    <span class="free-trial-shimmer"></span>
+                </a>
+                {% endif %}
+            {% endif %}
         </div>
+
+        <div class="row g-3 mt-4">
+            {% if home_page_text.hero_trust_badge_1 %}
+            <div class="col-sm-6 col-lg-3">
+                <div class="feature-card card h-100 border-0">
+                    <div class="card-body text-center p-3">
+                        <p class="mb-0 fw-semibold">{{ home_page_text.hero_trust_badge_1 }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% if home_page_text.hero_trust_badge_2 %}
+            <div class="col-sm-6 col-lg-3">
+                <div class="feature-card card h-100 border-0">
+                    <div class="card-body text-center p-3">
+                        <p class="mb-0 fw-semibold">{{ home_page_text.hero_trust_badge_2 }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% if home_page_text.hero_trust_badge_3 %}
+            <div class="col-sm-6 col-lg-3">
+                <div class="feature-card card h-100 border-0">
+                    <div class="card-body text-center p-3">
+                        <p class="mb-0 fw-semibold">{{ home_page_text.hero_trust_badge_3 }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% if home_page_text.hero_trust_badge_4 %}
+            <div class="col-sm-6 col-lg-3">
+                <div class="feature-card card h-100 border-0">
+                    <div class="card-body text-center p-3">
+                        <p class="mb-0 fw-semibold">{{ home_page_text.hero_trust_badge_4 }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if home_page_text.hero_pricing_note %}
+        <p class="mt-4 mb-0 lead">{{ home_page_text.hero_pricing_note }}</p>
+        {% endif %}
     </div>
 </div>
 
-<!-- features -->
+
+<!-- Primary Features Section -->
+{% if home_page.show_primary_features %}
 <section class="features-section py-6 my-5">
     <div class="container">
-        <div class="row justify-content-center"></div>
-            <div class=" text-center mb-5">
-                <h2 class="display-5 fw-bold mb-3 text-gradient" data-translate="learning_journey">Start Your Learning Journey</h2>
-                <p class="lead text-muted" data-translate="platform_features">Discover the key features that make our e-learning platform stand out</p>
+        <div class="row justify-content-center">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold mb-3 text-gradient">{{ home_page_text.primary_features_title }}</h2>
+                <p class="lead text-muted">{{ home_page_text.primary_features_description }}</p>
             </div>
         </div>
-        <div class="container ">
-            <div class="container row ">
+        <div class="container">
+            <div class="container row">
+                {% for feature in home_page_primary_features %}
                 <div class="col-md-6 col-lg-3 mb-4">
                     <div class="feature-card card h-100 border-0 transform-hover">
                         <div class="card-body d-flex flex-column align-items-center text-center p-4">
                             <div class="feature-icon-wrapper mb-3">
-                                <i class="fas fa-graduation-cap fa-2x text-primary"></i>
+                                <i class="{{ feature.icon_class }} fa-2x text-primary"></i>
                             </div>
-                            <h4 class="fw-bold mb-2" data-translate="expert_teachers">Expert Teachers</h4>
-                            <p class="text-muted" data-translate="expert_teachers_desc">Learn from certified professionals with years of teaching experience</p>
+                            <h4 class="fw-bold mb-2">{{ feature.title }}</h4>
+                            <p class="text-muted">{{ feature.description }}</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="feature-card card h-100 border-0 transform-hover">
-                        <div class="card-body d-flex flex-column align-items-center text-center p-4">
-                            <div class="feature-icon-wrapper mb-3">
-                                <i class="fas fa-book-reader fa-2x text-primary"></i>
-                            </div>
-                            <h4 class="fw-bold mb-2" data-translate="learning_resources">Rich Resources</h4>
-                            <p class="text-muted" data-translate="learning_resources_desc">Access comprehensive study materials, videos, and practice exercises</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="feature-card card h-100 border-0 transform-hover">
-                        <div class="card-body d-flex flex-column align-items-center text-center p-4">
-                            <div class="feature-icon-wrapper mb-3">
-                                <i class="fas fa-clock fa-2x text-primary"></i>
-                            </div>
-                            <h4 class="fw-bold mb-2" data-translate="flexible_learning">Flexible Learning</h4>
-                            <p class="text-muted" data-translate="flexible_learning_desc">Study at your own pace with 24/7 access to course materials</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="feature-card card h-100 border-0 transform-hover">
-                        <div class="card-body d-flex flex-column align-items-center text-center p-4">
-                            <div class="feature-icon-wrapper mb-3">
-                                <i class="fas fa-brain fa-2x text-primary"></i>
-                            </div>
-                            <h4 class="fw-bold mb-2" data-translate="practical_skills">Practical Skills</h4>
-                            <p class="text-muted" data-translate="practical_skills_desc">Gain hands-on experience through interactive exercises and projects</p>
-                        </div>
-                    </div>
-                </div>
+                {% empty %}
+                <p class="text-muted text-center w-100 py-4">{{ home_page_text.primary_features_empty_text }}</p>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -221,7 +253,7 @@
         .features-section {
             background: linear-gradient(to bottom, rgba(var(--main-color-rgb), 0.05), transparent);
         }
-        
+
         .text-gradient {
             background: linear-gradient(45deg, var(--main-color), var(--sub-color));
             -webkit-background-clip: text;
@@ -259,79 +291,89 @@
     </style>
 
 </section>
+{% endif %}
 
 
 <!-- Who We Are Section -->
+{% if home_page.show_who_we_are_section %}
 <section class="who-we-are-section" id="who-we-are">
     <div class="container">
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
-                <img src="{% static 'imgs/bg/t3.jpg' %}" alt="Who We Are" class="img-fluid w-100">
+                <img
+                    src="{% if home_page.who_we_are_image %}{{ home_page.who_we_are_image.url }}{% else %}{% static 'imgs/bg/t3.jpg' %}{% endif %}"
+                    alt="Who We Are"
+                    class="img-fluid w-100"
+                >
             </div>
             <div class="col-lg-6">
-                <h2 class="display-5 fw-bold mb-4" data-translate="who_we_are_title">Who We Are</h2>
-                <p class="lead mb-4" data-translate="who_we_are_p1">
-                    We are a passionate team of educators, technologists, and innovators dedicated to transforming the online learning experience. Our mission is to make high-quality education accessible, engaging, and effective for everyone, everywhere.
-                </p>
-                <p class="mb-4" data-translate="who_we_are_p2">
-                    Founded on the belief that learning should be limitless, we strive to create a platform that not only imparts knowledge but also fosters curiosity, critical thinking, and a lifelong love for learning. We connect expert instructors with eager learners in a dynamic and supportive environment.
-                </p>
-                <a href="{% url 'courses:levels' %}" class="btn btn-primary" data-translate="explore_courses">Explore Our Courses</a>
+                <h2 class="display-5 fw-bold mb-4">{{ home_page_text.who_we_are_title }}</h2>
+                <p class="lead mb-4">{{ home_page_text.who_we_are_lead }}</p>
+                <p class="mb-4">{{ home_page_text.who_we_are_description }}</p>
+                <a href="{% url 'courses:levels' %}" class="btn btn-primary">{{ home_page_text.who_we_are_button_text }}</a>
             </div>
         </div>
     </div>
 </section>
+{% endif %}
+
 
 <!-- Video Section -->
+{% if home_page.show_video_section %}
 <section class="video-section" id="video">
     <div class="container">
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
                 <div class="video-container position-relative">
-                    <img src="{% static 'imgs/bg/t1.png' %}" alt="Video Cover" class="img-fluid" id="video-cover">
+                    <img
+                        src="{% if home_page.video_cover_image %}{{ home_page.video_cover_image.url }}{% else %}{% static 'imgs/bg/t1.png' %}{% endif %}"
+                        alt="Video Cover"
+                        class="img-fluid"
+                        id="video-cover"
+                    >
                     <button id="play-pause-button">
                         <i class="fas fa-play" id="play-icon"></i>
                     </button>
                     <video id="video-player" class="w-100" style="display: none;" controls>
+                        {% if home_page.intro_video %}
+                        <source src="{{ home_page.intro_video.url }}" type="video/mp4">
+                        {% else %}
                         <source src="{% static 'videos/nab.mp4' %}" type="video/mp4">
+                        {% endif %}
                         Your browser does not support the video tag.
                     </video>
                 </div>
             </div>
             <div class="col-lg-6 video-text-content">
-                <h2 class="display-5 fw-bold mb-4" data-translate="discover_platform">Discover Our Platform</h2>
-                <p class="lead mb-4" data-translate="discover_platform_desc">
-                    Watch our introductory video to learn more about our innovative e-learning platform and how it can help you achieve your educational goals.
-                </p>
+                <h2 class="display-5 fw-bold mb-4">{{ home_page_text.video_section_title }}</h2>
+                <p class="lead mb-4">{{ home_page_text.video_section_description }}</p>
+                {% for point in home_page_video_points %}
+                <div class="d-flex align-items-start mb-3">
+                    <i class="{{ point.icon_class }} fa-fw fa-lg me-3 mt-1"></i>
+                    <p class="mb-0">{{ point.text }}</p>
+                </div>
+                {% empty %}
                 <div class="d-flex align-items-start mb-3">
                     <i class="fas fa-check-circle fa-fw fa-lg me-3 mt-1"></i>
-                    <p class="mb-0" data-translate="feature_video">High-quality video lectures from expert instructors</p>
+                    <p class="mb-0">{{ home_page_text.video_point_fallback }}</p>
                 </div>
-                <div class="d-flex align-items-start mb-3">
-                    <i class="fas fa-check-circle fa-fw fa-lg me-3 mt-1"></i>
-                    <p class="mb-0" data-translate="feature_interactive">Interactive learning materials and resources</p>
-                </div>
-                <div class="d-flex align-items-start">
-                    <i class="fas fa-check-circle fa-fw fa-lg me-3 mt-1"></i>
-                    <p class="mb-0" data-translate="feature_flexible">Flexible learning options to fit your schedule</p>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
 </section>
+{% endif %}
+
 
 <!-- Chat Section -->
+{% if home_page.show_chat_section %}
 <section class="chat-section" id="chat">
     <div class="container">
         <div class="row align-items-center g-5">
             <div class="col-lg-6 order-lg-1 order-2">
-                <h2 class="display-5 fw-bold mb-4" data-translate="connect_team">Connect With Our Team</h2>
-                <p class="lead mb-3" data-translate="connect_desc1">
-                    Have questions or need support? Our dedicated team is available around the clock to assist you.
-                </p>
-                <p class="lead mb-4" data-translate="connect_desc2">
-                    Get instant answers and guidance through our user-friendly live chat system.
-                </p>
+                <h2 class="display-5 fw-bold mb-4">{{ home_page_text.chat_section_title }}</h2>
+                <p class="lead mb-3">{{ home_page_text.chat_section_description_1 }}</p>
+                <p class="lead mb-4">{{ home_page_text.chat_section_description_2 }}</p>
                 {% csrf_token %}
                 <div id="homeLastRoomContainer" class="mb-4" style="display: none;">
                     <div class="card border-0 hover-shadow">
@@ -349,75 +391,61 @@
                     </div>
                 </div>
                 <button id="homeChatButton" class="btn btn-lg py-3 px-5">
-                    <i class="fas fa-comments me-2"></i> <span data-translate="start_chat">Start Live Chat</span>
+                    <i class="fas fa-comments me-2"></i> <span>{{ home_page_text.chat_button_text }}</span>
                 </button>
             </div>
             <div class="col-lg-6 order-lg-2 order-1 text-center">
-                <img src="{% static 'imgs/bg/chat.png' %}" alt="Chat Support" class="img-fluid">
+                <img
+                    src="{% if home_page.chat_image %}{{ home_page.chat_image.url }}{% else %}{% static 'imgs/bg/chat.png' %}{% endif %}"
+                    alt="Chat Support"
+                    class="img-fluid"
+                >
             </div>
         </div>
     </div>
 </section>
+{% endif %}
 
-<!-- Learning Features Section -->
+
+<!-- Secondary Features Section -->
+{% if home_page.show_secondary_features %}
 <div class="container my-5">
+    {% if home_page_text.secondary_features_title %}
+    <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold mb-3 text-gradient">{{ home_page_text.secondary_features_title }}</h2>
+        {% if home_page_text.secondary_features_description %}
+        <p class="lead text-muted">{{ home_page_text.secondary_features_description }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
     <div class="row">
+        {% for feature in home_page_secondary_features %}
         <div class="col-md-6 col-lg-3 mb-4">
             <div class="feature-card card h-100 border-0">
                 <div class="card-body d-flex flex-column align-items-center text-center p-4">
                     <div class="feature-icon-wrapper">
-                        <i class="fas fa-tasks fa-2x"></i> <!-- Assignments icon -->
+                        <i class="{{ feature.icon_class }} fa-2x"></i>
                     </div>
-                    <h4 class="fw-bold mb-2" data-translate="assignments">Structured Assignments</h4>
-                    <p class="text-muted small" data-translate="assignments_desc">Reinforce learning with practical tasks and real-world applications.</p>
+                    <h4 class="fw-bold mb-2">{{ feature.title }}</h4>
+                    <p class="text-muted small">{{ feature.description }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="feature-card card h-100 border-0">
-                <div class="card-body d-flex flex-column align-items-center text-center p-4">
-                    <div class="feature-icon-wrapper">
-                        <i class="fas fa-file-alt fa-2x"></i> <!-- Exams icon -->
-                    </div>
-                    <h4 class="fw-bold mb-2" data-translate="exams">Progress Exams</h4>
-                    <p class="text-muted small" data-translate="exams_desc">Test your knowledge with quizzes and exams to track mastery.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="feature-card card h-100 border-0">
-                <div class="card-body d-flex flex-column align-items-center text-center p-4">
-                    <div class="feature-icon-wrapper">
-                        <i class="fas fa-heartbeat fa-2x"></i> <!-- Vital education icon -->
-                    </div>
-                    <h4 class="fw-bold mb-2" data-translate="vital_education">Vital Education</h4>
-                    <p class="text-muted small" data-translate="vital_education_desc">Essential skills for career growth and personal development.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="feature-card card h-100 border-0">
-                <div class="card-body d-flex flex-column align-items-center text-center p-4">
-                    <div class="feature-icon-wrapper">
-                        <i class="fas fa-chalkboard-teacher fa-2x"></i> <!-- Interactive learning icon -->
-                    </div>
-                    <h4 class="fw-bold mb-2" data-translate="interactive_learning">Interactive Learning</h4>
-                    <p class="text-muted small" data-translate="interactive_learning_desc">Engage with multimedia lessons, discussions, and peer feedback.</p>
-                </div>
-            </div>
-        </div>
+        {% empty %}
+        <p class="text-muted text-center w-100 py-4">{{ home_page_text.secondary_features_empty_text }}</p>
+        {% endfor %}
     </div>
 </div>
-
+{% endif %}
 
 
 <!-- Our Teachers Section -->
-{% if teachers %}
+{% if home_page.show_teachers_section and teachers %}
 <section class="container teachers-section-container py-0">
     <div class="teachers-section" id="teachers">
         <div class="form-header">
-            <h3 class="header-title" data-translate="our_teachers">OUR TEAM</h3>
-            <p class="section-subtitle text-center mb-0" data-translate="meet_our_teachers">Meet our exceptional teachers who inspire and guide learners.</p>
+            <h3 class="header-title">{{ home_page_text.teachers_section_title }}</h3>
+            <p class="section-subtitle text-center mb-0">{{ home_page_text.teachers_section_subtitle }}</p>
         </div>
 
         <!-- Teacher Slider Container -->
@@ -448,7 +476,7 @@
                 </div>
                 {% endfor %}
             </div>
-            
+
             <!-- Navigation Arrows -->
             <div class="slider-controls">
                 <button id="teacherPrevArrow" class="btn btn-outline-primary btn-floating">
@@ -461,18 +489,544 @@
         </div>
     </div>
 </section>
+{% endif %}
 
+{% if home_page_testimonials %}
+<section class="container my-5">
+    <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold mb-3 text-gradient">{{ home_page_text.testimonials_section_title }}</h2>
+        {% if home_page_text.testimonials_section_subtitle %}
+        <p class="lead text-muted">{{ home_page_text.testimonials_section_subtitle }}</p>
+        {% endif %}
+    </div>
+    <div class="row">
+        {% for feature in home_page_testimonials %}
+        <div class="col-lg-6 mb-4">
+            <div class="feature-card card h-100 border-0">
+                <div class="card-body p-4">
+                    <div class="mb-3 text-warning">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="mb-4">"{{ feature.description }}"</p>
+                    <div>
+                        <h5 class="fw-bold mb-1">{{ feature.title }}</h5>
+                        {% if feature.subtitle %}
+                        <p class="text-primary mb-1">{{ feature.subtitle }}</p>
+                        {% endif %}
+                        {% if feature.meta %}
+                        <p class="text-muted small mb-0">{{ feature.meta }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if home_page_family_bundle_plans or home_page_family_bundle_comparison or home_page_family_bundle_testimonials or home_page_family_bundle_faq %}
+<section class="container my-5" id="family-bundle">
+    <div class="text-center mb-5">
+        {% if home_page_text.family_bundle_section_badge %}
+        <p class="fw-bold text-primary mb-2">{{ home_page_text.family_bundle_section_badge }}</p>
+        {% endif %}
+        <h2 class="display-5 fw-bold mb-3 text-gradient">{{ home_page_text.family_bundle_section_title }}</h2>
+        {% if home_page_text.family_bundle_section_description %}
+        <p class="lead text-muted">{{ home_page_text.family_bundle_section_description }}</p>
+        {% endif %}
+    </div>
+
+    <div class="row g-4 mb-5">
+        {% if home_page_text.family_bundle_section_pricing_note_1 %}
+        <div class="col-sm-6 col-lg-3">
+            <div class="feature-card card h-100 border-0">
+                <div class="card-body text-center p-4">
+                    <p class="fw-bold text-primary mb-2">{{ home_page_text.family_bundle_section_pricing_note_1 }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if home_page_text.family_bundle_section_pricing_note_2 %}
+        <div class="col-sm-6 col-lg-3">
+            <div class="feature-card card h-100 border-0">
+                <div class="card-body text-center p-4">
+                    <p class="fw-bold text-primary mb-2">{{ home_page_text.family_bundle_section_pricing_note_2 }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if home_page_text.family_bundle_section_pricing_note_3 %}
+        <div class="col-sm-6 col-lg-3">
+            <div class="feature-card card h-100 border-0">
+                <div class="card-body text-center p-4">
+                    <p class="fw-bold text-primary mb-2">{{ home_page_text.family_bundle_section_pricing_note_3 }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if home_page_text.family_bundle_section_pricing_note_4 %}
+        <div class="col-sm-6 col-lg-3">
+            <div class="feature-card card h-100 border-0">
+                <div class="card-body text-center p-4">
+                    <p class="fw-bold text-primary mb-2">{{ home_page_text.family_bundle_section_pricing_note_4 }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if home_page_family_bundle_plans %}
+    <div class="text-center mb-4">
+        <h3 class="fw-bold mb-3">{{ home_page_text.family_bundle_plans_title }}</h3>
+        {% if home_page_text.family_bundle_plans_description %}
+        <p class="text-muted lead">{{ home_page_text.family_bundle_plans_description }}</p>
+        {% endif %}
+    </div>
+    <div class="row mb-5">
+        {% for feature in home_page_family_bundle_plans %}
+        <div class="col-lg-4 mb-4">
+            <div class="feature-card card h-100 border-0">
+                <div class="card-body p-4 text-center">
+                    <div class="feature-icon-wrapper mb-3 mx-auto">
+                        <i class="{{ feature.icon_class }} fa-2x text-primary"></i>
+                    </div>
+                    {% if feature.meta %}
+                    <p class="fw-bold text-primary mb-2">{{ feature.meta }}</p>
+                    {% endif %}
+                    <h4 class="fw-bold mb-2">{{ feature.title }}</h4>
+                    {% if feature.subtitle %}
+                    <p class="text-primary mb-3">{{ feature.subtitle }}</p>
+                    {% endif %}
+                    <p class="text-muted mb-0">{{ feature.description }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if home_page_family_bundle_comparison %}
+    <div class="text-center mb-4">
+        <h3 class="fw-bold mb-3">{{ home_page_text.family_bundle_comparison_title }}</h3>
+        {% if home_page_text.family_bundle_comparison_description %}
+        <p class="text-muted lead">{{ home_page_text.family_bundle_comparison_description }}</p>
+        {% endif %}
+    </div>
+    <div class="row mb-5">
+        {% for feature in home_page_family_bundle_comparison %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="feature-card card h-100 border-0">
+                <div class="card-body p-4 text-center">
+                    <div class="feature-icon-wrapper mb-3 mx-auto">
+                        <i class="{{ feature.icon_class }} fa-2x text-primary"></i>
+                    </div>
+                    <h4 class="fw-bold mb-2">{{ feature.title }}</h4>
+                    {% if feature.subtitle %}
+                    <p class="text-primary mb-2">{{ feature.subtitle }}</p>
+                    {% endif %}
+                    <p class="text-muted mb-0">{{ feature.description }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if home_page_family_bundle_testimonials %}
+    <div class="row mb-5">
+        {% for feature in home_page_family_bundle_testimonials %}
+        <div class="col-lg-4 mb-4">
+            <div class="feature-card card h-100 border-0">
+                <div class="card-body p-4">
+                    <div class="mb-3 text-warning">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="mb-4">"{{ feature.description }}"</p>
+                    <div>
+                        <h5 class="fw-bold mb-1">{{ feature.title }}</h5>
+                        {% if feature.subtitle %}
+                        <p class="text-primary mb-1">{{ feature.subtitle }}</p>
+                        {% endif %}
+                        {% if feature.meta %}
+                        <p class="text-muted small mb-0">{{ feature.meta }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if home_page_family_bundle_faq %}
+    <div class="text-center mb-4">
+        <h3 class="fw-bold mb-3">{{ home_page_text.family_bundle_faq_title }}</h3>
+        {% if home_page_text.family_bundle_faq_description %}
+        <p class="text-muted lead">{{ home_page_text.family_bundle_faq_description }}</p>
+        {% endif %}
+    </div>
+    <div class="row mb-4">
+        {% for feature in home_page_family_bundle_faq %}
+        <div class="col-lg-6 mb-4">
+            <div class="feature-card card h-100 border-0">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-start">
+                        <div class="feature-icon-wrapper me-3 flex-shrink-0" style="width: 60px; height: 60px;">
+                            <i class="{{ feature.icon_class }} fa-lg text-primary"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-2">{{ feature.title }}</h5>
+                            <p class="text-muted mb-0">{{ feature.description }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="free-session-card text-center">
+        <h3 class="fw-bold mb-3">{{ home_page_text.family_bundle_cta_title }}</h3>
+        {% if home_page_text.family_bundle_cta_description %}
+        <p class="lead mb-4 free-session-desc">{{ home_page_text.family_bundle_cta_description }}</p>
+        {% endif %}
+        <a href="#free-session" class="btn btn-primary btn-lg btn-rounded">
+            <i class="fas fa-users me-2"></i> {{ home_page_text.family_bundle_cta_button_text }}
+        </a>
+    </div>
+</section>
+{% endif %}
+
+{% if home_page_process_steps %}
+<section class="container my-5">
+    <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold mb-3 text-gradient">{{ home_page_text.process_section_title }}</h2>
+        {% if home_page_text.process_section_description %}
+        <p class="lead text-muted">{{ home_page_text.process_section_description }}</p>
+        {% endif %}
+    </div>
+    <div class="row">
+        {% for feature in home_page_process_steps %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="feature-card card h-100 border-0">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon-wrapper mb-3">
+                        <i class="{{ feature.icon_class }} fa-2x text-primary"></i>
+                    </div>
+                    {% if feature.meta %}
+                    <div class="fw-bold text-primary mb-2">{{ feature.meta }}</div>
+                    {% endif %}
+                    <h4 class="fw-bold mb-2">{{ feature.title }}</h4>
+                    <p class="text-muted mb-0">{{ feature.description }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+
+<!-- Free Session CTA Section -->
+<section class="free-session-section py-5 my-2" id="free-session">
+    <div class="container">
+        <div class="free-session-card text-center">
+            <div class="free-session-icon mb-3">
+                <i class="fas fa-calendar-check fa-3x"></i>
+            </div>
+            {% if home_page_text.free_session_section_badge %}
+            <p class="fw-bold text-primary mb-2">{{ home_page_text.free_session_section_badge }}</p>
+            {% endif %}
+            <h2 class="fw-bold mb-3" data-translate="free_session_title">
+                {% if home_page_text.free_session_section_title %}{{ home_page_text.free_session_section_title }}{% else %}Book a Free Session{% endif %}
+            </h2>
+            <p class="lead mb-4 free-session-desc" data-translate="free_session_desc">
+                {% if home_page_text.free_session_section_description %}{{ home_page_text.free_session_section_description }}{% else %}Not sure where to start? Book a free one-on-one session with our team and we'll guide you to the right path.{% endif %}
+            </p>
+            {% if request.user.is_authenticated %}
+                {% if request.user.free_session %}
+                    {% if request.user.free_session.status == 'done' %}
+                    <button class="btn btn-success btn-lg btn-rounded" disabled>
+                        <i class="fas fa-check-circle me-2"></i>
+                        <span data-translate="free_session_completed">Session Completed ✓</span>
+                    </button>
+                    {% else %}
+                    <button class="btn btn-warning btn-lg btn-rounded" disabled>
+                        <i class="fas fa-clock me-2"></i>
+                        <span data-translate="free_session_pending">Already Booked – We'll Contact You Soon</span>
+                    </button>
+                    {% endif %}
+                {% else %}
+                <button class="btn btn-primary btn-lg btn-rounded" id="openFreeSessionModal" data-translate="book_free_session_btn">
+                    <i class="fas fa-calendar-plus me-2"></i> Book My Free Session
+                </button>
+                {% endif %}
+            {% else %}
+            <a href="{% url 'accounts:login' %}?next={{ request.path }}#free-session"
+               class="btn btn-primary btn-lg btn-rounded" data-translate="login_to_book">
+                <i class="fas fa-sign-in-alt me-2"></i> Login to Book Your Free Session
+            </a>
+            {% endif %}
+            {% if home_page_text.free_session_privacy_note %}
+            <p class="small text-muted mt-4 mb-0">{{ home_page_text.free_session_privacy_note }}</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Free Session Modal -->
+{% if request.user.is_authenticated and not request.user.free_session %}
+<div class="modal fade" id="freeSessionModal" tabindex="-1" aria-labelledby="freeSessionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="freeSessionModalLabel">
+                    <i class="fas fa-calendar-check text-primary me-2"></i>
+                    <span data-translate="free_session_modal_title">Book a Free Session</span>
+                </h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <p class="text-muted mb-4" data-translate="free_session_modal_desc">
+                    Fill in your details and we'll reach out to schedule your free session.
+                </p>
+                <form id="freeSessionForm">
+                    {% csrf_token %}
+                    <div class="form-floating mb-3">
+                        <input type="tel" class="form-control" id="freeSessionPhone"
+                               name="phone" placeholder="Phone Number"
+                               value="{{ request.user.phone|default:'' }}">
+                        <label for="freeSessionPhone" data-translate="your_phone">Your Phone Number</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control" id="freeSessionMessage" name="message"
+                                  placeholder="Any message..." style="height: 100px;"></textarea>
+                        <label for="freeSessionMessage" data-translate="free_session_message">Any message or topic you'd like to discuss? (optional)</label>
+                    </div>
+                    <div id="freeSessionAlert" class="alert d-none" role="alert"></div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary btn-rounded"
+                        data-mdb-dismiss="modal" data-translate="cancel">Cancel</button>
+                <button type="button" class="btn btn-primary btn-rounded" id="confirmFreeSession">
+                    <span id="confirmFreeSessionText" data-translate="confirm_booking">Confirm Booking</span>
+                    <span id="confirmFreeSessionSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+.free-session-section {
+    background: linear-gradient(135deg, rgba(var(--main-color-rgb), 0.08) 0%, rgba(var(--sub-color-rgb), 0.12) 100%);
+}
+.free-session-card {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    max-width: 700px;
+    margin: 0 auto;
+}
+.free-session-icon {
+    color: var(--main-color);
+}
+.free-session-desc {
+    color: #6c757d;
+    max-width: 500px;
+    margin: 0 auto 1.5rem;
+}
+
+/* ── Hero Free Trial Button ───────────────────────────── */
+.btn-free-trial {
+    background: linear-gradient(135deg, #fca311 0%, #ff6f61 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 20px rgba(252, 163, 17, 0.45) !important;
+    transition: box-shadow 0.3s, transform 0.3s !important;
+}
+.btn-free-trial:hover {
+    box-shadow: 0 8px 28px rgba(252, 163, 17, 0.65) !important;
+    background: linear-gradient(135deg, #ff6f61 0%, #fca311 100%) !important;
+    transform: translateY(-4px) !important;
+}
+.free-trial-badge {
+    position: absolute;
+    top: -9px;
+    right: -9px;
+    background: #253b8d;
+    color: #fff;
+    font-size: 0.58rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 20px;
+    letter-spacing: 0.08em;
+    box-shadow: 0 2px 6px rgba(37, 59, 141, 0.4);
+    pointer-events: none;
+    white-space: nowrap;
+}
+.free-trial-shimmer {
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.32) 50%, transparent 100%);
+    animation: btn-shimmer 2.6s infinite;
+    pointer-events: none;
+}
+@keyframes btn-shimmer {
+    0%   { left: -75%; }
+    55%  { left: 130%; }
+    100% { left: 130%; }
+}
+
+/* ── Floating Sticky Widget ───────────────────────────── */
+.free-session-sticky {
+    position: fixed;
+    right: -300px;
+    bottom: 110px;
+    z-index: 1050;
+    transition: right 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.free-session-sticky.visible {
+    right: 0;
+}
+.fss-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border-radius: 16px 0 0 16px;
+    padding: 12px 18px 12px 14px;
+    box-shadow: -4px 4px 24px rgba(0, 0, 0, 0.13);
+    text-decoration: none !important;
+    color: inherit;
+    border-left: 4px solid #fca311;
+    min-width: 210px;
+    transition: background 0.2s;
+}
+.fss-inner:hover {
+    background: #fff8f0;
+    color: inherit;
+}
+.fss-icon-wrap {
+    position: relative;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fca311, #ff6f61);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.1rem;
+}
+.fss-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #28a745;
+    border: 2px solid #fff;
+    animation: fss-pulse 1.6s ease-in-out infinite;
+}
+.fss-dot.pending {
+    background: #fca311;
+    animation: none;
+}
+@keyframes fss-pulse {
+    0%, 100% { transform: scale(1);   opacity: 1;   }
+    50%       { transform: scale(1.35); opacity: 0.65; }
+}
+.fss-body {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+}
+.fss-eyebrow {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #fca311;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+}
+.fss-title {
+    font-size: 0.87rem;
+    color: #222;
+    font-weight: 700;
+}
+.fss-arrow {
+    color: #ccc;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+    margin-left: auto;
+    transition: color 0.2s, transform 0.2s;
+}
+.fss-inner:hover .fss-arrow {
+    color: #fca311;
+    transform: translateX(3px);
+}
+</style>
+
+<!-- Floating Free Session Sticky Widget -->
+{% if not request.user.is_superuser %}
+    {% if not request.user.is_authenticated or request.user.role == 'student' or request.user.role == 'parent' or request.user.role == 'cs' %}
+        {% if not request.user.is_authenticated or not request.user.free_session or request.user.free_session.status != 'done' %}
+        <div id="freeSessionSticky" class="free-session-sticky" aria-label="Book a free session">
+            <a href="#free-session" class="fss-inner">
+                <div class="fss-icon-wrap">
+                    <i class="fas fa-calendar-check"></i>
+                    {% if request.user.is_authenticated and request.user.free_session %}
+                    <span class="fss-dot pending"></span>
+                    {% else %}
+                    <span class="fss-dot"></span>
+                    {% endif %}
+                </div>
+                <div class="fss-body">
+                    {% if request.user.is_authenticated and request.user.free_session %}
+                    <span class="fss-eyebrow">Your session</span>
+                    <strong class="fss-title">Pending — We'll call you</strong>
+                    {% else %}
+                    <span class="fss-eyebrow">It's FREE ✨</span>
+                    <strong class="fss-title">Book a Session</strong>
+                    {% endif %}
+                </div>
+                <i class="fas fa-chevron-right fss-arrow"></i>
+            </a>
+        </div>
+        {% endif %}
+    {% endif %}
 {% endif %}
 
 <!-- Contact Section -->
+{% if home_page.show_contact_section %}
 <section class="container contact-section py-5" id="contact">
     <div class="contact-card card p-0">
         <div class="row g-0">
             <div class="col-lg-7 order-lg-1 order-2 contact-form-col">
                 <div class="form-header text-start mb-4">
-                    <h3 class="header-title" data-translate="get_in_touch">Get in Touch</h3>
+                    <h3 class="header-title">{{ home_page_text.contact_section_title }}</h3>
                 </div>
-                <p class="mb-4 text-muted" data-translate="contact_form_desc">Have questions or suggestions? Fill out the form below, and we'll get back to you shortly.</p>
+                <p class="mb-4 text-muted">{{ home_page_text.contact_section_description }}</p>
                 <form id="contactForm" class="contact-form form-validate" novalidate>
                     {% csrf_token %}
                     <div class="row g-3">
@@ -507,16 +1061,30 @@
                 </form>
             </div>
             <div class="col-lg-5 order-lg-2 order-1 contact-info-col d-flex flex-column justify-content-center">
-                <h3 data-translate="contact_info">Contact Information</h3>
-                <p data-translate="contact_info_desc">Reach out to us directly through phone or email.</p>
-                <p><i class="fas fa-phone fa-fw"></i> <a href="tel:{{company_info.phone}}">{{company_info.phone}}</a></p>
-                <p><i class="fas fa-envelope fa-fw"></i> <a href="mailto:{{company_info.email}}">{{company_info.email}}</a></p>
-                <p><i class="fab fa-facebook-f fa-fw"></i> <a href="https://www.facebook.com/share/15ossJyDXe/" target="_blank" rel="noopener noreferrer" data-translate="follow_us_fb">Follow us on Facebook</a></p>
-                <img src="{% static 'imgs/mail3.webp' %}" alt="Contact Illustration" class="img-fluid mt-4" style="max-width: 250px; opacity: 0.8; margin-left: auto; margin-right: auto;">
+                <h3>{{ home_page_text.contact_info_title }}</h3>
+                <p>{{ home_page_text.contact_info_description }}</p>
+                {% if company_info %}
+                <p><i class="fas fa-phone fa-fw"></i> <a href="tel:{{ company_info.phone }}">{{ company_info.phone }}</a></p>
+                <p><i class="fas fa-envelope fa-fw"></i> <a href="mailto:{{ company_info.email }}">{{ company_info.email }}</a></p>
+                {% endif %}
+                {% if home_page.facebook_url %}
+                <p>
+                    <i class="fab fa-facebook-f fa-fw"></i>
+                    <a href="{{ home_page.facebook_url }}" target="_blank" rel="noopener noreferrer">{{ home_page_text.facebook_label }}</a>
+                </p>
+                {% endif %}
+                <img
+                    src="{% if home_page.contact_illustration %}{{ home_page.contact_illustration.url }}{% else %}{% static 'imgs/mail3.webp' %}{% endif %}"
+                    alt="Contact Illustration"
+                    class="img-fluid mt-4"
+                    style="max-width: 250px; opacity: 0.8; margin-left: auto; margin-right: auto;"
+                >
             </div>
         </div>
     </div>
 </section>
+{% endif %}
+
 
 <!-- Footer -->
 <footer class="bg-footer text-white">
@@ -524,14 +1092,16 @@
         <div class="row gy-4">
             <div class="col-lg-4 col-md-6">
                 <a class="footer-brand" href="/">
-                    <img src="{{logo_url}}" alt="Logo">
+                    <img src="{% if logo_url %}{{ logo_url }}{% else %}{% static 'imgs/bg/l2.png' %}{% endif %}" alt="Logo">
                 </a>
-                <p class="my-3" data-translate="footer_description">{{ company_info.description|default:"Empowering learners through accessible and engaging online education." }}</p>
+                <p class="my-3">{{ home_page_text.footer_description }}</p>
+                {% if home_page.facebook_url %}
                 <div class="social-icons mt-3">
-                    <a href="https://www.facebook.com/share/15ossJyDXe/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                    <a href="{{ home_page.facebook_url }}" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                         <i class="fab fa-facebook-f"></i>
                     </a>
                 </div>
+                {% endif %}
             </div>
 
             <div class="col-lg-2 col-md-6">
@@ -561,24 +1131,29 @@
             <div class="col-lg-3 col-md-6">
                 <h5 data-translate="contact_info">Contact Info</h5>
                 <ul class="list-unstyled footer-contact-info">
+                    {% if company_info %}
                     <li class="d-flex align-items-start mb-2">
                         <i class="fas fa-phone mt-1"></i>
-                        <span><a href="tel:{{company_info.phone}}">{{company_info.phone}}</a></span>
+                        <span><a href="tel:{{ company_info.phone }}">{{ company_info.phone }}</a></span>
                     </li>
                     <li class="d-flex align-items-start">
                         <i class="fas fa-envelope mt-1"></i>
-                        <span><a href="mailto:{{company_info.email}}">{{company_info.email}}</a></span>
+                        <span><a href="mailto:{{ company_info.email }}">{{ company_info.email }}</a></span>
                     </li>
+                    {% endif %}
                 </ul>
-                <a class="btn btn-primary rounded-pill mt-3 d-block" href="https://mail.google.com/mail/?view=cm&fs=1&to={{company_info.email}}" target="_blank" rel="noopener noreferrer">
-                    <i class="fas fa-paper-plane me-2"></i> <span data-translate="send_email">Send us an Email</span>
+                <a
+                    class="btn btn-primary rounded-pill mt-3 d-block"
+                    href="#free-session"
+                >
+                    <i class="fas fa-paper-plane me-2"></i> <span>{{ home_page_text.footer_cta_text }}</span>
                 </a>
             </div>
         </div>
 
         <div class="footer-bottom text-center">
-            <span data-translate="created_by">Created By BlueBook Team</span> |
-            <span >© "{{current_year}}" - BlueBook (01095163117)</span>
+            <span>{{ home_page_text.footer_created_by_text }}</span> |
+            <span>{{ home_page_text.footer_copyright_text }} "{{ current_year }}"</span>
         </div>
     </div>
 </footer>
@@ -595,7 +1170,7 @@
               if (window.scrollY > 50) {
                   navbar.style.backgroundColor = 'var(--white-color)';
                   navbar.classList.remove('navbar-dark', 'bg-transparent');
-                  navbar.classList.add('navbar-light'); // Assuming light background needs light text
+                  navbar.classList.add('navbar-light');
               } else {
                   navbar.style.backgroundColor = 'transparent';
                   navbar.classList.remove('navbar-light');
@@ -603,7 +1178,7 @@
               }
           };
           window.addEventListener('scroll', changeNavbarBg);
-          changeNavbarBg(); // Initial check
+          changeNavbarBg();
       }
 
 
@@ -618,9 +1193,8 @@
               if (videoPlayer.paused || videoPlayer.ended) {
                   if(videoCover) videoCover.style.display = 'none';
                   videoPlayer.style.display = 'block';
-                  playPauseButton.style.display = 'none'; // Hide button when playing
+                  playPauseButton.style.display = 'none';
                   videoPlayer.play();
-                  // playIcon.classList.replace('fa-play', 'fa-pause'); // Not needed if button hides
               }
           });
 
@@ -646,34 +1220,6 @@
           });
       }
 
-    // Teacher slider
-    const slider = document.querySelector(".teacher-slider");
-    const teacherprevArrow = document.getElementById("teacherprevArrow");
-    const teachernextArrow = document.getElementById("teachernextArrow");
-
-    if (slider && teacherprevArrow && teachernextArrow) {
-        const scrollAmount = () => {
-            const itemWidth = slider.querySelector('.slider-item')?.offsetWidth || 300;
-            return itemWidth; // Scroll by one item width
-        }
-
-        teacherprevArrow.addEventListener("click", () => {
-            slider.scrollBy({ left: -scrollAmount(), behavior: "smooth" });
-        });
-
-        teachernextArrow.addEventListener("click", () => {
-            slider.scrollBy({ left: scrollAmount(), behavior: "smooth" });
-        });
-
-        // Optional: Hide/show arrows based on scroll position
-        const updateArrows = () => {
-            teacherprevArrow.disabled = slider.scrollLeft <= 0;
-            teachernextArrow.disabled = slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 10; // Add tolerance
-        };
-        slider.addEventListener('scroll', updateArrows);
-        updateArrows(); // Initial check
-    }
-
 
       // Chat functionality
       const lastRoom = localStorage.getItem('lastChatRoom');
@@ -688,7 +1234,6 @@
               const now = new Date();
               const hoursDiff = (now - timestamp) / (1000 * 60 * 60);
 
-              // Only show "continue" if the room is less than, say, 24 hours old
               if (hoursDiff < 24) {
                   homeLastRoomContainer.style.display = 'block';
                   const joinBtn = document.getElementById('homeJoinLastRoomBtn');
@@ -698,7 +1243,7 @@
                       });
                   }
               } else {
-                  localStorage.removeItem('lastChatRoom'); // Expired room
+                  localStorage.removeItem('lastChatRoom');
               }
           } catch (e) {
               console.error('Error parsing last room data:', e);
@@ -723,7 +1268,6 @@
 
               button.disabled = true;
               if (buttonIcon) buttonIcon.className = 'fas fa-spinner fa-spin me-2';
-              
 
               try {
                   const response = await fetch('/chat/rooms/', {
@@ -733,7 +1277,7 @@
                           'X-CSRFToken': csrfToken,
                           'Accept': 'application/json',
                       },
-                      body: JSON.stringify({}), // Sending empty body as per likely requirement
+                      body: JSON.stringify({}),
                   });
 
                   if (!response.ok) {
@@ -756,16 +1300,14 @@
                       timestamp: new Date().toISOString()
                   }));
 
-                  // Optional: Show success briefly before redirecting
                   if (buttonIcon) buttonIcon.className = 'fas fa-check me-2';
-                  await new Promise(resolve => setTimeout(resolve, 500)); // Short delay
+                  await new Promise(resolve => setTimeout(resolve, 500));
 
                   window.location.href = `/chat/rooms/${data.code}/`;
 
               } catch (error) {
                   console.error('Error creating room:', error);
                   if (buttonIcon) buttonIcon.className = 'fas fa-exclamation-triangle me-2';
-                  // Restore button after a delay
                   setTimeout(() => {
                       if (buttonIcon) buttonIcon.className = originalIconClass;
                       if (buttonText) buttonText.textContent = originalText;
@@ -774,141 +1316,216 @@
               }
           });
       } else {
-          if (!homeChatButton) console.error("Chat button #homeChatButton not found.");
-          if (!csrfTokenInput) console.error("CSRF token input not found.");
+          if (!homeChatButton) console.warn("Chat button #homeChatButton not found (chat section may be hidden).");
+          if (!csrfTokenInput) console.warn("CSRF token input not found.");
       }
 
-      // Basic form validation feedback (optional, MDB might handle this)
-      const forms = document.querySelectorAll('.form-validate');
-      Array.from(forms).forEach(form => {
-          form.addEventListener('submit', event => {
-              if (!form.checkValidity()) {
-                  event.preventDefault();
-                  event.stopPropagation();
-              }
-              form.classList.add('was-validated');
-          }, false);
-      });
 
-      // Example: Contact form submission (replace with your actual AJAX handler)
+      // Contact form AJAX submission
       const contactForm = document.getElementById('contactForm');
       if (contactForm) {
-          contactForm.addEventListener('submit', function(event) {
+          contactForm.addEventListener('submit', async function(event) {
               event.preventDefault();
+
               if (!contactForm.checkValidity()) {
                   event.stopPropagation();
                   contactForm.classList.add('was-validated');
                   return;
               }
-              // Add your AJAX form submission logic here
-              console.log('Contact form submitted (add AJAX call here)');
-              alert('Thank you for your message! (This is a demo - form not sent)');
-              contactForm.reset();
-              contactForm.classList.remove('was-validated');
+
+              const submitBtn = contactForm.querySelector('[type="submit"]');
+              const originalBtnText = submitBtn ? submitBtn.textContent : 'Send Message';
+              if (submitBtn) {
+                  submitBtn.disabled = true;
+                  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Sending...';
+              }
+
+              const formData = new FormData(contactForm);
+              const csrfToken = contactForm.querySelector('[name="csrfmiddlewaretoken"]');
+
+              try {
+                  const response = await fetch('{% url "about:send_email" %}', {
+                      method: 'POST',
+                      headers: {
+                          'X-CSRFToken': csrfToken ? csrfToken.value : '',
+                          'Accept': 'application/json',
+                      },
+                      body: formData,
+                  });
+
+                  const data = await response.json();
+
+                  if (response.ok && data.message) {
+                      if (typeof showToastMessage === 'function') {
+                          showToastMessage(data.message, 'success');
+                      } else {
+                          alert(data.message);
+                      }
+                      contactForm.reset();
+                      contactForm.classList.remove('was-validated');
+                  } else {
+                      const errorText = data.error || JSON.stringify(data.errors) || 'Something went wrong. Please try again.';
+                      if (typeof showToastMessage === 'function') {
+                          showToastMessage(errorText, 'error');
+                      } else {
+                          alert(errorText);
+                      }
+                  }
+              } catch (error) {
+                  console.error('Contact form error:', error);
+                  const msg = 'Failed to send message. Please check your connection and try again.';
+                  if (typeof showToastMessage === 'function') {
+                      showToastMessage(msg, 'error');
+                  } else {
+                      alert(msg);
+                  }
+              } finally {
+                  if (submitBtn) {
+                      submitBtn.disabled = false;
+                      submitBtn.textContent = originalBtnText;
+                  }
+              }
           });
       }
 
   });
-
-
-
-
-
-
 </script>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Get all needed elements
         const sliderContainer = document.querySelector('.teacher-slider-container');
         const slider = document.querySelector('.teacher-slider');
         const prevArrow = document.getElementById('teacherPrevArrow');
         const nextArrow = document.getElementById('teacherNextArrow');
         const items = document.querySelectorAll('.slider-item');
-        
-        // Debug info
-        console.log("Elements found:", {
-            sliderContainer: !!sliderContainer,
-            slider: !!slider,
-            prevArrow: !!prevArrow,
-            nextArrow: !!nextArrow,
-            itemCount: items.length
-        });
-        
-        // Only proceed if we have all necessary elements
+
         if (sliderContainer && slider && prevArrow && nextArrow && items.length > 0) {
-            // Track current position
             let currentPosition = 0;
-            
-            // Calculate how many items can be visible at once based on container width
+
             const getVisibleCount = () => {
                 const containerWidth = sliderContainer.clientWidth;
                 const itemWidth = items[0].offsetWidth;
                 return Math.floor(containerWidth / itemWidth);
             };
-            
-            // Calculate maximum scroll position
+
             const getMaxScrollPosition = () => {
                 return Math.max(0, items.length - getVisibleCount());
             };
-            
-            // Move slide to specific position
+
             const moveSlider = (position) => {
-                // Constrain position to valid range
                 position = Math.max(0, Math.min(position, getMaxScrollPosition()));
                 currentPosition = position;
-                
-                // Calculate translation distance based on item width
                 const itemWidth = items[0].offsetWidth;
                 const translateX = -position * itemWidth;
-                
-                // Apply transform to slider
                 slider.style.transform = `translateX(${translateX}px)`;
-                
-                // Update button states
                 updateButtonStates();
-                
-                // Debug info
-                console.log(`Moved to position ${position}, translateX: ${translateX}px`);
             };
-            
-            // Update button states
+
             const updateButtonStates = () => {
                 prevArrow.disabled = currentPosition <= 0;
                 nextArrow.disabled = currentPosition >= getMaxScrollPosition();
-                
                 prevArrow.style.opacity = prevArrow.disabled ? "0.5" : "1";
                 nextArrow.style.opacity = nextArrow.disabled ? "0.5" : "1";
             };
-            
-            // Add click event listeners
+
             prevArrow.addEventListener('click', function() {
-                console.log("Prev button clicked");
                 moveSlider(currentPosition - 1);
             });
-            
+
             nextArrow.addEventListener('click', function() {
-                console.log("Next button clicked");
                 moveSlider(currentPosition + 1);
             });
-            
-            // Handle window resize
+
             window.addEventListener('resize', function() {
-                // Recalculate positions on window resize
                 moveSlider(currentPosition);
             });
-            
-            // Initialize states
+
             updateButtonStates();
-        } else {
-            console.error("Some teacher slider elements are missing");
         }
     });
+
+    // Free Session Modal
+    const openFreeSessionModalBtn = document.getElementById('openFreeSessionModal');
+    const freeSessionModal = document.getElementById('freeSessionModal');
+
+    if (openFreeSessionModalBtn && freeSessionModal) {
+        openFreeSessionModalBtn.addEventListener('click', function () {
+            const modal = new mdb.Modal(freeSessionModal);
+            modal.show();
+        });
+    }
+
+    const confirmFreeSessionBtn = document.getElementById('confirmFreeSession');
+    if (confirmFreeSessionBtn) {
+        confirmFreeSessionBtn.addEventListener('click', async function () {
+            const phone = document.getElementById('freeSessionPhone').value.trim();
+            const message = document.getElementById('freeSessionMessage').value.trim();
+            const alertBox = document.getElementById('freeSessionAlert');
+            const spinner = document.getElementById('confirmFreeSessionSpinner');
+            const btnText = document.getElementById('confirmFreeSessionText');
+            const csrfToken = document.querySelector('#freeSessionForm [name=csrfmiddlewaretoken]').value;
+
+            // Show loading state
+            confirmFreeSessionBtn.disabled = true;
+            spinner.classList.remove('d-none');
+            alertBox.classList.add('d-none');
+
+            try {
+                const response = await fetch("{% url 'about:book_free_session' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: JSON.stringify({ phone, message }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    alertBox.className = 'alert alert-success';
+                    alertBox.textContent = data.message;
+                    alertBox.classList.remove('d-none');
+                    confirmFreeSessionBtn.classList.add('d-none');
+                    // Reload after 2 seconds to reflect new status
+                    setTimeout(() => window.location.reload(), 2000);
+                } else {
+                    alertBox.className = 'alert alert-warning';
+                    alertBox.textContent = data.message || 'Something went wrong. Please try again.';
+                    alertBox.classList.remove('d-none');
+                    confirmFreeSessionBtn.disabled = false;
+                }
+            } catch (err) {
+                alertBox.className = 'alert alert-danger';
+                alertBox.textContent = 'Network error. Please try again.';
+                alertBox.classList.remove('d-none');
+                confirmFreeSessionBtn.disabled = false;
+            } finally {
+                spinner.classList.add('d-none');
+            }
+        });
+    }
+
+    // ── Floating Free Session Sticky ─────────────────────
+    const freeSessionSticky = document.getElementById('freeSessionSticky');
+    if (freeSessionSticky) {
+        const heroSection = document.querySelector('.hero-section');
+        if (heroSection) {
+            const heroObserver = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (!entry.isIntersecting) {
+                        freeSessionSticky.classList.add('visible');
+                    } else {
+                        freeSessionSticky.classList.remove('visible');
+                    }
+                });
+            }, { threshold: 0.05 });
+            heroObserver.observe(heroSection);
+        }
+    }
 </script>
 
 
 
 {% endblock content %}
-
-
-

@@ -1,0 +1,1177 @@
+{% extends 'base.html' %} {% load static %} {% block translationFolder
+%}data-translation-folder="home"{% endblock %} {% block title %}Home{% endblock
+%} {% block content %}
+<section
+    class="hero-section position-relative overflow-hidden"
+    style="{% if home_page.hero_background_image %}background-image: linear-gradient(rgba(10, 18, 30, 0.55), rgba(10, 18, 30, 0.55)), url('{{ home_page.hero_background_image.url }}'); background-size: cover; background-position: center; background-repeat: no-repeat;{% else %}background: linear-gradient(135deg, rgba(var(--main-color-rgb), 0.95), rgba(var(--sub-color-rgb), 0.9));{% endif %}"
+>
+    {% include "navbar.html" %}
+
+    <div class="container py-5">
+        <div class="row min-vh-100 align-items-center py-5">
+            <div class="col-lg-7 text-white">
+                <span
+                    class="badge rounded-pill bg-light text-dark mb-3"
+                    data-home-text="hero_badge"
+                >
+                    {{ home_page_text.hero_badge|default:"Welcome" }}
+                </span>
+                <h1 class="display-3 fw-bold mb-3" data-home-text="hero_title">
+                    {{ home_page_text.hero_title|default:"Learn with confidence"
+                    }}
+                </h1>
+                <p
+                    class="lead mb-4 col-lg-10"
+                    data-home-text="hero_description"
+                >
+                    {{ home_page_text.hero_description|default:"Build skills
+                    with expert teachers, flexible learning, and a supportive
+                    environment." }}
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a
+                        href="{{ home_page.hero_primary_button_url|default:'/courses/' }}"
+                        class="btn btn-primary btn-lg px-4"
+                    >
+                        <span data-home-text="hero_primary_button_text">
+                            {{
+                            home_page_text.hero_primary_button_text|default:"Explore
+                            Courses" }}
+                        </span>
+                    </a>
+
+                    {% if request.user.is_authenticated %}
+                    <a
+                        href="{% if request.user.role == 'parent' %}{% url 'accounts:parent_dashboard' %}{% else %}{% url 'accounts:profile' %}{% endif %}"
+                        class="btn btn-outline-light btn-lg px-4"
+                        data-translate="profile"
+                    >
+                        My Profile
+                    </a>
+                    {% else %}
+                    <a
+                        href="{% url 'accounts:register' %}?next={{ request.path }}"
+                        class="btn btn-outline-light btn-lg px-4"
+                        data-translate="register"
+                    >
+                        Register
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-5 mt-5 mt-lg-0">
+                <div class="hero-card card border-0 shadow-lg">
+                    <div class="card-body p-4 p-lg-5">
+                        <h3
+                            class="h4 fw-bold mb-3"
+                            data-home-text="hero_side_title"
+                        >
+                            {{ home_page_text.hero_side_title|default:"Why
+                            students choose us" }}
+                        </h3>
+                        <p
+                            class="text-muted mb-0"
+                            data-home-text="hero_side_description"
+                        >
+                            {{
+                            home_page_text.hero_side_description|default:"Quality
+                            teaching, practical learning, and a pathway to
+                            steady progress." }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if home_page.show_primary_features %}
+<section class="py-5" id="primary-features">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2
+                class="display-5 fw-bold mb-3"
+                data-home-text="primary_features_title"
+            >
+                {{ home_page_text.primary_features_title|default:"Primary
+                Features" }}
+            </h2>
+            <p
+                class="lead text-muted mx-auto"
+                style="max-width: 760px"
+                data-home-text="primary_features_description"
+            >
+                {{ home_page_text.primary_features_description|default:"Discover
+                the core strengths that make this learning experience stand
+                out." }}
+            </p>
+        </div>
+
+        <div class="row g-4" id="primary-features-container">
+            {% for feature in home_page_primary_features %}
+            <div class="col-md-6 col-xl-3">
+                <div class="card h-100 border-0 shadow-sm feature-card">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon-wrapper mx-auto mb-3">
+                            {% if feature.image_url %}
+                            <img
+                                src="{{ feature.image_url }}"
+                                alt="{{ feature.title }}"
+                                class="img-fluid"
+                                style="max-height: 48px"
+                            />
+                            {% else %}
+                            <i
+                                class="{{ feature.icon_class|default:'fas fa-star' }} fa-2x text-primary"
+                            ></i>
+                            {% endif %}
+                        </div>
+                        <h3
+                            class="h5 fw-bold mb-2"
+                            data-home-text="primary_feature_title_{{ forloop.counter0 }}"
+                        >
+                            {{ feature.title }}
+                        </h3>
+                        <p
+                            class="text-muted mb-0"
+                            data-home-text="primary_feature_description_{{ forloop.counter0 }}"
+                        >
+                            {{ feature.description }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-light border text-center mb-0">
+                    <span data-home-text="primary_features_empty_text">
+                        {{
+                        home_page_text.primary_features_empty_text|default:"No
+                        features have been added yet." }}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %} {% if home_page.show_who_we_are_section %}
+<section class="py-5 bg-light" id="who-we-are">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                {% if home_page.who_we_are_image %}
+                <img
+                    src="{{ home_page.who_we_are_image.url }}"
+                    alt="{{ home_page_text.who_we_are_title|default:'Who We Are' }}"
+                    class="img-fluid rounded-4 shadow-sm w-100"
+                />
+                {% else %}
+                <img
+                    src="{% static 'imgs/bg/t3.jpg' %}"
+                    alt="{{ home_page_text.who_we_are_title|default:'Who We Are' }}"
+                    class="img-fluid rounded-4 shadow-sm w-100"
+                />
+                {% endif %}
+            </div>
+            <div class="col-lg-6">
+                <h2
+                    class="display-5 fw-bold mb-3"
+                    data-home-text="who_we_are_title"
+                >
+                    {{ home_page_text.who_we_are_title|default:"Who We Are" }}
+                </h2>
+                <p class="lead mb-3" data-home-text="who_we_are_lead">
+                    {{ home_page_text.who_we_are_lead|default:"We help learners
+                    grow through guided practice and meaningful support." }}
+                </p>
+                <p
+                    class="text-muted mb-4"
+                    data-home-text="who_we_are_description"
+                >
+                    {{ home_page_text.who_we_are_description|default:"Our
+                    mission is to provide a strong educational foundation with
+                    trusted teachers and accessible resources." }}
+                </p>
+                <a
+                    href="{{ home_page.who_we_are_button_url|default:'/courses/' }}"
+                    class="btn btn-primary"
+                >
+                    <span data-home-text="who_we_are_button_text">
+                        {{ home_page_text.who_we_are_button_text|default:"Learn
+                        More" }}
+                    </span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %} {% if home_page.show_video_section %}
+<section class="py-5" id="video">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <div
+                    class="position-relative rounded-4 overflow-hidden shadow-sm"
+                >
+                    <video
+                        id="video-player"
+                        class="w-100 d-block"
+                        preload="metadata"
+                        playsinline
+                        poster="{% if home_page.video_cover_image %}{{ home_page.video_cover_image.url }}{% else %}{% static 'imgs/bg/t1.png' %}{% endif %}"
+                    >
+                        {% if home_page.intro_video %}
+                        <source
+                            src="{{ home_page.intro_video.url }}"
+                            type="video/mp4"
+                        />
+                        {% else %}
+                        <source
+                            src="{% static 'videos/nab.mp4' %}"
+                            type="video/mp4"
+                        />
+                        {% endif %}
+                    </video>
+                    <button
+                        type="button"
+                        id="play-pause-button"
+                        class="video-play-button btn btn-light rounded-circle shadow"
+                        aria-label="Play video"
+                    >
+                        <i class="fas fa-play" id="play-icon"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <h2
+                    class="display-5 fw-bold mb-3"
+                    data-home-text="video_section_title"
+                >
+                    {{ home_page_text.video_section_title|default:"Watch Our
+                    Introduction" }}
+                </h2>
+                <p
+                    class="lead text-muted mb-4"
+                    data-home-text="video_section_description"
+                >
+                    {{ home_page_text.video_section_description|default:"See how
+                    our platform, teaching style, and learning approach come
+                    together." }}
+                </p>
+
+                <div id="video-points-container">
+                    {% for point in home_page_video_points %}
+                    <div class="d-flex align-items-start mb-3">
+                        <i
+                            class="{{ point.icon_class|default:'fas fa-check-circle' }} fa-fw fa-lg text-primary me-3 mt-1"
+                        ></i>
+                        <p
+                            class="mb-0"
+                            data-home-text="video_point_{{ forloop.counter0 }}"
+                        >
+                            {{ point.text }}
+                        </p>
+                    </div>
+                    {% empty %}
+                    <div class="d-flex align-items-start mb-3">
+                        <i
+                            class="fas fa-check-circle fa-fw fa-lg text-primary me-3 mt-1"
+                        ></i>
+                        <p class="mb-0" data-home-text="video_point_0">
+                            {{
+                            home_page_text.video_point_fallback|default:"High-quality
+                            video lectures from expert instructors." }}
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %} {% if home_page.show_chat_section %}
+<section class="py-5 bg-light" id="chat">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 order-2 order-lg-1">
+                <h2
+                    class="display-5 fw-bold mb-3"
+                    data-home-text="chat_section_title"
+                >
+                    {{ home_page_text.chat_section_title|default:"Chat With Us"
+                    }}
+                </h2>
+                <p
+                    class="lead mb-3"
+                    data-home-text="chat_section_description_1"
+                >
+                    {{ home_page_text.chat_section_description_1|default:"Have
+                    questions about classes, schedules, or learning paths?" }}
+                </p>
+                <p
+                    class="text-muted mb-4"
+                    data-home-text="chat_section_description_2"
+                >
+                    {{ home_page_text.chat_section_description_2|default:"Our
+                    team is here to help you quickly and clearly." }}
+                </p>
+
+                {% csrf_token %}
+
+                <div id="homeLastRoomContainer" class="alert alert-info d-none">
+                    <div
+                        class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3"
+                    >
+                        <div>
+                            <h3
+                                class="h6 fw-bold mb-1"
+                                data-translate="continue_chat"
+                            >
+                                Continue Your Conversation
+                            </h3>
+                            <p
+                                class="mb-0 small"
+                                data-translate="continue_chat_desc"
+                            >
+                                Pick up where you left off
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            id="homeJoinLastRoomBtn"
+                            class="btn btn-outline-primary btn-sm"
+                        >
+                            <span data-translate="join">Join</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button
+                    type="button"
+                    id="homeChatButton"
+                    class="btn btn-primary btn-lg"
+                >
+                    <i class="fas fa-comments me-2"></i>
+                    <span data-home-text="chat_button_text">
+                        {{ home_page_text.chat_button_text|default:"Start Chat"
+                        }}
+                    </span>
+                </button>
+            </div>
+
+            <div class="col-lg-6 order-1 order-lg-2 text-center">
+                {% if home_page.chat_image %}
+                <img
+                    src="{{ home_page.chat_image.url }}"
+                    alt="{{ home_page_text.chat_section_title|default:'Chat With Us' }}"
+                    class="img-fluid rounded-4 shadow-sm"
+                />
+                {% else %}
+                <img
+                    src="{% static 'imgs/bg/chat.png' %}"
+                    alt="{{ home_page_text.chat_section_title|default:'Chat With Us' }}"
+                    class="img-fluid rounded-4 shadow-sm"
+                />
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %} {% if home_page.show_secondary_features %}
+<section class="py-5" id="secondary-features">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2
+                class="display-6 fw-bold mb-3"
+                data-home-text="secondary_features_title"
+            >
+                {{ home_page_text.secondary_features_title|default:"More Reasons
+                to Choose Us" }}
+            </h2>
+            <p
+                class="text-muted mx-auto"
+                style="max-width: 760px"
+                data-home-text="secondary_features_description"
+            >
+                {{
+                home_page_text.secondary_features_description|default:"Additional
+                benefits that support steady progress and strong outcomes." }}
+            </p>
+        </div>
+
+        <div class="row g-4" id="secondary-features-container">
+            {% for feature in home_page_secondary_features %}
+            <div class="col-md-6 col-xl-3">
+                <div class="card h-100 border-0 shadow-sm feature-card">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon-wrapper mx-auto mb-3">
+                            {% if feature.image_url %}
+                            <img
+                                src="{{ feature.image_url }}"
+                                alt="{{ feature.title }}"
+                                class="img-fluid"
+                                style="max-height: 48px"
+                            />
+                            {% else %}
+                            <i
+                                class="{{ feature.icon_class|default:'fas fa-star' }} fa-2x text-primary"
+                            ></i>
+                            {% endif %}
+                        </div>
+                        <h3
+                            class="h5 fw-bold mb-2"
+                            data-home-text="secondary_feature_title_{{ forloop.counter0 }}"
+                        >
+                            {{ feature.title }}
+                        </h3>
+                        <p
+                            class="text-muted mb-0"
+                            data-home-text="secondary_feature_description_{{ forloop.counter0 }}"
+                        >
+                            {{ feature.description }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-light border text-center mb-0">
+                    <span data-home-text="secondary_features_empty_text">
+                        {{
+                        home_page_text.secondary_features_empty_text|default:"No
+                        additional features have been added yet." }}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %} {% if teachers and home_page.show_teachers_section %}
+<section class="py-5 bg-light" id="teachers">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2
+                class="display-5 fw-bold mb-3"
+                data-home-text="teachers_section_title"
+            >
+                {{ home_page_text.teachers_section_title|default:"Our Teachers"
+                }}
+            </h2>
+            <p
+                class="lead text-muted mx-auto"
+                style="max-width: 760px"
+                data-home-text="teachers_section_subtitle"
+            >
+                {{ home_page_text.teachers_section_subtitle|default:"Meet the
+                dedicated educators guiding your learning journey." }}
+            </p>
+        </div>
+
+        <div class="position-relative">
+            <div class="d-flex justify-content-end gap-2 mb-3">
+                <button
+                    type="button"
+                    id="teacherPrevArrow"
+                    class="btn btn-outline-primary"
+                    aria-label="Previous teachers"
+                >
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button
+                    type="button"
+                    id="teacherNextArrow"
+                    class="btn btn-outline-primary"
+                    aria-label="Next teachers"
+                >
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <div
+                class="teacher-slider d-flex gap-4 overflow-auto pb-2"
+                id="teacherSlider"
+            >
+                {% for teacher in teachers %}
+                <article
+                    class="card border-0 shadow-sm flex-shrink-0 teacher-card"
+                >
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            {% if teacher.image %}
+                            <img
+                                src="{{ teacher.image.url }}"
+                                alt="{{ teacher.name }}"
+                                class="rounded-circle teacher-avatar"
+                            />
+                            {% else %}
+                            <img
+                                src="{% static 'imgs/defaults/person.png' %}"
+                                alt="{{ teacher.name }}"
+                                class="rounded-circle teacher-avatar"
+                            />
+                            {% endif %}
+                        </div>
+                        <h3 class="h5 fw-bold mb-1">{{ teacher.name }}</h3>
+                        <p class="text-primary mb-2">
+                            {{ teacher.specialization }}
+                        </p>
+                        <p class="text-muted small mb-0">
+                            {{ teacher.bio|truncatechars:120 }}
+                        </p>
+                    </div>
+                    {% if teacher.profile_link %}
+                    <div
+                        class="card-footer bg-white border-0 pt-0 pb-4 text-center"
+                    >
+                        <a
+                            href="{{ teacher.profile_link }}"
+                            class="btn btn-outline-primary btn-sm"
+                            data-translate="view_profile"
+                        >
+                            View Profile
+                        </a>
+                    </div>
+                    {% endif %}
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %} {% if home_page.show_contact_section %}
+<section class="py-5" id="contact">
+    <div class="container">
+        <div class="card border-0 shadow-lg overflow-hidden">
+            <div class="row g-0">
+                <div class="col-lg-7 p-4 p-lg-5">
+                    <h2
+                        class="display-6 fw-bold mb-3"
+                        data-home-text="contact_section_title"
+                    >
+                        {{ home_page_text.contact_section_title|default:"Contact
+                        Us" }}
+                    </h2>
+                    <p
+                        class="text-muted mb-4"
+                        data-home-text="contact_section_description"
+                    >
+                        {{
+                        home_page_text.contact_section_description|default:"Send
+                        us a message and we will get back to you as soon as
+                        possible." }}
+                    </p>
+
+                    <form
+                        id="contactForm"
+                        class="needs-validation"
+                        method="post"
+                        novalidate
+                    >
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label
+                                    for="name"
+                                    class="form-label"
+                                    data-translate="your_name"
+                                    >Your Name</label
+                                >
+                                <input
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                                    class="form-control"
+                                    required
+                                />
+                                <div class="invalid-feedback">
+                                    Please enter your name.
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label
+                                    for="email"
+                                    class="form-label"
+                                    data-translate="your_email"
+                                    >Your Email</label
+                                >
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    class="form-control"
+                                    required
+                                />
+                                <div class="invalid-feedback">
+                                    Please enter a valid email address.
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label
+                                    for="phone"
+                                    class="form-label"
+                                    data-translate="your_phone"
+                                    >Your Phone (Optional)</label
+                                >
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    class="form-control"
+                                />
+                            </div>
+
+                            <div class="col-12">
+                                <label
+                                    for="message"
+                                    class="form-label"
+                                    data-translate="how_can_we_help"
+                                    >How can we help?</label
+                                >
+                                <textarea
+                                    id="message"
+                                    name="message"
+                                    class="form-control"
+                                    rows="6"
+                                    required
+                                ></textarea>
+                                <div class="invalid-feedback">
+                                    Please enter your message.
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <button
+                                    type="submit"
+                                    id="contactSubmitButton"
+                                    class="btn btn-primary btn-lg"
+                                >
+                                    <span data-translate="send_button"
+                                        >Send Message</span
+                                    >
+                                </button>
+                            </div>
+
+                            <div class="col-12">
+                                <div
+                                    id="contactFormFeedback"
+                                    class="small mt-2"
+                                    role="status"
+                                    aria-live="polite"
+                                ></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div
+                    class="col-lg-5 bg-light p-4 p-lg-5 d-flex flex-column justify-content-center"
+                >
+                    <h3
+                        class="h4 fw-bold mb-3"
+                        data-home-text="contact_info_title"
+                    >
+                        {{ home_page_text.contact_info_title|default:"Contact
+                        Information" }}
+                    </h3>
+                    <p
+                        class="text-muted mb-4"
+                        data-home-text="contact_info_description"
+                    >
+                        {{
+                        home_page_text.contact_info_description|default:company_info.description
+                        }}
+                    </p>
+
+                    {% if company_info.phone %}
+                    <p class="mb-3">
+                        <i class="fas fa-phone fa-fw me-2 text-primary"></i>
+                        <a href="tel:{{ company_info.phone }}"
+                            >{{ company_info.phone }}</a
+                        >
+                    </p>
+                    {% endif %} {% if company_info.email %}
+                    <p class="mb-3">
+                        <i class="fas fa-envelope fa-fw me-2 text-primary"></i>
+                        <a href="mailto:{{ company_info.email }}"
+                            >{{ company_info.email }}</a
+                        >
+                    </p>
+                    {% endif %} {% if home_page.facebook_url %}
+                    <p class="mb-0">
+                        <i
+                            class="fab fa-facebook-f fa-fw me-2 text-primary"
+                        ></i>
+                        <a
+                            href="{{ home_page.facebook_url }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <span data-home-text="facebook_label">
+                                {{ home_page_text.facebook_label|default:"Follow
+                                us on Facebook" }}
+                            </span>
+                        </a>
+                    </p>
+                    {% endif %}
+
+                    <div class="mt-4 text-center">
+                        {% if home_page.contact_illustration %}
+                        <img
+                            src="{{ home_page.contact_illustration.url }}"
+                            alt="{{ home_page_text.contact_info_title|default:'Contact Information' }}"
+                            class="img-fluid"
+                            style="max-width: 260px"
+                        />
+                        {% else %}
+                        <img
+                            src="{% static 'imgs/mail3.webp' %}"
+                            alt="{{ home_page_text.contact_info_title|default:'Contact Information' }}"
+                            class="img-fluid"
+                            style="max-width: 260px"
+                        />
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<footer class="bg-footer text-white pt-5 pb-4">
+    <div class="container">
+        <div class="row gy-4">
+            <div class="col-lg-4 col-md-6">
+                <a href="/" class="d-inline-block mb-3">
+                    <img
+                        src="{{ logo_url }}"
+                        alt="Logo"
+                        style="max-height: 64px"
+                    />
+                </a>
+                <p class="mb-3" data-home-text="footer_description">
+                    {{
+                    home_page_text.footer_description|default:company_info.description
+                    }}
+                </p>
+
+                {% if home_page.facebook_url %}
+                <a
+                    href="{{ home_page.facebook_url }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-white fs-5"
+                >
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                {% endif %}
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <h5 class="fw-bold mb-3" data-translate="quick_links">
+                    Quick Links
+                </h5>
+                <ul class="list-unstyled footer-links">
+                    <li class="mb-2">
+                        <a href="/" data-translate="home">Home</a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#who-we-are"
+                            ><span data-home-text="who_we_are_title_footer"
+                                >{{ home_page_text.who_we_are_title|default:"Who
+                                We Are" }}</span
+                            ></a
+                        >
+                    </li>
+                    <li class="mb-2">
+                        <a href="#teachers"
+                            ><span
+                                data-home-text="teachers_section_title_footer"
+                                >{{
+                                home_page_text.teachers_section_title|default:"Our
+                                Teachers" }}</span
+                            ></a
+                        >
+                    </li>
+                    <li class="mb-2">
+                        <a href="#contact" data-translate="contact_us"
+                            >Contact Us</a
+                        >
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h5 class="fw-bold mb-3" data-translate="support">Support</h5>
+                <ul class="list-unstyled footer-links">
+                    <li class="mb-2">
+                        <a href="#chat" data-translate="live_chat">Live Chat</a>
+                    </li>
+                    <li class="mb-2">
+                        <a
+                            href="{% url 'courses:levels' %}"
+                            data-translate="levels"
+                            >Levels & Courses</a
+                        >
+                    </li>
+                    {% if request.user.is_authenticated %}
+                    <li class="mb-2">
+                        <a
+                            href="{% if request.user.role == 'parent' %}{% url 'accounts:parent_dashboard' %}{% else %}{% url 'accounts:profile' %}{% endif %}"
+                            data-translate="profile"
+                        >
+                            My Profile
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="mb-2">
+                        <a
+                            href="{% url 'accounts:login' %}"
+                            data-translate="login"
+                            >Login</a
+                        >
+                    </li>
+                    <li class="mb-2">
+                        <a
+                            href="{% url 'accounts:register' %}"
+                            data-translate="register"
+                            >Register</a
+                        >
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h5
+                    class="fw-bold mb-3"
+                    data-home-text="contact_info_title_footer"
+                >
+                    {{ home_page_text.contact_info_title|default:"Contact
+                    Information" }}
+                </h5>
+                <ul class="list-unstyled footer-links">
+                    {% if company_info.phone %}
+                    <li class="mb-2">
+                        <i class="fas fa-phone fa-fw me-2"></i>
+                        <a href="tel:{{ company_info.phone }}"
+                            >{{ company_info.phone }}</a
+                        >
+                    </li>
+                    {% endif %} {% if company_info.email %}
+                    <li class="mb-2">
+                        <i class="fas fa-envelope fa-fw me-2"></i>
+                        <a href="mailto:{{ company_info.email }}"
+                            >{{ company_info.email }}</a
+                        >
+                    </li>
+                    {% endif %}
+                </ul>
+
+                {% if company_info.email %}
+                <a
+                    class="btn btn-primary mt-2"
+                    href="{% if home_page.footer_cta_url %}{{ home_page.footer_cta_url }}{% else %}https://mail.google.com/mail/?view=cm&fs=1&to={{ company_info.email }}{% endif %}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <span data-home-text="footer_cta_text">
+                        {{ home_page_text.footer_cta_text|default:"Get in Touch"
+                        }}
+                    </span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <hr class="border-secondary my-4" />
+
+        <div class="text-center small">
+            <span data-home-text="footer_created_by_text">
+                {{ home_page_text.footer_created_by_text|default:"Created with
+                care" }}
+            </span>
+            <span class="mx-2">|</span>
+            <span data-home-text="footer_copyright_text">
+                {{ home_page_text.footer_copyright_text|default:"Copyright" }}
+            </span>
+            <span>{{ current_year }}</span>
+        </div>
+    </div>
+</footer>
+
+{{ home_page_translations|json_script:"home-page-translations" }}
+
+<style>
+    .hero-card {
+        border-radius: 1.5rem;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+    }
+
+    .feature-card {
+        border-radius: 1.25rem;
+        transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.08);
+    }
+
+    .feature-icon-wrapper {
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(var(--main-color-rgb), 0.08);
+        overflow: hidden;
+    }
+
+    .video-play-button {
+        position: absolute;
+        inset: 50% auto auto 50%;
+        transform: translate(-50%, -50%);
+        width: 72px;
+        height: 72px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        z-index: 2;
+    }
+
+    .teacher-slider {
+        scroll-behavior: smooth;
+        scrollbar-width: thin;
+        scroll-snap-type: x mandatory;
+    }
+
+    .teacher-card {
+        width: 280px;
+        min-width: 280px;
+        border-radius: 1.25rem;
+        scroll-snap-align: start;
+    }
+
+    .teacher-avatar {
+        width: 96px;
+        height: 96px;
+        object-fit: cover;
+    }
+
+    .footer-links a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .footer-links a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var videoPlayer = document.getElementById('video-player');
+        var playPauseButton = document.getElementById('play-pause-button');
+        var playIcon = document.getElementById('play-icon');
+
+        if (videoPlayer && playPauseButton) {
+            playPauseButton.addEventListener('click', function () {
+                if (videoPlayer.paused) {
+                    videoPlayer.controls = true;
+                    videoPlayer.play();
+                } else {
+                    videoPlayer.pause();
+                }
+            });
+
+            videoPlayer.addEventListener('play', function () {
+                playPauseButton.classList.add('d-none');
+                if (playIcon) {
+                    playIcon.className = 'fas fa-pause';
+                }
+            });
+
+            videoPlayer.addEventListener('pause', function () {
+                playPauseButton.classList.remove('d-none');
+                if (playIcon) {
+                    playIcon.className = 'fas fa-play';
+                }
+            });
+
+            videoPlayer.addEventListener('ended', function () {
+                playPauseButton.classList.remove('d-none');
+                if (playIcon) {
+                    playIcon.className = 'fas fa-play';
+                }
+                videoPlayer.controls = false;
+            });
+        }
+
+        var lastRoomContainer = document.getElementById('homeLastRoomContainer');
+        var joinLastRoomBtn = document.getElementById('homeJoinLastRoomBtn');
+        var chatButton = document.getElementById('homeChatButton');
+
+        try {
+            var lastRoom = localStorage.getItem('lastChatRoom');
+            if (lastRoom && lastRoomContainer) {
+                var roomData = JSON.parse(lastRoom);
+                if (roomData && roomData.code) {
+                    lastRoomContainer.classList.remove('d-none');
+                    if (joinLastRoomBtn) {
+                        joinLastRoomBtn.addEventListener('click', function () {
+                            window.location.href = '/chat/rooms/' + roomData.code + '/';
+                        });
+                    }
+                }
+            }
+        } catch (error) {
+            localStorage.removeItem('lastChatRoom');
+        }
+
+        if (chatButton) {
+            chatButton.addEventListener('click', function () {
+                {% if request.user.is_superuser %}
+                    window.location.href = "{% url 'chat:dashboard' %}";
+                {% else %}
+                    window.location.href = "{% url 'chat:contact' %}";
+                {% endif %}
+            });
+        }
+
+        var teacherSlider = document.getElementById('teacherSlider');
+        var teacherPrevArrow = document.getElementById('teacherPrevArrow');
+        var teacherNextArrow = document.getElementById('teacherNextArrow');
+
+        if (teacherSlider && teacherPrevArrow && teacherNextArrow) {
+            teacherPrevArrow.addEventListener('click', function () {
+                teacherSlider.scrollBy({ left: -320, behavior: 'smooth' });
+            });
+
+            teacherNextArrow.addEventListener('click', function () {
+                teacherSlider.scrollBy({ left: 320, behavior: 'smooth' });
+            });
+        }
+
+        var contactForm = document.getElementById('contactForm');
+        var contactSubmitButton = document.getElementById('contactSubmitButton');
+        var contactFormFeedback = document.getElementById('contactFormFeedback');
+
+        if (contactForm) {
+            contactForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                if (!contactForm.checkValidity()) {
+                    event.stopPropagation();
+                    contactForm.classList.add('was-validated');
+                    return;
+                }
+
+                var formData = new FormData(contactForm);
+                var csrfInput = contactForm.querySelector('input[name="csrfmiddlewaretoken"]');
+
+                if (contactSubmitButton) {
+                    contactSubmitButton.disabled = true;
+                }
+
+                if (contactFormFeedback) {
+                    contactFormFeedback.className = 'small mt-2 text-muted';
+                    contactFormFeedback.textContent = 'Sending...';
+                }
+
+                fetch("{% url 'about:send_email' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfInput ? csrfInput.value : ''
+                    },
+                    body: formData
+                })
+                    .then(function (response) {
+                        return response.json().then(function (data) {
+                            return { ok: response.ok, data: data };
+                        });
+                    })
+                    .then(function (result) {
+                        if (!result.ok) {
+                            throw result.data;
+                        }
+
+                        contactForm.reset();
+                        contactForm.classList.remove('was-validated');
+
+                        if (contactFormFeedback) {
+                            contactFormFeedback.className = 'small mt-2 text-success';
+                            contactFormFeedback.textContent = result.data.message || 'Your message was sent successfully.';
+                        }
+                    })
+                    .catch(function (error) {
+                        var errorMessage = 'Something went wrong. Please try again.';
+                        if (error && error.error) {
+                            errorMessage = error.error;
+                        } else if (error && error.errors) {
+                            errorMessage = 'Please review the form and try again.';
+                        }
+
+                        if (contactFormFeedback) {
+                            contactFormFeedback.className = 'small mt-2 text-danger';
+                            contactFormFeedback.textContent = errorMessage;
+                        }
+                    })
+                    .finally(function () {
+                        if (contactSubmitButton) {
+                            contactSubmitButton.disabled = false;
+                        }
+                    });
+            });
+        }
+    });
+
+    window.updateDynamicContent = function (currentLanguage) {
+        var translationsNode = document.getElementById('home-page-translations');
+        if (!translationsNode) {
+            return;
+        }
+
+        var payload = {};
+        try {
+            payload = JSON.parse(translationsNode.textContent || '{}');
+        } catch (error) {
+            payload = {};
+        }
+
+        var pageText = {};
+        if (payload.page_text && payload.page_text[currentLanguage]) {
+            pageText = payload.page_text[currentLanguage];
+        } else if (payload.page_text && payload.page_text.en) {
+            pageText = payload.page_text.en;
+        } else if (payload[currentLanguage]) {
+            pageText = payload[currentLanguage];
+        } else if (payload.en) {
+            pageText = payload.en;
+        }
+
+        document.querySelectorAll('[data-home-text]').forEach(function (node) {
+            var key = node.getAttribute('data-home-text');
+            if (!key || typeof pageText[key] === 'undefined' || pageText[key] === null) {
+                return;
+            }
+
+            if (node.tagName === 'INPUT' || node.tagName === 'TEXTAREA') {
+                node.value = pageText[key];
+            } else {
+                node.textContent = pageText[key];
+            }
+        });
+    };
+</script>
+{% endblock content %}

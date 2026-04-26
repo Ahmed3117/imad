@@ -1,0 +1,1524 @@
+  {
+    "model": "about.homepagecontent",
+    "pk": 1,
+    "fields": {
+      "hero_background_image": null,
+      "who_we_are_image": null,
+      "video_cover_image": null,
+      "intro_video": null,
+      "chat_image": null,
+      "contact_illustration": null,
+      "hero_primary_button_url": "/courses/",
+      "who_we_are_button_url": "/courses/",
+      "footer_cta_url": "/courses/",
+      "facebook_url": "https://www.facebook.com/",
+      "show_primary_features": true,
+      "show_who_we_are_section": true,
+      "show_video_section": true,
+      "show_chat_section": true,
+      "show_secondary_features": true,
+      "show_teachers_section": true,
+      "show_contact_section": true,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "about.homepagecontenttranslation",
+    "pk": 1,
+    "fields": {
+      "home_page": 1,
+      "language": "en",
+      "hero_badge": "FREE TRIAL — NO CARD REQUIRED",
+      "hero_title": "Your Child Deserves to Love the Quran",
+      "hero_description": "Book a free 1-on-1 class with a certified Egyptian teacher. Real instruction, real progress — from the comfort of your home.",
+      "hero_primary_button_text": "Book Your Child's Free Class",
+      "hero_side_title": "A Real Teacher. A Real Relationship. Real Results.",
+      "hero_side_description": "Most online platforms are institutions. Nabbiuwny is different — we match each learner with one dedicated teacher who understands their pace, personality, and goals. That consistency helps children build confidence, make steady progress, and genuinely love learning the Quran.",
+      "hero_trust_badge_1": "Al-Azhar Certified teachers",
+      "hero_trust_badge_2": "⭐ 4.9/5 parent rating",
+      "hero_trust_badge_3": "🕐 24/7 scheduling — your timezone",
+      "hero_trust_badge_4": "👨‍👩‍👧‍👦 Family bundles available",
+      "hero_pricing_note": "💰 From $45/mo after trial",
+      "primary_features_title": "Why Families Choose Nabbiuwny",
+      "primary_features_description": "We combine authentic Quran teaching, personal teacher matching, flexible scheduling, and family-friendly support to create a learning experience children enjoy and parents trust.",
+      "primary_features_empty_text": "New highlights will appear here soon.",
+      "who_we_are_title": "Why Nabbiuwny",
+      "who_we_are_lead": "A real teacher, a real relationship, and real results — built around your child's long-term Quran journey.",
+      "who_we_are_description": "Most online platforms feel transactional, with rotating teachers and generic lesson flow. Nabbiuwny takes a more personal approach. We match each student with one dedicated teacher who learns their level, supports their confidence, and grows with them over time. Your child does not just attend classes — they build a meaningful relationship that makes Quran learning more consistent, more joyful, and more effective.",
+      "who_we_are_button_text": "Explore Learning Options",
+      "video_section_title": "See How the Journey Works",
+      "video_section_description": "From the first class to steady weekly progress, our learning experience is designed to be clear, supportive, and measurable for both children and parents.",
+      "video_point_fallback": "Live, one-on-one Quran learning with a teacher who truly knows your child.",
+      "chat_section_title": "Talk to Us Before You Decide",
+      "chat_section_description_1": "If you have questions about age, level, scheduling, or the right program, our team is here to help you make the best choice with confidence.",
+      "chat_section_description_2": "Reach out anytime to discuss your child's needs, compare options, and get guidance before booking or enrolling.",
+      "chat_button_text": "Chat With Us",
+      "secondary_features_title": "What Makes the Experience Different",
+      "secondary_features_description": "Beyond strong teaching, we focus on the details that help families stay consistent, informed, and confident throughout the learning journey.",
+      "secondary_features_empty_text": "More program details will be added soon.",
+      "teachers_section_title": "Our Teachers",
+      "teachers_section_subtitle": "Al-Azhar certified, carefully vetted, and experienced in teaching children, teens, and adults with patience, clarity, and care.",
+      "testimonials_section_title": "What Parents Are Saying",
+      "testimonials_section_subtitle": "Real feedback from families who saw confidence, consistency, and love for Quran learning grow at home.",
+      "process_section_title": "From Sign-Up to First Class in 24 Hours",
+      "process_section_description": "A simple, guided process that helps your family get started quickly and confidently.",
+      "free_session_section_badge": "100% FREE • NO CARD REQUIRED",
+      "free_session_section_title": "Book Your Child's Free Trial Class",
+      "free_session_section_description": "Takes 60 seconds. We'll match your child with the right teacher and help you experience the quality before you commit.",
+      "free_session_privacy_note": "Your info is private. We never sell data. If you enroll and the first week is not the right fit, you're covered by our money-back guarantee.",
+      "family_bundle_section_badge": "FAMILY BUNDLE — EXCLUSIVE OFFER",
+      "family_bundle_section_title": "One Platform. Every Child. One Price.",
+      "family_bundle_section_description": "Give all your children the Islamic education they deserve. Our Family Bundle is designed for Muslim families who want dedicated teachers, transparent pricing, and a simpler way to support every child at once.",
+      "family_bundle_section_pricing_note_1": "$45 per child / month",
+      "family_bundle_section_pricing_note_2": "3 children for $95/mo",
+      "family_bundle_section_pricing_note_3": "$40+ average monthly savings vs. competitors",
+      "family_bundle_section_pricing_note_4": "Free first class, no card needed",
+      "family_bundle_plans_title": "Transparent Pricing. No Surprises.",
+      "family_bundle_plans_description": "Every plan includes dedicated certified teaching, weekly parent updates, progress tracking, and a clear first-week money-back guarantee.",
+      "family_bundle_comparison_title": "How We Compare",
+      "family_bundle_comparison_description": "Families choose us for transparent pricing, dedicated teachers, personal communication, and a trial-first experience that reduces risk.",
+      "family_bundle_faq_title": "Questions Answered",
+      "family_bundle_faq_description": "Clear answers for the most common family bundle questions before you book.",
+      "family_bundle_cta_title": "Start Your Family's Quran Journey Today",
+      "family_bundle_cta_description": "Free trial for every child. No cards. No commitment. Just the Islamic education your family deserves.",
+      "family_bundle_cta_button_text": "Get the Family Bundle",
+      "contact_section_title": "Get in Touch",
+      "contact_section_description": "Need help choosing the right starting point, understanding pricing, or planning for multiple children? Send us a message and we'll guide you.",
+      "contact_info_title": "Contact Information",
+      "contact_info_description": "Reach out directly by phone, email, or Facebook and our team will help you take the next step with clarity.",
+      "facebook_label": "Follow us on Facebook",
+      "footer_description": "Nabbiuwny helps families build a meaningful Quran journey through certified teachers, personal guidance, flexible scheduling, and a learning experience children can truly enjoy.",
+      "footer_cta_text": "Book the Free Class Now",
+      "footer_created_by_text": "Built to support meaningful Quran learning for families everywhere",
+      "footer_copyright_text": "© Nabbiuwny"
+    }
+  },
+  {
+    "model": "about.homepagecontenttranslation",
+    "pk": 2,
+    "fields": {
+      "home_page": 1,
+      "language": "ar",
+      "hero_badge": "حصة تجريبية مجانية — بدون بطاقة",
+      "hero_title": "طفلك يستحق أن يحب القرآن",
+      "hero_description": "احجز حصة فردية مجانية مع معلم مصري معتمد. تعليم حقيقي، وتقدّم حقيقي — من راحة منزلك.",
+      "hero_primary_button_text": "احجز الحصة المجانية لطفلك",
+      "hero_side_title": "معلم حقيقي. علاقة حقيقية. نتائج حقيقية.",
+      "hero_side_description": "معظم المنصات التعليمية تعمل كأنها مؤسسات عامة. أما نبيُّوني فنهجها مختلف — نربط كل طالب بمعلم ثابت يفهم مستواه وشخصيته وأهدافه. هذا الثبات يساعد الأطفال على بناء الثقة، وتحقيق تقدّم مستمر، وحب تعلّم القرآن فعلًا.",
+      "hero_trust_badge_1": "معلمون معتمدون من الأزهر",
+      "hero_trust_badge_2": "⭐ تقييم أولياء الأمور 4.9/5",
+      "hero_trust_badge_3": "🕐 جدولة 24/7 حسب توقيتك",
+      "hero_trust_badge_4": "👨‍👩‍👧‍👦 باقات عائلية متاحة",
+      "hero_pricing_note": "💰 تبدأ من 45 دولارًا شهريًا بعد التجربة",
+      "primary_features_title": "لماذا تختارنا العائلات",
+      "primary_features_description": "نجمع بين التعليم القرآني الأصيل، واختيار المعلم المناسب، والجدولة المرنة، والدعم المناسب للعائلة لنقدّم تجربة تعليمية يحبها الأطفال ويثق بها الآباء.",
+      "primary_features_empty_text": "ستظهر مزايا جديدة هنا قريبًا.",
+      "who_we_are_title": "لماذا نبيُّوني",
+      "who_we_are_lead": "معلم حقيقي، وعلاقة حقيقية، ونتائج حقيقية — ضمن رحلة قرآنية طويلة المدى لطفلك.",
+      "who_we_are_description": "تشعر كثير من المنصات التعليمية بأنها تعاملية، مع تبديل مستمر للمعلمين وخطة دروس عامة. أما نبيُّوني فتتبنّى نهجًا أكثر شخصية. نحن نربط كل طالب بمعلم ثابت يتعرّف إلى مستواه، ويدعم ثقته، وينمو معه مع الوقت. طفلك لا يحضر دروسًا فقط — بل يبني علاقة تعليمية ذات معنى تجعل تعلّم القرآن أكثر ثباتًا ومتعة وفاعلية.",
+      "who_we_are_button_text": "استكشف خيارات التعلّم",
+      "video_section_title": "شاهد كيف تسير الرحلة",
+      "video_section_description": "من الحصة الأولى إلى التقدّم الأسبوعي المستمر، صُمّمت تجربتنا التعليمية لتكون واضحة وداعمة وقابلة للمتابعة لكل من الطفل وولي الأمر.",
+      "video_point_fallback": "تعلّم قرآني مباشر فردي مع معلم يعرف طفلك حقًا.",
+      "chat_section_title": "تواصل معنا قبل أن تقرر",
+      "chat_section_description_1": "إذا كانت لديك أسئلة حول العمر المناسب أو المستوى أو المواعيد أو البرنامج الأنسب، ففريقنا هنا ليساعدك على اتخاذ القرار بثقة.",
+      "chat_section_description_2": "تواصل معنا في أي وقت لمناقشة احتياجات طفلك، ومقارنة الخيارات، والحصول على توجيه قبل الحجز أو الاشتراك.",
+      "chat_button_text": "تحدث معنا",
+      "secondary_features_title": "ما الذي يجعل التجربة مختلفة",
+      "secondary_features_description": "إلى جانب جودة التعليم، نهتم بالتفاصيل التي تساعد العائلات على الاستمرار، والمتابعة، والشعور بالثقة طوال الرحلة التعليمية.",
+      "secondary_features_empty_text": "ستتم إضافة مزيد من تفاصيل البرنامج قريبًا.",
+      "teachers_section_title": "معلمونا",
+      "teachers_section_subtitle": "معتمدون من الأزهر، ومدقَّقون بعناية، ولديهم خبرة في تعليم الأطفال والمراهقين والبالغين بصبر ووضوح واهتمام.",
+      "testimonials_section_title": "ماذا يقول أولياء الأمور",
+      "testimonials_section_subtitle": "آراء حقيقية من عائلات لاحظت نمو الثقة والاستمرارية وحب تعلّم القرآن داخل البيت.",
+      "process_section_title": "من التسجيل إلى أول حصة خلال 24 ساعة",
+      "process_section_description": "خطوات بسيطة وواضحة تساعد عائلتك على البدء بسرعة وثقة.",
+      "free_session_section_badge": "مجاني 100% • بدون بطاقة",
+      "free_session_section_title": "احجز الحصة التجريبية المجانية لطفلك",
+      "free_session_section_description": "يستغرق الأمر 60 ثانية فقط. سنختار لطفلك المعلم المناسب ونمنحك فرصة لتجربة الجودة قبل الالتزام.",
+      "free_session_privacy_note": "بياناتك خاصة. نحن لا نبيع المعلومات أبدًا. وإذا اشتركت ولم تكن التجربة مناسبة في الأسبوع الأول، فأنت مشمول بضمان استرجاع المبلغ.",
+      "family_bundle_section_badge": "الباقة العائلية — عرض حصري",
+      "family_bundle_section_title": "منصة واحدة. كل طفل. وسعر واحد.",
+      "family_bundle_section_description": "امنح جميع أطفالك التعليم الإسلامي الذي يستحقونه. صُممت الباقة العائلية للأسر المسلمة التي تريد معلمين مخصصين، وأسعارًا واضحة، وطريقة أبسط لدعم كل طفل معًا.",
+      "family_bundle_section_pricing_note_1": "45 دولارًا لكل طفل / شهريًا",
+      "family_bundle_section_pricing_note_2": "3 أطفال مقابل 95 دولارًا شهريًا",
+      "family_bundle_section_pricing_note_3": "أكثر من 40 دولارًا متوسط التوفير الشهري مقارنة بالمنافسين",
+      "family_bundle_section_pricing_note_4": "الحصة الأولى مجانية، بدون بطاقة",
+      "family_bundle_plans_title": "أسعار واضحة. بلا مفاجآت.",
+      "family_bundle_plans_description": "تشمل كل خطة تعليمًا معتمدًا مخصصًا، وتحديثات أسبوعية لولي الأمر، ومتابعة للتقدّم، وضمان استرجاع واضح خلال الأسبوع الأول.",
+      "family_bundle_comparison_title": "كيف نقارن",
+      "family_bundle_comparison_description": "تختارنا العائلات بسبب الأسعار الواضحة، والمعلمين المخصصين، والتواصل الشخصي، وتجربة البدء المجاني التي تقلل المخاطرة.",
+      "family_bundle_faq_title": "إجابات على الأسئلة",
+      "family_bundle_faq_description": "إجابات واضحة على أكثر أسئلة الباقة العائلية شيوعًا قبل الحجز.",
+      "family_bundle_cta_title": "ابدأ رحلة عائلتك مع القرآن اليوم",
+      "family_bundle_cta_description": "حصة تجريبية مجانية لكل طفل. بدون بطاقات. بدون التزام. فقط التعليم الإسلامي الذي تستحقه عائلتك.",
+      "family_bundle_cta_button_text": "احصل على الباقة العائلية",
+      "contact_section_title": "تواصل معنا",
+      "contact_section_description": "هل تحتاج مساعدة في اختيار البداية المناسبة، أو فهم الأسعار، أو التخطيط لأكثر من طفل؟ أرسل لنا رسالة وسنرشدك.",
+      "contact_info_title": "معلومات التواصل",
+      "contact_info_description": "تواصل معنا مباشرة عبر الهاتف أو البريد الإلكتروني أو فيسبوك، وسيساعدك فريقنا على اتخاذ الخطوة التالية بوضوح.",
+      "facebook_label": "تابعنا على فيسبوك",
+      "footer_description": "تساعد نبيُّوني العائلات على بناء رحلة قرآنية ذات معنى من خلال معلمين معتمدين، وتوجيه شخصي، وجدولة مرنة، وتجربة تعليمية يمكن للأطفال أن يحبوها فعلًا.",
+      "footer_cta_text": "احجز الحصة المجانية الآن",
+      "footer_created_by_text": "بُنيت لدعم تعلّم القرآن الهادف للعائلات في كل مكان",
+      "footer_copyright_text": "© نبيُّوني"
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 1,
+    "fields": {
+      "home_page": 1,
+      "section": "primary",
+      "icon_class": "fas fa-certificate",
+      "image": null,
+      "order": 1,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 2,
+    "fields": {
+      "home_page": 1,
+      "section": "primary",
+      "icon_class": "fas fa-user-check",
+      "image": null,
+      "order": 2,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 3,
+    "fields": {
+      "home_page": 1,
+      "section": "primary",
+      "icon_class": "fas fa-comments",
+      "image": null,
+      "order": 3,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 4,
+    "fields": {
+      "home_page": 1,
+      "section": "primary",
+      "icon_class": "fas fa-tags",
+      "image": null,
+      "order": 4,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 1,
+    "fields": {
+      "feature": 1,
+      "language": "en",
+      "title": "Al-Azhar Certified Egyptian Teachers",
+      "description": "Every teacher holds trusted credentials and teaches with authentic recitation, correct Tajweed, and a strong grounding in Quran education.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 2,
+    "fields": {
+      "feature": 1,
+      "language": "ar",
+      "title": "معلمون مصريون معتمدون من الأزهر",
+      "description": "كل معلم يحمل مؤهلات موثوقة ويُدرّس بتلاوة صحيحة وتجويد سليم وأساس قوي في تعليم القرآن الكريم.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 3,
+    "fields": {
+      "feature": 2,
+      "language": "en",
+      "title": "One Dedicated Teacher",
+      "description": "Your child learns with one consistent teacher who understands their pace, personality, strengths, and goals — making progress more personal and sustainable.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 4,
+    "fields": {
+      "feature": 2,
+      "language": "ar",
+      "title": "معلم ثابت لكل طفل",
+      "description": "يتعلّم طفلك مع معلم ثابت يفهم سرعته وشخصيته ونقاط قوته وأهدافه — مما يجعل التقدّم أكثر خصوصية واستدامة.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 5,
+    "fields": {
+      "feature": 3,
+      "language": "en",
+      "title": "Weekly Parent Progress Updates",
+      "description": "Parents stay informed through clear communication about what was learned, what needs practice, and what comes next in the journey.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 6,
+    "fields": {
+      "feature": 3,
+      "language": "ar",
+      "title": "تحديثات أسبوعية لولي الأمر",
+      "description": "يبقى أولياء الأمور على اطلاع من خلال تواصل واضح حول ما تم تعلمه، وما يحتاج إلى مراجعة، وما الخطوة التالية في الرحلة.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 7,
+    "fields": {
+      "feature": 4,
+      "language": "en",
+      "title": "Family Pricing That Makes Sense",
+      "description": "Flexible family bundles help households enroll more than one child while keeping high-quality Quran education practical and accessible.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 8,
+    "fields": {
+      "feature": 4,
+      "language": "ar",
+      "title": "أسعار عائلية مناسبة",
+      "description": "تساعد الباقات العائلية المرنة الأسر على تسجيل أكثر من طفل مع الحفاظ على تعليم قرآني عالي الجودة وبسعر عملي ومتاح.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 5,
+    "fields": {
+      "home_page": 1,
+      "section": "secondary",
+      "icon_class": "fas fa-clock",
+      "image": null,
+      "order": 1,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 6,
+    "fields": {
+      "home_page": 1,
+      "section": "secondary",
+      "icon_class": "fas fa-laptop-house",
+      "image": null,
+      "order": 2,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 7,
+    "fields": {
+      "home_page": 1,
+      "section": "secondary",
+      "icon_class": "fas fa-child",
+      "image": null,
+      "order": 3,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 8,
+    "fields": {
+      "home_page": 1,
+      "section": "secondary",
+      "icon_class": "fas fa-shield-alt",
+      "image": null,
+      "order": 4,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 9,
+    "fields": {
+      "home_page": 1,
+      "section": "secondary",
+      "icon_class": "fas fa-calendar-alt",
+      "image": null,
+      "order": 5,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 10,
+    "fields": {
+      "home_page": 1,
+      "section": "secondary",
+      "icon_class": "fas fa-heart",
+      "image": null,
+      "order": 6,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 9,
+    "fields": {
+      "feature": 5,
+      "language": "en",
+      "title": "24/7 Scheduling Across Time Zones",
+      "description": "Families can choose times that fit their real routine, no matter where they live or how busy the week becomes.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 10,
+    "fields": {
+      "feature": 5,
+      "language": "ar",
+      "title": "جدولة 24/7 عبر المناطق الزمنية",
+      "description": "يمكن للعائلات اختيار المواعيد التي تناسب روتينها الحقيقي مهما كان مكان الإقامة أو ازدحام الأسبوع.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 11,
+    "fields": {
+      "feature": 6,
+      "language": "en",
+      "title": "Real Learning From Home",
+      "description": "Children receive live, one-on-one instruction from home without sacrificing quality, structure, or meaningful teacher connection.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 12,
+    "fields": {
+      "feature": 6,
+      "language": "ar",
+      "title": "تعلّم حقيقي من المنزل",
+      "description": "يحصل الأطفال على تعليم مباشر فردي من المنزل دون التنازل عن الجودة أو التنظيم أو العلاقة التعليمية الحقيقية مع المعلم.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 13,
+    "fields": {
+      "feature": 7,
+      "language": "en",
+      "title": "Child-Focused Teaching Style",
+      "description": "Lessons are shaped around the learner's age, confidence, and attention span so children feel safe, engaged, and ready to grow.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 14,
+    "fields": {
+      "feature": 7,
+      "language": "ar",
+      "title": "أسلوب تدريس يراعي الطفل",
+      "description": "تُبنى الدروس وفق عمر المتعلم وثقته ومدى تركيزه حتى يشعر الطفل بالأمان والاندماج والاستعداد للنمو.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 15,
+    "fields": {
+      "feature": 8,
+      "language": "en",
+      "title": "Money-Back Confidence",
+      "description": "Families can move forward with peace of mind thanks to a clear trial-first approach and a money-back guarantee after enrollment.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 16,
+    "fields": {
+      "feature": 8,
+      "language": "ar",
+      "title": "ثقة مدعومة بضمان استرجاع",
+      "description": "يمكن للعائلات البدء براحة بال بفضل نهج التجربة أولًا وضمان استرجاع المبلغ بعد الاشتراك.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 17,
+    "fields": {
+      "feature": 9,
+      "language": "en",
+      "title": "Fast Start, Clear Next Steps",
+      "description": "The journey from booking to first class is simple, guided, and designed to help families begin without confusion or delay.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 18,
+    "fields": {
+      "feature": 9,
+      "language": "ar",
+      "title": "بداية سريعة وخطوات واضحة",
+      "description": "الانتقال من الحجز إلى أول حصة بسيط وموجّه ومصمم لمساعدة العائلات على البدء دون ارتباك أو تأخير.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 19,
+    "fields": {
+      "feature": 10,
+      "language": "en",
+      "title": "A Journey Children Can Love",
+      "description": "Our goal is not only correct recitation, but also a positive relationship with Quran learning that lasts beyond the lesson itself.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 20,
+    "fields": {
+      "feature": 10,
+      "language": "ar",
+      "title": "رحلة يحبها الأطفال",
+      "description": "هدفنا ليس التلاوة الصحيحة فقط، بل أيضًا بناء علاقة إيجابية مع تعلّم القرآن تستمر بعد انتهاء الحصة نفسها.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 11,
+    "fields": {
+      "home_page": 1,
+      "section": "testimonials",
+      "icon_class": "fas fa-quote-left",
+      "image": null,
+      "order": 1,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 12,
+    "fields": {
+      "home_page": 1,
+      "section": "testimonials",
+      "icon_class": "fas fa-quote-left",
+      "image": null,
+      "order": 2,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 21,
+    "fields": {
+      "feature": 11,
+      "language": "en",
+      "title": "Sara M.",
+      "description": "My daughter used to dread Quran practice. After a few weeks with her teacher, she started asking for extra classes on weekends. The teacher really understands her learning style, what motivates her, and what challenges her. It feels less like a class and more like a relationship that is helping her grow.",
+      "subtitle": "Mother of 2",
+      "meta": "Houston, TX"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 22,
+    "fields": {
+      "feature": 11,
+      "language": "ar",
+      "title": "سارة م.",
+      "description": "كانت ابنتي تتضايق من ممارسة القرآن. وبعد أسابيع قليلة مع معلمتها، بدأت تطلب حصصًا إضافية في عطلة نهاية الأسبوع. المعلمة تفهم فعلًا أسلوب تعلمها، وما يحفزها، وما يصعب عليها. الأمر يبدو أقل من كونه حصة وأكثر من كونه علاقة تساعدها على النمو.",
+      "subtitle": "أم لطفلين",
+      "meta": "هيوستن، تكساس"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 23,
+    "fields": {
+      "feature": 12,
+      "language": "en",
+      "title": "Fatima K.",
+      "description": "I enrolled all three of my children. The family bundle made the program much more practical for us, and the quality has been excellent. We saw real progress quickly, and the communication from the teachers gave us confidence that our children were in the right place.",
+      "subtitle": "Mother of 3",
+      "meta": "Dearborn, MI"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 24,
+    "fields": {
+      "feature": 12,
+      "language": "ar",
+      "title": "فاطمة ك.",
+      "description": "سجلت أطفالي الثلاثة جميعًا. جعلت الباقة العائلية البرنامج أكثر عملية بالنسبة لنا، وكانت الجودة ممتازة فعلًا. رأينا تقدمًا حقيقيًا بسرعة، ومنحنا تواصل المعلمين ثقة بأن أطفالنا في المكان الصحيح.",
+      "subtitle": "أم لثلاثة أطفال",
+      "meta": "ديربورن، ميشيغان"
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 13,
+    "fields": {
+      "home_page": 1,
+      "section": "process",
+      "icon_class": "fas fa-file-alt",
+      "image": null,
+      "order": 1,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 14,
+    "fields": {
+      "home_page": 1,
+      "section": "process",
+      "icon_class": "fas fa-user-friends",
+      "image": null,
+      "order": 2,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 15,
+    "fields": {
+      "home_page": 1,
+      "section": "process",
+      "icon_class": "fas fa-video",
+      "image": null,
+      "order": 3,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 16,
+    "fields": {
+      "home_page": 1,
+      "section": "process",
+      "icon_class": "fas fa-check-circle",
+      "image": null,
+      "order": 4,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 25,
+    "fields": {
+      "feature": 13,
+      "language": "en",
+      "title": "Fill the Form",
+      "description": "Tell us your child's age, level, and subject. It only takes about 60 seconds to get started.",
+      "subtitle": null,
+      "meta": "Step 1"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 26,
+    "fields": {
+      "feature": 13,
+      "language": "ar",
+      "title": "املأ النموذج",
+      "description": "أخبرنا بعمر طفلك ومستواه والمادة المطلوبة. لن يستغرق الأمر سوى نحو 60 ثانية للبدء.",
+      "subtitle": null,
+      "meta": "الخطوة 1"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 27,
+    "fields": {
+      "feature": 14,
+      "language": "en",
+      "title": "We Match Your Teacher",
+      "description": "We select the certified teacher who best fits your child's needs, personality, and schedule.",
+      "subtitle": null,
+      "meta": "Step 2"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 28,
+    "fields": {
+      "feature": 14,
+      "language": "ar",
+      "title": "نختار المعلم المناسب",
+      "description": "نختار المعلم المعتمد الأنسب لاحتياجات طفلك وشخصيته وجدوله.",
+      "subtitle": null,
+      "meta": "الخطوة 2"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 29,
+    "fields": {
+      "feature": 15,
+      "language": "en",
+      "title": "Attend Your Free Class",
+      "description": "Join a live, one-on-one session and experience the teaching quality before making any commitment.",
+      "subtitle": null,
+      "meta": "Step 3"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 30,
+    "fields": {
+      "feature": 15,
+      "language": "ar",
+      "title": "احضر الحصة المجانية",
+      "description": "انضم إلى حصة مباشرة فردية واختبر جودة التعليم قبل أي التزام.",
+      "subtitle": null,
+      "meta": "الخطوة 3"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 31,
+    "fields": {
+      "feature": 16,
+      "language": "en",
+      "title": "Enroll With Confidence",
+      "description": "If you love the experience, continue with confidence knowing your family has a clear and supportive path forward.",
+      "subtitle": null,
+      "meta": "Step 4"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 32,
+    "fields": {
+      "feature": 16,
+      "language": "ar",
+      "title": "اشترك بثقة",
+      "description": "إذا أعجبتك التجربة، فواصل بثقة وأنت تعلم أن أمام عائلتك مسارًا واضحًا وداعمًا للاستمرار.",
+      "subtitle": null,
+      "meta": "الخطوة 4"
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 17,
+    "fields": {
+      "home_page": 1,
+      "section": "family_bundle_plans",
+      "icon_class": "fas fa-user",
+      "image": null,
+      "order": 1,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 18,
+    "fields": {
+      "home_page": 1,
+      "section": "family_bundle_plans",
+      "icon_class": "fas fa-users",
+      "image": null,
+      "order": 2,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 19,
+    "fields": {
+      "home_page": 1,
+      "section": "family_bundle_plans",
+      "icon_class": "fas fa-book-reader",
+      "image": null,
+      "order": 3,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 33,
+    "fields": {
+      "feature": 17,
+      "language": "en",
+      "title": "Single Student",
+      "description": "1-on-1 live classes, a dedicated Al-Azhar certified teacher, weekly parent updates, milestone certificates, flexible scheduling, and support for Quran, Arabic, or Islamic Studies.",
+      "subtitle": "$45 / month",
+      "meta": "Save $10/mo vs. Studio Arabiya's $55"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 34,
+    "fields": {
+      "feature": 17,
+      "language": "ar",
+      "title": "طالب واحد",
+      "description": "حصص مباشرة فردية، ومعلم معتمد من الأزهر، وتحديثات أسبوعية لولي الأمر، وشهادات رقمية عند المحطات المهمة، وجدولة مرنة، ودعم للقرآن أو العربية أو الدراسات الإسلامية.",
+      "subtitle": "45 دولارًا / شهريًا",
+      "meta": "وفّر 10 دولارات شهريًا مقارنة بـ Studio Arabiya"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 35,
+    "fields": {
+      "feature": 18,
+      "language": "en",
+      "title": "Family Bundle",
+      "description": "Up to 3 children enrolled, a dedicated teacher for each child, 12 live classes per child each month, weekly WhatsApp updates, mixed subjects across children, one invoice, and a first-week money-back guarantee.",
+      "subtitle": "$95 / month",
+      "meta": "Up to 3 children • Save $40+/mo"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 36,
+    "fields": {
+      "feature": 18,
+      "language": "ar",
+      "title": "الباقة العائلية",
+      "description": "حتى 3 أطفال، ومعلم مخصص لكل طفل، و12 حصة مباشرة لكل طفل شهريًا، وتحديثات أسبوعية عبر واتساب، وإمكانية تنويع المواد بين الأطفال، وفاتورة واحدة، وضمان استرجاع خلال الأسبوع الأول.",
+      "subtitle": "95 دولارًا / شهريًا",
+      "meta": "حتى 3 أطفال • وفّر أكثر من 40 دولارًا شهريًا"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 37,
+    "fields": {
+      "feature": 19,
+      "language": "en",
+      "title": "Hifz / Advanced",
+      "description": "Intensive memorization sessions, an Ijazah-certified Sheikh, a custom memorization tracking plan, a revision system, and a pathway toward official Ijazah certification. Available as an add-on to the Family Bundle.",
+      "subtitle": "$120 / month",
+      "meta": "Quran memorization & Ijaazah pathway"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 38,
+    "fields": {
+      "feature": 19,
+      "language": "ar",
+      "title": "الحفظ / المتقدم",
+      "description": "جلسات حفظ مكثفة، وشيخ معتمد بالإجازة، وخطة مخصصة لمتابعة الحفظ، ونظام مراجعة، ومسار نحو الإجازة الرسمية. متاح كإضافة إلى الباقة العائلية.",
+      "subtitle": "120 دولارًا / شهريًا",
+      "meta": "مسار حفظ القرآن والإجازة"
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 20,
+    "fields": {
+      "home_page": 1,
+      "section": "family_bundle_comparison",
+      "icon_class": "fas fa-balance-scale",
+      "image": null,
+      "order": 1,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 21,
+    "fields": {
+      "home_page": 1,
+      "section": "family_bundle_comparison",
+      "icon_class": "fas fa-user-check",
+      "image": null,
+      "order": 2,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 22,
+    "fields": {
+      "home_page": 1,
+      "section": "family_bundle_comparison",
+      "icon_class": "fas fa-comments",
+      "image": null,
+      "order": 3,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 23,
+    "fields": {
+      "home_page": 1,
+      "section": "family_bundle_comparison",
+      "icon_class": "fas fa-certificate",
+      "image": null,
+      "order": 4,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 24,
+    "fields": {
+      "home_page": 1,
+      "section": "family_bundle_comparison",
+      "icon_class": "fas fa-shield-alt",
+      "image": null,
+      "order": 5,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 25,
+    "fields": {
+      "home_page": 1,
+      "section": "family_bundle_comparison",
+      "icon_class": "fas fa-random",
+      "image": null,
+      "order": 6,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 39,
+    "fields": {
+      "feature": 20,
+      "language": "en",
+      "title": "Monthly Pricing Advantage",
+      "description": "A single student starts at $45/month, and a family of 3 can learn for $95/month total — a much clearer and more affordable path for growing families.",
+      "subtitle": "Transparent pricing for individuals and families",
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 40,
+    "fields": {
+      "feature": 20,
+      "language": "ar",
+      "title": "ميزة السعر الشهري",
+      "description": "يبدأ الطالب الواحد من 45 دولارًا شهريًا، ويمكن لعائلة من 3 أطفال التعلّم مقابل 95 دولارًا شهريًا إجمالًا — وهو مسار أوضح وأكثر توفيرًا للعائلات المتنامية.",
+      "subtitle": "أسعار واضحة للأفراد والعائلات",
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 41,
+    "fields": {
+      "feature": 21,
+      "language": "en",
+      "title": "Dedicated Teacher Per Child",
+      "description": "Each child gets a teacher who knows their subject, pace, and personality instead of a generic shared experience.",
+      "subtitle": "Personalized support for every learner",
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 42,
+    "fields": {
+      "feature": 21,
+      "language": "ar",
+      "title": "معلم مخصص لكل طفل",
+      "description": "يحصل كل طفل على معلم يعرف مادته وسرعته وشخصيته بدلًا من تجربة عامة مشتركة.",
+      "subtitle": "دعم شخصي لكل متعلم",
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 43,
+    "fields": {
+      "feature": 22,
+      "language": "en",
+      "title": "Weekly WhatsApp Parent Updates",
+      "description": "Families receive personal weekly updates, not just reports, so parents stay close to each child's progress.",
+      "subtitle": "Clear communication that feels personal",
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 44,
+    "fields": {
+      "feature": 22,
+      "language": "ar",
+      "title": "تحديثات أسبوعية عبر واتساب",
+      "description": "تتلقى العائلات تحديثات أسبوعية شخصية، وليس مجرد تقارير، حتى يبقى ولي الأمر قريبًا من تقدّم كل طفل.",
+      "subtitle": "تواصل واضح بطابع شخصي",
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 45,
+    "fields": {
+      "feature": 23,
+      "language": "en",
+      "title": "Al-Azhar Certified Teachers",
+      "description": "Every teacher is verified before joining and brings trusted Islamic teaching credentials to the classroom.",
+      "subtitle": "Authentic credentials families can trust",
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 46,
+    "fields": {
+      "feature": 23,
+      "language": "ar",
+      "title": "معلمون معتمدون من الأزهر",
+      "description": "يتم التحقق من كل معلم قبل الانضمام، ويحمل مؤهلات تعليمية إسلامية موثوقة داخل الصف.",
+      "subtitle": "اعتمادات أصيلة تثق بها العائلات",
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 47,
+    "fields": {
+      "feature": 24,
+      "language": "en",
+      "title": "Money-Back Guarantee + Free Trial",
+      "description": "Families can start with confidence thanks to a free trial class and a first-week money-back guarantee after enrollment.",
+      "subtitle": "A lower-risk way to begin",
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 48,
+    "fields": {
+      "feature": 24,
+      "language": "ar",
+      "title": "ضمان استرجاع + تجربة مجانية",
+      "description": "يمكن للعائلات البدء بثقة بفضل الحصة التجريبية المجانية وضمان استرجاع المبلغ خلال الأسبوع الأول بعد الاشتراك.",
+      "subtitle": "طريقة أقل مخاطرة للبدء",
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 49,
+    "fields": {
+      "feature": 25,
+      "language": "en",
+      "title": "Mix Subjects Across Children",
+      "description": "One child can study Quran, another Arabic, and another Islamic Studies — all within one family setup.",
+      "subtitle": "Flexible learning paths under one account",
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 50,
+    "fields": {
+      "feature": 25,
+      "language": "ar",
+      "title": "تنويع المواد بين الأطفال",
+      "description": "يمكن لطفل أن يدرس القرآن، وآخر العربية، وآخر الدراسات الإسلامية — وكل ذلك ضمن إعداد عائلي واحد.",
+      "subtitle": "مسارات تعلم مرنة تحت حساب واحد",
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 26,
+    "fields": {
+      "home_page": 1,
+      "section": "family_bundle_testimonials",
+      "icon_class": "fas fa-quote-left",
+      "image": null,
+      "order": 1,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 27,
+    "fields": {
+      "home_page": 1,
+      "section": "family_bundle_testimonials",
+      "icon_class": "fas fa-quote-left",
+      "image": null,
+      "order": 2,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 28,
+    "fields": {
+      "home_page": 1,
+      "section": "family_bundle_testimonials",
+      "icon_class": "fas fa-quote-left",
+      "image": null,
+      "order": 3,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 51,
+    "fields": {
+      "feature": 26,
+      "language": "en",
+      "title": "Amira H.",
+      "description": "Three kids, one bill. $95 a month for all of them to have dedicated teachers has been a game-changer. My eldest is memorizing Juz Amma. My younger two are learning to read. I cannot believe we did this without Nabbiuwny.",
+      "subtitle": "Mother of 3",
+      "meta": "Chicago, IL"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 52,
+    "fields": {
+      "feature": 26,
+      "language": "ar",
+      "title": "أميرة هـ.",
+      "description": "ثلاثة أطفال، وفاتورة واحدة. 95 دولارًا شهريًا ليحصلوا جميعًا على معلمين مخصصين كان تغييرًا كبيرًا بالنسبة لنا. ابني الأكبر يحفظ جزء عمّ، وطفلاي الأصغر يتعلمان القراءة. لا أصدق أننا كنا نحاول من دون نبيُّوني.",
+      "subtitle": "أم لثلاثة أطفال",
+      "meta": "شيكاغو، إلينوي"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 53,
+    "fields": {
+      "feature": 27,
+      "language": "en",
+      "title": "Khalid & Yasmin B.",
+      "description": "I was spending $55 per child at another platform. That's $165 a month for three kids. Nabbiuwny's family bundle gave me the same quality — honestly better teacher communication — for $95. I moved all three within the first month.",
+      "subtitle": "Family of 5",
+      "meta": "Toronto, Canada"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 54,
+    "fields": {
+      "feature": 27,
+      "language": "ar",
+      "title": "خالد وياسمين ب.",
+      "description": "كنت أدفع 55 دولارًا لكل طفل في منصة أخرى، أي 165 دولارًا شهريًا لثلاثة أطفال. منحتني الباقة العائلية من نبيُّوني الجودة نفسها — بل وتواصلًا أفضل مع المعلمين بصراحة — مقابل 95 دولارًا. نقلت أطفالي الثلاثة خلال الشهر الأول.",
+      "subtitle": "عائلة من 5 أفراد",
+      "meta": "تورونتو، كندا"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 55,
+    "fields": {
+      "feature": 28,
+      "language": "en",
+      "title": "Rania T.",
+      "description": "The weekly WhatsApp updates from each of my children's teachers changed everything. I actually know what my kids are working on. I haven't had that from any other platform. It feels like a real school that knows my family.",
+      "subtitle": "Mother of 2",
+      "meta": "London, UK"
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 56,
+    "fields": {
+      "feature": 28,
+      "language": "ar",
+      "title": "رانيا ت.",
+      "description": "غيّرت التحديثات الأسبوعية عبر واتساب من معلمي أطفالي كل شيء. أصبحت أعرف فعلًا ما الذي يعمل عليه أطفالي. لم أحصل على هذا من أي منصة أخرى. يبدو الأمر كمدرسة حقيقية تعرف عائلتي.",
+      "subtitle": "أم لطفلين",
+      "meta": "لندن، المملكة المتحدة"
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 29,
+    "fields": {
+      "home_page": 1,
+      "section": "family_bundle_faq",
+      "icon_class": "fas fa-question",
+      "image": null,
+      "order": 1,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 30,
+    "fields": {
+      "home_page": 1,
+      "section": "family_bundle_faq",
+      "icon_class": "fas fa-question",
+      "image": null,
+      "order": 2,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 31,
+    "fields": {
+      "home_page": 1,
+      "section": "family_bundle_faq",
+      "icon_class": "fas fa-question",
+      "image": null,
+      "order": 3,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 32,
+    "fields": {
+      "home_page": 1,
+      "section": "family_bundle_faq",
+      "icon_class": "fas fa-question",
+      "image": null,
+      "order": 4,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeature",
+    "pk": 33,
+    "fields": {
+      "home_page": 1,
+      "section": "family_bundle_faq",
+      "icon_class": "fas fa-question",
+      "image": null,
+      "order": 5,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 57,
+    "fields": {
+      "feature": 29,
+      "language": "en",
+      "title": "Can my children have different subjects?",
+      "description": "Absolutely. One child can study Quran, another Arabic, and another Islamic Studies. Each child gets their own dedicated teacher for their specific subject.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 58,
+    "fields": {
+      "feature": 29,
+      "language": "ar",
+      "title": "هل يمكن أن يدرس أطفالي مواد مختلفة؟",
+      "description": "بالتأكيد. يمكن لطفل أن يدرس القرآن، وآخر العربية، وآخر الدراسات الإسلامية. ويحصل كل طفل على معلمه المخصص للمادة التي يدرسها.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 59,
+    "fields": {
+      "feature": 30,
+      "language": "en",
+      "title": "What if I have more than 3 children?",
+      "description": "Contact us for a custom quote. We serve families of all sizes and can build a plan that works for your household budget and learning goals.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 60,
+    "fields": {
+      "feature": 30,
+      "language": "ar",
+      "title": "ماذا لو كان لدي أكثر من 3 أطفال؟",
+      "description": "تواصل معنا للحصول على عرض مخصص. نحن نخدم العائلات بمختلف أحجامها ويمكننا بناء خطة تناسب ميزانية أسرتك وأهدافها التعليمية.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 61,
+    "fields": {
+      "feature": 31,
+      "language": "en",
+      "title": "How does the free trial work?",
+      "description": "Each child gets one free live 1-on-1 class with their matched teacher. No credit card required. After the trial, you decide whether to continue — no pressure, no commitment.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 62,
+    "fields": {
+      "feature": 31,
+      "language": "ar",
+      "title": "كيف تعمل الحصة التجريبية المجانية؟",
+      "description": "يحصل كل طفل على حصة مباشرة فردية مجانية مع المعلم الذي تم اختياره له. لا حاجة إلى بطاقة ائتمان. وبعد التجربة، أنتم من يقرر الاستمرار من عدمه — بلا ضغط ولا التزام.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 63,
+    "fields": {
+      "feature": 32,
+      "language": "en",
+      "title": "What if my child doesn't connect with their teacher?",
+      "description": "We'll rematch them immediately. The right teacher-student relationship is central to our model, and we'll keep matching until it feels right.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 64,
+    "fields": {
+      "feature": 32,
+      "language": "ar",
+      "title": "ماذا لو لم ينسجم طفلي مع معلمه؟",
+      "description": "سنقوم بإعادة المطابقة فورًا. فالعلاقة الصحيحة بين المعلم والطالب عنصر أساسي في نموذجنا، وسنستمر في المطابقة حتى نجد الخيار المناسب.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 65,
+    "fields": {
+      "feature": 33,
+      "language": "en",
+      "title": "Are the teachers really Al-Azhar certified?",
+      "description": "Yes. Every teacher holds certification from Al-Azhar University in Egypt, and credentials are verified before any teacher joins the platform.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagefeaturetranslation",
+    "pk": 66,
+    "fields": {
+      "feature": 33,
+      "language": "ar",
+      "title": "هل المعلمون معتمدون فعلًا من الأزهر؟",
+      "description": "نعم. يحمل كل معلم اعتمادًا من جامعة الأزهر في مصر، ويتم التحقق من المؤهلات قبل انضمام أي معلم إلى المنصة.",
+      "subtitle": null,
+      "meta": null
+    }
+  },
+  {
+    "model": "about.homepagevideopoint",
+    "pk": 1,
+    "fields": {
+      "home_page": 1,
+      "icon_class": "fas fa-check-circle",
+      "order": 1,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagevideopoint",
+    "pk": 2,
+    "fields": {
+      "home_page": 1,
+      "icon_class": "fas fa-check-circle",
+      "order": 2,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagevideopoint",
+    "pk": 3,
+    "fields": {
+      "home_page": 1,
+      "icon_class": "fas fa-check-circle",
+      "order": 3,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagevideopoint",
+    "pk": 4,
+    "fields": {
+      "home_page": 1,
+      "icon_class": "fas fa-check-circle",
+      "order": 4,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagevideopoint",
+    "pk": 5,
+    "fields": {
+      "home_page": 1,
+      "icon_class": "fas fa-check-circle",
+      "order": 5,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagevideopoint",
+    "pk": 6,
+    "fields": {
+      "home_page": 1,
+      "icon_class": "fas fa-check-circle",
+      "order": 6,
+      "is_active": true
+    }
+  },
+  {
+    "model": "about.homepagevideopointtranslation",
+    "pk": 1,
+    "fields": {
+      "video_point": 1,
+      "language": "en",
+      "text": "Learn with an Al-Azhar certified teacher matched to your child's level"
+    }
+  },
+  {
+    "model": "about.homepagevideopointtranslation",
+    "pk": 2,
+    "fields": {
+      "video_point": 1,
+      "language": "ar",
+      "text": "تعلّم مع معلم معتمد من الأزهر يتم اختياره وفق مستوى طفلك"
+    }
+  },
+  {
+    "model": "about.homepagevideopointtranslation",
+    "pk": 3,
+    "fields": {
+      "video_point": 2,
+      "language": "en",
+      "text": "Build consistency through one dedicated teacher instead of rotating staff"
+    }
+  },
+  {
+    "model": "about.homepagevideopointtranslation",
+    "pk": 4,
+    "fields": {
+      "video_point": 2,
+      "language": "ar",
+      "text": "ابنِ الاستمرارية مع معلم ثابت بدلًا من التبديل المستمر للمعلمين"
+    }
+  },
+  {
+    "model": "about.homepagevideopointtranslation",
+    "pk": 5,
+    "fields": {
+      "video_point": 3,
+      "language": "en",
+      "text": "Join live one-on-one classes from home with real interaction and guidance"
+    }
+  },
+  {
+    "model": "about.homepagevideopointtranslation",
+    "pk": 6,
+    "fields": {
+      "video_point": 3,
+      "language": "ar",
+      "text": "احضر حصصًا مباشرة فردية من المنزل مع تفاعل وتوجيه حقيقي"
+    }
+  },
+  {
+    "model": "about.homepagevideopointtranslation",
+    "pk": 7,
+    "fields": {
+      "video_point": 4,
+      "language": "en",
+      "text": "Keep parents informed with clear weekly progress communication"
+    }
+  },
+  {
+    "model": "about.homepagevideopointtranslation",
+    "pk": 8,
+    "fields": {
+      "video_point": 4,
+      "language": "ar",
+      "text": "ابقَ على اطلاع من خلال تواصل أسبوعي واضح حول التقدّم"
+    }
+  },
+  {
+    "model": "about.homepagevideopointtranslation",
+    "pk": 9,
+    "fields": {
+      "video_point": 5,
+      "language": "en",
+      "text": "Choose schedules that fit your timezone and your family's routine"
+    }
+  },
+  {
+    "model": "about.homepagevideopointtranslation",
+    "pk": 10,
+    "fields": {
+      "video_point": 5,
+      "language": "ar",
+      "text": "اختر مواعيد تناسب توقيتك وروتين عائلتك"
+    }
+  },
+  {
+    "model": "about.homepagevideopointtranslation",
+    "pk": 11,
+    "fields": {
+      "video_point": 6,
+      "language": "en",
+      "text": "Start with a free class and move forward only when it feels right"
+    }
+  },
+  {
+    "model": "about.homepagevideopointtranslation",
+    "pk": 12,
+    "fields": {
+      "video_point": 6,
+      "language": "ar",
+      "text": "ابدأ بحصة مجانية ثم واصل فقط عندما تشعر أنها الخيار المناسب"
+    }
+  }
+]

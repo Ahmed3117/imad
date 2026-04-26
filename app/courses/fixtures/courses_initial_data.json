@@ -1,0 +1,793 @@
+[
+  {
+    "model": "courses.level",
+    "pk": 1,
+    "fields": { "name": "Beginner Foundation" }
+  },
+  {
+    "model": "courses.level",
+    "pk": 2,
+    "fields": { "name": "Elementary Arabic" }
+  },
+  {
+    "model": "courses.level",
+    "pk": 3,
+    "fields": { "name": "Intermediate Quranic Arabic" }
+  },
+  {
+    "model": "courses.level",
+    "pk": 4,
+    "fields": { "name": "Advanced Tajweed & Hifz" }
+  },
+  {
+    "model": "courses.level",
+    "pk": 5,
+    "fields": { "name": "Mastery Level" }
+  },
+
+  {
+    "model": "courses.leveltranslation",
+    "pk": 1,
+    "fields": { "level": 1, "language": "en", "translated_name": "Beginner Foundation" }
+  },
+  {
+    "model": "courses.leveltranslation",
+    "pk": 2,
+    "fields": { "level": 1, "language": "ar", "translated_name": "الأساسيات للمبتدئين" }
+  },
+  {
+    "model": "courses.leveltranslation",
+    "pk": 3,
+    "fields": { "level": 2, "language": "en", "translated_name": "Elementary Arabic" }
+  },
+  {
+    "model": "courses.leveltranslation",
+    "pk": 4,
+    "fields": { "level": 2, "language": "ar", "translated_name": "العربية الابتدائية" }
+  },
+  {
+    "model": "courses.leveltranslation",
+    "pk": 5,
+    "fields": { "level": 3, "language": "en", "translated_name": "Intermediate Quranic Arabic" }
+  },
+  {
+    "model": "courses.leveltranslation",
+    "pk": 6,
+    "fields": { "level": 3, "language": "ar", "translated_name": "العربية القرآنية المتوسطة" }
+  },
+  {
+    "model": "courses.leveltranslation",
+    "pk": 7,
+    "fields": { "level": 4, "language": "en", "translated_name": "Advanced Tajweed & Hifz" }
+  },
+  {
+    "model": "courses.leveltranslation",
+    "pk": 8,
+    "fields": { "level": 4, "language": "ar", "translated_name": "التجويد والحفظ المتقدم" }
+  },
+  {
+    "model": "courses.leveltranslation",
+    "pk": 9,
+    "fields": { "level": 5, "language": "en", "translated_name": "Mastery Level" }
+  },
+  {
+    "model": "courses.leveltranslation",
+    "pk": 10,
+    "fields": { "level": 5, "language": "ar", "translated_name": "مستوى الإتقان" }
+  },
+
+  {
+    "model": "courses.track",
+    "pk": 1,
+    "fields": { "name": "Arabic Alphabet", "level": 1 }
+  },
+  {
+    "model": "courses.track",
+    "pk": 2,
+    "fields": { "name": "Noorani Qaida", "level": 1 }
+  },
+  {
+    "model": "courses.track",
+    "pk": 3,
+    "fields": { "name": "Basic Conversations", "level": 2 }
+  },
+  {
+    "model": "courses.track",
+    "pk": 4,
+    "fields": { "name": "Grammar Fundamentals", "level": 2 }
+  },
+  {
+    "model": "courses.track",
+    "pk": 5,
+    "fields": { "name": "Quranic Vocabulary", "level": 3 }
+  },
+  {
+    "model": "courses.track",
+    "pk": 6,
+    "fields": { "name": "Tafseer Introduction", "level": 3 }
+  },
+  {
+    "model": "courses.track",
+    "pk": 7,
+    "fields": { "name": "Tajweed Rules", "level": 4 }
+  },
+  {
+    "model": "courses.track",
+    "pk": 8,
+    "fields": { "name": "Hifz Preparation", "level": 4 }
+  },
+  {
+    "model": "courses.track",
+    "pk": 9,
+    "fields": { "name": "Islamic Studies", "level": 5 }
+  },
+
+  {
+    "model": "courses.tracktranslation",
+    "pk": 1,
+    "fields": { "track": 1, "language": "en", "translated_name": "Arabic Alphabet" }
+  },
+  {
+    "model": "courses.tracktranslation",
+    "pk": 2,
+    "fields": { "track": 1, "language": "ar", "translated_name": "الحروف العربية" }
+  },
+  {
+    "model": "courses.tracktranslation",
+    "pk": 3,
+    "fields": { "track": 2, "language": "en", "translated_name": "Noorani Qaida" }
+  },
+  {
+    "model": "courses.tracktranslation",
+    "pk": 4,
+    "fields": { "track": 2, "language": "ar", "translated_name": "القاعدة النورانية" }
+  },
+  {
+    "model": "courses.tracktranslation",
+    "pk": 5,
+    "fields": { "track": 3, "language": "en", "translated_name": "Basic Conversations" }
+  },
+  {
+    "model": "courses.tracktranslation",
+    "pk": 6,
+    "fields": { "track": 3, "language": "ar", "translated_name": "الحوارات الأساسية" }
+  },
+  {
+    "model": "courses.tracktranslation",
+    "pk": 7,
+    "fields": { "track": 4, "language": "en", "translated_name": "Grammar Fundamentals" }
+  },
+  {
+    "model": "courses.tracktranslation",
+    "pk": 8,
+    "fields": { "track": 4, "language": "ar", "translated_name": "أساسيات النحو" }
+  },
+  {
+    "model": "courses.tracktranslation",
+    "pk": 9,
+    "fields": { "track": 5, "language": "en", "translated_name": "Quranic Vocabulary" }
+  },
+  {
+    "model": "courses.tracktranslation",
+    "pk": 10,
+    "fields": { "track": 5, "language": "ar", "translated_name": "مفردات قرآنية" }
+  },
+  {
+    "model": "courses.tracktranslation",
+    "pk": 11,
+    "fields": { "track": 6, "language": "en", "translated_name": "Tafseer Introduction" }
+  },
+  {
+    "model": "courses.tracktranslation",
+    "pk": 12,
+    "fields": { "track": 6, "language": "ar", "translated_name": "مقدمة في التفسير" }
+  },
+  {
+    "model": "courses.tracktranslation",
+    "pk": 13,
+    "fields": { "track": 7, "language": "en", "translated_name": "Tajweed Rules" }
+  },
+  {
+    "model": "courses.tracktranslation",
+    "pk": 14,
+    "fields": { "track": 7, "language": "ar", "translated_name": "أحكام التجويد" }
+  },
+  {
+    "model": "courses.tracktranslation",
+    "pk": 15,
+    "fields": { "track": 8, "language": "en", "translated_name": "Hifz Preparation" }
+  },
+  {
+    "model": "courses.tracktranslation",
+    "pk": 16,
+    "fields": { "track": 8, "language": "ar", "translated_name": "الإعداد للحفظ" }
+  },
+  {
+    "model": "courses.tracktranslation",
+    "pk": 17,
+    "fields": { "track": 9, "language": "en", "translated_name": "Islamic Studies" }
+  },
+  {
+    "model": "courses.tracktranslation",
+    "pk": 18,
+    "fields": { "track": 9, "language": "ar", "translated_name": "الدراسات الإسلامية" }
+  },
+
+  {
+    "model": "courses.course",
+    "pk": 1,
+    "fields": {
+      "name": "Arabic Letters Mastery",
+      "description": "Learn to read and write all 28 Arabic letters with proper pronunciation and vowel marks.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 1,
+      "track": 1
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 2,
+    "fields": {
+      "name": "Arabic Letters for Kids",
+      "description": "A fun and interactive course designed especially for children to learn the Arabic alphabet.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 1,
+      "track": 1
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 3,
+    "fields": {
+      "name": "Noorani Qaida Complete",
+      "description": "The complete Noorani Qaida course covering all basic Tajweed rules and pronunciation fundamentals.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 1,
+      "track": 2
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 4,
+    "fields": {
+      "name": "Noorani Qaida for Adults",
+      "description": "A structured course for adult beginners to master the basics of Quran reading.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 1,
+      "track": 2
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 5,
+    "fields": {
+      "name": "Everyday Arabic Conversations",
+      "description": "Learn practical Arabic phrases for daily life situations, greetings, and basic communication.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 2,
+      "track": 3
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 6,
+    "fields": {
+      "name": "Arabic Speaking Practice",
+      "description": "Intensive speaking practice to build fluency in conversational Arabic through dialogues and role-play.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 2,
+      "track": 3
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 7,
+    "fields": {
+      "name": "Arabic Grammar Made Easy",
+      "description": "Master the fundamentals of Arabic grammar (Nahw) including word order, pronouns, and verb conjugation.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 2,
+      "track": 4
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 8,
+    "fields": {
+      "name": "Essential Arabic Morphology",
+      "description": "Learn Arabic morphology (Sarf) to understand word formations and patterns in the Quran.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 2,
+      "track": 4
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 9,
+    "fields": {
+      "name": "2000+ Quranic Words",
+      "description": "Build a strong Quranic vocabulary with 2000+ high-frequency words from the Holy Quran with meanings and usage.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 3,
+      "track": 5
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 10,
+    "fields": {
+      "name": "Quran Root Words System",
+      "description": "Learn the Arabic root word system to understand and deduce meanings of thousands of Quranic words.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 3,
+      "track": 5
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 11,
+    "fields": {
+      "name": "Short Surahs Tafsir",
+      "description": "Understanding the meaning and lessons from the shorter Surahs (Al-Fatiha through Al-Nas) with tafsir.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 3,
+      "track": 6
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 12,
+    "fields": {
+      "name": "Stories of the Quran",
+      "description": "Explore the inspiring stories of prophets and communities mentioned in the Quran for spiritual growth.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 3,
+      "track": 6
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 13,
+    "fields": {
+      "name": "Tajweed Rules Intensive",
+      "description": "Comprehensive study of all Tajweed rules including makharij al-huruf, sifah, and madd to perfect Quran recitation.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 4,
+      "track": 7
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 14,
+    "fields": {
+      "name": "Advanced Quran Recitation",
+      "description": "Master the art of beautiful Quran recitation (Tarteel) with proper Tajweed and melody.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 4,
+      "track": 7
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 15,
+    "fields": {
+      "name": "Juz Amma Memorization",
+      "description": "Memorize the 30th part of the Quran (Juz Amma) with professional guidance and revision techniques.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 4,
+      "track": 8
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 16,
+    "fields": {
+      "name": "Full Quran Hifz Program",
+      "description": "Complete memorization program for the entire Holy Quran with daily lessons and weekly revision.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 4,
+      "track": 8
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 17,
+    "fields": {
+      "name": "Pillars of Islam",
+      "description": "Learn about the five pillars of Islam: Shahada, Salah, Zakat, Sawm, and Hajj with authentic sources.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 5,
+      "track": 9
+    }
+  },
+  {
+    "model": "courses.course",
+    "pk": 18,
+    "fields": {
+      "name": "Prophetic Biography",
+      "description": "Study the life of Prophet Muhammad (peace be upon him) and learn from his exemplary character.",
+      "image": "defaults/default.jpg",
+      "preview_video": null,
+      "level": 5,
+      "track": 9
+    }
+  },
+
+  {
+    "model": "courses.coursetranslation",
+    "pk": 1,
+    "fields": {
+      "course": 1,
+      "language": "en",
+      "translated_name": "Arabic Letters Mastery",
+      "translated_description": "Learn to read and write all 28 Arabic letters with proper pronunciation and vowel marks."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 2,
+    "fields": {
+      "course": 1,
+      "language": "ar",
+      "translated_name": "إتقان الحروف العربية",
+      "translated_description": "تعلَّم قراءة وكتابة جميع الحروف العربية الـ 28 بالنطق الصحيح والعلامات الإعرابية."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 3,
+    "fields": {
+      "course": 2,
+      "language": "en",
+      "translated_name": "Arabic Letters for Kids",
+      "translated_description": "A fun and interactive course designed especially for children to learn the Arabic alphabet."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 4,
+    "fields": {
+      "course": 2,
+      "language": "ar",
+      "translated_name": "الحروف العربية للأطفال",
+      "translated_description": " course تفاعلي مصمم خصيصًا للأطفال لتعلُّم الحروف العربية."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 5,
+    "fields": {
+      "course": 3,
+      "language": "en",
+      "translated_name": "Noorani Qaida Complete",
+      "translated_description": "The complete Noorani Qaida course covering all basic Tajweed rules and pronunciation fundamentals."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 6,
+    "fields": {
+      "course": 3,
+      "language": "ar",
+      "translated_name": "القاعدة النورانية الكاملة",
+      "translated_description": " course الكامل للقاعدة النورانية يغطي جميع أحكام التجويد الأساسية وصحيح النطق."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 7,
+    "fields": {
+      "course": 4,
+      "language": "en",
+      "translated_name": "Noorani Qaida for Adults",
+      "translated_description": "A structured course for adult beginners to master the basics of Quran reading."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 8,
+    "fields": {
+      "course": 4,
+      "language": "ar",
+      "translated_name": "القاعدة النورانية للبالغين",
+      "translated_description": " course منظم للمبتدئين البالغين لإتقان أساسيات قراءة القرآن."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 9,
+    "fields": {
+      "course": 5,
+      "language": "en",
+      "translated_name": "Everyday Arabic Conversations",
+      "translated_description": "Learn practical Arabic phrases for daily life situations, greetings, and basic communication."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 10,
+    "fields": {
+      "course": 5,
+      "language": "ar",
+      "translated_name": "الحوارات العربية اليومية",
+      "translated_description": "تعلَّم العبارات العربية العملية لل situations اليومية والتحيات والتواصل الأساسي."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 11,
+    "fields": {
+      "course": 6,
+      "language": "en",
+      "translated_name": "Arabic Speaking Practice",
+      "translated_description": "Intensive speaking practice to build fluency in conversational Arabic through dialogues and role-play."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 12,
+    "fields": {
+      "course": 6,
+      "language": "ar",
+      "translated_name": "تدريب التحدث بالعربية",
+      "translated_description": "تدريب مكثف لبناء الطلاقة في العربية Conversation من خلال الحوارات والتمارين."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 13,
+    "fields": {
+      "course": 7,
+      "language": "en",
+      "translated_name": "Arabic Grammar Made Easy",
+      "translated_description": "Master the fundamentals of Arabic grammar (Nahw) including word order, pronouns, and verb conjugation."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 14,
+    "fields": {
+      "course": 7,
+      "language": "ar",
+      "translated_name": "النحو العربي المبسط",
+      "translated_description": "أتقن أسس النحو العربي بما في ذلك ترتيب الكلمات والضمائر وتصريف الأفعال."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 15,
+    "fields": {
+      "course": 8,
+      "language": "en",
+      "translated_name": "Essential Arabic Morphology",
+      "translated_description": "Learn Arabic morphology (Sarf) to understand word formations and patterns in the Quran."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 16,
+    "fields": {
+      "course": 8,
+      "language": "ar",
+      "translated_name": "الصرف العربي الأساسي",
+      "translated_description": "تعلَّم الصرف العربي لفهم تكوين الكلمات والأنماط في القرآن الكريم."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 17,
+    "fields": {
+      "course": 9,
+      "language": "en",
+      "translated_name": "2000+ Quranic Words",
+      "translated_description": "Build a strong Quranic vocabulary with 2000+ high-frequency words from the Holy Quran with meanings and usage."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 18,
+    "fields": {
+      "course": 9,
+      "language": "ar",
+      "translated_name": "2000+ كلمة قرآنية",
+      "translated_description": "ابنِ مفردات قرآنية قوية مع أكثر من 2000 كلمة ذات تردد tinggi dari Al-Quran dengan makna dan penggunaan."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 19,
+    "fields": {
+      "course": 10,
+      "language": "en",
+      "translated_name": "Quran Root Words System",
+      "translated_description": "Learn the Arabic root word system to understand and deduce meanings of thousands of Quranic words."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 20,
+    "fields": {
+      "course": 10,
+      "language": "ar",
+      "translated_name": "نظام الجذر القرآني",
+      "translated_description": "تعلَّم نظام الكلمات الجذرية العربية لفهم واستنتاج معاني Thousands kata Quran."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 21,
+    "fields": {
+      "course": 11,
+      "language": "en",
+      "translated_name": "Short Surahs Tafsir",
+      "translated_description": "Understanding the meaning and lessons from the shorter Surahs (Al-Fatiha through Al-Nas) with tafsir."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 22,
+    "fields": {
+      "course": 11,
+      "language": "ar",
+      "translated_name": "تفسير السور القصيرة",
+      "translated_description": "فهم المعاني والدروس من السور القصيرة (الفاتحة إلى الناس) مع التفسير."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 23,
+    "fields": {
+      "course": 12,
+      "language": "en",
+      "translated_name": "Stories of the Quran",
+      "translated_description": "Explore the inspiring stories of prophets and communities mentioned in the Quran for spiritual growth."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 24,
+    "fields": {
+      "course": 12,
+      "language": "ar",
+      "translated_name": "قصص القرآن",
+      "translated_description": "استكشفStories inspiratif dari nabi dan komunitas yang disebutkan dalam Al-Quran untuk pertumbuhan rohani."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 25,
+    "fields": {
+      "course": 13,
+      "language": "en",
+      "translated_name": "Tajweed Rules Intensive",
+      "translated_description": "Comprehensive study of all Tajweed rules including makharij al-huruf, sifah, and madd to perfect Quran recitation."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 26,
+    "fields": {
+      "course": 13,
+      "language": "ar",
+      "translated_name": "أحكام التجويد المكثفة",
+      "translated_description": "دراسة شاملة لجميع أحكام التجويد بما في ذلك مخارج الحروف والصفة والمد لإتقان تلاوة القرآن."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 27,
+    "fields": {
+      "course": 14,
+      "language": "en",
+      "translated_name": "Advanced Quran Recitation",
+      "translated_description": "Master the art of beautiful Quran recitation (Tarteel) with proper Tajweed and melody."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 28,
+    "fields": {
+      "course": 14,
+      "language": "ar",
+      "translated_name": "التلاوة القرآنية المتقدمة",
+      "translated_description": "أتقن فن تلاوة القرآن الكريم الجميلة (الترتيل) مع التجويد الصحيح واللحن."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 29,
+    "fields": {
+      "course": 15,
+      "language": "en",
+      "translated_name": "Juz Amma Memorization",
+      "translated_description": "Memorize the 30th part of the Quran (Juz Amma) with professional guidance and revision techniques."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 30,
+    "fields": {
+      "course": 15,
+      "language": "ar",
+      "translated_name": "حفظ جزء عم",
+      "translated_description": "احفظ الجزء الثلاثين من القرآن الكريم (جزء عم) بإرشاد احترافي وتقنيات المراجعة."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 31,
+    "fields": {
+      "course": 16,
+      "language": "en",
+      "translated_name": "Full Quran Hifz Program",
+      "translated_description": "Complete memorization program for the entire Holy Quran with daily lessons and weekly revision."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 32,
+    "fields": {
+      "course": 16,
+      "language": "ar",
+      "translated_name": "برنامج حفظ القرآن الكامل",
+      "translated_description": "برنامج حفظ كامل للقرآن الكريم بالكامل مع دروس يومية ومراجعة أسبوعية."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 33,
+    "fields": {
+      "course": 17,
+      "language": "en",
+      "translated_name": "Pillars of Islam",
+      "translated_description": "Learn about the five pillars of Islam: Shahada, Salah, Zakat, Sawm, and Hajj with authentic sources."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 34,
+    "fields": {
+      "course": 17,
+      "language": "ar",
+      "translated_name": "أركان الإسلام",
+      "translated_description": "تعرف على أركان الإسلام الخمسة: الشهادة والصلاة والزكاة والصوم والحج من المصادر الأصيلة."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 35,
+    "fields": {
+      "course": 18,
+      "language": "en",
+      "translated_name": "Prophetic Biography",
+      "translated_description": "Study the life of Prophet Muhammad (peace be upon him) and learn from his exemplary character."
+    }
+  },
+  {
+    "model": "courses.coursetranslation",
+    "pk": 36,
+    "fields": {
+      "course": 18,
+      "language": "ar",
+      "translated_name": "السيرة النبوية",
+      "translated_description": "دراسة حياة النبي محمد ﷺ والتعلم منCharacter Exemplary الخاص به."
+    }
+  }
+]

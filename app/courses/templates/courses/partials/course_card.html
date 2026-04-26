@@ -23,18 +23,36 @@
         <h5 class="card-title text-primary text-center mb-3 fw-bold">{{ course.name }}</h5>
 
         <!-- Course Description -->
-        <div class="card card-bg px-3 mb-3 w-100 text-center description-container">
+        <div class="description-container card card-bg px-3 mb-3 w-100 text-center">
             <div class="short-desc">{{ course.description|truncatechars:100 }}</div>
-            <div class="full-desc" style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease;">
+            <div class="full-desc" style="display:none;">
                 {{ course.description }}
             </div>
             
             <!-- Toggle Button -->
             <div class="text-center mt-2">
-                <button class="toggle-desc-btn btn btn-link text-primary p-0 small fw-bold">
-                    <span class="show-more" data-translate="show_more">Show More <i class="fas fa-chevron-down ms-1"></i></span>
-                    <span class="show-less" style="display: none;">Show Less <i class="fas fa-chevron-up ms-1"></i></span>
-                </button>
+                <a href="javascript:void(0)" class="toggle-desc-link" onclick="
+                    var dc = this.closest('.description-container');
+                    var fd = dc.querySelector('.full-desc');
+                    var sd = dc.querySelector('.short-desc');
+                    var sm = dc.querySelector('.show-more');
+                    var sl = dc.querySelector('.show-less');
+                    if (fd.style.display === 'none') {
+                        fd.style.display = 'block';
+                        sd.style.display = 'none';
+                        sm.style.display = 'none';
+                        sl.style.display = 'inline';
+                    } else {
+                        fd.style.display = 'none';
+                        sd.style.display = 'block';
+                        sm.style.display = 'inline';
+                        sl.style.display = 'none';
+                    }
+                    return false;
+                ">
+                    <span class="show-more" data-translate="show_more" style="font-size:0.875rem;color:#1976d2;font-weight:bold;">Show More <i class="fas fa-chevron-down ms-1"></i></span>
+                    <span class="show-less" style="display:none;font-size:0.875rem;color:#1976d2;font-weight:bold;">Show Less <i class="fas fa-chevron-up ms-1"></i></span>
+                </a>
             </div>
         </div>
 
@@ -60,67 +78,17 @@
 </div>
 
 <style>
-    .description-container {
-        position: relative;
-    }
-    
-    .full-desc {
-        background: white;
-    }
-    
-    .toggle-desc-btn {
+    .toggle-desc-link {
         text-decoration: none;
     }
     
-    .toggle-desc-btn:hover {
+    .toggle-desc-link:hover {
         text-decoration: underline;
     }
 </style>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Ensure the script works for dynamically loaded content as well
-        const initializeToggleDescription = () => {
-            const toggleButtons = document.querySelectorAll('.toggle-desc-btn');
-    
-            toggleButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const container = this.closest('.description-container');
-                    const fullDesc = container.querySelector('.full-desc');
-                    const shortDesc = container.querySelector('.short-desc');
-                    const showMore = container.querySelector('.show-more');
-                    const showLess = container.querySelector('.show-less');
-    
-                    if (!fullDesc || !shortDesc || !showMore || !showLess) {
-                        console.error("Missing required elements for toggle functionality.");
-                        return;
-                    }
-    
-                    // Toggle visibility
-                    if (fullDesc.style.maxHeight === '0px' || !fullDesc.style.maxHeight) {
-                        // Expand the full description
-                        fullDesc.style.maxHeight = fullDesc.scrollHeight + 'px';
-                        showMore.style.display = 'none';
-                        showLess.style.display = 'inline';
-                        shortDesc.style.display = 'none';
-                    } else {
-                        // Collapse the full description
-                        fullDesc.style.maxHeight = '0';
-                        showMore.style.display = 'inline';
-                        showLess.style.display = 'none';
-                        shortDesc.style.display = 'block';
-                    }
-                });
-            });
-        };
-    
-        // Initialize the functionality on page load
-        initializeToggleDescription();
-    
-        // Optional: Reinitialize for dynamically loaded content
-        document.addEventListener('DOMNodeInserted', initializeToggleDescription);
-    });
-    </script>
+
+
 
 
 

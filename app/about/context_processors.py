@@ -1,5 +1,16 @@
+import os
 from admin_interface.models import Theme
 from .models import CompanyInfo, CompanyInfoTranslation
+
+
+def get_meta_pixel_id(request):
+    return {
+        'META_PIXEL_ID': os.environ.get('META_PIXEL_ID', ''),
+        'META_DOMAIN_VERIFICATION': os.environ.get(
+            'META_DOMAIN_VERIFICATION',
+            os.environ.get('FACEBOOK_DOMAIN_VERIFICATION', '')
+        ),
+    }
 
 
 def get_logo_url(request):
@@ -30,4 +41,5 @@ def get_company_info(request):
     return {
         'company_info': company_info
     }
+
 
