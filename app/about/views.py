@@ -1,4 +1,5 @@
 import json
+import uuid
 
 from accounts.models import TeacherInfo, TeacherInfoTranslation
 from admin_interface.models import Theme
@@ -6,6 +7,8 @@ from django.core.mail import EmailMessage
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
+
+from .meta_capi import send_lead_event, send_contact_event
 
 from about.models import (
     CompanyInfo,
@@ -484,6 +487,10 @@ def send_email(request):
             )
 
             email.send(fail_silently=False)
+
+            # Fire server-side Contact event via Meta Conversions API
+            send_contact_event(request, email=user_email)
+
             return JsonResponse({"message": "Email sent successfully!"})
 
         return JsonResponse({"errors": form.errors}, status=400)
@@ -531,6 +538,13 @@ def book_free_session(request):
         user=request.user,
         phone=phone,
         message=message,
+    )
+
+    # Fire server-side Lead event via Meta Conversions API
+    send_lead_event(
+        request,
+        email=getattr(request.user, "email", ""),
+        phone=phone,
     )
 
     return JsonResponse(

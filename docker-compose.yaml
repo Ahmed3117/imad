@@ -9,6 +9,7 @@ services:
       - static_volume:/app/static
       - media_volume:/app/media
     environment:
+      - DJANGO_ENV=prod
       - DB_NAME=django_db
       - DB_USER=django_user
       - DB_PASSWORD=django_password

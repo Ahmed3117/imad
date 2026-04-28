@@ -1361,6 +1361,10 @@
                       } else {
                           alert(data.message);
                       }
+                      // Fire Meta Pixel Contact event on successful contact form submission
+                      if (typeof fbq === 'function') {
+                          fbq('track', 'Contact');
+                      }
                       contactForm.reset();
                       contactForm.classList.remove('was-validated');
                   } else {
@@ -1488,6 +1492,13 @@
                     alertBox.textContent = data.message;
                     alertBox.classList.remove('d-none');
                     confirmFreeSessionBtn.classList.add('d-none');
+                    // Fire Meta Pixel Lead event on successful free session booking
+                    if (typeof fbq === 'function') {
+                        fbq('track', 'Lead', {
+                            content_name: 'Free Session Booking',
+                            content_category: 'Free Trial'
+                        });
+                    }
                     // Reload after 2 seconds to reflect new status
                     setTimeout(() => window.location.reload(), 2000);
                 } else {
