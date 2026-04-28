@@ -6,7 +6,18 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
+    # Load .env so DJANGO_ENV is available before Django boots
+    try:
+        import dotenv
+        from pathlib import Path
+        dotenv.load_dotenv(Path(__file__).resolve().parent / '.env')
+    except ImportError:
+        pass
+
+    django_env = os.environ.get('DJANGO_ENV', 'local')
+    settings_module = f'project.settings.{django_env}'
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_module)
+
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

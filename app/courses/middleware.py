@@ -2,7 +2,7 @@ from threading import local
 import requests
 from django.core.cache import cache
 
-from project import settings
+from django.conf import settings
 
 _thread_locals = local()
 

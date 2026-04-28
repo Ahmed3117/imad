@@ -6,7 +6,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.hashers import make_password
 from django.utils.timezone import now
 from library.models import LibraryCategory
-from project.settings import BASE_URL
+from django.conf import settings as django_settings
 from subscriptions.models import GroupTime, Lecture, LectureFile, LectureNote, StudyGroup, StudyGroupResource
 from .models import TeacherInfo, TeacheroomAccount, User, StudentProfile, ZoomAccount
 from django.views.decorators.csrf import csrf_exempt
@@ -586,7 +586,7 @@ def create_zoom_meeting(title, description, duration, date, start_time, timezone
     while attempt < max_attempts:
         try:
             response = requests.post(
-                f'{BASE_URL}/subscriptions/create-meeting/',
+                f'{django_settings.BASE_URL}/subscriptions/create-meeting/',
                 data=zoom_data
             )
             if response.status_code == 200:
