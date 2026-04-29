@@ -43,21 +43,15 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'about.apps.AboutConfig',
     'courses.apps.CoursesConfig',
-    #'loves',
-    #'carts',
-    #'orders',
     'subscriptions',
     'library',
     'assignment',
-    'chat',
-    # 'appointments',
-    # 'exams',
     "crispy_forms",
     "crispy_bootstrap5",
     'rest_framework',
-    # 'payments',
-    # 'freemeet',
     'ckeditor',
+    'channels',
+    'chat',
 ]
 
 ASGI_APPLICATION = 'project.asgi.application'
@@ -204,7 +198,8 @@ ADMIN_ORDERING = (
     )),
     ('accounts', (
         'User', 'ParentStudent',
-        'TeacherInfo', 'TeacherInfoTranslation'
+        'TeacherInfo', 'TeacherInfoTranslation',
+        'TeacheroomAccount','ZoomAccount'
     )),
     # ('freemeet', ('FreeMeet',)),
     ('courses', (
@@ -213,7 +208,10 @@ ADMIN_ORDERING = (
         'Course', 'CourseTranslation',
         # 'LevelContent', 'LevelContentTranslation'
     )),
-    ('subscriptions', ('StudyGroup','JoinRequest','Lecture')),
+    ('library', (
+        'CourseLibrary', 'MyLibrary',
+    )),
+    ('subscriptions', ('StudyGroup','JoinRequest','Lecture','StudyGroupResource','LectureVisitHistory')),
     # ('appointments', ('TeacherAvailability', 'Appointment')),
     # ('exams', ('Exam', 'Question', 'Option', 'ExamResult')),
     # ('orders', ('Order', 'OrderItem')),
@@ -222,7 +220,6 @@ ADMIN_ORDERING = (
     ('auth', ('Group',)),
     ('admin_interface', ('Theme',)),
 )
-
 
 def get_app_list(self, request, app_label=None):
     """Reorder the appearance of apps and models in the Django admin."""
