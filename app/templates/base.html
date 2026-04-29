@@ -12,9 +12,9 @@
     <meta property="og:type" content="website">
     <meta name="csrf-token" content="{{ csrf_token }}">
     {% if META_DOMAIN_VERIFICATION %}
-    <meta name="facebook-domain-verification" content="{{ META_DOMAIN_VERIFICATION }}" />
+    <meta name="facebook-domain-verification" content="{{ META_DOMAIN_VERIFICATION }}">
     {% else %}
-    <meta name="facebook-domain-verification" content="d6g2chn9l27eimvptlbwamey5yj3ju" />
+    <meta name="facebook-domain-verification" content="d6g2chn9l27eimvptlbwamey5yj3ju">
     {% endif %}
     <title>{% block title %}{% endblock %}</title>
 

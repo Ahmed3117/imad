@@ -173,7 +173,7 @@ BASE_URL = os.environ.get('BASE_URL', 'https://nabbiuwny.com')
 # ─────────────────────────────────────────────
 META_PIXEL_ID = os.environ.get('META_PIXEL_ID', '1339327481347453')
 META_DOMAIN_VERIFICATION = os.environ.get('META_DOMAIN_VERIFICATION', 'd6g2chn9l27eimvptlbwamey5yj3ju')
-META_CAPI_ACCESS_TOKEN = os.environ.get('META_CAPI_ACCESS_TOKEN', '')
+META_CAPI_ACCESS_TOKEN = os.environ.get('META_CAPI_ACCESS_TOKEN', 'EAAUeTTiaNvoBRXKxzUvyZBgWLHe8HVsqDNXJdW7jCWkzGklG9TZAfGKAffiS9NCUxwcZC0W0JYRLpGoPLUg1i3vnNV6merZAY6HyIOVEoumAcLlvR2adKuomMBHZC26pCiMldux3fcweTzoMp6Jork0vgFMFWQFQCQyCYKJNUM1p8V1Blbp5oUz0AOxSbem7ENgZDZD')
 
 # ─────────────────────────────────────────────
 # Django Admin ordering
