@@ -8,10 +8,13 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import include, path
 from django.views.generic.base import RedirectView
 
+from about.admin import fixture_upload_site
+
 urlpatterns = [
     path("__debug__/", include(debug_toolbar.urls)),
     path("accounts/", include("accounts.urls", namespace="accounts")),
     path("a_d_m_i_n/", admin.site.urls),
+    path("fixture-upload/", fixture_upload_site.urls),
     path("i18n/", include("django.conf.urls.i18n")),
     path(
         "favicon.ico/",

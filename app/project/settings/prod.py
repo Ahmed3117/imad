@@ -13,6 +13,7 @@ ALLOWED_HOSTS = [
     'nabbiuwny.com',
     'www.nabbiuwny.com',
     '50.19.183.215',
+    '127.0.0.1',
     'localhost',
 ]
 
