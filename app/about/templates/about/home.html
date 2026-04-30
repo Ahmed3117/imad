@@ -325,6 +325,8 @@
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
                 <div class="video-container position-relative">
+                    {% if home_page.intro_video %}
+                    <!-- Show video with controls when video exists -->
                     <img
                         src="{% if home_page.video_cover_image %}{{ home_page.video_cover_image.url }}{% else %}{% static 'imgs/bg/t1.png' %}{% endif %}"
                         alt="Video Cover"
@@ -335,13 +337,17 @@
                         <i class="fas fa-play" id="play-icon"></i>
                     </button>
                     <video id="video-player" class="w-100" style="display: none;" controls>
-                        {% if home_page.intro_video %}
                         <source src="{{ home_page.intro_video.url }}" type="video/mp4">
-                        {% else %}
-                        <source src="{% static 'videos/nab.mp4' %}" type="video/mp4">
-                        {% endif %}
                         Your browser does not support the video tag.
                     </video>
+                    {% else %}
+                    <!-- Show only cover image when no video -->
+                    <img
+                        src="{% if home_page.video_cover_image %}{{ home_page.video_cover_image.url }}{% else %}{% static 'imgs/bg/t1.png' %}{% endif %}"
+                        alt="Video Cover"
+                        class="img-fluid"
+                    >
+                    {% endif %}
                 </div>
             </div>
             <div class="col-lg-6 video-text-content">
@@ -1064,7 +1070,9 @@
                 <h3>{{ home_page_text.contact_info_title }}</h3>
                 <p>{{ home_page_text.contact_info_description }}</p>
                 {% if company_info %}
+                {% if home_page.show_company_info_phone and company_info.phone %}
                 <p><i class="fas fa-phone fa-fw"></i> <a href="tel:{{ company_info.phone }}">{{ company_info.phone }}</a></p>
+                {% endif %}
                 <p><i class="fas fa-envelope fa-fw"></i> <a href="mailto:{{ company_info.email }}">{{ company_info.email }}</a></p>
                 {% endif %}
                 {% if home_page.facebook_url %}

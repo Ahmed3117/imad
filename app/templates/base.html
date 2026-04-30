@@ -100,7 +100,7 @@
     {% block content %}{% endblock %}
 </div>
 
-{% if company_info and company_info.phone %}
+{% if company_info and company_info.phone and home_page.show_company_info_phone %}
 <!-- WhatsApp Button -->
 <a href="https://wa.me/{{ company_info.phone|cut:"+"|cut:" " }}" target="_blank" class="whatsapp-float" title="Chat with us on WhatsApp">
   <i class="fab fa-whatsapp whatsapp-icon"></i>
