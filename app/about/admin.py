@@ -209,6 +209,7 @@ class HomePageContentAdmin(admin.ModelAdmin):
         "show_secondary_features",
         "show_teachers_section",
         "show_contact_section",
+        "show_company_info_phone",
         "updated_at",
     )
     search_fields = (
@@ -245,20 +246,21 @@ class HomePageContentAdmin(admin.ModelAdmin):
                 )
             },
         ),
-        (
-            "Section Visibility",
-            {
-                "fields": (
-                    "show_primary_features",
-                    "show_who_we_are_section",
-                    "show_video_section",
-                    "show_chat_section",
-                    "show_secondary_features",
-                    "show_teachers_section",
-                    "show_contact_section",
-                )
-            },
-        ),
+            (
+                "Section Visibility",
+                {
+                    "fields": (
+                        "show_primary_features",
+                        "show_who_we_are_section",
+                        "show_video_section",
+                        "show_chat_section",
+                        "show_secondary_features",
+                        "show_teachers_section",
+                        "show_contact_section",
+                        "show_company_info_phone",
+                    )
+                },
+            ),
     )
 
     def has_add_permission(self, request):
