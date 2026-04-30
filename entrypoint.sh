@@ -8,4 +8,4 @@ cp -r /static_source/* /app/static/
 python /app/manage.py migrate
 
 # Start the application
-uvicorn project.asgi:application --host 0.0.0.0 --port 8000 --workers 8
+python -m uvicorn project.asgi:application --host 0.0.0.0 --port 8000 --workers 8
