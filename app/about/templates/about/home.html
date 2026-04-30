@@ -157,7 +157,7 @@
             </a>
             {% endif %}
             {% endif %}
-            {% if not request.user.is_superuser %}
+            {% if home_page.show_chat_section and not request.user.is_superuser %}
             <a href="{% url 'chat:contact' %}" class="btn btn-info btn-lg hero-button" data-translate="chat_with_us">Chat with Us</a>
             {% endif %}
             {% if not request.user.is_superuser %}
