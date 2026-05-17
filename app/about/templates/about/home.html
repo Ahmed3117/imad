@@ -162,11 +162,9 @@
             {% endif %}
             {% if not request.user.is_superuser %}
                 {% if not request.user.is_authenticated or request.user.role == 'student' or request.user.role == 'parent' or request.user.role == 'cs' %}
-                <a href="#free-session" class="btn btn-free-trial btn-lg hero-button position-relative overflow-hidden" data-translate="book_free_session_btn">
-                    <i class="fas fa-gift me-2"></i>
-                    <span>Book a Free Session</span>
-                    <span class="free-trial-badge">FREE</span>
-                    <span class="free-trial-shimmer"></span>
+                <a href="{% url 'courses:levels' %}" class="btn btn-free-trial btn-lg hero-button position-relative overflow-hidden" data-translate="book_free_session_btn">
+                    <i class="fas fa-graduation-cap me-2"></i>
+                    <span>View Courses</span>
                 </a>
                 {% endif %}
             {% endif %}
@@ -1082,7 +1080,7 @@
                 <h3>{{ home_page_text.contact_info_title }}</h3>
                 <p>{{ home_page_text.contact_info_description }}</p>
                 {% if company_info %}
-                {% if home_page.show_company_info_phone and company_info.phone %}
+                <!-- {% if home_page.show_company_info_phone and company_info.phone %}
                 <p><i class="fas fa-phone fa-fw"></i> <a href="tel:{{ company_info.phone }}">{{ company_info.phone }}</a></p>
                 {% endif %}
                 {% if home_page.show_whatsapp_number and company_info.whatsapp_number %}
@@ -1090,15 +1088,15 @@
                 {% endif %}
                 {% if home_page.show_telegram_number and company_info.telegram_number %}
                 <p><i class="fab fa-telegram fa-fw"></i> <a href="https://t.me/{{ company_info.telegram_number }}" target="_blank" rel="noopener noreferrer">{{ company_info.telegram_number }}</a></p>
-                {% endif %}
+                {% endif %} -->
                 <p><i class="fas fa-envelope fa-fw"></i> <a href="mailto:{{ company_info.email }}">{{ company_info.email }}</a></p>
                 {% endif %}
-                {% if home_page.facebook_url %}
+                <!-- {% if home_page.facebook_url %}
                 <p>
                     <i class="fab fa-facebook-f fa-fw"></i>
                     <a href="{{ home_page.facebook_url }}" target="_blank" rel="noopener noreferrer">{{ home_page_text.facebook_label }}</a>
                 </p>
-                {% endif %}
+                {% endif %} -->
                 <img
                     src="{% if home_page.contact_illustration %}{{ home_page.contact_illustration.url }}{% else %}{% static 'imgs/mail3.webp' %}{% endif %}"
                     alt="Contact Illustration"

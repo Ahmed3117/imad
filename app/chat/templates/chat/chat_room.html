@@ -101,7 +101,7 @@
             
             // Connect to WebSocket
             const chatSocket = new WebSocket(
-                'ws://' + window.location.host + '/ws/chat/' + roomCode + '/'
+                'wss://' + window.location.host + '/ws/chat/' + roomCode + '/'
             );
 
             chatSocket.onmessage = function(e) {
