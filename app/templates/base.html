@@ -106,6 +106,12 @@
   <i class="fab fa-whatsapp whatsapp-icon"></i>
 </a>
 {% endif %}
+{% if company_info and company_info.telegram_url and home_page.show_telegram_number %}
+<!-- Telegram Button -->
+<a href="{{ company_info.telegram_url }}" target="_blank" class="telegram-float" title="Contact us on Telegram">
+  <i class="fab fa-telegram-plane telegram-icon"></i>
+</a>
+{% endif %}
 
 <!-- JavaScript Libraries with versioning -->
 <script type="text/javascript" src="{% static 'js/mdb.min.js' %}?v=1.0.0"></script>

@@ -1170,10 +1170,10 @@
                         <span><a href="https://wa.me/{{ company_info.whatsapp_number }}" target="_blank" rel="noopener noreferrer">{{ company_info.whatsapp_number }}</a></span>
                     </li>
                     {% endif %}
-                    {% if home_page.show_telegram_number and company_info.telegram_number %}
+                    {% if home_page.show_telegram_number and company_info.telegram_url %}
                     <li class="d-flex align-items-start mb-2">
                         <i class="fab fa-telegram mt-1"></i>
-                        <span><a href="https://t.me/{{ company_info.telegram_number }}" target="_blank" rel="noopener noreferrer">{{ company_info.telegram_number }}</a></span>
+                        <span><a href="{{ company_info.telegram_url }}" target="_blank" rel="noopener noreferrer">@{{ company_info.telegram_username }}</a></span>
                     </li>
                     {% endif %}
                     <li class="d-flex align-items-start">

@@ -1,3 +1,5 @@
+import re
+
 from django.conf import settings
 from django.db import models
 
@@ -12,6 +14,31 @@ class CompanyInfo(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def telegram_username(self):
+        raw_value = (self.telegram_number or "").strip()
+        if not raw_value:
+            return ""
+
+        if raw_value.startswith("https://t.me/"):
+            raw_value = raw_value.removeprefix("https://t.me/")
+        elif raw_value.startswith("http://t.me/"):
+            raw_value = raw_value.removeprefix("http://t.me/")
+
+        raw_value = raw_value.lstrip("@").strip()
+
+        # Telegram usernames are 5-32 chars, letters/digits/underscore.
+        if re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{4,31}", raw_value):
+            return raw_value
+
+        return ""
+
+    @property
+    def telegram_url(self):
+        if not self.telegram_username:
+            return ""
+        return f"https://t.me/{self.telegram_username}"
 
 
 class CompanyInfoTranslation(models.Model):
