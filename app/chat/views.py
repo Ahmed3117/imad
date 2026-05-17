@@ -41,6 +41,7 @@ class RoomListCreate(generics.ListCreateAPIView):
 
 class MessageListCreate(generics.ListCreateAPIView):
     serializer_class = MessageSerializer
+    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         room_code = self.kwargs['room_code']  # Get room_code from URL
@@ -51,19 +52,17 @@ class MessageListCreate(generics.ListCreateAPIView):
         room_code = self.kwargs['room_code']
         room = Room.objects.get(code=room_code)
         user = self.request.user
+        is_agent = bool(
+            user.is_authenticated and (user.is_superuser or getattr(user, "role", None) == 'cs')
+        )
         
         # Create the message
-        message = serializer.save(room=room, sender=user)
-        
-        # Update unread counts based on sender type
-        if user.is_superuser or user.role == 'cs':
-            # Message from CS/superuser, increment user_unread_count
-            room.user_unread_count += 1
-        else:
-            # Message from regular user, increment admin_unread_count
-            room.admin_unread_count += 1
-            
-        room.save()
+        serializer.save(
+            room=room,
+            sender=user if user.is_authenticated else None,
+            is_agent=is_agent,
+        )
+        room.refresh_from_db()
 
         # Broadcast unread count update (gracefully handle if Redis is unavailable)
         try:
@@ -219,7 +218,6 @@ def room_list(request):
     
     # Handle POST for room creation...
 
-@login_required
 def room_status(request, room_code):
     """
     Return the status of a specific room with unread counts and agent username.

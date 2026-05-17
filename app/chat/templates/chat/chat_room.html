@@ -88,57 +88,26 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const roomCode = '{{ room_code }}';
-            const isAgent = {{ is_agent|yesno:"true,false" }};
+            const isAgent = '{{ is_agent|yesno:"true,false" }}' === 'true';
             const chatBox = document.getElementById('chatBox');
             const messageInput = document.getElementById('messageInput');
             const sendButton = document.getElementById('sendButton');
             const endChatButton = document.getElementById('endChatButton');
             const unreadNotification = document.getElementById('unreadNotification');
             const unreadCount = document.getElementById('unreadCount');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
             
             let userIsActive = true;
             let localUnreadCount = 0;
-            
-            // Connect to WebSocket
-            const chatSocket = new WebSocket(
-                'wss://' + window.location.host + '/ws/chat/' + roomCode + '/'
-            );
+            let chatSocket = null;
+            let reconnectAttempts = 0;
+            let pollingIntervalId = null;
+            const maxReconnectAttempts = 2;
+            const renderedMessageKeys = new Set();
 
-            chatSocket.onmessage = function(e) {
-                const data = JSON.parse(e.data);
-                
-                if (data.type === 'chat_ended') {
-                    handleChatEnded(data);
-                } else if (data.type === 'error') {
-                    handleError(data);
-                } else if (data.type === 'unread_count_update') {
-                    // Handle unread count updates
-                    handleUnreadCountUpdate(data);
-                } else {
-                    // Regular chat message
-                    addMessage(data.message, data.sender, data.is_agent);
-                    
-                    // Update unread count if user is not active and message is not from current user
-                    if (!userIsActive && ((isAgent && !data.is_agent) || (!isAgent && data.is_agent))) {
-                        localUnreadCount++;
-                        updateUnreadNotification();
-                    }
-                }
-            };
-
-            chatSocket.onclose = function(e) {
-                console.error('Chat socket closed unexpectedly');
-            };
-
-            // Fetch existing messages
-            fetch('/chat/rooms/' + roomCode + '/messages/')
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(msg => {
-                        addMessage(msg.text, msg.sender, msg.is_agent);
-                    });
-                    scrollToBottom();
-                });
+            connectToWebSocket();
+            fetchMessages();
 
             // Send message when button is clicked
             sendButton.addEventListener('click', sendMessage);
@@ -153,14 +122,11 @@
             // End chat when button is clicked
             if (endChatButton) {
                 endChatButton.addEventListener('click', function() {
-                    // Fix: Use the hidden element or a default message if not found
                     const confirmElement = document.getElementById('confirmEndChatText');
                     const confirmMessage = confirmElement ? confirmElement.textContent : 'Are you sure you want to end this chat?';
                     
                     if (confirm(confirmMessage)) {
-                        chatSocket.send(JSON.stringify({
-                            'type': 'end_chat'
-                        }));
+                        endChat();
                     }
                 });
             }
@@ -198,24 +164,17 @@
             
             // Handle unread count updates from server
             function handleUnreadCountUpdate(data) {
-                // Only update if it's relevant to this user/room
                 if (data.room_code === roomCode) {
                     if (isAgent) {
-                        // For agents, we care about admin_unread
                         if (userIsActive) {
-                            // If user is active, reset local count
                             localUnreadCount = 0;
                         } else {
-                            // If user is not active, update local count
                             localUnreadCount = data.admin_unread;
                         }
                     } else {
-                        // For regular users, we care about user_unread
                         if (userIsActive) {
-                            // If user is active, reset local count
                             localUnreadCount = 0;
                         } else {
-                            // If user is not active, update local count
                             localUnreadCount = data.user_unread;
                         }
                     }
@@ -224,18 +183,50 @@
             }
 
             // Function to send a message
-            function sendMessage() {
+            async function sendMessage() {
                 const message = messageInput.value.trim();
-                if (message) {
+                if (!message) {
+                    return;
+                }
+
+                if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
                     chatSocket.send(JSON.stringify({
                         'message': message
                     }));
                     messageInput.value = '';
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/chat/rooms/${roomCode}/messages/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken,
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({ text: message }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Failed to send message (${response.status})`);
+                    }
+
+                    const data = await response.json();
+                    addMessage(data.text, data.sender, data.is_agent, data.timestamp);
+                    messageInput.value = '';
+                } catch (error) {
+                    console.error('Failed to send message:', error);
                 }
             }
 
-            // Function to add a message to the chat box
-            function addMessage(message, sender, isAgentMessage) {
+            function addMessage(message, sender, isAgentMessage, timestamp = null) {
+                const key = `${timestamp || 'local'}|${sender}|${isAgentMessage}|${message}`;
+                if (renderedMessageKeys.has(key)) {
+                    return;
+                }
+                renderedMessageKeys.add(key);
+
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('message-bubble');
                 
@@ -248,7 +239,7 @@
                 messageElement.innerHTML = `
                     <div>${message}</div>
                     <div class="chat-timestamp text-end">
-                        <small>${sender} • ${new Date().toLocaleTimeString()}</small>
+                        <small>${sender} • ${formatTimestamp(timestamp)}</small>
                     </div>
                 `;
                 
@@ -258,6 +249,7 @@
 
             // Function to handle chat ended event
             function handleChatEnded(data) {
+                stopPolling();
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('alert', 'alert-warning', 'text-center', 'my-3');
                 messageElement.innerHTML = `
@@ -283,6 +275,7 @@
 
             // Function to handle error messages
             function handleError(data) {
+                stopPolling();
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('alert', 'alert-danger', 'text-center', 'my-3');
                 messageElement.innerHTML = `
@@ -309,6 +302,144 @@
             // Function to scroll to the bottom of the chat box
             function scrollToBottom() {
                 chatBox.scrollTop = chatBox.scrollHeight;
+            }
+
+            function formatTimestamp(timestamp) {
+                if (!timestamp) {
+                    return new Date().toLocaleTimeString();
+                }
+                return new Date(timestamp).toLocaleTimeString();
+            }
+
+            function connectToWebSocket() {
+                chatSocket = new WebSocket(
+                    wsProtocol + window.location.host + '/ws/chat/' + roomCode + '/'
+                );
+
+                chatSocket.onmessage = function(e) {
+                    const data = JSON.parse(e.data);
+                    
+                    if (data.type === 'chat_ended') {
+                        handleChatEnded(data);
+                    } else if (data.type === 'error') {
+                        handleError(data);
+                    } else if (data.type === 'unread_count_update') {
+                        handleUnreadCountUpdate(data);
+                    } else {
+                        addMessage(data.message, data.sender, data.is_agent);
+                        
+                        if (!userIsActive && ((isAgent && !data.is_agent) || (!isAgent && data.is_agent))) {
+                            localUnreadCount++;
+                            updateUnreadNotification();
+                        }
+                    }
+                };
+
+                chatSocket.onopen = function() {
+                    reconnectAttempts = 0;
+                    stopPolling();
+                };
+
+                chatSocket.onclose = function() {
+                    if (reconnectAttempts < maxReconnectAttempts) {
+                        reconnectAttempts += 1;
+                        setTimeout(connectToWebSocket, 3000);
+                    } else {
+                        startPolling();
+                    }
+                };
+
+                chatSocket.onerror = function(e) {
+                    console.error('Chat WebSocket error:', e);
+                };
+            }
+
+            function startPolling() {
+                if (pollingIntervalId) {
+                    return;
+                }
+                pollingIntervalId = setInterval(() => {
+                    fetchMessages();
+                    fetchRoomStatus();
+                }, 4000);
+            }
+
+            function stopPolling() {
+                if (!pollingIntervalId) {
+                    return;
+                }
+                clearInterval(pollingIntervalId);
+                pollingIntervalId = null;
+            }
+
+            async function fetchMessages() {
+                try {
+                    const response = await fetch('/chat/rooms/' + roomCode + '/messages/', {
+                        headers: { 'Accept': 'application/json' },
+                    });
+                    if (!response.ok) {
+                        throw new Error(`Failed to load messages (${response.status})`);
+                    }
+                    const data = await response.json();
+                    data.forEach(msg => {
+                        addMessage(msg.text, msg.sender, msg.is_agent, msg.timestamp);
+                    });
+                    scrollToBottom();
+                } catch (error) {
+                    console.error('Failed to fetch messages:', error);
+                }
+            }
+
+            async function fetchRoomStatus() {
+                try {
+                    const response = await fetch(`/chat/rooms/${roomCode}/status/`, {
+                        headers: { 'Accept': 'application/json' },
+                    });
+                    if (response.status === 404) {
+                        handleError({ message: 'This chat room no longer exists.' });
+                        return;
+                    }
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch room status (${response.status})`);
+                    }
+                    const data = await response.json();
+                    if (data.status === 'finished') {
+                        handleChatEnded({ ended_by: 'support team' });
+                        return;
+                    }
+                    handleUnreadCountUpdate({
+                        room_code: roomCode,
+                        admin_unread: data.admin_unread_count || 0,
+                        user_unread: data.user_unread_count || 0,
+                    });
+                } catch (error) {
+                    console.error('Failed to fetch room status:', error);
+                }
+            }
+
+            async function endChat() {
+                if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+                    chatSocket.send(JSON.stringify({
+                        'type': 'end_chat'
+                    }));
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/chat/rooms/${roomCode}/end/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'Accept': 'application/json',
+                        },
+                    });
+                    if (!response.ok) {
+                        throw new Error(`Failed to end chat (${response.status})`);
+                    }
+                    handleChatEnded({ ended_by: 'support team' });
+                } catch (error) {
+                    console.error('Failed to end chat:', error);
+                }
             }
         });
     </script>
