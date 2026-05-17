@@ -31,6 +31,16 @@ class CompanyInfoAdmin(admin.ModelAdmin):
     inlines = [CompanyInfoTranslationInline]
     list_display = ["name", "email", "phone", "whatsapp_number", "telegram_number"]
 
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        formfield = super().formfield_for_dbfield(db_field, request, **kwargs)
+        if db_field.name == "telegram_number":
+            formfield.label = "Telegram username"
+            formfield.help_text = (
+                "Use a Telegram username like @nabbiuwny_support or "
+                "nabbiuwny_support. Phone numbers are not supported."
+            )
+        return formfield
+
 
 class HomePageContentTranslationInline(admin.StackedInline):
     model = HomePageContentTranslation
@@ -208,6 +218,12 @@ class HomePageContentAdmin(admin.ModelAdmin):
         "show_chat_section",
         "show_secondary_features",
         "show_teachers_section",
+        "show_testimonials_section",
+        "show_family_bundle_section",
+        "show_family_bundle_comparison_section",
+        "show_family_bundle_faq_section",
+        "show_process_section",
+        "show_free_session_section",
         "show_contact_section",
         "show_company_info_phone",
         "show_whatsapp_number",
@@ -258,6 +274,12 @@ class HomePageContentAdmin(admin.ModelAdmin):
                         "show_chat_section",
                         "show_secondary_features",
                         "show_teachers_section",
+                        "show_testimonials_section",
+                        "show_family_bundle_section",
+                        "show_family_bundle_comparison_section",
+                        "show_family_bundle_faq_section",
+                        "show_process_section",
+                        "show_free_session_section",
                         "show_contact_section",
                         "show_company_info_phone",
                         "show_whatsapp_number",
