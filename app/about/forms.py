@@ -6,3 +6,10 @@ class ContactForm(forms.Form):
     email = forms.EmailField(required=True)
     phone = forms.CharField(max_length=30, required=False)
     message = forms.CharField(widget=forms.Textarea, required=True)
+    website = forms.CharField(required=False)
+
+    def clean_website(self):
+        value = self.cleaned_data.get("website")
+        if value:
+            raise forms.ValidationError("Invalid request")
+        return value

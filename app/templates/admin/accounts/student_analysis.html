@@ -1,0 +1,553 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url 'admin:accounts_user_changelist' %}">Users</a>
+    &rsaquo; <a href="{% url 'admin:accounts_user_change' student.pk %}">{{ student }}</a>
+    &rsaquo; Student analysis
+</div>
+{% endblock %}
+
+{% block content %}
+<style>
+    .student-analysis {
+        color: #1f2937;
+    }
+    .analysis-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 24px;
+        align-items: center;
+        margin-bottom: 24px;
+        padding: 24px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #fff;
+    }
+    .analysis-kicker {
+        margin: 0 0 6px;
+        color: #6b7280;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+    .analysis-title {
+        margin: 0;
+        font-size: 28px;
+        line-height: 1.2;
+        color: #111827;
+    }
+    .analysis-subtitle {
+        margin: 8px 0 0;
+        color: #4b5563;
+    }
+    .analysis-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+    .analysis-button {
+        display: inline-flex;
+        align-items: center;
+        min-height: 34px;
+        padding: 0 12px;
+        border-radius: 6px;
+        background: #374151;
+        color: #fff !important;
+        font-weight: 700;
+        text-decoration: none;
+    }
+    .analysis-button.secondary {
+        background: #eef2ff;
+        color: #3730a3 !important;
+    }
+    .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    .metric-card,
+    .analysis-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+    }
+    .metric-card {
+        padding: 18px;
+    }
+    .metric-label {
+        margin: 0 0 8px;
+        color: #6b7280;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+    .metric-value {
+        margin: 0;
+        color: #111827;
+        font-size: 26px;
+        font-weight: 800;
+    }
+    .metric-note {
+        margin: 6px 0 0;
+        color: #6b7280;
+        font-size: 12px;
+    }
+    .analysis-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 18px;
+        margin-bottom: 18px;
+    }
+    .analysis-card {
+        overflow: hidden;
+    }
+    .analysis-card.full {
+        grid-column: 1 / -1;
+    }
+    .analysis-card h2 {
+        margin: 0;
+        padding: 14px 18px;
+        border-bottom: 1px solid #e5e7eb;
+        color: #111827;
+        font-size: 16px;
+        background: #f9fafb;
+    }
+    .analysis-body {
+        padding: 16px 18px;
+    }
+    .detail-list {
+        display: grid;
+        grid-template-columns: 180px minmax(0, 1fr);
+        gap: 10px 14px;
+        margin: 0;
+    }
+    .detail-list dt {
+        color: #6b7280;
+        font-weight: 700;
+    }
+    .detail-list dd {
+        margin: 0;
+        color: #111827;
+    }
+    .analysis-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .analysis-table th,
+    .analysis-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #eef2f7;
+        text-align: left;
+        vertical-align: top;
+    }
+    .analysis-table th {
+        color: #6b7280;
+        font-size: 12px;
+        text-transform: uppercase;
+        background: #fcfcfd;
+    }
+    .status-pill {
+        display: inline-flex;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #3730a3;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    .status-pill.success {
+        background: #dcfce7;
+        color: #166534;
+    }
+    .status-pill.warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    .status-pill.danger {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    .empty-state {
+        margin: 0;
+        color: #6b7280;
+        font-style: italic;
+    }
+    @media (max-width: 1100px) {
+        .metric-grid,
+        .analysis-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    @media (max-width: 720px) {
+        .analysis-header,
+        .metric-grid,
+        .analysis-grid,
+        .detail-list {
+            grid-template-columns: 1fr;
+        }
+        .analysis-actions {
+            justify-content: flex-start;
+        }
+    }
+</style>
+
+<div class="student-analysis">
+    <div class="analysis-header">
+        <div>
+            <p class="analysis-kicker">Student intelligence report</p>
+            <h1 class="analysis-title">{{ student.get_name }}</h1>
+            <p class="analysis-subtitle">
+                Username: <strong>{{ student.username }}</strong>
+                {% if student.email %} · Email: <strong>{{ student.email }}</strong>{% endif %}
+                {% if student.phone %} · Phone: <strong>{{ student.phone }}</strong>{% endif %}
+            </p>
+        </div>
+        <div class="analysis-actions">
+            <a class="analysis-button secondary" href="{% url 'admin:accounts_user_changelist' %}">Back to users</a>
+            <a class="analysis-button" href="{% url 'admin:accounts_user_change' student.pk %}">Edit student</a>
+        </div>
+    </div>
+
+    <div class="metric-grid">
+        <div class="metric-card">
+            <p class="metric-label">Active groups</p>
+            <p class="metric-value">{{ groups|length }}</p>
+            <p class="metric-note">Study groups currently linked to this student.</p>
+        </div>
+        <div class="metric-card">
+            <p class="metric-label">Lectures</p>
+            <p class="metric-value">{{ lecture_stats.finished|default:0 }}/{{ lecture_stats.total|default:0 }}</p>
+            <p class="metric-note">{{ lecture_stats.upcoming|default:0 }} upcoming, {{ lecture_stats.with_links|default:0 }} with live links.</p>
+        </div>
+        <div class="metric-card">
+            <p class="metric-label">Teacher completion</p>
+            <p class="metric-value">{{ completion_rate }}%</p>
+            <p class="metric-note">Based on teacher lecture status notes.</p>
+        </div>
+        <div class="metric-card">
+            <p class="metric-label">Assignments</p>
+            <p class="metric-value">{{ answer_stats.submitted|default:0 }}/{{ assignment_total }}</p>
+            <p class="metric-note">{{ submission_rate }}% submitted, {{ pending_assignment_count }} pending{% if overdue_pending_count %}, {{ overdue_pending_count }} overdue{% endif %}{% if answer_stats.average_grade %}, avg grade {{ answer_stats.average_grade|floatformat:1 }}{% endif %}.</p>
+        </div>
+    </div>
+
+    <div class="analysis-grid">
+        <section class="analysis-card">
+            <h2>Account And Profile</h2>
+            <div class="analysis-body">
+                <dl class="detail-list">
+                    <dt>Full name</dt><dd>{{ student.name|default:"-" }}</dd>
+                    <dt>Username</dt><dd>{{ student.username }}</dd>
+                    <dt>Email</dt><dd>{{ student.email|default:"-" }}</dd>
+                    <dt>Phone</dt><dd>{{ student.phone|default:"-" }}</dd>
+                    <dt>Parent phone</dt><dd>{% if profile %}{{ profile.parent_phone|default:"-" }}{% else %}-{% endif %}</dd>
+                    <dt>Age</dt><dd>{% if profile %}{{ profile.age }}{% else %}-{% endif %}</dd>
+                    <dt>Joined</dt><dd>{{ student.date_joined|date:"M d, Y H:i" }}</dd>
+                    <dt>Last login</dt><dd>{{ student.last_login|date:"M d, Y H:i"|default:"Never" }}</dd>
+                    <dt>Active</dt><dd>{% if student.is_active %}<span class="status-pill success">Active</span>{% else %}<span class="status-pill danger">Inactive</span>{% endif %}</dd>
+                    <dt>Free session</dt>
+                    <dd>
+                        {% if free_session %}
+                            <span class="status-pill {% if free_session.status == 'done' %}success{% else %}warning{% endif %}">{{ free_session.get_status_display }}</span>
+                            requested {{ free_session.requested_at|date:"M d, Y H:i" }}
+                            {% if free_session.phone %}<br>Phone: {{ free_session.phone }}{% endif %}
+                            {% if free_session.message %}<br>{{ free_session.message|linebreaksbr }}{% endif %}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </section>
+
+        <section class="analysis-card">
+            <h2>Lecture Status Breakdown</h2>
+            <div class="analysis-body">
+                <dl class="detail-list">
+                    <dt>Completed successfully</dt><dd><span class="status-pill success">{{ status_counts.completed|default:0 }}</span></dd>
+                    <dt>Student delayed or absent</dt><dd><span class="status-pill warning">{{ status_counts.student_delayed|default:0 }}</span></dd>
+                    <dt>Teacher delayed</dt><dd><span class="status-pill danger">{{ status_counts.teacher_delayed|default:0 }}</span></dd>
+                    <dt>Student notes submitted</dt><dd>{{ student_notes_count }}</dd>
+                    <dt>Teacher notes reviewed</dt><dd>{{ reviewed_count }}</dd>
+                </dl>
+            </div>
+        </section>
+
+        <section class="analysis-card full">
+            <h2>Study Groups, Courses, Teachers, And Schedule</h2>
+            <div class="analysis-body">
+                {% if group_summaries %}
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>Group</th>
+                            <th>Course</th>
+                            <th>Teacher</th>
+                            <th>Schedule</th>
+                            <th>Progress</th>
+                            <th>Assignments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in group_summaries %}
+                        <tr>
+                            <td>{{ item.group.name }}</td>
+                            <td>{{ item.group.course }}</td>
+                            <td>{{ item.group.teacher.get_name }}</td>
+                            <td>
+                                {% for group_time in item.group.group_times.all %}
+                                    <span class="status-pill">{{ group_time.get_day_display }} {{ group_time.time|time:"H:i" }}</span>
+                                {% empty %}
+                                    -
+                                {% endfor %}
+                            </td>
+                            <td>{{ item.finished_lecture_count }}/{{ item.lecture_count }} lectures finished</td>
+                            <td>
+                                {{ item.answer_count }}/{{ item.assignment_count }} submitted
+                                {% if item.average_grade %}<br>Average grade: {{ item.average_grade|floatformat:1 }}{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="empty-state">This student is not assigned to any study groups yet.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="analysis-card full">
+            <h2>Recent Lectures</h2>
+            <div class="analysis-body">
+                {% if recent_lectures %}
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>Lecture</th>
+                            <th>Group</th>
+                            <th>Date</th>
+                            <th>Duration</th>
+                            <th>Finished</th>
+                            <th>Link status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lecture in recent_lectures %}
+                        <tr>
+                            <td>{{ lecture.title }}</td>
+                            <td>{{ lecture.group.name }}</td>
+                            <td>{{ lecture.live_link_date|date:"M d, Y H:i"|default:"-" }}</td>
+                            <td>{{ lecture.duration }} min</td>
+                            <td>{% if lecture.is_finished %}<span class="status-pill success">Finished</span>{% else %}<span class="status-pill warning">Open</span>{% endif %}</td>
+                            <td>{{ lecture.get_link_status }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="empty-state">No lectures were found for this student's groups.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="analysis-card full">
+            <h2>Teacher Notes And Attendance Signals</h2>
+            <div class="analysis-body">
+                {% if recent_teacher_notes %}
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>Lecture</th>
+                            <th>Teacher</th>
+                            <th>Status</th>
+                            <th>Delay reason</th>
+                            <th>Note</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for note in recent_teacher_notes %}
+                        <tr>
+                            <td>{{ note.lecture.title }}</td>
+                            <td>{{ note.user.get_name }}</td>
+                            <td>{{ note.get_lecture_status_display }}</td>
+                            <td>{{ note.delay_reason|default:"-"|linebreaksbr }}</td>
+                            <td>{{ note.note|default:"-"|linebreaksbr }}</td>
+                            <td>{{ note.created_at|date:"M d, Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="empty-state">No teacher notes were found for this student's lectures.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="analysis-card">
+            <h2>Student Notes And Ratings</h2>
+            <div class="analysis-body">
+                {% if recent_student_notes %}
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>Lecture</th>
+                            <th>Rating</th>
+                            <th>Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for note in recent_student_notes %}
+                        <tr>
+                            <td>{{ note.lecture.title }}</td>
+                            <td>{{ note.rating|default:"-" }}</td>
+                            <td>{{ note.note|default:"-"|linebreaksbr }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="empty-state">No student-submitted lecture notes were found.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="analysis-card">
+            <h2>Join Requests</h2>
+            <div class="analysis-body">
+                {% if join_requests %}
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>Course</th>
+                            <th>Group</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for join_request in join_requests %}
+                        <tr>
+                            <td>{{ join_request.course }}</td>
+                            <td>{{ join_request.group|default:"-" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="empty-state">No join requests were found.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="analysis-card full">
+            <h2>Assignment Submissions And Grades</h2>
+            <div class="analysis-body">
+                {% if recent_answers %}
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>Assignment</th>
+                            <th>Lecture</th>
+                            <th>Submitted</th>
+                            <th>Grade</th>
+                            <th>Feedback</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for answer in recent_answers %}
+                        <tr>
+                            <td>{{ answer.assignment.title }}</td>
+                            <td>{{ answer.assignment.lecture.title }}</td>
+                            <td>{{ answer.submitted_at|date:"M d, Y H:i" }}</td>
+                            <td>
+                                {% if answer.grade != None %}
+                                    {{ answer.grade }}/{{ answer.assignment.max_grade }}
+                                {% else %}
+                                    <span class="status-pill warning">Ungraded</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ answer.teacher_feedback|default:"-"|linebreaksbr }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="empty-state">No assignment submissions were found.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="analysis-card full">
+            <h2>Pending Assignments</h2>
+            <div class="analysis-body">
+                {% if pending_assignments %}
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>Assignment</th>
+                            <th>Lecture</th>
+                            <th>Due</th>
+                            <th>Max grade</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for assignment in pending_assignments %}
+                        <tr>
+                            <td>{{ assignment.title }}</td>
+                            <td>{{ assignment.lecture.title }}</td>
+                            <td>{{ assignment.due_at|date:"M d, Y H:i" }}</td>
+                            <td>{{ assignment.max_grade }}</td>
+                            <td>{% if assignment.is_past_due %}<span class="status-pill danger">Overdue</span>{% else %}<span class="status-pill warning">Pending</span>{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="empty-state">No pending assignments were found.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="analysis-card full">
+            <h2>Shared Learning Resources</h2>
+            <div class="analysis-body">
+                {% if shared_resources %}
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>Resource</th>
+                            <th>Course</th>
+                            <th>Group</th>
+                            <th>Shared by</th>
+                            <th>Shared at</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in shared_resources %}
+                        <tr>
+                            <td>{{ item.resource.file.name }}</td>
+                            <td>{{ item.resource.course }}</td>
+                            <td>{{ item.studygroup.name }}</td>
+                            <td>{{ item.shared_by.get_name }}</td>
+                            <td>{{ item.shared_at|date:"M d, Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="empty-state">No shared resources were found for this student's groups.</p>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

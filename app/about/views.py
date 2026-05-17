@@ -3,10 +3,15 @@ import uuid
 
 from accounts.models import TeacherInfo, TeacherInfoTranslation
 from admin_interface.models import Theme
-from django.core.mail import EmailMessage
+from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
+from services.email_service import (
+    EmailConfigurationError,
+    EmailRateLimitError,
+    send_contact_email,
+)
 
 from .meta_capi import send_lead_event, send_contact_event
 
@@ -107,6 +112,8 @@ def _get_company_info(language):
         company_info.description = (
             translation.translated_description or company_info.description
         )
+
+    company_info.email = getattr(settings, "CONTACT_EMAIL_TO", company_info.email)
 
     return company_info
 
@@ -469,24 +476,19 @@ def send_email(request):
         form = ContactForm(request.POST)
         if form.is_valid():
             user_email = form.cleaned_data["email"]
-            message = form.cleaned_data["message"]
-            company_info = CompanyInfo.objects.last()
-
-            if not company_info:
+            try:
+                send_contact_email(request, form.cleaned_data)
+            except EmailRateLimitError as e:
                 return JsonResponse(
-                    {"error": "Company information is not configured."},
-                    status=400,
+                    {
+                        "error": f"Too many contact requests. Try again in {e.retry_after} seconds."
+                    },
+                    status=429,
                 )
-
-            email = EmailMessage(
-                subject="HiCode Contact",
-                body=message,
-                from_email="platraincloud@gmail.com",
-                to=[company_info.email],
-                headers={"Reply-To": user_email},
-            )
-
-            email.send(fail_silently=False)
+            except EmailConfigurationError:
+                return JsonResponse({"error": "Email service is not configured."}, status=500)
+            except Exception:
+                return JsonResponse({"error": "Could not send email."}, status=502)
 
             # Fire server-side Contact event via Meta Conversions API
             send_contact_event(request, email=user_email)

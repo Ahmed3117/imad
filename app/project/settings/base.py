@@ -146,15 +146,31 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # ─────────────────────────────────────────────
-# Email (SMTP via Gmail)
+# Email
+# Contact form uses Namecheap SMTP. OTP / auth emails use Resend API.
 # ─────────────────────────────────────────────
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'platraincloud@gmail.com')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'meczfpooichwkudl')
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+CONTACT_EMAIL_HOST = os.environ.get('CONTACT_EMAIL_HOST', 'mail.privateemail.com')
+CONTACT_EMAIL_PORT = int(os.environ.get('CONTACT_EMAIL_PORT', '587'))
+CONTACT_EMAIL_USE_TLS = os.environ.get('CONTACT_EMAIL_USE_TLS', 'True') == 'True'
+CONTACT_EMAIL_USE_SSL = os.environ.get('CONTACT_EMAIL_USE_SSL', 'False') == 'True'
+CONTACT_EMAIL_HOST_USER = os.environ.get('CONTACT_EMAIL_HOST_USER', 'contact@nabbiuwny.com')
+CONTACT_EMAIL_HOST_PASSWORD = os.environ.get('CONTACT_EMAIL_HOST_PASSWORD', 'Bluebook@2026')
+CONTACT_EMAIL_FROM = os.environ.get('CONTACT_EMAIL_FROM', 'contact@nabbiuwny.com')
+CONTACT_EMAIL_TO = os.environ.get('CONTACT_EMAIL_TO', 'contact@nabbiuwny.com')
+CONTACT_EMAIL_RATE_LIMIT = int(os.environ.get('CONTACT_EMAIL_RATE_LIMIT', '5'))
+CONTACT_EMAIL_RATE_WINDOW_SECONDS = int(os.environ.get('CONTACT_EMAIL_RATE_WINDOW_SECONDS', '600'))
+
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
+TRANSACTIONAL_FROM_EMAIL = os.environ.get(
+    'TRANSACTIONAL_FROM_EMAIL',
+    'Nabbiuwny <noreply@nabbiuwny.com>',
+)
+DEFAULT_FROM_EMAIL = TRANSACTIONAL_FROM_EMAIL
+
+OTP_LENGTH = int(os.environ.get('OTP_LENGTH', '6'))
+OTP_EXPIRATION_MINUTES = int(os.environ.get('OTP_EXPIRATION_MINUTES', '5'))
+OTP_RATE_LIMIT_MAX_REQUESTS = int(os.environ.get('OTP_RATE_LIMIT_MAX_REQUESTS', '3'))
+OTP_RATE_LIMIT_WINDOW_SECONDS = int(os.environ.get('OTP_RATE_LIMIT_WINDOW_SECONDS', '300'))
 
 # ─────────────────────────────────────────────
 # Zoom API
@@ -184,24 +200,34 @@ from django.utils.translation import gettext_lazy as _
 
 ADMIN_ORDERING = (
     ('about', (
-        'CompanyInfo', 'CompanyInfoTranslation',
+        'CompanyInfo',
         'HomePageContent', 'HomePageFeature', 'HomePageVideoPoint',
         'FreeSession',
     )),
     ('accounts', (
-        'User', 'ParentStudent',
-        'TeacherInfo', 'TeacherInfoTranslation',
+        'User', 'StudentProfile',
+        'TeacherInfo',
         'TeacheroomAccount', 'ZoomAccount',
     )),
     ('courses', (
-        'Level', 'LevelTranslation',
-        'Track', 'TrackTranslation',
-        'Course', 'CourseTranslation',
+        'Level',
+        'Track',
+        'Course',
     )),
     ('library', (
-        'CourseLibrary', 'MyLibrary',
+        'LibraryCategory', 'CourseLibrary', 'MyLibrary',
     )),
-    ('subscriptions', ('StudyGroup', 'JoinRequest', 'Lecture', 'StudyGroupResource', 'LectureVisitHistory')),
+    ('subscriptions', (
+        'StudyGroup', 'GroupTime', 'JoinRequest',
+        'Lecture', 'LectureFile', 'LectureNote', 'LectureVisitHistory',
+        'StudyGroupResource', 'StudyGroupReport',
+    )),
+    ('assignment', (
+        'Assignment', 'StudentAnswer',
+    )),
+    ('chat', (
+        'Room', 'Message',
+    )),
     ('auth', ('Group',)),
     ('admin_interface', ('Theme',)),
 )

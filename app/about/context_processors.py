@@ -39,6 +39,8 @@ def get_company_info(request):
         company_info.name = translation.translated_name or company_info.name
         company_info.description = translation.translated_description or company_info.description
 
+    company_info.email = getattr(settings, 'CONTACT_EMAIL_TO', company_info.email)
+
     return {
         'company_info': company_info
     }

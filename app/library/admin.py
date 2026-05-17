@@ -1,31 +1,59 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
+
 from .models import CourseLibrary, LibraryCategory, MyLibrary
 
-# Register CourseLibrary model
+User = get_user_model()
+
 @admin.register(LibraryCategory)
 class LibraryCategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description')
+    list_display = ('name', 'resources_count', 'description')
     search_fields = ('name',)
+
+    def resources_count(self, obj):
+        return obj.libraries.count()
+
+    resources_count.short_description = 'Resources'
+
 
 @admin.register(CourseLibrary)
 class CourseLibraryAdmin(admin.ModelAdmin):
-    list_display = ('course', 'file', 'get_file_name', 'category')
-    list_filter = ('course', 'category')  # Add category filter
+    list_display = ('get_file_name', 'course', 'category')
+    list_filter = ('category', 'course__level', 'course__track', 'course')
     search_fields = ('course__name', 'file', 'category__name')
-    
+    autocomplete_fields = ('course', 'category')
+    fieldsets = (
+        ('Resource', {'fields': ('course', 'category', 'file')}),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('course__level', 'course__track', 'category')
+
     def get_file_name(self, obj):
         return obj.file.name.split('/')[-1]
+
     get_file_name.short_description = 'File Name'
 
-# Register MyLibrary model
+
 @admin.register(MyLibrary)
 class MyLibraryAdmin(admin.ModelAdmin):
-    list_display = ('user', 'course', 'file', 'get_file_name')
-    list_filter = ('user', 'course')
-    search_fields = ('user__username', 'course__name', 'file')
-    
+    list_display = ('get_file_name', 'user', 'course')
+    list_filter = ('course__level', 'course__track', 'course', 'user')
+    search_fields = ('user__username', 'user__name', 'course__name', 'file')
+    autocomplete_fields = ('user', 'course')
+    fieldsets = (
+        ('Teacher File', {'fields': ('user', 'course', 'file')}),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'course__level', 'course__track')
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'user':
+            kwargs['queryset'] = User.objects.filter(role='teacher').order_by('name', 'username')
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     def get_file_name(self, obj):
-        return obj.file.name.split('/')[-1]  # Display only the file name, not the full path
+        return obj.file.name.split('/')[-1]
+
     get_file_name.short_description = 'File Name'
-
-
