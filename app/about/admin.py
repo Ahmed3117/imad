@@ -29,7 +29,7 @@ class CompanyInfoTranslationInline(admin.TabularInline):
 @admin.register(CompanyInfo)
 class CompanyInfoAdmin(admin.ModelAdmin):
     inlines = [CompanyInfoTranslationInline]
-    list_display = ["name", "email", "phone"]
+    list_display = ["name", "email", "phone", "whatsapp_number", "telegram_number"]
 
 
 class HomePageContentTranslationInline(admin.StackedInline):
@@ -210,6 +210,8 @@ class HomePageContentAdmin(admin.ModelAdmin):
         "show_teachers_section",
         "show_contact_section",
         "show_company_info_phone",
+        "show_whatsapp_number",
+        "show_telegram_number",
         "updated_at",
     )
     search_fields = (
@@ -258,6 +260,8 @@ class HomePageContentAdmin(admin.ModelAdmin):
                         "show_teachers_section",
                         "show_contact_section",
                         "show_company_info_phone",
+                        "show_whatsapp_number",
+                        "show_telegram_number",
                     )
                 },
             ),

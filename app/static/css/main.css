@@ -370,6 +370,21 @@ svg {
     margin: 0.5rem;
     min-width: 180px; /* Give buttons some minimum width */
 }
+.hero-content .row.g-3 .feature-card,
+.hero-content .row.g-3 .feature-card:hover,
+.hero-content .row.g-3 .feature-card:focus,
+.hero-content .row.g-3 .feature-card:active,
+.hero-content .row.g-3 .feature-card:focus-within {
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
+}
+.hero-content .row.g-3 .feature-card .ripple-wave {
+    display: none !important;
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
+}
 @media (min-width: 992px) and (max-height: 820px) {
     .hero-section {
         align-items: flex-start;

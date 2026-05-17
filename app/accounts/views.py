@@ -17,9 +17,13 @@ from django.shortcuts import render, redirect
 from django.db.models import Q, Sum, Prefetch, F
 from courses.models import   Course, CourseTranslation, Level, LevelTranslation, Track, TrackTranslation
 from .forms import LectureNoteForm, SessionURLForm
-from django.core.mail import send_mail
-from django.conf import settings
-import random
+from services.email_service import EmailConfigurationError, EmailRateLimitError
+from services.otp_service import (
+    create_and_send_otp,
+    invalidate_otp,
+    otp_session_is_valid,
+    verify_otp,
+)
 from django.views.decorators.cache import never_cache
 from subscriptions.zoom import get_meeting_participants, get_meeting_status
 import logging
@@ -33,28 +37,10 @@ import time
 # Set up logging
 logger = logging.getLogger(__name__)
 
-class EmailVerification:
-    @staticmethod
-    def generate_otp():
-        return str(random.randint(100000, 999999))
-
-    @staticmethod
-    def send_otp_email(email, otp, purpose="verification"):
-        subject = "Email Verification" if purpose == "verification" else "Password Reset"
-        message = f"Your OTP for {purpose} is: {otp}"
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [email],
-            fail_silently=False,
-        )
-
 def register(request):
     """Render the registration page (Step 1)."""
     return render(request, 'accounts/register.html')
 
-@csrf_exempt
 def register_user(request):
     """Handle user registration with email verification."""
     if request.method == 'POST':
@@ -73,25 +59,48 @@ def register_user(request):
             if User.objects.filter(username=username).exists():
                 return JsonResponse({'success': False, 'error': 'Username already exists'})
 
-            # Generate and send OTP
-            otp = EmailVerification.generate_otp()
-            request.session['registration_otp'] = otp
             request.session['registration_data'] = request.POST.dict()
-            EmailVerification.send_otp_email(email, otp)
+            try:
+                create_and_send_otp(request, email, purpose="registration")
+            except EmailRateLimitError as e:
+                return JsonResponse(
+                    {
+                        'success': False,
+                        'error': f'Too many OTP requests. Try again in {e.retry_after} seconds.',
+                    },
+                    status=429,
+                )
+            except EmailConfigurationError:
+                logger.exception("OTP email configuration error")
+                return JsonResponse(
+                    {'success': False, 'error': 'Email service is not configured'},
+                    status=500,
+                )
+            except Exception:
+                logger.exception("Failed to send registration OTP")
+                return JsonResponse(
+                    {'success': False, 'error': 'Could not send OTP email'},
+                    status=502,
+                )
 
             return JsonResponse({'success': True, 'message': 'OTP sent to your email'})
 
         elif step == 'verify_otp':
             # Handle OTP verification
             entered_otp = request.POST.get('otp')
-            stored_otp = request.session.get('registration_otp')
             registration_data = request.session.get('registration_data')
 
-            if not stored_otp or not registration_data:
+            if not registration_data:
                 return JsonResponse({'success': False, 'error': 'Session expired'})
 
-            if entered_otp != stored_otp:
-                return JsonResponse({'success': False, 'error': 'Invalid OTP'})
+            is_valid, error = verify_otp(
+                request,
+                registration_data.get('email'),
+                entered_otp,
+                purpose="registration",
+            )
+            if not is_valid:
+                return JsonResponse({'success': False, 'error': error})
 
             try:
                 # Create user after OTP verification
@@ -106,7 +115,6 @@ def register_user(request):
                 )
 
                 # Clear session data
-                del request.session['registration_otp']
                 del request.session['registration_data']
 
                 login(request, user)
@@ -139,10 +147,29 @@ def forgot_password(request):
         email = request.POST.get('email')
         try:
             user = User.objects.get(email=email)
-            otp = EmailVerification.generate_otp()
-            request.session['reset_otp'] = otp
             request.session['reset_email'] = email
-            EmailVerification.send_otp_email(email, otp, purpose="reset")
+            try:
+                create_and_send_otp(request, email, purpose="reset")
+            except EmailRateLimitError as e:
+                return JsonResponse(
+                    {
+                        'success': False,
+                        'error': f'Too many OTP requests. Try again in {e.retry_after} seconds.',
+                    },
+                    status=429,
+                )
+            except EmailConfigurationError:
+                logger.exception("OTP email configuration error")
+                return JsonResponse(
+                    {'success': False, 'error': 'Email service is not configured'},
+                    status=500,
+                )
+            except Exception:
+                logger.exception("Failed to send password reset OTP")
+                return JsonResponse(
+                    {'success': False, 'error': 'Could not send OTP email'},
+                    status=502,
+                )
             return JsonResponse({'success': True, 'message': 'OTP sent to your email'})
         except User.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Email not found'})
@@ -152,11 +179,22 @@ def verify_reset_otp(request):
     """Verify OTP for password reset."""
     if request.method == 'POST':
         entered_otp = request.POST.get('otp')
-        stored_otp = request.session.get('reset_otp')
-        
-        if entered_otp == stored_otp:
+        email = request.session.get('reset_email')
+
+        if not email:
+            return JsonResponse({'success': False, 'error': 'Session expired'})
+
+        is_valid, error = verify_otp(
+            request,
+            email,
+            entered_otp,
+            purpose="reset",
+            invalidate=False,
+        )
+        if is_valid:
+            request.session['reset_otp_verified'] = True
             return JsonResponse({'success': True})
-        return JsonResponse({'success': False, 'error': 'Invalid OTP'})
+        return JsonResponse({'success': False, 'error': error})
     return JsonResponse({'success': False, 'error': 'Invalid request'})
 
 def reset_password(request):
@@ -167,15 +205,23 @@ def reset_password(request):
         
         if not email:
             return JsonResponse({'success': False, 'error': 'Session expired'})
-        
+        if not request.session.get('reset_otp_verified') or not otp_session_is_valid(
+            request,
+            email,
+            purpose="reset",
+        ):
+            return JsonResponse({'success': False, 'error': 'OTP verification required'})
+
         user = User.objects.get(email=email)
         user.set_password(new_password)
         user.save()
-        
+
         # Clear session data
-        del request.session['reset_otp']
+        invalidate_otp(request, purpose="reset")
         del request.session['reset_email']
-        
+        if 'reset_otp_verified' in request.session:
+            del request.session['reset_otp_verified']
+
         return JsonResponse({'success': True, 'message': 'Password reset successfully'})
     return JsonResponse({'success': False, 'error': 'Invalid request'})
 

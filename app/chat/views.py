@@ -21,20 +21,23 @@ class RoomListCreate(generics.ListCreateAPIView):
         code = generate_unique_code()
         room = serializer.save(code=code)
 
-        # Broadcast the new room to all clients
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            "rooms",
-            {
-                'type': 'room_created',
-                'room': {
-                    'code': room.code,
-                    'status': room.status,
-                    'created_at': room.created_at.isoformat(),
-                    'agent': room.agent.username if room.agent else None
+        # Broadcast the new room to all clients (gracefully handle if Redis is unavailable)
+        try:
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "rooms",
+                {
+                    'type': 'room_created',
+                    'room': {
+                        'code': room.code,
+                        'status': room.status,
+                        'created_at': room.created_at.isoformat(),
+                        'agent': room.agent.username if room.agent else None
+                    }
                 }
-            }
-        )
+            )
+        except Exception:
+            pass  # Redis not configured or unavailable; room is still created
 
 class MessageListCreate(generics.ListCreateAPIView):
     serializer_class = MessageSerializer
@@ -61,18 +64,21 @@ class MessageListCreate(generics.ListCreateAPIView):
             room.admin_unread_count += 1
             
         room.save()
-        
-        # Broadcast unread count update
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            "rooms",
-            {
-                'type': 'unread_count_update',
-                'room_code': room.code,
-                'admin_unread': room.admin_unread_count,
-                'user_unread': room.user_unread_count
-            }
-        )
+
+        # Broadcast unread count update (gracefully handle if Redis is unavailable)
+        try:
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "rooms",
+                {
+                    'type': 'unread_count_update',
+                    'room_code': room.code,
+                    'admin_unread': room.admin_unread_count,
+                    'user_unread': room.user_unread_count
+                }
+            )
+        except Exception:
+            pass  # Redis not configured or unavailable; message is still saved
 
 @api_view(['POST'])
 def end_chat(request, room_code):
@@ -110,20 +116,23 @@ def open_room(request, room_code):
             room.user_unread_count = 0
             
         room.save()
-        
-        # Broadcast room status update
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            "rooms",
-            {
-                'type': 'room_status',
-                'room_code': room.code,
-                'status': room.status,
-                'agent': room.agent.username if room.agent else None,
-                'first_opener': room.first_opener.username if room.first_opener else None
-            }
-        )
-        
+
+        # Broadcast room status update (gracefully handle if Redis is unavailable)
+        try:
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "rooms",
+                {
+                    'type': 'room_status',
+                    'room_code': room.code,
+                    'status': room.status,
+                    'agent': room.agent.username if room.agent else None,
+                    'first_opener': room.first_opener.username if room.first_opener else None
+                }
+            )
+        except Exception:
+            pass  # Redis not configured or unavailable; room is still saved
+
         return Response({'status': 'success', 'message': 'Room opened successfully.'})
     except Room.DoesNotExist:
         return Response({'status': 'error', 'message': 'Room not found.'}, status=404)
@@ -145,19 +154,22 @@ def join_room(request, room_code):
             room.user_unread_count = 0
             
         room.save()
-        
-        # Broadcast unread count update
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            "rooms",
-            {
-                'type': 'unread_count_update',
-                'room_code': room.code,
-                'admin_unread': room.admin_unread_count,
-                'user_unread': room.user_unread_count
-            }
-        )
-        
+
+        # Broadcast unread count update (gracefully handle if Redis is unavailable)
+        try:
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "rooms",
+                {
+                    'type': 'unread_count_update',
+                    'room_code': room.code,
+                    'admin_unread': room.admin_unread_count,
+                    'user_unread': room.user_unread_count
+                }
+            )
+        except Exception:
+            pass  # Redis not configured or unavailable; room is still saved
+
         return Response({'status': 'success', 'message': 'Joined room successfully.'})
     except Room.DoesNotExist:
         return Response({'status': 'error', 'message': 'Room not found.'}, status=404)
@@ -281,19 +293,22 @@ def chat_room(request, room_code):
                 room.user_unread_count = 0
                 
             room.save()
-            
-            # Broadcast unread count update
-            channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                "rooms",
-                {
-                    'type': 'unread_count_update',
-                    'room_code': room.code,
-                    'admin_unread': room.admin_unread_count,
-                    'user_unread': room.user_unread_count
-                }
-            )
+
+            # Broadcast unread count update (gracefully handle if Redis is unavailable)
+            try:
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    "rooms",
+                    {
+                        'type': 'unread_count_update',
+                        'room_code': room.code,
+                        'admin_unread': room.admin_unread_count,
+                        'user_unread': room.user_unread_count
+                    }
+                )
+            except Exception:
+                pass  # Redis not configured or unavailable; room is still saved
     except Room.DoesNotExist:
         pass
-    
+
     return render(request, 'chat/chat_room.html', {"room_code": room_code, "is_agent": is_agent})

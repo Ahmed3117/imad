@@ -5,6 +5,7 @@ import requests
 from django.utils import timezone
 from django.conf import settings
 from datetime import timedelta
+from django.db.models import Avg
 from django.core.validators import MaxValueValidator,MinValueValidator
 from library.models import CourseLibrary
 
@@ -158,7 +159,7 @@ class Lecture(models.Model):
     
     def get_status_display(self):
         """Returns a human-readable status with color coding"""
-        teacher_note = self.notes.filter(user__userprofile__role='teacher').first()
+        teacher_note = self.notes.filter(user__role='teacher').first()
         if teacher_note:
             return {
                 'text': teacher_note.get_lecture_status_display(),

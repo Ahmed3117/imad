@@ -247,7 +247,7 @@
                   <small class="text-muted">{{ note.created_at|date:"M d, Y H:i" }}</small>
                 </div>
                 <p class="mb-2">{{ note.note }}</p>
-                {% if note.user.userprofile.role == 'teacher' %}
+                {% if note.user.role == 'teacher' %}
                   <div class="teacher-feedback mt-2 p-2 bg-light rounded">
                     <small class="text-muted d-block"><i class="fas fa-chalkboard-teacher me-1"></i> Teacher's Status:</small>
                     <span class="badge 

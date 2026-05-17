@@ -426,8 +426,8 @@
                     <button data-mdb-ripple-init class="accordion-button collapsed" type="button" data-mdb-toggle="collapse"
                             data-mdb-target="#noteCollapse{{ note.id }}" aria-expanded="false"
                             aria-controls="noteCollapse{{ note.id }}">
-                      <i class="fas fa-user-circle me-2 {% if note.user.userprofile.role == 'teacher' %}text-info{% else %}text-success{% endif %}"></i>
-                      {{ note.user.get_full_name|default:note.user.username }} ({{ note.user.userprofile.get_role_display }}) - {{ note.created_at|date:"M d, Y" }}
+                      <i class="fas fa-user-circle me-2 {% if note.user.role == 'teacher' %}text-info{% else %}text-success{% endif %}"></i>
+                      {{ note.user.get_full_name|default:note.user.username }} ({{ note.user.get_role_display }}) - {{ note.created_at|date:"M d, Y" }}
                       {% if note.rating %}
                        <span class="badge bg-primary rounded-pill ms-auto me-3 d-inline-flex align-items-center">
                            {{ note.rating }} <i class="fas fa-star fa-xs ms-1"></i>
@@ -438,7 +438,7 @@
                   <div id="noteCollapse{{ note.id }}" class="accordion-collapse collapse"
                        aria-labelledby="noteHeading{{ note.id }}" data-mdb-parent="#notesAccordion{{ lecture.id }}">
                     <div class="accordion-body">
-                      {% if note.user.userprofile.role == 'teacher' and note.lecture_status %}
+                      {% if note.user.role == 'teacher' and note.lecture_status %}
                        <p><strong><span data-translate="teacherStatusUpdate"></span>:</strong>
                         <span class="badge rounded-pill
                           {% if note.lecture_status == 'completed' %}badge-success
