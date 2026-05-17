@@ -1077,7 +1077,7 @@ textarea.form-control {
     position: fixed;
     width: 60px;
     height: 60px;
-    bottom: 90px;
+    bottom: 185px;
     right: 20px;
     background-color: var(--second-main-color);
     color: var(--white-color);
