@@ -72,7 +72,7 @@
         
         // Connect to WebSocket
         const roomsSocket = new WebSocket(
-            'ws://' + window.location.host + '/ws/rooms/'
+            'wss://' + window.location.host + '/ws/rooms/'
         );
 
         roomsSocket.onmessage = function(e) {
@@ -369,7 +369,7 @@
     // Function to open a room
     function openRoom(roomCode) {
         const roomsSocket = new WebSocket(
-            'ws://' + window.location.host + '/ws/rooms/'
+            'wss://' + window.location.host + '/ws/rooms/'
         );
         
         roomsSocket.onopen = function() {
@@ -389,7 +389,7 @@
         
         if (confirm(confirmMessage)) {
             const roomsSocket = new WebSocket(
-                'ws://' + window.location.host + '/ws/rooms/'
+                'wss://' + window.location.host + '/ws/rooms/'
             );
             
             roomsSocket.onopen = function() {
