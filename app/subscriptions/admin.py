@@ -5,6 +5,7 @@ from django.db.models import Avg, Count, Q
 from django.urls import reverse
 from django.utils.html import format_html
 
+from project.admin_helpers import UnhandledChangelistMixin, contact_link_icons
 from .models import (
     GroupTime,
     JoinRequest,
@@ -84,7 +85,7 @@ class StudyGroupAdmin(admin.ModelAdmin):
         "students__name",
         "students__email",
     )
-    autocomplete_fields = ("course", "teacher", "students")
+    autocomplete_fields = ("course", "teacher")
     readonly_fields = (
         "display_name",
         "student_count",
@@ -93,7 +94,7 @@ class StudyGroupAdmin(admin.ModelAdmin):
         "average_rating",
         "report_button",
     )
-    filter_horizontal = ()
+    filter_horizontal = ("students",)
     inlines = (GroupTimeInline, LectureInline, StudyGroupResourceInline)
     fieldsets = (
         (
@@ -229,42 +230,32 @@ class StudyGroupAdmin(admin.ModelAdmin):
     report_button.short_description = "Report"
 
 
-@admin.register(GroupTime)
-class GroupTimeAdmin(admin.ModelAdmin):
-    list_display = ("group", "day", "time", "teacher_name", "course_name")
-    list_filter = ("day", ("group__teacher", RelatedOnlyFieldListFilter), ("group__course", RelatedOnlyFieldListFilter))
-    search_fields = ("group__name", "group__course__name", "group__teacher__username", "group__teacher__name")
-    autocomplete_fields = ("group",)
-    ordering = ("day", "time")
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related("group__teacher", "group__course")
-
-    def teacher_name(self, obj):
-        return obj.group.teacher.get_name() or obj.group.teacher.username
-
-    teacher_name.short_description = "Teacher"
-
-    def course_name(self, obj):
-        return obj.group.course.name
-
-    course_name.short_description = "Course"
-
-
 @admin.register(JoinRequest)
-class JoinRequestAdmin(admin.ModelAdmin):
-    list_display = ("student_link", "student_contact", "course_path", "group_link", "enrollment_status")
-    list_filter = (("course", RelatedOnlyFieldListFilter), ("group", RelatedOnlyFieldListFilter))
+class JoinRequestAdmin(UnhandledChangelistMixin, admin.ModelAdmin):
+    list_display = (
+        "student_link",
+        "contact_links",
+        "course_path",
+        "group_link",
+        "enrollment_status",
+        "handled",
+        "created_at",
+    )
+    list_filter = ("handled", "created_at", ("course", RelatedOnlyFieldListFilter), ("group", RelatedOnlyFieldListFilter))
+    list_editable = ("handled",)
     search_fields = (
         "student__username",
         "student__name",
         "student__email",
         "student__phone",
+        "student__telegram_username",
         "course__name",
         "group__name",
     )
     autocomplete_fields = ("student", "course", "group")
-    actions = ("enroll_selected_requests",)
+    readonly_fields = ("created_at",)
+    ordering = ("handled", "-created_at")
+    actions = ("enroll_selected_requests", "mark_as_handled", "mark_as_unhandled")
     fieldsets = (
         (
             "Request",
@@ -273,6 +264,8 @@ class JoinRequestAdmin(admin.ModelAdmin):
                     "student",
                     "course",
                     "group",
+                    "handled",
+                    "created_at",
                 ),
                 "description": "Assign a group and save. The student will be added to the selected group automatically.",
             },
@@ -294,11 +287,14 @@ class JoinRequestAdmin(admin.ModelAdmin):
     student_link.short_description = "Student"
     student_link.admin_order_field = "student__name"
 
-    def student_contact(self, obj):
-        parts = [part for part in (obj.student.phone, obj.student.email) if part]
-        return " / ".join(parts) if parts else "-"
+    def contact_links(self, obj):
+        return contact_link_icons(
+            phone=obj.student.phone,
+            email=obj.student.email,
+            telegram_username=getattr(obj.student, "telegram_username", ""),
+        )
 
-    student_contact.short_description = "Contact"
+    contact_links.short_description = "Contact"
 
     def course_path(self, obj):
         level = obj.course.level.name if obj.course and obj.course.level else "No level"
@@ -331,12 +327,25 @@ class JoinRequestAdmin(admin.ModelAdmin):
                 skipped += 1
                 continue
             join_request.group.students.add(join_request.student)
+            if not join_request.handled:
+                join_request.handled = True
+                join_request.save(update_fields=["handled"])
             enrolled += 1
         self.message_user(
             request,
             f"{enrolled} request(s) enrolled. {skipped} skipped because no group was assigned.",
             messages.SUCCESS if enrolled else messages.WARNING,
         )
+
+    @admin.action(description="Mark selected as handled")
+    def mark_as_handled(self, request, queryset):
+        updated = queryset.update(handled=True)
+        self.message_user(request, f"{updated} request(s) marked as handled.")
+
+    @admin.action(description="Mark selected as unhandled")
+    def mark_as_unhandled(self, request, queryset):
+        updated = queryset.update(handled=False)
+        self.message_user(request, f"{updated} request(s) marked as unhandled.")
 
 
 class LectureFileInline(admin.TabularInline):
@@ -352,6 +361,17 @@ class LectureNoteInline(admin.TabularInline):
     readonly_fields = ("created_at",)
     autocomplete_fields = ("user",)
     show_change_link = True
+
+
+class LectureVisitHistoryInline(admin.TabularInline):
+    model = LectureVisitHistory
+    extra = 0
+    fields = ("user", "visited_at")
+    readonly_fields = ("user", "visited_at")
+    can_delete = False
+
+    def has_add_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(Lecture)
@@ -384,7 +404,7 @@ class LectureAdmin(admin.ModelAdmin):
     autocomplete_fields = ("group", "zoom_account")
     readonly_fields = ("created", "link_status", "meeting_id", "rating_summary")
     date_hierarchy = "live_link_date"
-    inlines = (LectureFileInline, LectureNoteInline)
+    inlines = (LectureFileInline, LectureNoteInline, LectureVisitHistoryInline)
     fieldsets = (
         ("Lecture", {"fields": ("group", "title", "description", "duration", "created")}),
         (
@@ -452,42 +472,6 @@ class LectureAdmin(admin.ModelAdmin):
         return f"{obj.get_average_rating():.1f} from {count} rating(s)"
 
     rating_summary.short_description = "Rating"
-
-
-@admin.register(LectureFile)
-class LectureFileAdmin(admin.ModelAdmin):
-    list_display = ("lecture", "file")
-    search_fields = ("lecture__title", "file")
-    autocomplete_fields = ("lecture",)
-
-
-@admin.register(LectureNote)
-class LectureNoteAdmin(admin.ModelAdmin):
-    list_display = ("lecture", "user", "rating", "lecture_status", "created_at")
-    list_filter = ("lecture_status", "rating", "created_at", ("user", RelatedOnlyFieldListFilter))
-    search_fields = ("lecture__title", "user__username", "user__name", "note", "delay_reason")
-    autocomplete_fields = ("lecture", "user")
-    readonly_fields = ("created_at",)
-    date_hierarchy = "created_at"
-
-
-@admin.register(LectureVisitHistory)
-class LectureVisitHistoryAdmin(admin.ModelAdmin):
-    list_display = ("lecture", "user", "visited_at")
-    list_filter = ("visited_at", ("lecture__group", RelatedOnlyFieldListFilter), ("user", RelatedOnlyFieldListFilter))
-    search_fields = ("lecture__title", "user__username", "user__name")
-    autocomplete_fields = ("lecture", "user")
-    date_hierarchy = "visited_at"
-
-
-@admin.register(StudyGroupResource)
-class StudyGroupResourceAdmin(admin.ModelAdmin):
-    list_display = ("studygroup", "resource", "shared_by", "shared_at")
-    search_fields = ("studygroup__name", "resource__file", "resource__course__name", "shared_by__username", "shared_by__name")
-    list_filter = ("shared_at", ("studygroup", RelatedOnlyFieldListFilter), ("shared_by", RelatedOnlyFieldListFilter))
-    autocomplete_fields = ("studygroup", "resource", "shared_by")
-    readonly_fields = ("shared_at",)
-    date_hierarchy = "shared_at"
 
 
 @admin.register(StudyGroupReport)

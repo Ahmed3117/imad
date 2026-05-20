@@ -325,6 +325,8 @@ svg {
     overflow: hidden;
     box-sizing: border-box;
     padding: 96px 0 48px;
+    background-color: #f8ead7;
+    z-index: 0;
 }
 .hero-section::before {
     /* Background overlay */
@@ -334,14 +336,14 @@ svg {
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--home-hero-bg, url("../imgs/bg/bg2.jpg")) no-repeat center
+    background: var(--home-hero-bg, url("../imgs/hero/quran-learning-hero-default-v2.png")) no-repeat center
         center/cover; /* Check path */
     filter: brightness(0.45); /* Darker */
-    z-index: -1;
+    z-index: 0;
 }
 .hero-content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     max-width: 850px;
     padding: 2.5rem;
     background: rgb(31 36 34 / 18%); /* Slightly more opaque */
@@ -365,9 +367,14 @@ svg {
     margin-left: auto;
     margin-right: auto;
 }
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+}
 .hero-button,
 .profile-button {
-    margin: 0.5rem;
     min-width: 180px; /* Give buttons some minimum width */
 }
 .hero-content .row.g-3 .feature-card,
@@ -1303,6 +1310,190 @@ body[dir="rtl"] .footer-links a::before {
     }
 }
 
+@media (max-width: 767.98px) {
+    .hero-section {
+        --hero-mobile-image-top: 84px;
+        --hero-mobile-image-height: min(46vw, 230px);
+        --hero-mobile-content-overlap: 22px;
+        display: block;
+        min-height: auto;
+        padding: calc(
+                var(--hero-mobile-image-top) + var(--hero-mobile-image-height) -
+                    var(--hero-mobile-content-overlap)
+            )
+            0.875rem 2rem;
+        background: linear-gradient(180deg, #fbebd7 0%, #fff8ee 48%, #ffffff 100%);
+        color: var(--black-color);
+        z-index: 20;
+    }
+
+    .hero-section .navbar-toggler i {
+        color: var(--second-main-color);
+        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.45);
+    }
+
+    .hero-section::before {
+        top: var(--hero-mobile-image-top);
+        bottom: auto;
+        height: var(--hero-mobile-image-height);
+        background-position: top center;
+        background-size: contain;
+        filter: none;
+    }
+
+    .hero-section::after {
+        content: "";
+        position: absolute;
+        top: var(--hero-mobile-image-top);
+        left: 0;
+        right: 0;
+        height: var(--hero-mobile-image-height);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0) 60%, #fff8ee 100%);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .hero-content {
+        max-width: 460px;
+        padding: 1.25rem 1rem 1rem;
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid rgba(var(--sub-color-rgb), 0.18);
+        border-radius: 12px;
+        box-shadow: 0 16px 38px rgba(37, 59, 141, 0.12);
+        backdrop-filter: none;
+    }
+
+    .hero-content .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .hero-content .badge {
+        background-color: #fff !important;
+        border: 1px solid rgba(var(--main-color-rgb), 0.22);
+        color: var(--light-black-color) !important;
+        font-size: 0.72rem;
+        line-height: 1.2;
+        white-space: normal;
+    }
+
+    .hero-title {
+        color: var(--second-main-color);
+        font-size: 2rem;
+        line-height: 1.18;
+        margin-bottom: 0.85rem;
+    }
+
+    .hero-description {
+        color: var(--description-color);
+        font-size: 1rem;
+        line-height: 1.55;
+        margin-bottom: 1.15rem;
+    }
+
+    .hero-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem;
+    }
+
+    .hero-actions > .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-width: 0;
+        min-height: 50px;
+        margin: 0;
+        padding: 0.75rem 0.8rem;
+        font-size: 0.98rem;
+        line-height: 1.2;
+        white-space: normal;
+    }
+
+    .hero-actions > .btn:first-child,
+    .hero-actions > .btn:only-child {
+        grid-column: 1 / -1;
+    }
+
+    .hero-content .row.g-3 {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.55rem;
+        margin-top: 1rem !important;
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+    .hero-content .row.g-3 > [class*="col-"] {
+        width: auto;
+        max-width: none;
+        padding: 0;
+    }
+
+    .hero-content .row.g-3 .feature-card {
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(37, 59, 141, 0.08);
+    }
+
+    .hero-content .card-body {
+        min-height: 58px;
+        padding: 0.7rem !important;
+        justify-content: center;
+    }
+
+    .hero-content .row.g-3 .feature-card p {
+        font-size: 0.86rem;
+        line-height: 1.35;
+        color: var(--light-black-color);
+    }
+
+    .hero-content .lead {
+        color: var(--description-color);
+        font-size: 0.95rem;
+        line-height: 1.4;
+        margin-top: 1rem !important;
+    }
+
+    .whatsapp-float,
+    .telegram-float {
+        width: 50px;
+        height: 50px;
+        right: 14px;
+        font-size: 25px;
+        z-index: 10;
+    }
+
+    .whatsapp-float {
+        bottom: 14px;
+    }
+
+    .telegram-float {
+        bottom: 76px;
+    }
+
+    .whatsapp-icon,
+    .telegram-icon {
+        margin-top: 12px;
+    }
+}
+
+@media (max-width: 380px) {
+    .hero-section {
+        --hero-mobile-image-top: 80px;
+        --hero-mobile-image-height: min(46vw, 220px);
+        --hero-mobile-content-overlap: 20px;
+    }
+
+    .hero-title {
+        font-size: 1.8rem;
+    }
+
+    .hero-actions,
+    .hero-content .row.g-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Tabs Navigation */
 .nav-tabs .nav-link {
     font-family: "SomarRounded", sans-serif;
@@ -1620,4 +1811,30 @@ body[dir="rtl"] .footer-links a::before {
 .profile-details {
     font-size: 0.9rem;
     color: var(--light-text-color);
+}
+
+.input-group > .country-code-select {
+    flex: 0 0 180px;
+    width: 180px;
+    min-width: 180px;
+    max-width: 180px;
+    padding-inline: 0.75rem 2rem;
+    background-position: right 0.75rem center;
+    white-space: nowrap;
+}
+
+[dir="rtl"] .input-group > .country-code-select,
+html[lang="ar"] .input-group > .country-code-select {
+    background-position: left 0.75rem center;
+    padding-inline: 2rem 0.75rem;
+}
+
+@media (max-width: 420px) {
+    .input-group > .country-code-select {
+        flex-basis: 145px;
+        width: 145px;
+        min-width: 145px;
+        max-width: 145px;
+        font-size: 0.875rem;
+    }
 }

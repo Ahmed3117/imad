@@ -12,6 +12,7 @@ from services.email_service import (
     EmailRateLimitError,
     send_contact_email,
 )
+from project.phone_utils import normalize_phone
 
 from .meta_capi import send_lead_event, send_contact_event
 
@@ -475,9 +476,22 @@ def send_email(request):
     if request.method == "POST":
         form = ContactForm(request.POST)
         if form.is_valid():
-            user_email = form.cleaned_data["email"]
+            contact_data = form.cleaned_data.copy()
+            contact_data["phone"] = normalize_phone(
+                contact_data.get("phone"),
+                contact_data.get("phone_country_code"),
+            )
+            user_email = contact_data["email"]
+            from about.models import ContactMessage
+            ContactMessage.objects.create(
+                name=contact_data["name"],
+                email=user_email,
+                phone=contact_data.get("phone", "") or "",
+                telegram_username=contact_data.get("telegram_username", "") or "",
+                message=contact_data["message"],
+            )
             try:
-                send_contact_email(request, form.cleaned_data)
+                send_contact_email(request, contact_data)
             except EmailRateLimitError as e:
                 return JsonResponse(
                     {
@@ -533,21 +547,33 @@ def book_free_session(request):
     except (json.JSONDecodeError, ValueError):
         data = {}
 
-    phone = data.get("phone", "") or request.user.phone or ""
+    phone = (
+        normalize_phone(data.get("phone", ""), data.get("phone_country_code"))
+        or normalize_phone(request.user.phone)
+    )
+    telegram_username = data.get("telegram_username", "") or getattr(request.user, "telegram_username", "") or ""
     message = data.get("message", "")
 
     FreeSession.objects.create(
         user=request.user,
         phone=phone,
+        telegram_username=telegram_username,
         message=message,
     )
+    if telegram_username and not getattr(request.user, "telegram_username", None):
+        request.user.telegram_username = telegram_username
+        request.user.save(update_fields=["telegram_username"])
 
     # Fire server-side Lead event via Meta Conversions API
-    send_lead_event(
-        request,
-        email=getattr(request.user, "email", ""),
-        phone=phone,
-    )
+    # (best-effort; must never break the booking flow)
+    try:
+        send_lead_event(
+            request,
+            email=getattr(request.user, "email", ""),
+            phone=phone,
+        )
+    except Exception:
+        pass
 
     return JsonResponse(
         {

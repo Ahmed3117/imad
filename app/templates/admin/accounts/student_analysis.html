@@ -209,6 +209,7 @@
                 Username: <strong>{{ student.username }}</strong>
                 {% if student.email %} · Email: <strong>{{ student.email }}</strong>{% endif %}
                 {% if student.phone %} · Phone: <strong>{{ student.phone }}</strong>{% endif %}
+                {% if student.telegram_username %} · Telegram: <strong>{{ student.telegram_username }}</strong>{% endif %}
             </p>
         </div>
         <div class="analysis-actions">
@@ -249,6 +250,7 @@
                     <dt>Username</dt><dd>{{ student.username }}</dd>
                     <dt>Email</dt><dd>{{ student.email|default:"-" }}</dd>
                     <dt>Phone</dt><dd>{{ student.phone|default:"-" }}</dd>
+                    <dt>Telegram</dt><dd>{{ student.telegram_username|default:"-" }}</dd>
                     <dt>Parent phone</dt><dd>{% if profile %}{{ profile.parent_phone|default:"-" }}{% else %}-{% endif %}</dd>
                     <dt>Age</dt><dd>{% if profile %}{{ profile.age }}{% else %}-{% endif %}</dd>
                     <dt>Joined</dt><dd>{{ student.date_joined|date:"M d, Y H:i" }}</dd>

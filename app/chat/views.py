@@ -17,6 +17,44 @@ class RoomListCreate(generics.ListCreateAPIView):
     serializer_class = RoomSerializer
     permission_classes = [permissions.AllowAny]
 
+    def list(self, request, *args, **kwargs):
+        rooms = Room.objects.all().order_by('-created_at')
+        rooms_data = []
+
+        for room in rooms:
+            agent_data = None
+            if room.agent:
+                agent_data = {
+                    'id': room.agent.id,
+                    'username': room.agent.username,
+                    'role': getattr(room.agent, 'role', None),
+                    'is_superuser': room.agent.is_superuser,
+                }
+
+            first_opener_data = None
+            if getattr(room, 'first_opener', None):
+                first_opener_data = {
+                    'id': room.first_opener.id,
+                    'username': room.first_opener.username,
+                    'role': getattr(room.first_opener, 'role', None),
+                    'is_superuser': room.first_opener.is_superuser,
+                }
+
+            rooms_data.append({
+                'id': room.id,
+                'code': room.code,
+                'status': room.status,
+                'created_at': room.created_at.isoformat(),
+                'agent': agent_data,
+                'first_opener': first_opener_data,
+                'admin_unread_count': room.admin_unread_count,
+                'user_unread_count': room.user_unread_count,
+                'last_cs_join_time': room.last_cs_join_time.isoformat() if room.last_cs_join_time else None,
+                'last_user_join_time': room.last_user_join_time.isoformat() if room.last_user_join_time else None,
+            })
+
+        return Response(rooms_data)
+
     def perform_create(self, serializer):
         code = generate_unique_code()
         room = serializer.save(code=code)

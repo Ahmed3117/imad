@@ -5,6 +5,7 @@
   "password": "Password",
   "email": "Email",
   "phone": "Phone",
+  "telegram": "Telegram Username",
   "profile_image": "Profile Image",
   "role": "Who are you ?",
   "parent": "Parent",

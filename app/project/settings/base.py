@@ -184,7 +184,7 @@ MEETING_URL = "https://api.zoom.us/v2/users/me/meetings"
 # Overridden in local.py for local dev
 BASE_URL = os.environ.get('BASE_URL', 'https://nabbiuwny.com')
 
-# ─────────────────────────────────────────────
+# ────────────────────────────────────────────
 # Meta / Facebook Integration
 # ─────────────────────────────────────────────
 META_PIXEL_ID = os.environ.get('META_PIXEL_ID', '1339327481347453')
@@ -192,79 +192,93 @@ META_DOMAIN_VERIFICATION = os.environ.get('META_DOMAIN_VERIFICATION', 'd6g2chn9l
 META_CAPI_ACCESS_TOKEN = os.environ.get('META_CAPI_ACCESS_TOKEN', 'EAAUeTTiaNvoBRXKxzUvyZBgWLHe8HVsqDNXJdW7jCWkzGklG9TZAfGKAffiS9NCUxwcZC0W0JYRLpGoPLUg1i3vnNV6merZAY6HyIOVEoumAcLlvR2adKuomMBHZC26pCiMldux3fcweTzoMp6Jork0vgFMFWQFQCQyCYKJNUM1p8V1Blbp5oUz0AOxSbem7ENgZDZD')
 
 # ─────────────────────────────────────────────
-# Django Admin ordering
+# Django Admin sidebar
 # ─────────────────────────────────────────────
-from django.contrib import admin
-from django.contrib.admin import AdminSite
-from django.utils.translation import gettext_lazy as _
+# Models listed here appear in the sidebar in this workflow order.
+# Models not listed here are hidden from the sidebar but stay registered, so
+# direct URLs, inline change links, and autocomplete endpoints still work.
+ADMIN_SIDEBAR_GROUPS = [
+    {
+        'name': 'Requests',
+        'slug': 'requests',
+        'models': [
+            'about.FreeSession',
+            'about.ContactMessage',
+            'subscriptions.JoinRequest',
+        ],
+    },
+    {
+        'name': 'Users & Accounts',
+        'slug': 'users_accounts',
+        'models': [
+            'accounts.User',
+            'accounts.ZoomAccount',
+        ],
+    },
+    {
+        'name': 'Courses',
+        'slug': 'courses',
+        'models': [
+            'courses.Level',
+            'courses.Track',
+            'courses.Course',
+        ],
+    },
+    {
+        'name': 'Study Groups',
+        'slug': 'study_groups',
+        'models': [
+            'subscriptions.StudyGroup',
+        ],
+    },
+    {
+        'name': 'Library',
+        'slug': 'library',
+        'models': [
+            'library.LibraryCategory',
+            'library.CourseLibrary',
+        ],
+    },
+    {
+        'name': 'Home Page',
+        'slug': 'home_page',
+        'models': [
+            'about.CompanyInfo',
+            'about.HomePageContent',
+        ],
+    },
+    {
+        'name': 'System',
+        'slug': 'system',
+        'models': [
+            'auth.Group',
+            'admin_interface.Theme',
+        ],
+    },
+]
 
-ADMIN_ORDERING = (
-    ('about', (
-        'CompanyInfo',
-        'HomePageContent', 'HomePageFeature', 'HomePageVideoPoint',
-        'FreeSession',
-    )),
-    ('accounts', (
-        'User', 'StudentProfile',
-        'TeacherInfo',
-        'TeacheroomAccount', 'ZoomAccount',
-    )),
-    ('courses', (
-        'Level',
-        'Track',
-        'Course',
-    )),
-    ('library', (
-        'LibraryCategory', 'CourseLibrary', 'MyLibrary',
-    )),
-    ('subscriptions', (
-        'StudyGroup', 'GroupTime', 'JoinRequest',
-        'Lecture', 'LectureFile', 'LectureNote', 'LectureVisitHistory',
-        'StudyGroupResource', 'StudyGroupReport',
-    )),
-    ('assignment', (
-        'Assignment', 'StudentAnswer',
-    )),
-    ('chat', (
-        'Room', 'Message',
-    )),
-    ('auth', ('Group',)),
-    ('admin_interface', ('Theme',)),
-)
+ADMIN_VISIBLE_MODEL_KEYS = {
+    model_key
+    for group in ADMIN_SIDEBAR_GROUPS
+    for model_key in group['models']
+}
+
+ADMIN_ORDERING = {}
+for group in ADMIN_SIDEBAR_GROUPS:
+    for model_key in group['models']:
+        app_label, object_name = model_key.split('.', 1)
+        ADMIN_ORDERING.setdefault(app_label, []).append(object_name)
+
+ADMIN_ORDER_LIST = list(ADMIN_ORDERING.keys())
+
+# Models that have a "handled" boolean field for badge counting
+UNHANDLED_BADGE_MODELS = {
+    'about.FreeSession': lambda: __import__('about.models', fromlist=['FreeSession']).FreeSession.objects.filter(handled=False).count(),
+    'about.ContactMessage': lambda: __import__('about.models', fromlist=['ContactMessage']).ContactMessage.objects.filter(handled=False).count(),
+    'subscriptions.JoinRequest': lambda: __import__('subscriptions.models', fromlist=['JoinRequest']).JoinRequest.objects.filter(handled=False).count(),
+}
 
 
-def get_app_list(self, request, app_label=None):
-    """Reorder the appearance of apps and models in the Django admin."""
-    app_dict = self._build_app_dict(request, app_label)
-    if not app_dict:
-        return
-
-    NEW_ADMIN_ORDERING = []
-    if app_label:
-        for ao in ADMIN_ORDERING:
-            if ao[0] == app_label:
-                NEW_ADMIN_ORDERING.append(ao)
-                break
-
-    if not app_label:
-        for app_key in list(app_dict.keys()):
-            if not any(app_key in ao_app for ao_app in ADMIN_ORDERING):
-                app_dict.pop(app_key)
-
-    app_list = sorted(
-        app_dict.values(),
-        key=lambda x: [ao[0] for ao in ADMIN_ORDERING].index(x['app_label'])
-    )
-
-    for app, ao in zip(app_list, NEW_ADMIN_ORDERING or ADMIN_ORDERING):
-        if app['app_label'] == ao[0]:
-            for model in list(app['models']):
-                if model['object_name'] not in ao[1]:
-                    app['models'].remove(model)
-            app['models'].sort(key=lambda x: ao[1].index(x['object_name']))
-
-    return app_list
-
-
-# Override the default get_app_list method
-admin.AdminSite.get_app_list = get_app_list
+# Admin ordering configuration — actual patching is done in about/apps.py ready()
+# to ensure it runs after all apps are fully loaded.
+# See about/apps.py for the get_app_list override.

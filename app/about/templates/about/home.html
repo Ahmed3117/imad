@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %}
 {% block translationFolder %}data-translation-folder="home"{% endblock %}
 {% block title %}Home{% endblock %}
 
@@ -8,7 +9,7 @@
 {% block content %}
 
 <!-- Hero Section -->
-<div class="hero-section"{% if home_page.hero_background_image %} style="background-image: url('{{ home_page.hero_background_image.url }}');"{% endif %}>
+<div class="hero-section"{% if home_page.hero_background_image %} style="--home-hero-bg: url('{{ home_page.hero_background_image.url }}');"{% endif %}>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg fixed-top " style="background-color :#0000001c !important;">
         <div class="container">
@@ -139,17 +140,13 @@
         {% endif %}
         <h1 class="hero-title">{{ home_page_text.hero_title }}</h1>
         <p class="hero-description">{{ home_page_text.hero_description }}</p>
-        <div>
-            <a href="{{ home_page.hero_primary_button_url|default:'#free-session' }}" class="btn btn-primary btn-lg hero-button">{{ home_page_text.hero_primary_button_text }}</a>
+        <div class="hero-actions">
+            <a href="{{ home_page.hero_primary_button_url|default:'#free-session'|local_internal_url }}" class="btn btn-primary btn-lg hero-button">{{ home_page_text.hero_primary_button_text }}</a>
             {% if request.user.is_authenticated %}
             <a href="{% url 'accounts:profile' %}" class="btn btn-accent btn-lg profile-button" data-translate="profile">My Profile</a>
             {% if request.user.role == "teacher" %}
             <a href="{% url 'subscriptions:teacher_timetable' %}" class="btn btn-success btn-lg hero-button" data-translate="view_my_timetable">
                 <i class="fas fa-calendar-alt"></i> View My Timetable
-            </a>
-            {% elif request.user.role == "student" %}
-            <a href="{% url 'subscriptions:student_timetable' %}" class="btn btn-success btn-lg hero-button" data-translate="view_my_schedule">
-                <i class="fas fa-calendar-alt"></i> View My Schedule
             </a>
             {% elif request.user.role == "admin" or request.user.is_superuser %}
             <a href="{% url 'subscriptions:admin_timetable' %}" class="btn btn-success btn-lg hero-button" data-translate="view_all_timetables">
@@ -817,11 +814,32 @@
                 </p>
                 <form id="freeSessionForm">
                     {% csrf_token %}
-                    <div class="form-floating mb-3">
+                    <label class="form-label" for="freeSessionPhone" data-translate="your_phone">Your Phone Number</label>
+                    <div class="input-group mb-3">
+                        <select class="form-select country-code-select" id="freeSessionPhoneCountryCode"
+                                name="phone_country_code">
+                            <option value="+20" selected>Egypt (+20)</option>
+                            <option value="+966">Saudi Arabia (+966)</option>
+                            <option value="+971">UAE (+971)</option>
+                            <option value="+974">Qatar (+974)</option>
+                            <option value="+965">Kuwait (+965)</option>
+                            <option value="+973">Bahrain (+973)</option>
+                            <option value="+968">Oman (+968)</option>
+                            <option value="+962">Jordan (+962)</option>
+                            <option value="+1">US / Canada (+1)</option>
+                            <option value="+44">UK (+44)</option>
+                            <option value="+61">Australia (+61)</option>
+                            <option value="+49">Germany (+49)</option>
+                            <option value="+33">France (+33)</option>
+                            <option value="+90">Turkey (+90)</option>
+                            <option value="+92">Pakistan (+92)</option>
+                            <option value="+91">India (+91)</option>
+                            <option value="+62">Indonesia (+62)</option>
+                            <option value="+60">Malaysia (+60)</option>
+                        </select>
                         <input type="tel" class="form-control" id="freeSessionPhone"
                                name="phone" placeholder="Phone Number"
                                value="{{ request.user.phone|default:'' }}">
-                        <label for="freeSessionPhone" data-translate="your_phone">Your Phone Number</label>
                     </div>
                     <div class="form-floating mb-3">
                         <textarea class="form-control" id="freeSessionMessage" name="message"
@@ -1059,9 +1077,29 @@
                             </div>
                         </div>
                         <div class="col-12">
-                            <div class="form-floating">
+                            <label class="form-label" for="phone" data-translate="your_phone">Your Phone (Optional)</label>
+                            <div class="input-group">
+                                <select class="form-select country-code-select" name="phone_country_code">
+                                    <option value="+20" selected>Egypt (+20)</option>
+                                    <option value="+966">Saudi Arabia (+966)</option>
+                                    <option value="+971">UAE (+971)</option>
+                                    <option value="+974">Qatar (+974)</option>
+                                    <option value="+965">Kuwait (+965)</option>
+                                    <option value="+973">Bahrain (+973)</option>
+                                    <option value="+968">Oman (+968)</option>
+                                    <option value="+962">Jordan (+962)</option>
+                                    <option value="+1">US / Canada (+1)</option>
+                                    <option value="+44">UK (+44)</option>
+                                    <option value="+61">Australia (+61)</option>
+                                    <option value="+49">Germany (+49)</option>
+                                    <option value="+33">France (+33)</option>
+                                    <option value="+90">Turkey (+90)</option>
+                                    <option value="+92">Pakistan (+92)</option>
+                                    <option value="+91">India (+91)</option>
+                                    <option value="+62">Indonesia (+62)</option>
+                                    <option value="+60">Malaysia (+60)</option>
+                                </select>
                                 <input type="tel" id="phone" class="form-control" name="phone" placeholder="Your Phone Number">
-                                <label class="form-label" for="phone" data-translate="your_phone">Your Phone (Optional)</label>
                             </div>
                         </div>
                         <div class="col-12">
@@ -1086,8 +1124,8 @@
                 {% if home_page.show_whatsapp_number and company_info.whatsapp_number %}
                 <p><i class="fab fa-whatsapp fa-fw"></i> <a href="https://wa.me/{{ company_info.whatsapp_number }}" target="_blank" rel="noopener noreferrer">{{ company_info.whatsapp_number }}</a></p>
                 {% endif %}
-                {% if home_page.show_telegram_number and company_info.telegram_number %}
-                <p><i class="fab fa-telegram fa-fw"></i> <a href="https://t.me/{{ company_info.telegram_number }}" target="_blank" rel="noopener noreferrer">{{ company_info.telegram_number }}</a></p>
+                {% if home_page.show_telegram_number and company_info.telegram_url %}
+                <p><i class="fab fa-telegram fa-fw"></i> <a href="{{ company_info.telegram_url }}" target="_blank" rel="noopener noreferrer">{{ company_info.telegram_display_number }}</a></p>
                 {% endif %} -->
                 <p><i class="fas fa-envelope fa-fw"></i> <a href="mailto:{{ company_info.email }}">{{ company_info.email }}</a></p>
                 {% endif %}
@@ -1173,7 +1211,7 @@
                     {% if home_page.show_telegram_number and company_info.telegram_url %}
                     <li class="d-flex align-items-start mb-2">
                         <i class="fab fa-telegram mt-1"></i>
-                        <span><a href="{{ company_info.telegram_url }}" target="_blank" rel="noopener noreferrer">@{{ company_info.telegram_username }}</a></span>
+                        <span><a href="{{ company_info.telegram_url }}" target="_blank" rel="noopener noreferrer">{{ company_info.telegram_display_number }}</a></span>
                     </li>
                     {% endif %}
                     <li class="d-flex align-items-start">
@@ -1503,12 +1541,16 @@
     const confirmFreeSessionBtn = document.getElementById('confirmFreeSession');
     if (confirmFreeSessionBtn) {
         confirmFreeSessionBtn.addEventListener('click', async function () {
-            const phone = document.getElementById('freeSessionPhone').value.trim();
-            const message = document.getElementById('freeSessionMessage').value.trim();
+            const phoneInput = document.getElementById('freeSessionPhone');
+            const phoneCountryCodeInput = document.getElementById('freeSessionPhoneCountryCode');
+            const messageInput = document.getElementById('freeSessionMessage');
             const alertBox = document.getElementById('freeSessionAlert');
             const spinner = document.getElementById('confirmFreeSessionSpinner');
-            const btnText = document.getElementById('confirmFreeSessionText');
-            const csrfToken = document.querySelector('#freeSessionForm [name=csrfmiddlewaretoken]').value;
+            const csrfInput = document.querySelector('#freeSessionForm [name=csrfmiddlewaretoken]');
+            const phone = phoneInput ? phoneInput.value.trim() : '';
+            const phoneCountryCode = phoneCountryCodeInput ? phoneCountryCodeInput.value : '+20';
+            const message = messageInput ? messageInput.value.trim() : '';
+            const csrfToken = csrfInput ? csrfInput.value : '';
 
             // Show loading state
             confirmFreeSessionBtn.disabled = true;
@@ -1522,10 +1564,17 @@
                         'Content-Type': 'application/json',
                         'X-CSRFToken': csrfToken,
                     },
-                    body: JSON.stringify({ phone, message }),
+                    body: JSON.stringify({
+                        phone,
+                        phone_country_code: phoneCountryCode,
+                        message
+                    }),
                 });
 
-                const data = await response.json();
+                const contentType = response.headers.get('content-type') || '';
+                const data = contentType.includes('application/json')
+                    ? await response.json()
+                    : { message: await response.text() };
 
                 if (response.ok && data.success) {
                     alertBox.className = 'alert alert-success';
@@ -1543,13 +1592,13 @@
                     setTimeout(() => window.location.reload(), 2000);
                 } else {
                     alertBox.className = 'alert alert-warning';
-                    alertBox.textContent = data.message || 'Something went wrong. Please try again.';
+                    alertBox.textContent = data.message || data.error || 'Something went wrong. Please try again.';
                     alertBox.classList.remove('d-none');
                     confirmFreeSessionBtn.disabled = false;
                 }
             } catch (err) {
                 alertBox.className = 'alert alert-danger';
-                alertBox.textContent = 'Network error. Please try again.';
+                alertBox.textContent = err.message || 'Network error. Please try again.';
                 alertBox.classList.remove('d-none');
                 confirmFreeSessionBtn.disabled = false;
             } finally {

@@ -16,6 +16,7 @@ from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect
 from django.db.models import Q, Sum, Prefetch, F
 from courses.models import   Course, CourseTranslation, Level, LevelTranslation, Track, TrackTranslation
+from project.phone_utils import normalize_phone
 from .forms import LectureNoteForm, SessionURLForm
 from services.email_service import EmailConfigurationError, EmailRateLimitError
 from services.otp_service import (
@@ -109,7 +110,11 @@ def register_user(request):
                     email=registration_data['email'],
                     password=make_password(registration_data['password']),
                     name=registration_data['name'],
-                    phone=registration_data['phone'],
+                    phone=normalize_phone(
+                        registration_data.get('phone'),
+                        registration_data.get('phone_country_code'),
+                    ),
+                    telegram_username=registration_data.get('telegram_username') or None,
                     image=request.FILES.get('image'),
                     role=registration_data['role']
                 )
@@ -133,7 +138,10 @@ def register_user(request):
             # Handle Step 2: Profile creation based on role
             user = request.user
             if user.role == 'student':
-                parent_phone = request.POST.get('parent_phone')
+                parent_phone = normalize_phone(
+                    request.POST.get('parent_phone'),
+                    request.POST.get('parent_phone_country_code'),
+                )
                 age = request.POST.get('age')
                 StudentProfile.objects.create(user=user, parent_phone=parent_phone, age=age)
 
@@ -231,7 +239,11 @@ def edit_profile(request):
     if request.method == 'POST':
         user = request.user
         user.name = request.POST.get('name', user.name)
-        user.phone = request.POST.get('phone', user.phone)
+        user.phone = normalize_phone(
+            request.POST.get('phone'),
+            request.POST.get('phone_country_code'),
+        ) or user.phone
+        user.telegram_username = request.POST.get('telegram_username', user.telegram_username)
         if 'image' in request.FILES:
             user.image = request.FILES['image']
         user.save()
@@ -243,7 +255,10 @@ def edit_profile(request):
         if user.role == 'student':
             student_profile = StudentProfile.objects.get(user=user)
             student_profile.age = request.POST.get('age', student_profile.age)
-            student_profile.parent_phone = request.POST.get('parent_phone', student_profile.parent_phone)
+            student_profile.parent_phone = normalize_phone(
+                request.POST.get('parent_phone'),
+                request.POST.get('parent_phone_country_code'),
+            ) or student_profile.parent_phone
             student_profile.save()
 
         messages.success(request, 'Profile updated successfully')

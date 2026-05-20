@@ -15,7 +15,8 @@ class User(AbstractUser):
     ]
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='admin')
     name = models.CharField(max_length=100)
-    phone = models.CharField(max_length=15, blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    telegram_username = models.CharField(max_length=32, blank=True, null=True)
     image = models.ImageField(upload_to='profiles/', blank=True, null=True)
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -112,7 +113,7 @@ class ZoomAccount(models.Model):
 
 class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    parent_phone = models.CharField(max_length=15, blank=True, null=True)
+    parent_phone = models.CharField(max_length=20, blank=True, null=True)
     age = models.IntegerField()
 
     def __str__(self):

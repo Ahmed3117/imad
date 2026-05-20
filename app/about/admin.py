@@ -6,11 +6,13 @@ from django.dispatch import receiver
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
-from django.utils.html import format_html
 
+from project.admin_helpers import UnhandledChangelistMixin, contact_link_icons
+from project.phone_utils import normalize_phone
 from .models import (
     CompanyInfo,
     CompanyInfoTranslation,
+    ContactMessage,
     FreeSession,
     HomePageContent,
     HomePageContentTranslation,
@@ -34,10 +36,10 @@ class CompanyInfoAdmin(admin.ModelAdmin):
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         formfield = super().formfield_for_dbfield(db_field, request, **kwargs)
         if db_field.name == "telegram_number":
-            formfield.label = "Telegram username"
+            formfield.label = "Telegram phone number"
             formfield.help_text = (
-                "Use a Telegram username like @nabbiuwny_support or "
-                "nabbiuwny_support. Phone numbers are not supported."
+                "Use the phone number with country code, like +201095163117. "
+                "This builds the public Telegram contact link."
             )
         return formfield
 
@@ -314,26 +316,44 @@ class HomePageVideoPointAdmin(admin.ModelAdmin):
 
 
 @admin.register(FreeSession)
-class FreeSessionAdmin(admin.ModelAdmin):
-    list_display = ("user", "user_phone", "status", "requested_at", "marked_done_at")
-    list_filter = ("status",)
-    search_fields = ("user__name", "user__username", "user__email", "phone")
-    ordering = ("-requested_at",)
-    readonly_fields = ("user", "phone", "message", "requested_at")
-    actions = ["mark_as_done"]
+class FreeSessionAdmin(UnhandledChangelistMixin, admin.ModelAdmin):
+    list_display = (
+        "user",
+        "user_phone",
+        "contact_links",
+        "handled",
+        "requested_at",
+        "marked_done_at",
+    )
+    list_filter = ("handled",)
+    list_editable = ("handled",)
+    search_fields = (
+        "user__name",
+        "user__username",
+        "user__email",
+        "user__phone",
+        "user__telegram_username",
+        "phone",
+        "telegram_username",
+    )
+    ordering = ("handled", "-requested_at")
+    readonly_fields = ("user", "phone", "message", "requested_at", "marked_done_at")
 
     def user_phone(self, obj):
-        return obj.phone or obj.user.phone or "—"
+        return normalize_phone(obj.phone or obj.user.phone) or "\u2014"
 
     user_phone.short_description = "Phone"
 
-    @admin.action(description="Mark selected requests as Done")
-    def mark_as_done(self, request, queryset):
-        updated = queryset.filter(status="pending").update(
-            status="done",
-            marked_done_at=timezone.now(),
+    def contact_links(self, obj):
+        phone = obj.phone or obj.user.phone
+        telegram = obj.telegram_username or getattr(obj.user, "telegram_username", "")
+        return contact_link_icons(
+            phone=phone,
+            email=getattr(obj.user, "email", ""),
+            telegram_username=telegram,
         )
-        self.message_user(request, f"{updated} request(s) marked as done.")
+
+    contact_links.short_description = "Contact"
 
     fieldsets = (
         (
@@ -343,9 +363,73 @@ class FreeSessionAdmin(admin.ModelAdmin):
             },
         ),
         (
+            "Contact",
+            {
+                "fields": ("telegram_username",),
+            },
+        ),
+        (
             "Status",
             {
-                "fields": ("status", "requested_at", "marked_done_at"),
+                "fields": ("handled", "requested_at", "marked_done_at"),
+            },
+        ),
+    )
+
+
+@admin.register(ContactMessage)
+class ContactMessageAdmin(UnhandledChangelistMixin, admin.ModelAdmin):
+    list_display = (
+        "name",
+        "email",
+        "phone_number",
+        "contact_links",
+        "handled",
+        "created_at",
+    )
+    list_filter = ("handled",)
+    list_editable = ("handled",)
+    search_fields = ("name", "email", "phone", "telegram_username", "message")
+    ordering = ("handled", "-created_at")
+    readonly_fields = ("name", "email", "phone", "telegram_username", "message", "created_at")
+    actions = ["mark_as_handled", "mark_as_unhandled"]
+
+    def contact_links(self, obj):
+        return contact_link_icons(
+            phone=obj.phone,
+            email=obj.email,
+            telegram_username=obj.telegram_username,
+        )
+
+    contact_links.short_description = "Contact"
+
+    def phone_number(self, obj):
+        return normalize_phone(obj.phone) or "\u2014"
+
+    phone_number.short_description = "Phone"
+    phone_number.admin_order_field = "phone"
+
+    @admin.action(description="Mark selected as handled")
+    def mark_as_handled(self, request, queryset):
+        updated = queryset.update(handled=True)
+        self.message_user(request, f"{updated} message(s) marked as handled.")
+
+    @admin.action(description="Mark selected as unhandled")
+    def mark_as_unhandled(self, request, queryset):
+        updated = queryset.update(handled=False)
+        self.message_user(request, f"{updated} message(s) marked as unhandled.")
+
+    fieldsets = (
+        (
+            "Message",
+            {
+                "fields": ("name", "email", "phone", "telegram_username", "message"),
+            },
+        ),
+        (
+            "Status",
+            {
+                "fields": ("handled", "created_at"),
             },
         ),
     )
@@ -635,7 +719,3 @@ def load_fixture_data(fixture_data):
             results["errors"].append(f"Error with {model_name} (pk={fixture_pk}): {str(e)}")
 
     return results
-
-
-
-
