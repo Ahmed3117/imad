@@ -25,8 +25,8 @@ class CourseLibrary(models.Model):
         return f"{self.course.name} | {self.file.name} | {self.category.name if self.category else 'Uncategorized'}"
 
     class Meta:
+        verbose_name_plural = "Library files"
         app_label = 'library'
-
 
 
 class MyLibrary(models.Model):

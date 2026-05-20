@@ -45,6 +45,7 @@ def send_contact_email(request, form_data):
     user_name = form_data["name"].strip()
     user_email = form_data["email"].strip()
     user_phone = form_data.get("phone", "").strip()
+    user_telegram = form_data.get("telegram_username", "").strip()
     user_message = form_data["message"].strip()
 
     _rate_limit(
@@ -71,7 +72,8 @@ def send_contact_email(request, form_data):
     text_body = (
         f"Name: {user_name}\n"
         f"Email: {user_email}\n"
-        f"Phone: {user_phone or 'Not provided'}\n\n"
+        f"Phone: {user_phone or 'Not provided'}\n"
+        f"Telegram: {user_telegram or 'Not provided'}\n\n"
         f"{user_message}"
     )
     html_body = f"""
@@ -80,6 +82,7 @@ def send_contact_email(request, form_data):
       <p><strong>Name:</strong> {escape(user_name)}</p>
       <p><strong>Email:</strong> {escape(user_email)}</p>
       <p><strong>Phone:</strong> {escape(user_phone) if user_phone else "Not provided"}</p>
+      <p><strong>Telegram:</strong> {escape(user_telegram) if user_telegram else "Not provided"}</p>
       <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 20px 0;">
       <p style="white-space: pre-line;">{escape(user_message)}</p>
     </div>

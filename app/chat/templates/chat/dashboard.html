@@ -37,7 +37,7 @@
                                     <th scope="col" data-translate="roomCode"></th>
                                     <th scope="col" data-translate="status"></th>
                                     <th scope="col" data-translate="createdAt"></th>
-                                    {% comment %} <th scope="col" data-translate="agent"></th> {% endcomment %}
+                                    <th scope="col" data-translate="agent"></th>
                                     <th scope="col" data-translate="actions"></th>
                                 </tr>
                             </thead>
@@ -61,148 +61,66 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Current filter
         let currentFilter = 'all';
-        
-        // Get current username and ID
         const currentUsername = document.getElementById('currentUsername').textContent;
         const currentUserId = document.getElementById('currentUserId').textContent;
-        console.log('Current username:', currentUsername);
-        console.log('Current user ID:', currentUserId);
-        
-        // Connect to WebSocket
-        const roomsSocket = new WebSocket(
-            'wss://' + window.location.host + '/ws/rooms/'
-        );
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+        const roomsTableBody = document.getElementById('roomsTableBody');
+        let roomsSocket = null;
+        let reconnectAttempts = 0;
+        let pollingIntervalId = null;
+        const maxReconnectAttempts = 2;
 
-        roomsSocket.onmessage = function(e) {
-            const data = JSON.parse(e.data);
-            console.log('WebSocket message received:', data);
-            
-            if (data.type === 'room_created') {
-                addRoom(data.room);
-                applyFilter(currentFilter);
-            } else if (data.type === 'room_status') {
-                updateRoomStatus(data.room_code, data.status, data.agent, data.first_opener);
-                applyFilter(currentFilter);
-            } else if (data.type === 'room_deleted') {
-                removeRoom(data.room_code);
-            } else if (data.type === 'unread_count_update') {
-                // Handle unread count updates
-                updateUnreadCount(data.room_code, data.admin_unread);
-                
-                // Store in localStorage for persistence
-                localStorage.setItem(`unread_count_${data.room_code}`, data.admin_unread.toString());
-            }
-        };
+        fetchRooms();
+        connectRoomsWebSocket();
 
-        roomsSocket.onclose = function(e) {
-            console.error('Chat socket closed unexpectedly');
-            // Reconnect after a short delay
-            setTimeout(function() {
-                window.location.reload();
-            }, 3000);
-        };
-
-        // Fetch existing rooms
-        fetch('/chat/rooms/')
-            .then(response => response.json())
-            .then(data => {
-                console.log('Rooms data:', data);
-                data.forEach(room => {
-                    // Extract first opener username (the CS/superuser who first opened the room)
-                    let firstOpenerUsername = null;
-                    let firstOpenerId = null;
-                    
-                    if (room.first_opener) {
-                        firstOpenerUsername = room.first_opener.username;
-                        firstOpenerId = room.first_opener.id;
-                    } else if (room.agent && (room.agent.role === 'cs' || room.agent.is_superuser)) {
-                        // Fallback to agent if first_opener not set but agent is CS/superuser
-                        firstOpenerUsername = room.agent.username;
-                        firstOpenerId = room.agent.id;
-                    }
-                    
-                    // Extract current agent username
-                    let agentUsername = null;
-                    let agentId = null;
-                    
-                    if (room.agent) {
-                        agentUsername = room.agent.username;
-                        agentId = room.agent.id;
-                    }
-                    
-                    addRoom({
-                        code: room.code,
-                        status: room.status,
-                        created_at: room.created_at,
-                        agent: agentUsername,
-                        agent_id: agentId,
-                        first_opener: firstOpenerUsername,
-                        first_opener_id: firstOpenerId,
-                        admin_unread_count: room.admin_unread_count || 0  // Include unread count
-                    });
-                    
-                    // Update unread count badge immediately
-                    if (room.admin_unread_count && room.admin_unread_count > 0) {
-                        updateUnreadCount(room.code, room.admin_unread_count);
-                        
-                        // Store in localStorage for persistence
-                        localStorage.setItem(`unread_count_${room.code}`, room.admin_unread_count.toString());
-                    } else {
-                        // Check if we have a cached unread count
-                        const cachedUnreadCount = localStorage.getItem(`unread_count_${room.code}`);
-                        if (cachedUnreadCount && parseInt(cachedUnreadCount, 10) > 0) {
-                            updateUnreadCount(room.code, parseInt(cachedUnreadCount, 10));
-                        }
-                    }
-                });
-                applyFilter(currentFilter);
-            });
-
-        // Set up filter buttons
         document.querySelectorAll('[data-filter]').forEach(button => {
             button.addEventListener('click', function() {
-                // Update active button
                 document.querySelectorAll('[data-filter]').forEach(btn => {
                     btn.classList.remove('active');
                 });
                 this.classList.add('active');
-                
-                // Apply filter
                 currentFilter = this.getAttribute('data-filter');
                 applyFilter(currentFilter);
             });
         });
 
-        // Function to add a new room to the table
+        roomsTableBody.addEventListener('click', async function(event) {
+            const actionButton = event.target.closest('[data-action]');
+            if (!actionButton) {
+                return;
+            }
+
+            const action = actionButton.getAttribute('data-action');
+            const roomCode = actionButton.getAttribute('data-room-code');
+
+            if (action === 'open') {
+                await openRoom(roomCode, actionButton);
+            } else if (action === 'end') {
+                await endChat(roomCode, actionButton);
+            }
+        });
+
         function addRoom(room) {
-            const tableBody = document.getElementById('roomsTableBody');
             const row = document.createElement('tr');
             row.id = `room-${room.code}`;
             row.setAttribute('data-status', room.status);
-            
-            // Set agent attributes for filtering
+
             if (room.agent) {
                 row.setAttribute('data-agent', room.agent);
                 row.setAttribute('data-agent-id', room.agent_id);
             }
-            
-            // Set first opener attributes for display and filtering
+
             if (room.first_opener) {
                 row.setAttribute('data-first-opener', room.first_opener);
                 row.setAttribute('data-first-opener-id', room.first_opener_id);
             }
-            
-            // Format the date
+
             const createdAt = new Date(room.created_at);
             const formattedDate = createdAt.toLocaleString();
-            
-            // Display the first opener (CS/superuser) who opened the room
-            // This is the key change requested by the user
             let displayName = room.first_opener || room.agent || '-';
-            
-            // Set the row content with unread badge
+
             row.innerHTML = `
                 <td>
                     ${room.code}
@@ -217,29 +135,33 @@
                     </div>
                 </td>
             `;
-            
-            tableBody.appendChild(row);
+
+            roomsTableBody.appendChild(row);
+
+            if (room.admin_unread_count && room.admin_unread_count > 0) {
+                updateUnreadCount(room.code, room.admin_unread_count);
+                localStorage.setItem(`unread_count_${room.code}`, room.admin_unread_count.toString());
+            } else {
+                const cachedUnreadCount = localStorage.getItem(`unread_count_${room.code}`);
+                if (cachedUnreadCount && parseInt(cachedUnreadCount, 10) > 0) {
+                    updateUnreadCount(room.code, parseInt(cachedUnreadCount, 10));
+                }
+            }
         }
 
-        // Function to update room status
         function updateRoomStatus(roomCode, status, agent, firstOpener) {
             const row = document.getElementById(`room-${roomCode}`);
             if (row) {
-                // Update status attribute for filtering
                 row.setAttribute('data-status', status);
-                
                 const statusCell = row.cells[1];
                 const agentCell = row.cells[3];
                 const actionsCell = row.cells[4];
-                
                 statusCell.innerHTML = `<span class="badge bg-${getStatusBadgeColor(status)}">${status}</span>`;
-                
-                // Update agent and first opener information
+
                 if (agent) {
-                    // Agent might be an object or a string
                     let agentName = agent;
                     let agentId = null;
-                    
+
                     if (typeof agent === 'object' && agent.username) {
                         agentName = agent.username;
                         agentId = agent.id;
@@ -248,12 +170,11 @@
                     row.setAttribute('data-agent', agentName);
                     if (agentId) row.setAttribute('data-agent-id', agentId);
                 }
-                
+
                 if (firstOpener) {
-                    // First opener might be an object or a string
                     let openerName = firstOpener;
                     let openerId = null;
-                    
+
                     if (typeof firstOpener === 'object' && firstOpener.username) {
                         openerName = firstOpener.username;
                         openerId = firstOpener.id;
@@ -261,19 +182,15 @@
                     
                     row.setAttribute('data-first-opener', openerName);
                     if (openerId) row.setAttribute('data-first-opener-id', openerId);
-                    
-                    // Update the displayed name to show the first opener
                     agentCell.textContent = openerName;
                 } else if (agent) {
-                    // Fallback to agent if first_opener not available
                     let agentName = agent;
                     if (typeof agent === 'object' && agent.username) {
                         agentName = agent.username;
                     }
                     agentCell.textContent = agentName;
                 }
-                
-                // Update action buttons based on new status
+
                 actionsCell.innerHTML = `
                     <div class="" role="group">
                         ${getActionButtons({code: roomCode, status: status})}
@@ -282,22 +199,17 @@
             }
         }
 
-        // Function to remove a room from the table
         function removeRoom(roomCode) {
             const row = document.getElementById(`room-${roomCode}`);
             if (row) {
                 row.remove();
-                
-                // Clean up localStorage
                 localStorage.removeItem(`unread_count_${roomCode}`);
             }
         }
-        
-        // Function to update unread count badge
+
         function updateUnreadCount(roomCode, unreadCount) {
             const badge = document.getElementById(`unread-badge-${roomCode}`);
             if (badge) {
-                console.log('Updating unread badge for room', roomCode, 'with count:', unreadCount);
                 if (unreadCount > 0) {
                     badge.textContent = unreadCount;
                     badge.style.display = 'inline-block';
@@ -306,8 +218,7 @@
                 }
             }
         }
-        
-        // Function to apply filter
+
         function applyFilter(filter) {
             const rows = document.querySelectorAll('#roomsTableBody tr');
             rows.forEach(row => {
@@ -333,7 +244,6 @@
             });
         }
 
-        // Helper function to get status badge color
         function getStatusBadgeColor(status) {
             switch (status) {
                 case 'active': return 'primary';
@@ -343,11 +253,10 @@
             }
         }
 
-        // Helper function to get action buttons based on room status
         function getActionButtons(room) {
             if (room.status === 'active') {
                 return `
-                    <button class="btn btn-sm btn-success" onclick="openRoom('${room.code}')">
+                    <button class="btn btn-sm btn-success" data-action="open" data-room-code="${room.code}">
                         <i class="fas fa-door-open me-1"></i> <span data-translate="openRoom"></span>
                     </button>
                 `;
@@ -356,7 +265,7 @@
                     <a href="/chat/rooms/${room.code}/" class="btn btn-sm btn-primary">
                         <i class="fas fa-comments me-1"></i> <span data-translate="viewChat"></span>
                     </a>
-                    <button class="btn btn-sm btn-danger" onclick="endChat('${room.code}')">
+                    <button class="btn btn-sm btn-danger" data-action="end" data-room-code="${room.code}">
                         <i class="fas fa-times-circle me-1"></i> <span data-translate="endChat"></span>
                     </button>
                 `;
@@ -364,46 +273,166 @@
                 return '-';
             }
         }
-    });
 
-    // Function to open a room
-    function openRoom(roomCode) {
-        const roomsSocket = new WebSocket(
-            'wss://' + window.location.host + '/ws/rooms/'
-        );
-        
-        roomsSocket.onopen = function() {
-            roomsSocket.send(JSON.stringify({
-                'type': 'open_room',
-                'room_code': roomCode
-            }));
-            roomsSocket.close();
-        };
-    }
+        async function fetchRooms() {
+            try {
+                const response = await fetch('/chat/rooms/', {
+                    headers: { 'Accept': 'application/json' },
+                });
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch rooms (${response.status})`);
+                }
 
-    // Function to end a chat
-    function endChat(roomCode) {
-        // Fix: Use the hidden element or a default message if not found
-        const confirmElement = document.getElementById('confirmEndChatText');
-        const confirmMessage = confirmElement ? confirmElement.textContent : 'Are you sure you want to end this chat?';
-        
-        if (confirm(confirmMessage)) {
-            const roomsSocket = new WebSocket(
-                'wss://' + window.location.host + '/ws/rooms/'
+                const data = await response.json();
+                roomsTableBody.innerHTML = '';
+
+                data.forEach(room => {
+                    let firstOpenerUsername = null;
+                    let firstOpenerId = null;
+
+                    if (room.first_opener) {
+                        firstOpenerUsername = room.first_opener.username;
+                        firstOpenerId = room.first_opener.id;
+                    } else if (room.agent && (room.agent.role === 'cs' || room.agent.is_superuser)) {
+                        firstOpenerUsername = room.agent.username;
+                        firstOpenerId = room.agent.id;
+                    }
+
+                    let agentUsername = null;
+                    let agentId = null;
+
+                    if (room.agent) {
+                        agentUsername = room.agent.username;
+                        agentId = room.agent.id;
+                    }
+
+                    addRoom({
+                        code: room.code,
+                        status: room.status,
+                        created_at: room.created_at,
+                        agent: agentUsername,
+                        agent_id: agentId,
+                        first_opener: firstOpenerUsername,
+                        first_opener_id: firstOpenerId,
+                        admin_unread_count: room.admin_unread_count || 0,
+                    });
+                });
+
+                applyFilter(currentFilter);
+            } catch (error) {
+                console.error('Failed to fetch rooms:', error);
+            }
+        }
+
+        function connectRoomsWebSocket() {
+            roomsSocket = new WebSocket(
+                wsProtocol + window.location.host + '/ws/rooms/'
             );
-            
+
+            roomsSocket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+
+                if (data.type === 'room_created') {
+                    fetchRooms();
+                } else if (data.type === 'room_status') {
+                    updateRoomStatus(data.room_code, data.status, data.agent, data.first_opener);
+                    applyFilter(currentFilter);
+                } else if (data.type === 'room_deleted') {
+                    removeRoom(data.room_code);
+                } else if (data.type === 'unread_count_update') {
+                    updateUnreadCount(data.room_code, data.admin_unread);
+                    localStorage.setItem(`unread_count_${data.room_code}`, data.admin_unread.toString());
+                }
+            };
+
             roomsSocket.onopen = function() {
-                roomsSocket.send(JSON.stringify({
-                    'type': 'end_chat',
-                    'room_code': roomCode
-                }));
-                roomsSocket.close();
+                reconnectAttempts = 0;
+                stopPolling();
+            };
+
+            roomsSocket.onclose = function() {
+                if (reconnectAttempts < maxReconnectAttempts) {
+                    reconnectAttempts += 1;
+                    setTimeout(connectRoomsWebSocket, 3000);
+                } else {
+                    startPolling();
+                }
+            };
+
+            roomsSocket.onerror = function(e) {
+                console.error('Rooms WebSocket error:', e);
             };
         }
-    }
+
+        function startPolling() {
+            if (pollingIntervalId) {
+                return;
+            }
+            pollingIntervalId = setInterval(fetchRooms, 5000);
+        }
+
+        function stopPolling() {
+            if (!pollingIntervalId) {
+                return;
+            }
+            clearInterval(pollingIntervalId);
+            pollingIntervalId = null;
+        }
+
+        async function openRoom(roomCode, button) {
+            try {
+                button.disabled = true;
+                const response = await fetch(`/chat/rooms/${roomCode}/open/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Accept': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to open room (${response.status})`);
+                }
+
+                await fetchRooms();
+            } catch (error) {
+                console.error('Failed to open room:', error);
+                button.disabled = false;
+            }
+        }
+
+        async function endChat(roomCode, button) {
+            const confirmElement = document.getElementById('confirmEndChatText');
+            const confirmMessage = confirmElement ? confirmElement.textContent : 'Are you sure you want to end this chat?';
+
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+
+            try {
+                button.disabled = true;
+                const response = await fetch(`/chat/rooms/${roomCode}/end/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Accept': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to end chat (${response.status})`);
+                }
+
+                removeRoom(roomCode);
+                applyFilter(currentFilter);
+            } catch (error) {
+                console.error('Failed to end chat:', error);
+                button.disabled = false;
+            }
+        }
+    });
 </script>
 {% endblock %}
-
 
 
 

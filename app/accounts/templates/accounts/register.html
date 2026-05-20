@@ -55,9 +55,29 @@
                         </div>
                     </div>
                     <div class="col-md-6 mb-4">
-                        <div class="form-floating">
-                            <input type="text" class="form-control" name="phone" />
-                            <label class="form-label" data-translate="phone">Phone</label>
+                        <label class="form-label" data-translate="phone">Phone</label>
+                        <div class="input-group">
+                            <select class="form-select country-code-select" name="phone_country_code">
+                                <option value="+20" selected>Egypt (+20)</option>
+                                <option value="+966">Saudi Arabia (+966)</option>
+                                <option value="+971">UAE (+971)</option>
+                                <option value="+974">Qatar (+974)</option>
+                                <option value="+965">Kuwait (+965)</option>
+                                <option value="+973">Bahrain (+973)</option>
+                                <option value="+968">Oman (+968)</option>
+                                <option value="+962">Jordan (+962)</option>
+                                <option value="+1">US / Canada (+1)</option>
+                                <option value="+44">UK (+44)</option>
+                                <option value="+61">Australia (+61)</option>
+                                <option value="+49">Germany (+49)</option>
+                                <option value="+33">France (+33)</option>
+                                <option value="+90">Turkey (+90)</option>
+                                <option value="+92">Pakistan (+92)</option>
+                                <option value="+91">India (+91)</option>
+                                <option value="+62">Indonesia (+62)</option>
+                                <option value="+60">Malaysia (+60)</option>
+                            </select>
+                            <input type="tel" class="form-control" name="phone" />
                         </div>
                     </div>
                     <div class="col-md-6 mb-4">
@@ -116,7 +136,29 @@
                 <div class="row">
                     <div class="col-md-6 mb-4">
                         <label class="form-label" data-translate="parent_phone">Parent Phone:</label>
-                        <input type="text" name="parent_phone" class="form-control">
+                        <div class="input-group">
+                            <select class="form-select country-code-select" name="parent_phone_country_code">
+                                <option value="+20" selected>Egypt (+20)</option>
+                                <option value="+966">Saudi Arabia (+966)</option>
+                                <option value="+971">UAE (+971)</option>
+                                <option value="+974">Qatar (+974)</option>
+                                <option value="+965">Kuwait (+965)</option>
+                                <option value="+973">Bahrain (+973)</option>
+                                <option value="+968">Oman (+968)</option>
+                                <option value="+962">Jordan (+962)</option>
+                                <option value="+1">US / Canada (+1)</option>
+                                <option value="+44">UK (+44)</option>
+                                <option value="+61">Australia (+61)</option>
+                                <option value="+49">Germany (+49)</option>
+                                <option value="+33">France (+33)</option>
+                                <option value="+90">Turkey (+90)</option>
+                                <option value="+92">Pakistan (+92)</option>
+                                <option value="+91">India (+91)</option>
+                                <option value="+62">Indonesia (+62)</option>
+                                <option value="+60">Malaysia (+60)</option>
+                            </select>
+                            <input type="tel" name="parent_phone" class="form-control">
+                        </div>
                     </div>
                     <div class="col-md-6 mb-4">
                         <label class="form-label" data-translate="age">Age:</label>
@@ -148,14 +190,17 @@
         const form = document.getElementById('step-1-form');
         const formData = new FormData(form);
         formData.append('step', '1');
-    
-        // Store the form data for later use
         registrationData = new FormData(form);
-    
+
+        const btn = document.querySelector('#step-1-form button[type="button"]');
+        btn.disabled = true;
+        btn.dataset.originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Sending...';
+
         fetch("{% url 'accounts:register_user' %}", {
-        method: 'POST',
-        body: formData,
-        headers: {'X-CSRFToken': '{{ csrf_token }}'}
+            method: 'POST',
+            body: formData,
+            headers: {'X-CSRFToken': getCsrfToken()}
         })
         .then(response => {
             if (!response.ok) {
@@ -165,81 +210,91 @@
         })
         .then(result => {
             if (result.success) {
-                // Show OTP verification step
                 document.getElementById('step-1').style.display = 'none';
                 document.getElementById('verification-step').style.display = 'block';
                 showToastMessage(result.message, 'success');
             } else {
                 showToastMessage(result.error, 'error');
+                btn.disabled = false;
+                btn.innerHTML = btn.dataset.originalText;
             }
         })
         .catch(error => {
             console.error('Error:', error);
             showToastMessage('Something went wrong. Please try again.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = btn.dataset.originalText;
         });
     }
 
     function verifyOTP() {
-    const otpData = new FormData(document.getElementById('verification-form'));
-    otpData.append('step', 'verify_otp');
+        const otpData = new FormData(document.getElementById('verification-form'));
+        otpData.append('step', 'verify_otp');
 
-    // Add all the registration data to the OTP verification request
-    for(let pair of registrationData.entries()) {
-        otpData.append(pair[0], pair[1]);
-    }
-
-    fetch("{% url 'accounts:register_user' %}", {
-        method: 'POST',
-        body: otpData,
-        headers: {'X-CSRFToken': '{{ csrf_token }}'}
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
+        for(let pair of registrationData.entries()) {
+            otpData.append(pair[0], pair[1]);
         }
-        return response.json();
-    })
-    .then(result => {
-        if (result.success) {
-            userRole = result.role;
-            // Hide verification step and show step 2
-            document.getElementById('verification-step').style.display = 'none';
-            document.getElementById('step-2').style.display = 'block';
 
-            if (userRole === 'parent') {
-                document.getElementById('parent-form').style.display = 'block';
-            } else if (userRole === 'student') {
-                document.getElementById('student-form').style.display = 'block';
+        const btn = document.querySelector('#verification-form button[type="button"]');
+        btn.disabled = true;
+        btn.dataset.originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Verifying...';
+
+        fetch("{% url 'accounts:register_user' %}", {
+            method: 'POST',
+            body: otpData,
+            headers: {'X-CSRFToken': getCsrfToken()}
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
             }
-        } else {
-            showToastMessage(result.error, 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToastMessage('Something went wrong. Please try again.', 'error');
-    });
-}
+            return response.json();
+        })
+        .then(result => {
+            if (result.success) {
+                userRole = result.role;
+                document.getElementById('verification-step').style.display = 'none';
+                document.getElementById('step-2').style.display = 'block';
 
-
+                if (userRole === 'parent') {
+                    document.getElementById('parent-form').style.display = 'block';
+                } else if (userRole === 'student') {
+                    document.getElementById('student-form').style.display = 'block';
+                }
+            } else {
+                showToastMessage(result.error, 'error');
+                btn.disabled = false;
+                btn.innerHTML = btn.dataset.originalText;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToastMessage('Something went wrong. Please try again.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = btn.dataset.originalText;
+        });
+    }
 
     function submitStep2() {
         const formId = userRole === 'parent' ? 'parent-form' : 'student-form';
         const formData = new FormData(document.getElementById(formId));
         formData.append('step', '2');
 
-        // Add the next URL to the form data
         const nextUrl = document.querySelector('input[name="next"]').value;
+        const btn = document.querySelector(`#${formId} button[type="button"]`);
+        btn.disabled = true;
+        btn.dataset.originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Completing...';
 
         fetch("{% url 'accounts:register_user' %}", {
             method: 'POST',
             body: formData,
-            headers: {'X-CSRFToken': '{{ csrf_token }}'}
+            headers: {'X-CSRFToken': getCsrfToken()}
         })
         .then(response => response.json())
         .then(result => {
             if (result.success) {
-                // Redirect based on the next URL or role
                 if (nextUrl) {
                     window.location.href = nextUrl;
                 } else if (userRole === 'parent') {
@@ -249,13 +304,22 @@
                 }
             } else {
                 showToastMessage(result.error, 'error');
+                btn.disabled = false;
+                btn.innerHTML = btn.dataset.originalText;
             }
         })
         .catch(error => {
             console.error('Error:', error);
             showToastMessage('Something went wrong. Please try again.', 'error');
-    });
-}
+            btn.disabled = false;
+            btn.innerHTML = btn.dataset.originalText;
+        });
+    }
+
+    function getCsrfToken() {
+        const csrfCookie = document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='));
+        return csrfCookie ? csrfCookie.split('=')[1].trim() : '';
+    }
 </script>
 
 {% endblock %}

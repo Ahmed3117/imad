@@ -1,32 +1,35 @@
 from django.contrib import admin
 from django.db.models import Count
 
-from library.models import CourseLibrary, MyLibrary
+from library.models import CourseLibrary
 from .models import (
     CourseTranslation, Level, LevelTranslation, Track, Course, TrackTranslation,
 )
+
 
 class LevelTranslationInline(admin.TabularInline):
     model = LevelTranslation
     extra = 1
     fields = ('language', 'translated_name')
 
+
 class TrackTranslationInline(admin.TabularInline):
     model = TrackTranslation
     extra = 1
     fields = ('language', 'translated_name')
+
 
 class CourseTranslationInline(admin.TabularInline):
     model = CourseTranslation
     extra = 1
     fields = ('language', 'translated_name', 'translated_description')
 
+
 class CourseLibraryInline(admin.TabularInline):
     model = CourseLibrary
     extra = 0
     fields = ('file', 'category')
     show_change_link = True
-
 
 
 @admin.register(Level)
@@ -52,6 +55,7 @@ class LevelAdmin(admin.ModelAdmin):
 
     courses_count.short_description = 'Courses'
 
+
 @admin.register(Track)
 class TrackAdmin(admin.ModelAdmin):
     inlines = [TrackTranslationInline]
@@ -71,10 +75,11 @@ class TrackAdmin(admin.ModelAdmin):
 
     courses_count.short_description = 'Courses'
 
+
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     inlines = [CourseTranslationInline, CourseLibraryInline]
-    list_display = ('name', 'level', 'track', 'study_groups_count', 'library_files_count')
+    list_display = ('name', 'level', 'track', 'study_groups_count')
     search_fields = ('name', 'description')
     list_filter = ('level', 'track')
     ordering = ('name',)
@@ -87,15 +92,9 @@ class CourseAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('level', 'track').annotate(
             groups_total=Count('study_groups', distinct=True),
-            library_total=Count('libraries', distinct=True),
         )
 
     def study_groups_count(self, obj):
         return obj.groups_total
 
     study_groups_count.short_description = 'Groups'
-
-    def library_files_count(self, obj):
-        return obj.library_total
-
-    library_files_count.short_description = 'Library files'

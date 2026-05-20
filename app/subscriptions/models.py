@@ -30,6 +30,7 @@ class StudyGroup(models.Model):
     )
     capacity = models.IntegerField(
         choices=CAPACITY_CHOICES,
+        default=1,
         null=True,
         blank=True
     )
@@ -40,7 +41,7 @@ class StudyGroup(models.Model):
         related_name='teaching_groups'
     )
     number_of_expected_lectures = models.PositiveIntegerField()
-    join_price = models.DecimalField(max_digits=8, decimal_places=2)
+    join_price = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     students = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         limit_choices_to={'role': 'student'},
@@ -49,13 +50,11 @@ class StudyGroup(models.Model):
     )
 
     def save(self, *args, **kwargs):
-    # First save to get the pk
+        is_new = self.pk is None
         super().save(*args, **kwargs)
         
-        # Then set the name if it's not already set
         if not self.name:
-            self.name = f"Group-{self.pk}"
-            # Save again with the updated name, but avoid recursive calls
+            self.name = "group1"
             super().save(update_fields=['name'])
 
     def __str__(self):
@@ -99,6 +98,11 @@ class JoinRequest(models.Model):
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={'role': 'student'}, related_name='join_requests')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='join_requests')
     group = models.ForeignKey(StudyGroup, on_delete=models.CASCADE, related_name='join_requests', blank=True, null=True)
+    handled = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

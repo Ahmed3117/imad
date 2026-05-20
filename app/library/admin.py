@@ -5,6 +5,7 @@ from .models import CourseLibrary, LibraryCategory, MyLibrary
 
 User = get_user_model()
 
+
 @admin.register(LibraryCategory)
 class LibraryCategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'resources_count', 'description')
@@ -14,6 +15,13 @@ class LibraryCategoryAdmin(admin.ModelAdmin):
         return obj.libraries.count()
 
     resources_count.short_description = 'Resources'
+
+
+class CourseLibraryInline(admin.TabularInline):
+    model = CourseLibrary
+    extra = 0
+    fields = ('file', 'category')
+    show_change_link = True
 
 
 @admin.register(CourseLibrary)

@@ -1,7 +1,8 @@
-import re
-
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
+
+from project.phone_utils import phone_digits_for_url
 
 
 class CompanyInfo(models.Model):
@@ -16,29 +17,36 @@ class CompanyInfo(models.Model):
         return self.name
 
     @property
-    def telegram_username(self):
+    def telegram_phone_digits(self):
         raw_value = (self.telegram_number or "").strip()
         if not raw_value:
             return ""
 
-        if raw_value.startswith("https://t.me/"):
-            raw_value = raw_value.removeprefix("https://t.me/")
-        elif raw_value.startswith("http://t.me/"):
-            raw_value = raw_value.removeprefix("http://t.me/")
+        for prefix in ("https://t.me/+", "http://t.me/+", "t.me/+"):
+            if raw_value.startswith(prefix):
+                raw_value = raw_value.removeprefix(prefix)
+                break
 
-        raw_value = raw_value.lstrip("@").strip()
+        if raw_value.startswith("tg://resolve?phone="):
+            raw_value = raw_value.split("phone=", 1)[1].split("&", 1)[0]
 
-        # Telegram usernames are 5-32 chars, letters/digits/underscore.
-        if re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{4,31}", raw_value):
-            return raw_value
+        if any(char.isalpha() for char in raw_value):
+            return ""
 
-        return ""
+        digits = phone_digits_for_url(raw_value)
+        return digits if len(digits) >= 8 else ""
+
+    @property
+    def telegram_display_number(self):
+        if not self.telegram_phone_digits:
+            return ""
+        return f"+{self.telegram_phone_digits}"
 
     @property
     def telegram_url(self):
-        if not self.telegram_username:
+        if not self.telegram_phone_digits:
             return ""
-        return f"https://t.me/{self.telegram_username}"
+        return f"https://t.me/+{self.telegram_phone_digits}"
 
 
 class CompanyInfoTranslation(models.Model):
@@ -314,8 +322,10 @@ class FreeSession(models.Model):
         related_name="free_session",
     )
     phone = models.CharField(max_length=30, blank=True, null=True)
+    telegram_username = models.CharField(max_length=32, blank=True, null=True)
     message = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
+    handled = models.BooleanField(default=False)
     requested_at = models.DateTimeField(auto_now_add=True)
     marked_done_at = models.DateTimeField(blank=True, null=True)
 
@@ -326,3 +336,31 @@ class FreeSession(models.Model):
 
     def __str__(self):
         return f"{self.user} – {self.get_status_display()}"
+
+    def save(self, *args, **kwargs):
+        if self.handled:
+            self.status = "done"
+            if self.marked_done_at is None:
+                self.marked_done_at = timezone.now()
+        else:
+            self.status = "pending"
+            self.marked_done_at = None
+        super().save(*args, **kwargs)
+
+
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=200)
+    email = models.EmailField()
+    phone = models.CharField(max_length=30, blank=True, null=True)
+    telegram_username = models.CharField(max_length=32, blank=True, null=True)
+    message = models.TextField()
+    handled = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Contact Message"
+        verbose_name_plural = "Contact Messages"
+
+    def __str__(self):
+        return f"{self.name} – {self.email}"

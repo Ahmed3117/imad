@@ -4,6 +4,16 @@ app/db.sqlite3
 app/venv
 app/myenv
 .env
+prod.py
+stag.py
+docker-compose.yaml
+.codex
+.dockerignore
+Resend.md
+docs/
+app/about/fixtures/homepage_initial_data.json
+app/about/migrations/0007_add_whatsapp_telegram_numbers.py
+app/about/migrations/0008_remove_companyinfo_video_and_more.py
 .venv
 myenv
 .myenv
@@ -12,5 +22,12 @@ app/logs/
 project/settings.py
 venv/
 *.bak
+emailinfo.md
 subscriptions/credentials.json
 subscriptions/token.json
+
+# Ignore markdown files
+*.md
+
+# Ignore migrations folders
+**/migrations/
