@@ -1,13 +1,14 @@
 from django.contrib import admin
 from django.contrib.admin.filters import RelatedOnlyFieldListFilter
 from django.contrib.auth import get_user_model
+from unfold.admin import ModelAdmin, TabularInline
 
 from .models import Assignment, StudentAnswer
 
 User = get_user_model()
 
 
-class StudentAnswerInline(admin.TabularInline):
+class StudentAnswerInline(TabularInline):
     model = StudentAnswer
     extra = 0
     fields = (
@@ -23,7 +24,7 @@ class StudentAnswerInline(admin.TabularInline):
 
 
 @admin.register(Assignment)
-class AssignmentAdmin(admin.ModelAdmin):
+class AssignmentAdmin(ModelAdmin):
     list_display = (
         "title",
         "lecture",
@@ -84,7 +85,7 @@ class AssignmentAdmin(admin.ModelAdmin):
 
 
 @admin.register(StudentAnswer)
-class StudentAnswerAdmin(admin.ModelAdmin):
+class StudentAnswerAdmin(ModelAdmin):
     list_display = (
         "student",
         "assignment",

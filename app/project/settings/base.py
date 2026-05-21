@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import dotenv
+from django.urls import reverse_lazy
 
 # ─────────────────────────────────────────────
 # Base directory & environment
@@ -22,8 +23,7 @@ DJANGO_ENV = os.environ.get('DJANGO_ENV', 'local')
 # Application definition
 # ─────────────────────────────────────────────
 INSTALLED_APPS = [
-    'admin_interface',
-    'colorfield',
+    'unfold',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -194,9 +194,122 @@ META_CAPI_ACCESS_TOKEN = os.environ.get('META_CAPI_ACCESS_TOKEN', 'EAAUeTTiaNvoB
 # ─────────────────────────────────────────────
 # Django Admin sidebar
 # ─────────────────────────────────────────────
-# Models listed here appear in the sidebar in this workflow order.
-# Models not listed here are hidden from the sidebar but stay registered, so
-# direct URLs, inline change links, and autocomplete endpoints still work.
+# UNFOLD Admin Configuration
+# ─────────────────────────────────────────────
+UNFOLD = {
+    "SITE_TITLE": "Nabbiuwny Admin",
+    "SITE_HEADER": "Nabbiuwny",
+    "SITE_SYMBOL": "school",
+    "SIDEBAR": {
+        "show_search": True,
+        "navigation": [
+            {
+                "title": "Requests",
+                "items": [
+                    {
+                        "title": "Free Session Requests",
+                        "link": reverse_lazy("admin:about_freesession_changelist"),
+                    },
+                    {
+                        "title": "Contact Messages",
+                        "link": reverse_lazy("admin:about_contactmessage_changelist"),
+                    },
+                    {
+                        "title": "Join Requests",
+                        "link": reverse_lazy("admin:subscriptions_joinrequest_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "Users & Accounts",
+                "items": [
+                    {
+                        "title": "Users",
+                        "link": reverse_lazy("admin:accounts_user_changelist"),
+                    },
+                    {
+                        "title": "Zoom Accounts",
+                        "link": reverse_lazy("admin:accounts_zoomaccount_changelist"),
+                    },
+                    {
+                        "title": "Account Deletion Requests",
+                        "link": reverse_lazy("admin:about_accountdeletionrequest_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "Courses",
+                "items": [
+                    {
+                        "title": "Levels",
+                        "link": reverse_lazy("admin:courses_level_changelist"),
+                    },
+                    {
+                        "title": "Tracks",
+                        "link": reverse_lazy("admin:courses_track_changelist"),
+                    },
+                    {
+                        "title": "Courses",
+                        "link": reverse_lazy("admin:courses_course_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "Study Groups",
+                "items": [
+                    {
+                        "title": "Study Groups",
+                        "link": reverse_lazy("admin:subscriptions_studygroup_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "Library",
+                "items": [
+                    {
+                        "title": "Library Categories",
+                        "link": reverse_lazy("admin:library_librarycategory_changelist"),
+                    },
+                    {
+                        "title": "Course Libraries",
+                        "link": reverse_lazy("admin:library_courselibrary_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "Home Page",
+                "items": [
+                    {
+                        "title": "Company Info",
+                        "link": reverse_lazy("admin:about_companyinfo_changelist"),
+                    },
+                    {
+                        "title": "Home Page Content",
+                        "link": reverse_lazy("admin:about_homepagecontent_changelist"),
+                    },
+                    {
+                        "title": "Legal Pages",
+                        "link": reverse_lazy("admin:about_legalpage_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "System",
+                "items": [
+                    {
+                        "title": "Groups",
+                        "link": reverse_lazy("admin:auth_group_changelist"),
+                    },
+                ],
+            },
+        ],
+    },
+}
+
+
+# ─────────────────────────────────────────────
+# Legacy sidebar reference (kept for documentation; UNFOLD SIDEBAR above is active)
+# ─────────────────────────────────────────────
 ADMIN_SIDEBAR_GROUPS = [
     {
         'name': 'Requests',
@@ -254,7 +367,6 @@ ADMIN_SIDEBAR_GROUPS = [
         'slug': 'system',
         'models': [
             'auth.Group',
-            'admin_interface.Theme',
         ],
     },
 ]
@@ -281,6 +393,5 @@ UNHANDLED_BADGE_MODELS = {
 }
 
 
-# Admin ordering configuration — actual patching is done in about/apps.py ready()
-# to ensure it runs after all apps are fully loaded.
-# See about/apps.py for the get_app_list override.
+# Admin ordering configuration — the monkey-patch in about/apps.py is DISABLED
+# because UNFOLD provides its own sidebar via the UNFOLD["SIDEBAR"] setting above.

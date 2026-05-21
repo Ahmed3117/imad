@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.db.models import Count
+from unfold.admin import ModelAdmin, StackedInline, TabularInline
 
 from library.models import CourseLibrary
 from .models import (
@@ -7,25 +8,25 @@ from .models import (
 )
 
 
-class LevelTranslationInline(admin.TabularInline):
+class LevelTranslationInline(TabularInline):
     model = LevelTranslation
     extra = 1
     fields = ('language', 'translated_name')
 
 
-class TrackTranslationInline(admin.TabularInline):
+class TrackTranslationInline(TabularInline):
     model = TrackTranslation
     extra = 1
     fields = ('language', 'translated_name')
 
 
-class CourseTranslationInline(admin.TabularInline):
+class CourseTranslationInline(TabularInline):
     model = CourseTranslation
     extra = 1
     fields = ('language', 'translated_name', 'translated_description')
 
 
-class CourseLibraryInline(admin.TabularInline):
+class CourseLibraryInline(TabularInline):
     model = CourseLibrary
     extra = 0
     fields = ('file', 'category')
@@ -33,7 +34,7 @@ class CourseLibraryInline(admin.TabularInline):
 
 
 @admin.register(Level)
-class LevelAdmin(admin.ModelAdmin):
+class LevelAdmin(ModelAdmin):
     inlines = [LevelTranslationInline]
     list_display = ('name', 'tracks_count', 'courses_count')
     search_fields = ('name',)
@@ -57,7 +58,7 @@ class LevelAdmin(admin.ModelAdmin):
 
 
 @admin.register(Track)
-class TrackAdmin(admin.ModelAdmin):
+class TrackAdmin(ModelAdmin):
     inlines = [TrackTranslationInline]
     list_display = ('name', 'level', 'courses_count')
     search_fields = ('name', 'level__name')
@@ -77,7 +78,7 @@ class TrackAdmin(admin.ModelAdmin):
 
 
 @admin.register(Course)
-class CourseAdmin(admin.ModelAdmin):
+class CourseAdmin(ModelAdmin):
     inlines = [CourseTranslationInline, CourseLibraryInline]
     list_display = ('name', 'level', 'track', 'study_groups_count')
     search_fields = ('name', 'description')

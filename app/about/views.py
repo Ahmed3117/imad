@@ -2,7 +2,6 @@ import json
 import uuid
 
 from accounts.models import TeacherInfo, TeacherInfoTranslation
-from admin_interface.models import Theme
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -438,8 +437,9 @@ def home(request):
 
     teachers = _get_teachers(language)
 
-    theme = Theme.objects.filter(active=True).first()
-    logo_url = theme.logo.url if theme and theme.logo else None
+    # Logo URL previously came from admin_interface Theme.
+    # After UNFOLD migration, templates fall back to static logo.
+    logo_url = None
 
     context = {
         "logo_url": logo_url,

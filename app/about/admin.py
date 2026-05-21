@@ -6,6 +6,8 @@ from django.dispatch import receiver
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
+from unfold.admin import ModelAdmin, StackedInline, TabularInline
+from unfold.sites import UnfoldAdminSite
 
 from project.admin_helpers import UnhandledChangelistMixin, contact_link_icons
 from project.phone_utils import normalize_phone
@@ -26,13 +28,13 @@ from .models import (
 )
 
 
-class CompanyInfoTranslationInline(admin.TabularInline):
+class CompanyInfoTranslationInline(TabularInline):
     model = CompanyInfoTranslation
     extra = 1
 
 
 @admin.register(CompanyInfo)
-class CompanyInfoAdmin(admin.ModelAdmin):
+class CompanyInfoAdmin(ModelAdmin):
     inlines = [CompanyInfoTranslationInline]
     list_display = ["name", "email", "phone", "whatsapp_number", "telegram_number"]
 
@@ -47,7 +49,7 @@ class CompanyInfoAdmin(admin.ModelAdmin):
         return formfield
 
 
-class HomePageContentTranslationInline(admin.StackedInline):
+class HomePageContentTranslationInline(StackedInline):
     model = HomePageContentTranslation
     extra = 1
     fieldsets = (
@@ -188,25 +190,25 @@ class HomePageContentTranslationInline(admin.StackedInline):
     )
 
 
-class HomePageFeatureTranslationInline(admin.TabularInline):
+class HomePageFeatureTranslationInline(TabularInline):
     model = HomePageFeatureTranslation
     extra = 1
     fields = ("language", "title", "subtitle", "meta", "description")
 
 
-class HomePageFeatureInline(admin.StackedInline):
+class HomePageFeatureInline(StackedInline):
     model = HomePageFeature
     extra = 1
     fields = ("section", "icon_class", "image", "order", "is_active")
     show_change_link = True
 
 
-class HomePageVideoPointTranslationInline(admin.TabularInline):
+class HomePageVideoPointTranslationInline(TabularInline):
     model = HomePageVideoPointTranslation
     extra = 1
 
 
-class HomePageVideoPointInline(admin.StackedInline):
+class HomePageVideoPointInline(StackedInline):
     model = HomePageVideoPoint
     extra = 1
     fields = ("icon_class", "order", "is_active")
@@ -214,7 +216,7 @@ class HomePageVideoPointInline(admin.StackedInline):
 
 
 @admin.register(HomePageContent)
-class HomePageContentAdmin(admin.ModelAdmin):
+class HomePageContentAdmin(ModelAdmin):
     list_display = (
         "id",
         "show_primary_features",
@@ -301,7 +303,7 @@ class HomePageContentAdmin(admin.ModelAdmin):
 
 
 @admin.register(HomePageFeature)
-class HomePageFeatureAdmin(admin.ModelAdmin):
+class HomePageFeatureAdmin(ModelAdmin):
     list_display = ("id", "section", "icon_class", "order", "is_active", "home_page")
     list_filter = ("section", "is_active")
     search_fields = ("icon_class",)
@@ -310,7 +312,7 @@ class HomePageFeatureAdmin(admin.ModelAdmin):
 
 
 @admin.register(HomePageVideoPoint)
-class HomePageVideoPointAdmin(admin.ModelAdmin):
+class HomePageVideoPointAdmin(ModelAdmin):
     list_display = ("id", "icon_class", "order", "is_active", "home_page")
     list_filter = ("is_active",)
     search_fields = ("icon_class",)
@@ -319,7 +321,7 @@ class HomePageVideoPointAdmin(admin.ModelAdmin):
 
 
 @admin.register(FreeSession)
-class FreeSessionAdmin(UnhandledChangelistMixin, admin.ModelAdmin):
+class FreeSessionAdmin(UnhandledChangelistMixin, ModelAdmin):
     list_display = (
         "user",
         "user_phone",
@@ -381,7 +383,7 @@ class FreeSessionAdmin(UnhandledChangelistMixin, admin.ModelAdmin):
 
 
 @admin.register(ContactMessage)
-class ContactMessageAdmin(UnhandledChangelistMixin, admin.ModelAdmin):
+class ContactMessageAdmin(UnhandledChangelistMixin, ModelAdmin):
     list_display = (
         "name",
         "email",
@@ -465,7 +467,7 @@ def remove_unwanted_permissions(sender, **kwargs):
 # =============================================================================
 
 
-class FixtureUploadAdminSite(admin.AdminSite):
+class FixtureUploadAdminSite(UnfoldAdminSite):
     site_header = "Fixture Upload"
     site_title = "Fixture Upload"
     index_template = "admin/fixture_upload.html"
@@ -546,13 +548,13 @@ def get_fixture_model_map():
     }
 
 
-class LegalPageTranslationInline(admin.TabularInline):
+class LegalPageTranslationInline(TabularInline):
     model = LegalPageTranslation
     extra = 1
 
 
 @admin.register(LegalPage)
-class LegalPageAdmin(admin.ModelAdmin):
+class LegalPageAdmin(ModelAdmin):
     list_display = ("page_type", "is_active", "last_updated")
     list_filter = ("is_active", "page_type")
     search_fields = ("content",)
@@ -560,7 +562,7 @@ class LegalPageAdmin(admin.ModelAdmin):
 
 
 @admin.register(AccountDeletionRequest)
-class AccountDeletionRequestAdmin(UnhandledChangelistMixin, admin.ModelAdmin):
+class AccountDeletionRequestAdmin(UnhandledChangelistMixin, ModelAdmin):
     list_display = (
         "user",
         "user_email",

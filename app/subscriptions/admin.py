@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Avg, Count, Q
 from django.urls import reverse
 from django.utils.html import format_html
+from unfold.admin import ModelAdmin, TabularInline
 
 from project.admin_helpers import UnhandledChangelistMixin, contact_link_icons
 from .models import (
@@ -21,14 +22,14 @@ from .models import (
 User = get_user_model()
 
 
-class GroupTimeInline(admin.TabularInline):
+class GroupTimeInline(TabularInline):
     model = GroupTime
     extra = 1
     fields = ("day", "time")
     ordering = ("day", "time")
 
 
-class LectureInline(admin.TabularInline):
+class LectureInline(TabularInline):
     model = Lecture
     extra = 0
     fields = (
@@ -46,7 +47,7 @@ class LectureInline(admin.TabularInline):
         return False
 
 
-class StudyGroupResourceInline(admin.TabularInline):
+class StudyGroupResourceInline(TabularInline):
     model = StudyGroupResource
     extra = 0
     fields = ("resource", "shared_by", "shared_at")
@@ -56,7 +57,7 @@ class StudyGroupResourceInline(admin.TabularInline):
 
 
 @admin.register(StudyGroup)
-class StudyGroupAdmin(admin.ModelAdmin):
+class StudyGroupAdmin(ModelAdmin):
     list_display = (
         "display_name",
         "course_path",
@@ -231,7 +232,7 @@ class StudyGroupAdmin(admin.ModelAdmin):
 
 
 @admin.register(JoinRequest)
-class JoinRequestAdmin(UnhandledChangelistMixin, admin.ModelAdmin):
+class JoinRequestAdmin(UnhandledChangelistMixin, ModelAdmin):
     list_display = (
         "student_link",
         "contact_links",
@@ -348,13 +349,13 @@ class JoinRequestAdmin(UnhandledChangelistMixin, admin.ModelAdmin):
         self.message_user(request, f"{updated} request(s) marked as unhandled.")
 
 
-class LectureFileInline(admin.TabularInline):
+class LectureFileInline(TabularInline):
     model = LectureFile
     extra = 0
     fields = ("file",)
 
 
-class LectureNoteInline(admin.TabularInline):
+class LectureNoteInline(TabularInline):
     model = LectureNote
     extra = 0
     fields = ("user", "note", "rating", "lecture_status", "delay_reason", "created_at")
@@ -363,7 +364,7 @@ class LectureNoteInline(admin.TabularInline):
     show_change_link = True
 
 
-class LectureVisitHistoryInline(admin.TabularInline):
+class LectureVisitHistoryInline(TabularInline):
     model = LectureVisitHistory
     extra = 0
     fields = ("user", "visited_at")
@@ -375,7 +376,7 @@ class LectureVisitHistoryInline(admin.TabularInline):
 
 
 @admin.register(Lecture)
-class LectureAdmin(admin.ModelAdmin):
+class LectureAdmin(ModelAdmin):
     list_display = (
         "title",
         "group",
@@ -475,7 +476,7 @@ class LectureAdmin(admin.ModelAdmin):
 
 
 @admin.register(StudyGroupReport)
-class StudyGroupReportAdmin(admin.ModelAdmin):
+class StudyGroupReportAdmin(ModelAdmin):
     list_display = ("study_group", "last_reported_date", "updated_at")
     list_filter = ("last_reported_date", "updated_at")
     search_fields = ("study_group__name", "study_group__course__name", "study_group__teacher__username")

@@ -1,6 +1,5 @@
 import os
 from django.conf import settings
-from admin_interface.models import Theme
 from .models import CompanyInfo, CompanyInfoTranslation
 
 
@@ -15,11 +14,11 @@ def get_meta_pixel_id(request):
 
 
 def get_logo_url(request):
-    theme = Theme.objects.filter(active=True).first()
-    logo_url = theme.logo.url if theme and theme.logo else None
-
+    # Logo was previously managed by django-admin-interface Theme.
+    # After migrating to UNFOLD, templates fall back to the static
+    # logo (static/imgs/bg/l2.png) when logo_url is None.
     return {
-        'logo_url': logo_url
+        'logo_url': None
     }
 
 

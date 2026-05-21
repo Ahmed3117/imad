@@ -1,6 +1,5 @@
-from django.contrib import admin
-from django.contrib import messages
-from django.contrib.auth.admin import UserAdmin
+from django.contrib import admin, messages
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Avg, Count, Q
 from django.shortcuts import redirect
@@ -8,6 +7,7 @@ from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.html import format_html
+from unfold.admin import ModelAdmin, StackedInline, TabularInline
 
 from about.models import FreeSession
 from assignment.models import Assignment, StudentAnswer
@@ -28,14 +28,14 @@ from .models import (
 )
 
 
-class StudentProfileInline(admin.StackedInline):
+class StudentProfileInline(StackedInline):
     model = StudentProfile
     can_delete = True
     verbose_name_plural = 'Student profile'
     extra = 0
 
 
-class TeacherInfoInline(admin.StackedInline):
+class TeacherInfoInline(StackedInline):
     model = TeacherInfo
     can_delete = True
     verbose_name_plural = "Teacher public profile"
@@ -43,7 +43,7 @@ class TeacherInfoInline(admin.StackedInline):
     fields = ("bio", "specialization", "profile_link", "is_active_to_be_shown_in_home")
 
 
-class TeacheroomAccountInline(admin.StackedInline):
+class TeacheroomAccountInline(StackedInline):
     model = TeacheroomAccount
     can_delete = True
     verbose_name_plural = "Teacher Zoom account"
@@ -58,13 +58,13 @@ class TeacheroomAccountInline(admin.StackedInline):
     )
 
 
-class TeacherInfoTranslationInline(admin.TabularInline):
+class TeacherInfoTranslationInline(TabularInline):
     model = TeacherInfoTranslation
     extra = 1
 
 
 @admin.register(User)
-class CustomUserAdmin(UserAdmin):
+class CustomUserAdmin(ModelAdmin, BaseUserAdmin):
     list_display = (
         'username',
         'name',
@@ -266,7 +266,7 @@ class CustomUserAdmin(UserAdmin):
 
 
 @admin.register(ZoomAccount)
-class ZoomAccountAdmin(admin.ModelAdmin):
+class ZoomAccountAdmin(ModelAdmin):
     list_display = ('id', 'account_id', 'is_available_display', 'client_id_masked', 'client_secret_masked')
     list_filter = ('account_id',)
     search_fields = ('account_id', 'client_id')
@@ -302,7 +302,7 @@ class ZoomAccountAdmin(admin.ModelAdmin):
 
 
 @admin.register(TeacherInfo)
-class TeacherInfoAdmin(admin.ModelAdmin):
+class TeacherInfoAdmin(ModelAdmin):
     inlines = [TeacherInfoTranslationInline]
     list_display = ('teacher', 'specialization', 'is_active_to_be_shown_in_home', 'profile_link')
     list_filter = ('specialization', 'is_active_to_be_shown_in_home')
@@ -311,7 +311,7 @@ class TeacherInfoAdmin(admin.ModelAdmin):
 
 
 @admin.register(TeacheroomAccount)
-class TeacheroomAccountAdmin(admin.ModelAdmin):
+class TeacheroomAccountAdmin(ModelAdmin):
     list_display = ('user', 'account_id', 'is_paid', 'client_id_masked', 'client_secret_masked')
     list_filter = ('is_paid',)
     search_fields = ('user__username', 'user__name', 'user__email', 'account_id', 'client_id')

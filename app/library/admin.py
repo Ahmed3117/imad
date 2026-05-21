@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
+from unfold.admin import ModelAdmin, TabularInline
 
 from .models import CourseLibrary, LibraryCategory, MyLibrary
 
@@ -7,7 +8,7 @@ User = get_user_model()
 
 
 @admin.register(LibraryCategory)
-class LibraryCategoryAdmin(admin.ModelAdmin):
+class LibraryCategoryAdmin(ModelAdmin):
     list_display = ('name', 'resources_count', 'description')
     search_fields = ('name',)
 
@@ -17,7 +18,7 @@ class LibraryCategoryAdmin(admin.ModelAdmin):
     resources_count.short_description = 'Resources'
 
 
-class CourseLibraryInline(admin.TabularInline):
+class CourseLibraryInline(TabularInline):
     model = CourseLibrary
     extra = 0
     fields = ('file', 'category')
@@ -25,7 +26,7 @@ class CourseLibraryInline(admin.TabularInline):
 
 
 @admin.register(CourseLibrary)
-class CourseLibraryAdmin(admin.ModelAdmin):
+class CourseLibraryAdmin(ModelAdmin):
     list_display = ('get_file_name', 'course', 'category')
     list_filter = ('category', 'course__level', 'course__track', 'course')
     search_fields = ('course__name', 'file', 'category__name')
@@ -44,7 +45,7 @@ class CourseLibraryAdmin(admin.ModelAdmin):
 
 
 @admin.register(MyLibrary)
-class MyLibraryAdmin(admin.ModelAdmin):
+class MyLibraryAdmin(ModelAdmin):
     list_display = ('get_file_name', 'user', 'course')
     list_filter = ('course__level', 'course__track', 'course', 'user')
     search_fields = ('user__username', 'user__name', 'course__name', 'file')
