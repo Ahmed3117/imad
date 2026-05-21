@@ -147,6 +147,11 @@
 
 
 
-  "show": "(عرض)"
-
+  "show": "(عرض)",
+  "footer_privacy": "سياسة الخصوصية",
+  "footer_terms": "الشروط والأحكام",
+  "footer_refund": "سياسة الاسترداد",
+  "footer_cookie": "سياسة ملفات تعريف الارتباط",
+  "footer_payment": "شروط الدفع",
+  "footer_copyright": "جميع الحقوق محفوظة."
 }

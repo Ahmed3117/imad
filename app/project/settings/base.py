@@ -213,6 +213,7 @@ ADMIN_SIDEBAR_GROUPS = [
         'models': [
             'accounts.User',
             'accounts.ZoomAccount',
+            'about.AccountDeletionRequest',
         ],
     },
     {
@@ -245,6 +246,7 @@ ADMIN_SIDEBAR_GROUPS = [
         'models': [
             'about.CompanyInfo',
             'about.HomePageContent',
+            'about.LegalPage',
         ],
     },
     {

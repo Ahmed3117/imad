@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block translationFolder %}data-translation-folder="legal"{% endblock %}
+{% block title %}{{ page.title }}{% endblock %}
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="legal-page">
+        <!-- Header with Styled Title -->
+        <div class="form-header text-center mb-4">
+            <h3 class="styled-title">
+                <span class="line"></span>
+                <span class="text">
+                    <span class="icon"><i class="me-2 fas fa-file-contract"></i></span>
+                    <span data-translate="{{ page_type }}">{{ page.title }}</span>
+                </span>
+                <span class="line"></span>
+            </h3>
+        </div>
+
+        <!-- Policy Content -->
+        <div class="card mb-4 p-4 shadow-sm">
+            <div class="legal-content">
+                {% if page.last_updated %}
+                <p class="text-muted mb-3">
+                    <span class="fw-bold" data-translate="last_updated">Last updated</span>: {{ page.last_updated|date:"F j, Y" }}
+                </p>
+                {% endif %}
+                <div class="content-body">
+                    {{ page.content|safe }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Reference -->
+        <div class="text-center mb-5">
+            <p data-translate="legal_contact_note">
+                If you have any questions about this document, please <a href="{% url 'about:send_email' %}">contact us</a>.
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+.legal-page .styled-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    font-weight: 700;
+    color: #2c3e50;
+}
+.legal-page .line {
+    display: inline-block;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #3498db, #2c3e50);
+    border-radius: 2px;
+}
+.legal-page .icon {
+    color: #3498db;
+}
+.legal-content .content-body h2 {
+    color: #2c3e50;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #ecf0f1;
+}
+.legal-content .content-body p {
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    text-align: justify;
+}
+.legal-content .content-body ul {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+.legal-content .content-body ul li {
+    margin-bottom: 0.5rem;
+    color: #555;
+    line-height: 1.6;
+}
+.legal-content .content-body strong {
+    color: #2c3e50;
+}
+</style>
+{% endblock content %}

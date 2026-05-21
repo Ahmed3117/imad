@@ -10,6 +10,7 @@ from django.utils import timezone
 from project.admin_helpers import UnhandledChangelistMixin, contact_link_icons
 from project.phone_utils import normalize_phone
 from .models import (
+    AccountDeletionRequest,
     CompanyInfo,
     CompanyInfoTranslation,
     ContactMessage,
@@ -20,6 +21,8 @@ from .models import (
     HomePageFeatureTranslation,
     HomePageVideoPoint,
     HomePageVideoPointTranslation,
+    LegalPage,
+    LegalPageTranslation,
 )
 
 
@@ -541,6 +544,71 @@ def get_fixture_model_map():
         "about.homepagevideopoint": HomePageVideoPoint,
         "about.homepagevideopointtranslation": HomePageVideoPointTranslation,
     }
+
+
+class LegalPageTranslationInline(admin.TabularInline):
+    model = LegalPageTranslation
+    extra = 1
+
+
+@admin.register(LegalPage)
+class LegalPageAdmin(admin.ModelAdmin):
+    list_display = ("page_type", "is_active", "last_updated")
+    list_filter = ("is_active", "page_type")
+    search_fields = ("content",)
+    inlines = [LegalPageTranslationInline]
+
+
+@admin.register(AccountDeletionRequest)
+class AccountDeletionRequestAdmin(UnhandledChangelistMixin, admin.ModelAdmin):
+    list_display = (
+        "user",
+        "user_email",
+        "status",
+        "requested_at",
+        "processed_at",
+    )
+    list_filter = ("status", "requested_at")
+    search_fields = (
+        "user__name",
+        "user__username",
+        "user__email",
+        "reason",
+    )
+    readonly_fields = ("user", "requested_at", "processed_at")
+    actions = ["mark_as_processed", "mark_as_rejected"]
+
+    def user_email(self, obj):
+        return obj.user.email or "—"
+
+    user_email.short_description = "Email"
+
+    @admin.action(description="Mark selected as processed")
+    def mark_as_processed(self, request, queryset):
+        from django.utils import timezone
+
+        updated = queryset.update(status="processed", processed_at=timezone.now())
+        self.message_user(request, f"{updated} request(s) marked as processed.")
+
+    @admin.action(description="Mark selected as rejected")
+    def mark_as_rejected(self, request, queryset):
+        updated = queryset.update(status="rejected", processed_at=None)
+        self.message_user(request, f"{updated} request(s) marked as rejected.")
+
+    fieldsets = (
+        (
+            "User Info",
+            {
+                "fields": ("user", "reason"),
+            },
+        ),
+        (
+            "Status",
+            {
+                "fields": ("status", "requested_at", "processed_at", "processed_by"),
+            },
+        ),
+    )
 
 
 def load_fixture_data(fixture_data):

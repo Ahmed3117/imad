@@ -152,6 +152,12 @@
 
 
 
-  "show": "(show)"
+  "show": "(show)",
+  "footer_privacy": "Privacy Policy",
+  "footer_terms": "Terms & Conditions",
+  "footer_refund": "Refund Policy",
+  "footer_cookie": "Cookie Policy",
+  "footer_payment": "Payment Terms",
+  "footer_copyright": "All rights reserved."
 }
 

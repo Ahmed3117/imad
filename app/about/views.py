@@ -23,6 +23,8 @@ from about.models import (
     HomePageContentTranslation,
     HomePageFeatureTranslation,
     HomePageVideoPointTranslation,
+    LegalPage,
+    LegalPageTranslation,
 )
 
 from .forms import ContactForm
@@ -581,3 +583,464 @@ def book_free_session(request):
             "message": "Your free session has been booked! We will contact you soon.",
         }
     )
+
+
+# ─────────────────────────────────────────────
+# Legal Pages Views
+# ─────────────────────────────────────────────
+
+DEFAULT_LEGAL_CONTENT = {
+    "en": {
+        "privacy": """
+<h2>1. Introduction</h2>
+<p>Welcome to Nabbiuwny. We respect your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, use, store, and safeguard your information when you use our website and mobile application.</p>
+
+<h2>2. Information We Collect</h2>
+<p><strong>Personal Information:</strong> When you register, we collect your name, email address, phone number, and Telegram username. This information is necessary to create your account and match you with the right teacher.</p>
+<p><strong>Payment Information:</strong> We collect billing details and payment method information through our secure payment processors. We do not store full credit card numbers on our servers.</p>
+<p><strong>Usage Data:</strong> We collect information about how you interact with our platform, including class attendance, lecture progress, and assignment submissions.</p>
+<p><strong>Device Information:</strong> We may collect device type, operating system, and IP address to improve our services and ensure security.</p>
+
+<h2>3. How We Use Your Information</h2>
+<p>We use your personal data to:</p>
+<ul>
+<li>Create and manage your account</li>
+<li>Match students with appropriate teachers</li>
+<li>Process payments and manage subscriptions</li>
+<li>Send class reminders and platform notifications</li>
+<li>Improve our teaching quality and user experience</li>
+<li>Comply with legal obligations</li>
+</ul>
+
+<h2>4. Data Sharing and Disclosure</h2>
+<p>We do not sell your personal data to third parties. We may share your information with:</p>
+<ul>
+<li><strong>Teachers:</strong> To facilitate Quran classes and communication</li>
+<li><strong>Payment Processors:</strong> To securely handle transactions</li>
+<li><strong>Service Providers:</strong> Trusted partners who assist in operating our platform (e.g., hosting, analytics)</li>
+<li><strong>Legal Authorities:</strong> When required by law or to protect our rights</li>
+</ul>
+
+<h2>5. Data Security</h2>
+<p>We implement industry-standard security measures including SSL encryption, secure data storage, and regular security audits. Access to personal data is restricted to authorized personnel only.</p>
+
+<h2>6. Data Retention</h2>
+<p>We retain your personal data for as long as your account is active or as needed to provide you with our services. You may request deletion of your account and associated data at any time through your profile settings or by contacting us.</p>
+
+<h2>7. Your Rights</h2>
+<p>You have the right to:</p>
+<ul>
+<li>Access the personal data we hold about you</li>
+<li>Correct inaccurate or incomplete data</li>
+<li>Request deletion of your personal data</li>
+<li>Withdraw consent for data processing</li>
+<li>Receive a copy of your data in a portable format</li>
+</ul>
+
+<h2>8. Children's Privacy</h2>
+<p>Nabbiuwny provides educational services to children under parental supervision. Parents or legal guardians manage student accounts and are responsible for the information provided. We do not knowingly collect data from children under 13 without verifiable parental consent.</p>
+
+<h2>9. Cookies and Tracking</h2>
+<p>We use cookies and similar technologies to enhance your browsing experience, remember your preferences, and analyze site traffic. You can manage cookie preferences through your browser settings.</p>
+
+<h2>10. Changes to This Policy</h2>
+<p>We may update this Privacy Policy periodically. We will notify you of significant changes via email or through the platform. The "Last Updated" date at the top of this page indicates when the policy was last revised.</p>
+
+<h2>11. Contact Us</h2>
+<p>If you have any questions about this Privacy Policy or our data practices, please contact us at contact@nabbiuwny.com or through our Contact page.</p>
+""",
+        "terms": """
+<h2>1. Acceptance of Terms</h2>
+<p>By accessing or using the Nabbiuwny platform, you agree to be bound by these Terms & Conditions. If you do not agree to these terms, please do not use our services. These terms apply to all users, including students, parents, teachers, and administrators.</p>
+
+<h2>2. Service Description</h2>
+<p>Nabbiuwny is an online Quran learning platform that connects students with certified teachers for one-on-one and group Quran classes. We provide scheduling, video conferencing integration, progress tracking, and educational resource management.</p>
+
+<h2>3. Account Registration</h2>
+<p>To use our services, you must create an accurate and complete account. You are responsible for maintaining the confidentiality of your login credentials and for all activities that occur under your account. You must be at least 18 years old to register a parent/teacher account, or have parental consent for a student account.</p>
+
+<h2>4. User Conduct</h2>
+<p>You agree to use the platform responsibly and respectfully. Prohibited activities include:</p>
+<ul>
+<li>Sharing inappropriate or offensive content during classes</li>
+<li>Recording or distributing class sessions without consent</li>
+<li>Harassing teachers, students, or staff</li>
+<li>Attempting to access unauthorized areas of the platform</li>
+<li>Using the platform for any illegal purpose</li>
+</ul>
+
+<h2>5. Class Scheduling and Attendance</h2>
+<p>Classes are scheduled based on the agreed-upon times between teachers and students. We expect punctuality and advance notice for cancellations. Repeated no-shows may result in forfeiture of that session. Teachers may mark attendance and provide progress notes after each session.</p>
+
+<h2>6. Teacher-Student Relationship</h2>
+<p>Teachers on our platform are independent contractors. Nabbiuwny facilitates the connection but is not directly responsible for individual teaching methods or outcomes. We carefully vet all teachers to ensure quality and appropriate conduct.</p>
+
+<h2>7. Intellectual Property</h2>
+<p>All content provided on the platform, including curriculum materials, videos, and software, is the property of Nabbiuwny or its licensors. You may not reproduce, distribute, or create derivative works without our express permission. User-generated content remains the property of the user but grants us a license to use it for platform operation.</p>
+
+<h2>8. Payment and Subscriptions</h2>
+<p>Fees for classes and subscriptions are clearly displayed before purchase. By making a payment, you agree to the pricing and billing terms. Subscription plans auto-renew unless canceled before the renewal date. Prices are subject to change with prior notice.</p>
+
+<h2>9. Termination</h2>
+<p>We reserve the right to suspend or terminate your account for violations of these terms, fraudulent activity, or behavior that endangers our community. You may also request account deletion at any time through your profile settings.</p>
+
+<h2>10. Limitation of Liability</h2>
+<p>Nabbiuwny provides its services "as is" without warranties of any kind. We are not liable for indirect, incidental, or consequential damages arising from your use of the platform. Our total liability shall not exceed the amount you paid for services in the preceding 12 months.</p>
+
+<h2>11. Governing Law</h2>
+<p>These Terms shall be governed by the laws of the Arab Republic of Egypt. Any disputes shall be resolved through good-faith negotiation, and if necessary, through the courts of Cairo.</p>
+
+<h2>12. Changes to Terms</h2>
+<p>We may modify these Terms at any time. Continued use of the platform after changes constitutes acceptance of the updated Terms. We will notify users of material changes via email or platform notifications.</p>
+""",
+        "refund": """
+<h2>1. Free Trial Policy</h2>
+<p>Every new student is entitled to one free trial class. No payment information is required to book the trial. The trial class is designed to help you evaluate our teaching quality before committing to a paid plan.</p>
+
+<h2>2. Money-Back Guarantee</h2>
+<p>If you are not satisfied after your first week of paid classes, you may request a full refund within 7 days of your first paid session. This guarantee applies to the first subscription period only.</p>
+
+<h2>3. Subscription Cancellations</h2>
+<p>You may cancel your subscription at any time through your account settings. Cancellations take effect at the end of the current billing period. You will retain access to your classes until the end of the paid period.</p>
+
+<h2>4. Refund Eligibility</h2>
+<p>Refunds may be granted in the following circumstances:</p>
+<ul>
+<li>Technical failures preventing class delivery (platform-side issues)</li>
+<li>Teacher unavailability after confirmed booking</li>
+<li>Service interruptions lasting more than 48 hours due to our infrastructure</li>
+<li>Accidental duplicate charges</li>
+</ul>
+
+<h2>5. Non-Refundable Situations</h2>
+<p>Refunds will not be issued for:</p>
+<ul>
+<li>Classes missed due to student absence or late cancellation (less than 24 hours notice)</li>
+<li>Partial completion of a subscription period (except under the 7-day guarantee)</li>
+<li>Classes completed but deemed unsatisfactory after multiple sessions</li>
+<li>Issues caused by the user's internet connection or device</li>
+</ul>
+
+<h2>6. Refund Process</h2>
+<p>To request a refund, contact our support team at contact@nabbiuwny.com with your order details and reason for the request. We aim to process refund decisions within 5 business days. Approved refunds are processed to the original payment method within 10-14 business days.</p>
+
+<h2>7. Family Bundle Refunds</h2>
+<p>Family bundle subscriptions follow the same refund policy. If any child in the bundle is dissatisfied within the first week, the entire bundle may be refunded. Partial family bundle refunds are not available after the guarantee period.</p>
+""",
+        "cookie": """
+<h2>1. What Are Cookies</h2>
+<p>Cookies are small text files stored on your device when you visit a website. They help the site remember your preferences, login status, and improve your browsing experience.</p>
+
+<h2>2. How We Use Cookies</h2>
+<p>Nabbiuwny uses cookies for the following purposes:</p>
+<ul>
+<li><strong>Essential Cookies:</strong> Required for the platform to function, including authentication and session management</li>
+<li><strong>Preference Cookies:</strong> Remember your language selection, display preferences, and notification settings</li>
+<li><strong>Analytics Cookies:</strong> Help us understand how users interact with our platform so we can improve it</li>
+<li><strong>Security Cookies:</strong> Protect your account from unauthorized access and detect suspicious activity</li>
+</ul>
+
+<h2>3. Third-Party Cookies</h2>
+<p>We may allow trusted third-party services to place cookies for analytics (e.g., understanding site traffic) and payment processing. These cookies are governed by the third parties' respective privacy policies.</p>
+
+<h2>4. Managing Cookies</h2>
+<p>You can control cookies through your browser settings. Most browsers allow you to block or delete cookies. Please note that disabling essential cookies may prevent you from using certain features of our platform, such as staying logged in.</p>
+
+<h2>5. Consent</h2>
+<p>By continuing to use our website and mobile application, you consent to our use of cookies as described in this policy. You may withdraw consent at any time by adjusting your browser settings, though this may affect functionality.</p>
+""",
+        "payment": """
+<h2>1. Accepted Payment Methods</h2>
+<p>Nabbiuwny accepts payments through major credit cards, debit cards, and digital payment methods available in your region. All transactions are processed through PCI-DSS compliant payment gateways.</p>
+
+<h2>2. Subscription Plans</h2>
+<p>We offer flexible subscription plans for individual students and family bundles. Plan details, pricing, and inclusions are clearly displayed before purchase. By subscribing, you authorize us to charge your payment method on a recurring basis.</p>
+
+<h2>3. Billing Cycle</h2>
+<p>Subscriptions are billed in advance on a monthly basis. Your billing date is determined by your initial subscription date. You will receive an email receipt for each successful payment.</p>
+
+<h2>4. Auto-Renewal</h2>
+<p>All subscriptions automatically renew at the end of each billing period unless you cancel before the renewal date. You can manage or cancel your subscription at any time from your account settings.</p>
+
+<h2>5. Failed Payments</h2>
+<p>If a payment fails, we will notify you and attempt to process the payment again. If payment continues to fail, your subscription may be suspended until the outstanding balance is resolved.</p>
+
+<h2>6. Price Changes</h2>
+<p>We may adjust subscription prices with at least 30 days' advance notice. Price changes will take effect on your next billing cycle after the notice period. You may cancel before the price change takes effect if you do not agree to the new pricing.</p>
+
+<h2>7. Taxes</h2>
+<p>All prices displayed are inclusive of applicable taxes unless otherwise stated. You are responsible for any additional taxes or duties imposed by your jurisdiction.</p>
+
+<h2>8. Secure Transactions</h2>
+<p>All payment information is encrypted using industry-standard SSL/TLS technology. We do not store complete credit card details on our servers. Payment processing is handled by certified, secure third-party providers.</p>
+
+<h2>9. Dispute Resolution</h2>
+<p>If you believe you have been incorrectly charged, please contact us immediately at contact@nabbiuwny.com. We will investigate and resolve billing disputes promptly. Chargebacks should only be initiated after attempting to resolve the issue with our support team.</p>
+""",
+    },
+    "ar": {
+        "privacy": """
+<h2>1. مقدمة</h2>
+<p>مرحبًا بك في نبـيـونـي. نحن نحترم خصوصيتك وملتزمون بحماية بياناتك الشخصية. توضح سياسة الخصوصية هذه كيفية جمعنا واستخدامنا وتخزيننا وحماية معلوماتك عند استخدامك لموقعنا وتطبيقنا.</p>
+
+<h2>2. المعلومات التي نجمعها</h2>
+<p><strong>المعلومات الشخصية:</strong> عند التسجيل، نجمع اسمك وعنوان بريدك الإلكتروني ورقم هاتفك واسم مستخدم تيليجرام. هذه المعلومات ضرورية لإنشاء حسابك ومطابقته مع المعلم المناسب.</p>
+<p><strong>معلومات الدفع:</strong> نجمع تفاصيل الفوترة ومعلومات طريقة الدفع من خلال معالجات الدفع الآمنة لدينا. لا نقوم بتخزين أرقام بطاقات الائتمان الكاملة على خوادمنا.</p>
+<p><strong>بيانات الاستخدام:</strong> نجمع معلومات حول كيفية تفاعلك مع منصتنا، بما في ذلك حضور الحصص وتقدم المحاضرات وتسليم الواجبات.</p>
+<p><strong>معلومات الجهاز:</strong> قد نجمع نوع الجهاز ونظام التشغيل وعنوان IP لتحسين خدماتنا وضمان الأمان.</p>
+
+<h2>3. كيف نستخدم معلوماتك</h2>
+<p>نستخدم بياناتك الشخصية من أجل:</p>
+<ul>
+<li>إنشاء حسابك وإدارته</li>
+<li>مطابقة الطلاب مع المعلمين المناسبين</li>
+<li>معالجة المدفوعات وإدارة الاشتراكات</li>
+<li>إرسال تذكيرات بالحصص وإشعارات المنصة</li>
+<li>تحسين جودة التدريس وتجربة المستخدم</li>
+<li>الامتثال للالتزامات القانونية</li>
+</ul>
+
+<h2>4. مشاركة البيانات والإفصاح</h2>
+<p>لا نقوم ببيع بياناتك الشخصية لأطراف ثالثة. قد نشارك معلوماتك مع:</p>
+<ul>
+<li><strong>المعلمين:</strong> لتسهيل حصص القرآن والتواصل</li>
+<li><strong>معالجي الدفع:</strong> لمعالجة المعاملات بشكل آمن</li>
+<li><strong>مزودي الخدمات:</strong> شركاء موثوقين يساعدون في تشغيل منصتنا (مثل الاستضافة والتحليلات)</li>
+<li><strong>السلطات القانونية:</strong> عندما يقتضي القانون ذلك أو لحماية حقوقنا</li>
+</ul>
+
+<h2>5. أمان البيانات</h2>
+<p>ننفذ تدابير أمان على مستوى الصناعة تشمل تشفير SSL وتخزين البيانات الآمن والتدقيق الأمني المنتظم. يقتصر الوصول إلى البيانات الشخصية على الموظفين المصرح لهم فقط.</p>
+
+<h2>6. الاحتفاظ بالبيانات</h2>
+<p>نحتفظ ببياناتك الشخصية طالما كان حسابك نشطًا أو حسب الحاجة لتزويدك بخدماتنا. يمكنك طلب حذف حسابك والبيانات المرتبطة به في أي وقت من خلال إعدادات ملفك الشخصي أو بالتواصل معنا.</p>
+
+<h2>7. حقوقك</h2>
+<p>لديك الحق في:</p>
+<ul>
+<li>الوصول إلى البيانات الشخصية التي نحتفظ بها عنك</li>
+<li>تصحيح البيانات غير الدقيقة أو غير المكتملة</li>
+<li>طلب حذف بياناتك الشخصية</li>
+<li>سحب الموافقة على معالجة البيانات</li>
+<li>تلقي نسخة من بياناتك بتنسيق محمول</li>
+</ul>
+
+<h2>8. خصوصية الأطفال</h2>
+<p>تقدم نبـيـونـي خدمات تعليمية للأطفال تحت إشراف الوالدين. يدير الوالدون أو الأوصياء القانونيون حسابات الطلاب ويتحملون المسؤولية عن المعلومات المقدمة. لا نقوم عن قصد بجمع بيانات من أطفال دون 13 عامًا دون موافقة أبوية يمكن التحقق منها.</p>
+
+<h2>9. ملفات تعريف الارتباط والتتبع</h2>
+<p>نستخدم ملفات تعريف الارتباط والتقنيات المشابهة لتحسين تجربة التصفح وتذكر تفضيلاتك وتحليل حركة المرور على الموقع. يمكنك إدارة تفضيلات ملفات تعريف الارتباط من خلال إعدادات متصفحك.</p>
+
+<h2>10. التغييرات على هذه السياسة</h2>
+<p>قد نقوم بتحديث سياسة الخصوصية هذه دوريًا. سنقوم بإخطارك بالتغييرات المهمة عبر البريد الإلكتروني أو من خلال المنصة. يشير تاريخ "آخر تحديث" أعلى هذه الصفحة إلى متى تمت مراجعة السياسة آخر مرة.</p>
+
+<h2>11. تواصل معنا</h2>
+<p>إذا كانت لديك أي أسئلة حول سياسة الخصوصية هذه أو ممارساتنا المتعلقة بالبيانات، يرجى التواصل معنا على contact@nabbiuwny.com أو من خلال صفحة التواصل.</p>
+""",
+        "terms": """
+<h2>1. قبول الشروط</h2>
+<p>باستخدامك منصة نبـيـونـي أو الوصول إليها، فإنك توافق على الالتزام بهذه الشروط والأحكام. إذا كنت لا توافق على هذه الشروط، يرجى عدم استخدام خدماتنا. تنطبق هذه الشروط على جميع المستخدمين، بما في ذلك الطلاب والوالدين والمعلمين والمسؤولين.</p>
+
+<h2>2. وصف الخدمة</h2>
+<p>نبـيـونـي هي منصة تعليمية عبر الإنترنت لتعليم القرآن تربط بين الطلاب والمعلمين المعتمدين للحصص الفردية والجماعية. نقدم الجدولة والتكامل مع مؤتمرات الفيديو وتتبع التقدم وإدارة الموارد التعليمية.</p>
+
+<h2>3. تسجيل الحساب</h2>
+<p>لاستخدام خدماتنا، يجب عليك إنشاء حساب دقيق وكامل. أنت مسؤول عن الحفاظ على سرية بيانات تسجيل الدخول الخاصة بك وعن جميع الأنشطة التي تحدث ضمن حسابك. يجب أن يكون عمرك 18 عامًا على الأقل لتسجيل حساب ولي/معلم، أو الحصول على موافقة الوالدين لحساب الطالب.</p>
+
+<h2>4. سلوك المستخدم</h2>
+<p>توافق على استخدام المنصة بمسؤولية واحترام. تشمل الأنشطة المحظورة:</p>
+<ul>
+<li>مشاركة محتوى غير لائق أو مهين أثناء الحصص</li>
+<li>تسجيل الحصص أو توزيعها دون موافقة</li>
+<li>التحرش بالمعلمين أو الطلاب أو الموظفين</li>
+<li>محاولة الوصول إلى مناطق غير مصرح بها في المنصة</li>
+<li>استخدام المنصة لأي غرض غير قانوني</li>
+</ul>
+
+<h2>5. جدولة الحصص والحضور</h2>
+<p>يتم جدولة الحصص بناءً على الأوقات المتفق عليها بين المعلمين والطلاب. نتوقع الانضباط في المواعيد والإشعار المسبق عند الإلغاء. قد يؤدي التخلف المتكرر عن الحضور إلى فقدان الحصة. يجوز للمعلمين تسجيل الحضور وتقديم ملاحظات التقدم بعد كل حصة.</p>
+
+<h2>6. العلاقة بين المعلم والطالب</h2>
+<p>المعلمون على منصتنا هم متعاقدون مستقلون. تسهل نبـيـونـي الربط ولكنها ليست مسؤولة مباشرة عن طرق التدريس الفردية أو النتائج. نقوم بفحص جميع المعلمين بعناية لضمان الجودة والسلوك اللائق.</p>
+
+<h2>7. الملكية الفكرية</h2>
+<p>جميع المحتويات المقدمة على المنصة، بما في ذلك مواد المنهج الدراسي ومقاطع الفيديو والبرمجيات، هي ملك لنبـيـونـي أو مرخصيها. لا يجوز لك إعادة إنتاجها أو توزيعها أو إنشاء أعمال مشتقة دون إذننا الصريح. يظل المحتوى الذي ينشئه المستخدم ملكًا للمستخدم ولكنه يمنحنا ترخيصًا لاستخدامه في تشغيل المنصة.</p>
+
+<h2>8. الدفع والاشتراكات</h2>
+<p>يتم عرض رسوم الحصص والاشتراكات بوضوح قبل الشراء. من خلال إجراء الدفع، فإنك توافق على شروط التسعير والفوترة. يتم تجديد خطط الاشتراك تلقائيًا ما لم يتم الإلغاء قبل تاريخ التجديد. تخضر الأسعار للتغيير مع إشعار مسبق.</p>
+
+<h2>9. إنهاء الحساب</h2>
+<p>نحتفظ بالحق في تعليق أو إنهاء حسابك في حالة انتهاك هذه الشروط أو النشاط الاحتيالي أو السلوك الذي يعرض مجتمعنا للخطر. يمكنك أيضًا طلب حذف حسابك في أي وقت من خلال إعدادات ملفك الشخصي.</p>
+
+<h2>10. تحديد المسؤولية</h2>
+<p>تقدم نبـيـونـي خدماتها "كما هي" دون ضمانات من أي نوع. نحن لسنا مسؤولين عن الأضرار غير المباشرة أو العرضية أو التبعية الناشئة عن استخدامك للمنصة. لا تتجاوز مسؤوليتنا الإجمالية المبلغ الذي دفعته مقابل الخدمات خلال الأشهر الـ 12 السابقة.</p>
+
+<h2>11. القانون الحاكم</h2>
+<p>تخضع هذه الشروط لقوانون جمهورية مصر العربية. يتم تسوية أي نزاعات من خلال التفاوض بحسن نية، وإذا لزم الأمر، من خلال محاكم القاهرة.</p>
+
+<h2>12. التغييرات على الشروط</h2>
+<p>يجوز لنا تعديل هذه الشروط في أي وقت. يشكل الاستخدام المستمر للمنصة بعد التغييرات قبولًا للشروط المحدثة. سنقوم بإخطار المستخدمين بالتغييرات الجوهرية عبر البريد الإلكتروني أو إشعارات المنصة.</p>
+""",
+        "refund": """
+<h2>1. سياسة الحصص التجريبية المجانية</h2>
+<p>يحق لكل طالب جديد الحصول على حصة تجريبية مجانية واحدة. لا يلزم تقديم معلومات دفع لحجز التجربة. تم تصميم الحصة التجريبية لمساعدتك في تقييم جودة تدريسنا قبل الالتزام بخطة مدفوعة.</p>
+
+<h2>2. ضمان استرداد الأموال</h2>
+<p>إذا لم تكن راضيًا بعد أول أسبوع من الحصص المدفوعة، يمكنك طلب استرداد كامل خلال 7 أيام من أول حصة مدفوعة. ينطبق هذا الضمان على فترة الاشتراك الأولى فقط.</p>
+
+<h2>3. إلغاء الاشتراكات</h2>
+<p>يمكنك إلغاء اشتراكك في أي وقت من خلال إعدادات حسابك. تسري عمليات الإلغاء في نهاية فترة الفوترة الحالية. ستبقى لديك حق الوصول إلى حصصك حتى نهاية الفترة المدفوعة.</p>
+
+<h2>4. أهلية الاسترداد</h2>
+<p>يجوز منح المبالغ المستردة في الحالات التالية:</p>
+<ul>
+<li>الأعطال التقنية التي تمنع تقديم الحصة (مشاكل من جانب المنصة)</li>
+<li>عدم توفر المعلم بعد الحجز المؤكد</li>
+<li>انقطاع الخدمة لأكثر من 48 ساعة بسبب بنيتنا التحتية</li>
+<li>الرسوم المكررة بالخطأ</li>
+</ul>
+
+<h2>5. الحالات غير القابلة للاسترداد</h2>
+<p>لن يتم إصدار المبالغ المستردة في الحالات التالية:</p>
+<ul>
+<li>الحصص التي تفوت بسبب غياب الطالب أو الإلغاء المتأخر (أقل من 24 ساعة إشعار)</li>
+<li>إكمال جزء من فترة الاشتراك (باستثناء ضمان الـ 7 أيام)</li>
+<li>الحصص المكتملة ولكنها تعتبر غير مرضية بعد عدة حصص</li>
+<li>المشاكل الناشئة عن اتصال الإنترنت أو جهاز المستخدم</li>
+</ul>
+
+<h2>6. عملية الاسترداد</h2>
+<p>لطلب استرداد، يرجى التواصل مع فريق الدعم لدينا على contact@nabbiuwny.com مع تفاصيل طلبك وسبب الطلب. نهدف إلى معالجة قرارات الاسترداد خلال 5 أيام عمل. يتم معالجة المبالغ المستردة المعتمدة إلى طريقة الدفع الأصلية خلال 10-14 يوم عمل.</p>
+
+<h2>7. استردادات الباقة العائلية</h2>
+<p>تتبع اشتراكات الباقة العائلية نفس سياسة الاسترداد. إذا كان أي طفل في الباقة غير راضٍ خلال الأسبوع الأول، يجوز استرداد تكلفة الباقة بالكامل. لا تتوفر استردادات جزئية للباقة العائلية بعد فترة الضمان.</p>
+""",
+        "cookie": """
+<h2>1. ما هي ملفات تعريف الارتباط</h2>
+<p>ملفات تعريف الارتباط هي ملفات نصية صغيرة تُخزن على جهازك عند زيارة موقع ويب. إنها تساعد الموقع على تذكر تفضيلاتك وحالة تسجيل الدخول وتحسين تجربة التصفح.</p>
+
+<h2>2. كيف نستخدم ملفات تعريف الارتباط</h2>
+<p>تستخدم نبـيـونـي ملفات تعريف الارتباط للأغراض التالية:</p>
+<ul>
+<li><strong>ملفات تعريف الارتباط الأساسية:</strong> مطلوبة لعمل المنصة، بما في ذلك المصادقة وإدارة الجلسات</li>
+<li><strong>ملفات تفضيل الارتباط:</strong> تذكر اختيار اللغة وتفضيلات العرض وإعدادات الإشعارات</li>
+<li><strong>ملفات تحليل الارتباط:</strong> تساعدنا في فهم كيفية تفاعل المستخدمين مع منصتنا حتى نتمكن من تحسينها</li>
+<li><strong>ملفات أمان الارتباط:</strong> تحمي حسابك من الوصول غير المصرح به وكشف النشاط المشبوه</li>
+</ul>
+
+<h2>3. ملفات تعريف الارتباط الخاصة بالأطراف الثالثة</h2>
+<p>قد نسمح لخدمات الأطراف الثالثة الموثوقة بوضع ملفات تعريف الارتباط لأغراض التحليلات (مثل فهم حركة المرور على الموقع) ومعالجة الدفع. تحكم هذه الملفات سياسات الخصوصية الخاصة بالأطراف الثالثة المعنية.</p>
+
+<h2>4. إدارة ملفات تعريف الارتباط</h2>
+<p>يمكنك التحكم في ملفات تعريف الارتباط من خلال إعدادات متصفحك. تسمح معظم المتصفحات لك بحظر أو حذف ملفات تعريف الارتباط. يرجى ملاحظة أن تعطيل ملفات تعريف الارتباط الأساسية قد يمنعك من استخدام بعض ميزات منصتنا، مثل البقاء متصلًا.</p>
+
+<h2>5. الموافقة</h2>
+<p>باستمرارك في استخدام موقعنا وتطبيقنا المحمول، فإنك توافق على استخدامنا لملفات تعريف الارتباط كما هو موضح في هذه السياسة. يمكنك سحب الموافقة في أي وقت عن طريق تعديل إعدادات متصفحك، على الرغم من أن هذا قد يؤثر على الوظائف.</p>
+""",
+        "payment": """
+<h2>1. طرق الدفع المقبولة</h2>
+<p>تقبل نبـيـونـي المدفوعات من خلال بطاقات الائتمان الرئيسية وبطاقات الخصم وطرق الدفع الرقمية المتوفرة في منطقتك. تتم معالجة جميع المعاملات من خلال بوابات دفع متوافقة مع معايير PCI-DSS.</p>
+
+<h2>2. خطط الاشتراك</h2>
+<p>نقدم خطط اشتراك مرنة للطلاب الأفراد والباقات العائلية. يتم عرض تفاصيل الخطة والتسعير والشروclusions بوضوح قبل الشراء. من خلال الاشتراك، فإنك تفوضنا بتحصيل رسوم من طريقة الدفع الخاصة بك بشكل متكرر.</p>
+
+<h2>3. دورة الفوترة</h2>
+<p>يتم تحصيل رسوم الاشتراكات مقدمًا على أساس شهري. يتم تحديد تاريخ فوترتك بناءً على تاريخ اشتراكك الأولي. ستتلقى إيصالًا عبر البريد الإلكتروني لكل عملية دفع ناجحة.</p>
+
+<h2>4. التجديد التلقائي</h2>
+<p>يتم تجديد جميع الاشتراكات تلقائيًا في نهاية كل فترة فوترة ما لم تقم بالإلغاء قبل تاريخ التجديد. يمكنك إدارة اشتراكك أو إلغائه في أي وقت من إعدادات حسابك.</p>
+
+<h2>5. المدفوعات الفاشلة</h2>
+<p>إذا فشلت عملية الدفع، فسنقوم بإخطارك ومحاولة معالجة الدفع مرة أخرى. إذا استمر فشل الدفع، فقد يتم تعليق اشتراكك حتى يتم تسوية الرصيد المستحق.</p>
+
+<h2>6. تغييرات الأسعار</h2>
+<p>يجوز لنا تعديل أسعار الاشتراك مع إشعار مسبق لمدة 30 يومًا على الأقل. تسري تغييرات الأسعار في دورة الفوترة التالية بعد فترة الإشعار. يمكنك الإلغاء قبل دخول تغيير السعر حيز التنفيذ إذا كنت لا توافق على التسعير الجديد.</p>
+
+<h2>7. الضرائب</h2>
+<p>جميع الأسعار المعروضة شاملة للضرائب المطبقة ما لم يُذكر خلاف ذلك. أنت مسؤول عن أي ضرائب أو رسوم إضافية تفرضها سلطة ولايتك.</p>
+
+<h2>8. المعاملات الآمنة</h2>
+<p>يتم تشفير جميع معلومات الدفع باستخدام تقنية SSL/TLS القياسية في الصناعة. لا نقوم بتخزين تفاصيل بطاقات الائتمان الكاملة على خوادمنا. تتم معالجة المدفوعات من قبل مزودين معتمدين وآمنين من الأطراف الثالثة.</p>
+
+<h2>9. تسوية النزاعات</h2>
+<p>إذا كنت تعتقد أنه تم تحصيل رسوم منك بشكل غير صحيح، يرجى التواصل معنا فورًا على contact@nabbiuwny.com. سنحقق في نزاعات الفوترة وحلها على الفور. يجب أن تتم عمليات الاسترجاع (chargebacks) فقط بعد محاولة حل المشكلة مع فريق الدعم لدينا.</p>
+""",
+    },
+}
+
+
+def _get_legal_page(page_type, language):
+    """Fetch legal page content, falling back to default if none exists."""
+    page = LegalPage.objects.filter(page_type=page_type, is_active=True).first()
+    lang_defaults = DEFAULT_LEGAL_CONTENT.get(language, DEFAULT_LEGAL_CONTENT["en"])
+
+    if not page:
+        content = lang_defaults.get(page_type, "")
+        title = dict(LegalPage.PAGE_TYPE_CHOICES).get(page_type, page_type.replace("-", " ").title())
+        return {"title": title, "content": content, "last_updated": None}
+
+    translation = LegalPageTranslation.objects.filter(
+        legal_page=page, language=language
+    ).first()
+
+    if translation and translation.translated_content:
+        content = translation.translated_content
+    else:
+        # Fall back to base content (usually English), then language defaults
+        content = page.content or lang_defaults.get(page_type, "")
+
+    return {
+        "title": page.get_page_type_display(),
+        "content": content,
+        "last_updated": page.last_updated,
+    }
+
+
+def privacy_policy(request):
+    language = _get_current_language(request)
+    page_data = _get_legal_page("privacy", language)
+    return render(request, "about/legal_page.html", {
+        "page": page_data,
+        "page_type": "privacy",
+        "translation_folder": "legal",
+    })
+
+
+def terms_conditions(request):
+    language = _get_current_language(request)
+    page_data = _get_legal_page("terms", language)
+    return render(request, "about/legal_page.html", {
+        "page": page_data,
+        "page_type": "terms",
+        "translation_folder": "legal",
+    })
+
+
+def refund_policy(request):
+    language = _get_current_language(request)
+    page_data = _get_legal_page("refund", language)
+    return render(request, "about/legal_page.html", {
+        "page": page_data,
+        "page_type": "refund",
+        "translation_folder": "legal",
+    })
+
+
+def cookie_policy(request):
+    language = _get_current_language(request)
+    page_data = _get_legal_page("cookie", language)
+    return render(request, "about/legal_page.html", {
+        "page": page_data,
+        "page_type": "cookie",
+        "translation_folder": "legal",
+    })
+
+
+def payment_terms(request):
+    language = _get_current_language(request)
+    page_data = _get_legal_page("payment", language)
+    return render(request, "about/legal_page.html", {
+        "page": page_data,
+        "page_type": "payment",
+        "translation_folder": "legal",
+    })

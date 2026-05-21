@@ -1,4 +1,4 @@
-{% extends "admin/base.html" %}
+{% extends "admin/base_site.html" %}
 
 {% block title %}{{ title }} | Fixture Upload{% endblock %}
 
@@ -11,38 +11,38 @@
 {% block content %}
 <div class="module">
     <h2>{{ title }}</h2>
-    
+
     {% if error %}
-    <p class="errornote" style="background-color: #ffe6e6; border-color: #cc0000; color: #cc0000;">
+    <p class="errornote">
         {{ error }}
     </p>
     {% endif %}
-    
+
     {% if success %}
-    <p class="success" style="background-color: #e6ffe6; border-color: #00cc00; color: #00aa00; padding: 10px; border: 1px solid #00aa00; border-radius: 4px;">
+    <ul class="messagelist">
+        <li class="success">
         {{ success }}
-    </p>
+        </li>
+    </ul>
     {% endif %}
-    
-    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 4px; margin: 20px 0;">
+
+    <div class="fixture-upload-card">
         <h3>Upload Fixture File</h3>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            <div style="margin: 15px 0;">
-                <label for="fixture_file" style="display: block; margin-bottom: 5px; font-weight: bold;">Select JSON Fixture File:</label>
-                <input type="file" name="fixture_file" id="fixture_file" accept=".json" required 
-                       style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; max-width: 500px;">
+            <div class="form-row">
+                <label for="fixture_file">Select JSON Fixture File:</label>
+                <input type="file" name="fixture_file" id="fixture_file" accept=".json" required>
             </div>
-            <div style="margin-top: 15px;">
-                <input type="submit" value="Upload and Apply" 
-                       style="background-color: #417690; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+            <div class="submit-row">
+                <input type="submit" value="Upload and Apply" class="default">
             </div>
         </form>
     </div>
-    
-    <div style="background-color: #fff3cd; padding: 15px; border-radius: 4px; margin: 20px 0;">
-        <h4 style="margin-top: 0;">⚠️ Important Notes:</h4>
-        <ul style="margin-bottom: 0;">
+
+    <div class="fixture-upload-note">
+        <h3>Important Notes</h3>
+        <ul>
             <li>This will upload and apply fixture data to the homepage models.</li>
             <li>Existing records with the same PK will be <strong>updated</strong>.</li>
             <li>New records will be <strong>created</strong>.</li>
@@ -50,20 +50,20 @@
             <li>The fixture file must be in Django fixture JSON format.</li>
         </ul>
     </div>
-    
+
     <h3>Available Fixtures</h3>
-    <table style="border-collapse: collapse; width: 100%; max-width: 600px;">
+    <table class="admin-polished-table">
         <thead>
-            <tr style="background-color: #417690; color: white;">
-                <th style="padding: 10px; text-align: left;">Fixture Name</th>
-                <th style="padding: 10px; text-align: left;">Description</th>
+            <tr>
+                <th>Fixture Name</th>
+                <th>Description</th>
             </tr>
         </thead>
         <tbody>
             {% for fixture in available_fixtures %}
-            <tr style="border-bottom: 1px solid #ddd;">
-                <td style="padding: 10px;">{{ fixture.name }}</td>
-                <td style="padding: 10px;">{{ fixture.description }}</td>
+            <tr>
+                <td>{{ fixture.name }}</td>
+                <td>{{ fixture.description }}</td>
             </tr>
             {% endfor %}
         </tbody>

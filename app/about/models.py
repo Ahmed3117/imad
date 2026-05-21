@@ -364,3 +364,98 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"{self.name} – {self.email}"
+
+
+# ─────────────────────────────────────────────
+# Legal Pages (Privacy, Terms, Refund, Cookie)
+# ─────────────────────────────────────────────
+
+class LegalPage(models.Model):
+    PAGE_TYPE_CHOICES = [
+        ("privacy", "Privacy Policy"),
+        ("terms", "Terms & Conditions"),
+        ("refund", "Refund Policy"),
+        ("cookie", "Cookie Policy"),
+        ("payment", "Payment & Subscription Terms"),
+    ]
+
+    page_type = models.CharField(
+        max_length=20,
+        choices=PAGE_TYPE_CHOICES,
+        unique=True,
+        help_text="Select the type of legal page. Only one record per type is allowed.",
+    )
+    content = models.TextField(
+        help_text="Full HTML content of the page. Use <h2> for sections and <p> for paragraphs.",
+        blank=True,
+        default="",
+    )
+    is_active = models.BooleanField(default=True)
+    last_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Legal Page"
+        verbose_name_plural = "Legal Pages"
+        ordering = ["page_type"]
+
+    def __str__(self):
+        return self.get_page_type_display()
+
+
+class LegalPageTranslation(models.Model):
+    legal_page = models.ForeignKey(
+        LegalPage, on_delete=models.CASCADE, related_name="translations"
+    )
+    language = models.CharField(max_length=10)  # e.g. en, ar
+    translated_content = models.TextField(blank=True, default="")
+
+    class Meta:
+        unique_together = ("legal_page", "language")
+        verbose_name = "Legal Page Translation"
+        verbose_name_plural = "Legal Page Translations"
+        default_permissions = ()
+
+    def __str__(self):
+        return f"{self.legal_page.get_page_type_display()} - {self.language}"
+
+
+# ─────────────────────────────────────────────
+# Account Deletion Requests
+# ─────────────────────────────────────────────
+
+class AccountDeletionRequest(models.Model):
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("processed", "Processed"),
+        ("rejected", "Rejected"),
+    ]
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="deletion_request",
+    )
+    reason = models.TextField(blank=True, null=True, help_text="Optional reason for deletion")
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending",
+    )
+    requested_at = models.DateTimeField(auto_now_add=True)
+    processed_at = models.DateTimeField(blank=True, null=True)
+    processed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="processed_deletions",
+        limit_choices_to={"role": "admin"},
+    )
+
+    class Meta:
+        ordering = ["-requested_at"]
+        verbose_name = "Account Deletion Request"
+        verbose_name_plural = "Account Deletion Requests"
+
+    def __str__(self):
+        return f"{self.user} – {self.get_status_display()}"
