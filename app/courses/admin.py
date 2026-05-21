@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.db.models import Count
-from unfold.admin import ModelAdmin, StackedInline, TabularInline
+from project.admin_base import ModelAdmin
+from unfold.admin import StackedInline, TabularInline
 
 from library.models import CourseLibrary
 from .models import (
@@ -11,24 +12,28 @@ from .models import (
 class LevelTranslationInline(TabularInline):
     model = LevelTranslation
     extra = 1
+    tab = True
     fields = ('language', 'translated_name')
 
 
 class TrackTranslationInline(TabularInline):
     model = TrackTranslation
     extra = 1
+    tab = True
     fields = ('language', 'translated_name')
 
 
 class CourseTranslationInline(TabularInline):
     model = CourseTranslation
     extra = 1
+    tab = True
     fields = ('language', 'translated_name', 'translated_description')
 
 
 class CourseLibraryInline(TabularInline):
     model = CourseLibrary
     extra = 0
+    tab = True
     fields = ('file', 'category')
     show_change_link = True
 

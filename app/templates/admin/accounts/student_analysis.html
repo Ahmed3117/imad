@@ -13,253 +13,80 @@
 
 {% block content %}
 <style>
-    .student-analysis {
-        color: #1f2937;
-    }
-    .analysis-header {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: 24px;
-        align-items: center;
-        margin-bottom: 24px;
-        padding: 24px;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        background: #fff;
-    }
-    .analysis-kicker {
-        margin: 0 0 6px;
-        color: #6b7280;
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: .08em;
-        text-transform: uppercase;
-    }
-    .analysis-title {
-        margin: 0;
-        font-size: 28px;
-        line-height: 1.2;
-        color: #111827;
-    }
-    .analysis-subtitle {
-        margin: 8px 0 0;
-        color: #4b5563;
-    }
-    .analysis-actions {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-    }
-    .analysis-button {
-        display: inline-flex;
-        align-items: center;
-        min-height: 34px;
-        padding: 0 12px;
-        border-radius: 6px;
-        background: #374151;
-        color: #fff !important;
-        font-weight: 700;
-        text-decoration: none;
-    }
-    .analysis-button.secondary {
-        background: #eef2ff;
-        color: #3730a3 !important;
-    }
-    .metric-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 16px;
-        margin-bottom: 24px;
-    }
-    .metric-card,
-    .analysis-card {
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        background: #fff;
-        box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
-    }
-    .metric-card {
-        padding: 18px;
-    }
-    .metric-label {
-        margin: 0 0 8px;
-        color: #6b7280;
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-    }
-    .metric-value {
-        margin: 0;
-        color: #111827;
-        font-size: 26px;
-        font-weight: 800;
-    }
-    .metric-note {
-        margin: 6px 0 0;
-        color: #6b7280;
-        font-size: 12px;
-    }
-    .analysis-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        gap: 18px;
-        margin-bottom: 18px;
-    }
-    .analysis-card {
-        overflow: hidden;
-    }
-    .analysis-card.full {
-        grid-column: 1 / -1;
-    }
-    .analysis-card h2 {
-        margin: 0;
-        padding: 14px 18px;
-        border-bottom: 1px solid #e5e7eb;
-        color: #111827;
-        font-size: 16px;
-        background: #f9fafb;
-    }
-    .analysis-body {
-        padding: 16px 18px;
-    }
-    .detail-list {
-        display: grid;
-        grid-template-columns: 180px minmax(0, 1fr);
-        gap: 10px 14px;
-        margin: 0;
-    }
-    .detail-list dt {
-        color: #6b7280;
-        font-weight: 700;
-    }
-    .detail-list dd {
-        margin: 0;
-        color: #111827;
-    }
-    .analysis-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .analysis-table th,
-    .analysis-table td {
-        padding: 10px 12px;
-        border-bottom: 1px solid #eef2f7;
-        text-align: left;
-        vertical-align: top;
-    }
-    .analysis-table th {
-        color: #6b7280;
-        font-size: 12px;
-        text-transform: uppercase;
-        background: #fcfcfd;
-    }
-    .status-pill {
-        display: inline-flex;
-        padding: 3px 8px;
-        border-radius: 999px;
-        background: #eef2ff;
-        color: #3730a3;
-        font-size: 12px;
-        font-weight: 700;
-        white-space: nowrap;
-    }
-    .status-pill.success {
-        background: #dcfce7;
-        color: #166534;
-    }
-    .status-pill.warning {
-        background: #fef3c7;
-        color: #92400e;
-    }
-    .status-pill.danger {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-    .empty-state {
-        margin: 0;
-        color: #6b7280;
-        font-style: italic;
-    }
-    @media (max-width: 1100px) {
-        .metric-grid,
-        .analysis-grid {
-            grid-template-columns: 1fr 1fr;
-        }
-    }
-    @media (max-width: 720px) {
-        .analysis-header,
-        .metric-grid,
-        .analysis-grid,
-        .detail-list {
-            grid-template-columns: 1fr;
-        }
-        .analysis-actions {
-            justify-content: flex-start;
-        }
-    }
+  .analysis-table th {
+    white-space: nowrap;
+  }
+  section, section table tbody tr {
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
 </style>
-
-<div class="student-analysis">
-    <div class="analysis-header">
-        <div>
-            <p class="analysis-kicker">Student intelligence report</p>
-            <h1 class="analysis-title">{{ student.get_name }}</h1>
-            <p class="analysis-subtitle">
-                Username: <strong>{{ student.username }}</strong>
-                {% if student.email %} · Email: <strong>{{ student.email }}</strong>{% endif %}
-                {% if student.phone %} · Phone: <strong>{{ student.phone }}</strong>{% endif %}
-                {% if student.telegram_username %} · Telegram: <strong>{{ student.telegram_username }}</strong>{% endif %}
+<div class="flex flex-col gap-6">
+    {% comment %}Header card{% endcomment %}
+    <div class="flex flex-col lg:flex-row gap-6 items-start lg:items-center p-6 bg-white border border-base-200 rounded-default shadow-xs dark:bg-base-900 dark:border-base-800">
+        <div class="grow">
+            <p class="text-xs font-bold uppercase tracking-widest text-base-500 dark:text-base-400 mb-1">Student intelligence report</p>
+            <h1 class="text-2xl lg:text-3xl font-bold text-base-900 dark:text-base-100">{{ student.get_name }}</h1>
+            <p class="mt-1 text-base-500 dark:text-base-400">
+                Username: <strong class="text-base-700 dark:text-base-200">{{ student.username }}</strong>
+                {% if student.email %} &middot; Email: <strong class="text-base-700 dark:text-base-200">{{ student.email }}</strong>{% endif %}
+                {% if student.phone %} &middot; Phone: <strong class="text-base-700 dark:text-base-200">{{ student.phone }}</strong>{% endif %}
             </p>
         </div>
-        <div class="analysis-actions">
-            <a class="analysis-button secondary" href="{% url 'admin:accounts_user_changelist' %}">Back to users</a>
-            <a class="analysis-button" href="{% url 'admin:accounts_user_change' student.pk %}">Edit student</a>
+        <div class="flex gap-2 shrink-0">
+            <a href="{% url 'admin:accounts_user_changelist' %}" class="inline-flex items-center min-h-[34px] px-3 rounded-md bg-base-100 text-base-700 font-bold text-sm no-underline hover:bg-base-200 dark:bg-base-800 dark:text-base-200 dark:hover:bg-base-700">Back to users</a>
+            <a href="{% url 'admin:accounts_user_change' student.pk %}" class="inline-flex items-center min-h-[34px] px-3 rounded-md bg-primary-600 text-white font-bold text-sm no-underline hover:bg-primary-700">Edit student</a>
         </div>
     </div>
 
-    <div class="metric-grid">
-        <div class="metric-card">
-            <p class="metric-label">Active groups</p>
-            <p class="metric-value">{{ groups|length }}</p>
-            <p class="metric-note">Study groups currently linked to this student.</p>
+    {% comment %}Metric cards{% endcomment %}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="p-4 bg-white border border-base-200 rounded-default shadow-xs dark:bg-base-900 dark:border-base-800">
+            <p class="text-xs font-bold uppercase tracking-widest text-base-500 dark:text-base-400 mb-1">Active groups</p>
+            <p class="text-2xl font-extrabold text-base-900 dark:text-base-100 m-0">{{ groups|length }}</p>
+            <p class="mt-1 text-xs text-base-500 dark:text-base-400">Study groups currently linked to this student.</p>
         </div>
-        <div class="metric-card">
-            <p class="metric-label">Lectures</p>
-            <p class="metric-value">{{ lecture_stats.finished|default:0 }}/{{ lecture_stats.total|default:0 }}</p>
-            <p class="metric-note">{{ lecture_stats.upcoming|default:0 }} upcoming, {{ lecture_stats.with_links|default:0 }} with live links.</p>
+        <div class="p-4 bg-white border border-base-200 rounded-default shadow-xs dark:bg-base-900 dark:border-base-800">
+            <p class="text-xs font-bold uppercase tracking-widest text-base-500 dark:text-base-400 mb-1">Lectures</p>
+            <p class="text-2xl font-extrabold text-base-900 dark:text-base-100 m-0">{{ lecture_stats.finished|default:0 }}/{{ lecture_stats.total|default:0 }}</p>
+            <p class="mt-1 text-xs text-base-500 dark:text-base-400">{{ lecture_stats.upcoming|default:0 }} upcoming, {{ lecture_stats.with_links|default:0 }} with live links.</p>
         </div>
-        <div class="metric-card">
-            <p class="metric-label">Teacher completion</p>
-            <p class="metric-value">{{ completion_rate }}%</p>
-            <p class="metric-note">Based on teacher lecture status notes.</p>
+        <div class="p-4 bg-white border border-base-200 rounded-default shadow-xs dark:bg-base-900 dark:border-base-800">
+            <p class="text-xs font-bold uppercase tracking-widest text-base-500 dark:text-base-400 mb-1">Teacher completion</p>
+            <p class="text-2xl font-extrabold text-base-900 dark:text-base-100 m-0">{{ completion_rate }}%</p>
+            <p class="mt-1 text-xs text-base-500 dark:text-base-400">Based on teacher lecture status notes.</p>
         </div>
-        <div class="metric-card">
-            <p class="metric-label">Assignments</p>
-            <p class="metric-value">{{ answer_stats.submitted|default:0 }}/{{ assignment_total }}</p>
-            <p class="metric-note">{{ submission_rate }}% submitted, {{ pending_assignment_count }} pending{% if overdue_pending_count %}, {{ overdue_pending_count }} overdue{% endif %}{% if answer_stats.average_grade %}, avg grade {{ answer_stats.average_grade|floatformat:1 }}{% endif %}.</p>
+        <div class="p-4 bg-white border border-base-200 rounded-default shadow-xs dark:bg-base-900 dark:border-base-800">
+            <p class="text-xs font-bold uppercase tracking-widest text-base-500 dark:text-base-400 mb-1">Assignments</p>
+            <p class="text-2xl font-extrabold text-base-900 dark:text-base-100 m-0">{{ answer_stats.submitted|default:0 }}/{{ assignment_total }}</p>
+            <p class="mt-1 text-xs text-base-500 dark:text-base-400">{{ submission_rate }}% submitted, {{ pending_assignment_count }} pending{% if overdue_pending_count %}, {{ overdue_pending_count }} overdue{% endif %}{% if answer_stats.average_grade %}, avg grade {{ answer_stats.average_grade|floatformat:1 }}{% endif %}.</p>
         </div>
     </div>
 
-    <div class="analysis-grid">
-        <section class="analysis-card">
-            <h2>Account And Profile</h2>
-            <div class="analysis-body">
-                <dl class="detail-list">
-                    <dt>Full name</dt><dd>{{ student.name|default:"-" }}</dd>
-                    <dt>Username</dt><dd>{{ student.username }}</dd>
-                    <dt>Email</dt><dd>{{ student.email|default:"-" }}</dd>
-                    <dt>Phone</dt><dd>{{ student.phone|default:"-" }}</dd>
-                    <dt>Telegram</dt><dd>{{ student.telegram_username|default:"-" }}</dd>
-                    <dt>Parent phone</dt><dd>{% if profile %}{{ profile.parent_phone|default:"-" }}{% else %}-{% endif %}</dd>
-                    <dt>Age</dt><dd>{% if profile %}{{ profile.age }}{% else %}-{% endif %}</dd>
-                    <dt>Joined</dt><dd>{{ student.date_joined|date:"M d, Y H:i" }}</dd>
-                    <dt>Last login</dt><dd>{{ student.last_login|date:"M d, Y H:i"|default:"Never" }}</dd>
-                    <dt>Active</dt><dd>{% if student.is_active %}<span class="status-pill success">Active</span>{% else %}<span class="status-pill danger">Inactive</span>{% endif %}</dd>
-                    <dt>Free session</dt>
-                    <dd>
+    {% comment %}Two-column section{% endcomment %}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {% comment %}Account And Profile{% endcomment %}
+        <section class="bg-white border border-base-200 rounded-default shadow-xs overflow-hidden dark:bg-base-900 dark:border-base-800">
+            <h2 class="m-0 px-4 py-3.5 border-b border-base-200 text-sm font-bold text-base-700 bg-base-50 dark:bg-base-800 dark:text-base-200 dark:border-base-800">Account And Profile</h2>
+            <div class="p-4">
+                <dl class="grid grid-cols-[180px_1fr] gap-x-4 gap-y-2.5 m-0">
+                    <dt class="text-xs font-bold text-base-500 dark:text-base-400">Full name</dt><dd class="m-0 text-base-700 dark:text-base-200">{{ student.name|default:"-" }}</dd>
+                    <dt class="text-xs font-bold text-base-500 dark:text-base-400">Username</dt><dd class="m-0 text-base-700 dark:text-base-200">{{ student.username }}</dd>
+                    <dt class="text-xs font-bold text-base-500 dark:text-base-400">Email</dt><dd class="m-0 text-base-700 dark:text-base-200">{{ student.email|default:"-" }}</dd>
+                    <dt class="text-xs font-bold text-base-500 dark:text-base-400">Phone</dt><dd class="m-0 text-base-700 dark:text-base-200">{{ student.phone|default:"-" }}</dd>
+                    <dt class="text-xs font-bold text-base-500 dark:text-base-400">Parent phone</dt><dd class="m-0 text-base-700 dark:text-base-200">{% if profile %}{{ profile.parent_phone|default:"-" }}{% else %}-{% endif %}</dd>
+                    <dt class="text-xs font-bold text-base-500 dark:text-base-400">Age</dt><dd class="m-0 text-base-700 dark:text-base-200">{% if profile %}{{ profile.age }}{% else %}-{% endif %}</dd>
+                    <dt class="text-xs font-bold text-base-500 dark:text-base-400">Joined</dt><dd class="m-0 text-base-700 dark:text-base-200">{{ student.date_joined|date:"M d, Y H:i" }}</dd>
+                    <dt class="text-xs font-bold text-base-500 dark:text-base-400">Last login</dt><dd class="m-0 text-base-700 dark:text-base-200">{{ student.last_login|date:"M d, Y H:i"|default:"Never" }}</dd>
+                    <dt class="text-xs font-bold text-base-500 dark:text-base-400">Active</dt>
+                    <dd class="m-0">{% if student.is_active %}<span class="inline-flex px-2 py-0.5 rounded-full text-xs font-bold bg-success-50 text-success-700 dark:bg-success-500/20 dark:text-success-400">Active</span>{% else %}<span class="inline-flex px-2 py-0.5 rounded-full text-xs font-bold bg-danger-50 text-danger-700 dark:bg-danger-500/20 dark:text-danger-400">Inactive</span>{% endif %}</dd>
+                    <dt class="text-xs font-bold text-base-500 dark:text-base-400">Free session</dt>
+                    <dd class="m-0 text-base-700 dark:text-base-200">
                         {% if free_session %}
-                            <span class="status-pill {% if free_session.status == 'done' %}success{% else %}warning{% endif %}">{{ free_session.get_status_display }}</span>
+                            <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-bold
+                                {% if free_session.status == 'done' %}bg-success-50 text-success-700 dark:bg-success-500/20 dark:text-success-400
+                                {% else %}bg-warning-50 text-warning-700 dark:bg-warning-500/20 dark:text-warning-400{% endif %}">
+                                {{ free_session.get_status_display }}
+                            </span>
                             requested {{ free_session.requested_at|date:"M d, Y H:i" }}
                             {% if free_session.phone %}<br>Phone: {{ free_session.phone }}{% endif %}
                             {% if free_session.message %}<br>{{ free_session.message|linebreaksbr }}{% endif %}
@@ -271,49 +98,57 @@
             </div>
         </section>
 
-        <section class="analysis-card">
-            <h2>Lecture Status Breakdown</h2>
-            <div class="analysis-body">
-                <dl class="detail-list">
-                    <dt>Completed successfully</dt><dd><span class="status-pill success">{{ status_counts.completed|default:0 }}</span></dd>
-                    <dt>Student delayed or absent</dt><dd><span class="status-pill warning">{{ status_counts.student_delayed|default:0 }}</span></dd>
-                    <dt>Teacher delayed</dt><dd><span class="status-pill danger">{{ status_counts.teacher_delayed|default:0 }}</span></dd>
-                    <dt>Student notes submitted</dt><dd>{{ student_notes_count }}</dd>
-                    <dt>Teacher notes reviewed</dt><dd>{{ reviewed_count }}</dd>
+        {% comment %}Lecture Status Breakdown{% endcomment %}
+        <section class="bg-white border border-base-200 rounded-default shadow-xs overflow-hidden dark:bg-base-900 dark:border-base-800">
+            <h2 class="m-0 px-4 py-3.5 border-b border-base-200 text-sm font-bold text-base-700 bg-base-50 dark:bg-base-800 dark:text-base-200 dark:border-base-800">Lecture Status Breakdown</h2>
+            <div class="p-4">
+                <dl class="grid grid-cols-[180px_1fr] gap-x-4 gap-y-2.5 m-0">
+                    <dt class="text-xs font-bold text-base-500 dark:text-base-400">Completed successfully</dt>
+                    <dd class="m-0"><span class="inline-flex px-2 py-0.5 rounded-full text-xs font-bold bg-success-50 text-success-700 dark:bg-success-500/20 dark:text-success-400">{{ status_counts.completed|default:0 }}</span></dd>
+                    <dt class="text-xs font-bold text-base-500 dark:text-base-400">Student delayed or absent</dt>
+                    <dd class="m-0"><span class="inline-flex px-2 py-0.5 rounded-full text-xs font-bold bg-warning-50 text-warning-700 dark:bg-warning-500/20 dark:text-warning-400">{{ status_counts.student_delayed|default:0 }}</span></dd>
+                    <dt class="text-xs font-bold text-base-500 dark:text-base-400">Teacher delayed</dt>
+                    <dd class="m-0"><span class="inline-flex px-2 py-0.5 rounded-full text-xs font-bold bg-danger-50 text-danger-700 dark:bg-danger-500/20 dark:text-danger-400">{{ status_counts.teacher_delayed|default:0 }}</span></dd>
+                    <dt class="text-xs font-bold text-base-500 dark:text-base-400">Student notes submitted</dt><dd class="m-0 text-base-700 dark:text-base-200">{{ student_notes_count }}</dd>
+                    <dt class="text-xs font-bold text-base-500 dark:text-base-400">Teacher notes reviewed</dt><dd class="m-0 text-base-700 dark:text-base-200">{{ reviewed_count }}</dd>
                 </dl>
             </div>
         </section>
+    </div>
 
-        <section class="analysis-card full">
-            <h2>Study Groups, Courses, Teachers, And Schedule</h2>
-            <div class="analysis-body">
+    {% comment %}Full-width sections{% endcomment %}
+    <div class="grid grid-cols-1 gap-4">
+        {% comment %}Study Groups{% endcomment %}
+        <section class="bg-white border border-base-200 rounded-default shadow-xs overflow-hidden dark:bg-base-900 dark:border-base-800">
+            <h2 class="m-0 px-4 py-3.5 border-b border-base-200 text-sm font-bold text-base-700 bg-base-50 dark:bg-base-800 dark:text-base-200 dark:border-base-800">Study Groups, Courses, Teachers, And Schedule</h2>
+            <div class="p-0 overflow-x-auto">
                 {% if group_summaries %}
-                <table class="analysis-table">
+                <table class="analysis-table w-full border-collapse">
                     <thead>
-                        <tr>
-                            <th>Group</th>
-                            <th>Course</th>
-                            <th>Teacher</th>
-                            <th>Schedule</th>
-                            <th>Progress</th>
-                            <th>Assignments</th>
+                        <tr class="text-xs font-bold uppercase tracking-wider text-base-500 bg-base-50 dark:bg-base-800 dark:text-base-400">
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Group</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Course</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Teacher</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Schedule</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Progress</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Assignments</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for item in group_summaries %}
-                        <tr>
-                            <td>{{ item.group.name }}</td>
-                            <td>{{ item.group.course }}</td>
-                            <td>{{ item.group.teacher.get_name }}</td>
-                            <td>
+                        <tr class="border-b border-base-100 dark:border-base-800 last:border-b-0 hover:bg-base-50 dark:hover:bg-base-800/30">
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ item.group.name }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ item.group.course }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ item.group.teacher.get_name }}</td>
+                            <td class="px-4 py-3">
                                 {% for group_time in item.group.group_times.all %}
-                                    <span class="status-pill">{{ group_time.get_day_display }} {{ group_time.time|time:"H:i" }}</span>
+                                    <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-bold bg-primary-50 text-primary-700 dark:bg-primary-500/20 dark:text-primary-400">{{ group_time.get_day_display }} {{ group_time.time|time:"H:i" }}</span>
                                 {% empty %}
-                                    -
+                                    <span class="text-base-500 dark:text-base-400">-</span>
                                 {% endfor %}
                             </td>
-                            <td>{{ item.finished_lecture_count }}/{{ item.lecture_count }} lectures finished</td>
-                            <td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ item.finished_lecture_count }}/{{ item.lecture_count }} lectures finished</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">
                                 {{ item.answer_count }}/{{ item.assignment_count }} submitted
                                 {% if item.average_grade %}<br>Average grade: {{ item.average_grade|floatformat:1 }}{% endif %}
                             </td>
@@ -322,231 +157,247 @@
                     </tbody>
                 </table>
                 {% else %}
-                <p class="empty-state">This student is not assigned to any study groups yet.</p>
+                <p class="m-0 px-4 py-4 text-base-500 dark:text-base-400 italic">This student is not assigned to any study groups yet.</p>
                 {% endif %}
             </div>
         </section>
 
-        <section class="analysis-card full">
-            <h2>Recent Lectures</h2>
-            <div class="analysis-body">
+        {% comment %}Recent Lectures{% endcomment %}
+        <section class="bg-white border border-base-200 rounded-default shadow-xs overflow-hidden dark:bg-base-900 dark:border-base-800">
+            <h2 class="m-0 px-4 py-3.5 border-b border-base-200 text-sm font-bold text-base-700 bg-base-50 dark:bg-base-800 dark:text-base-200 dark:border-base-800">Recent Lectures</h2>
+            <div class="p-0 overflow-x-auto">
                 {% if recent_lectures %}
-                <table class="analysis-table">
+                <table class="w-full border-collapse">
                     <thead>
-                        <tr>
-                            <th>Lecture</th>
-                            <th>Group</th>
-                            <th>Date</th>
-                            <th>Duration</th>
-                            <th>Finished</th>
-                            <th>Link status</th>
+                        <tr class="text-xs font-bold uppercase tracking-wider text-base-500 bg-base-50 dark:bg-base-800 dark:text-base-400">
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Lecture</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Group</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Date</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Duration</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Finished</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Link status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for lecture in recent_lectures %}
-                        <tr>
-                            <td>{{ lecture.title }}</td>
-                            <td>{{ lecture.group.name }}</td>
-                            <td>{{ lecture.live_link_date|date:"M d, Y H:i"|default:"-" }}</td>
-                            <td>{{ lecture.duration }} min</td>
-                            <td>{% if lecture.is_finished %}<span class="status-pill success">Finished</span>{% else %}<span class="status-pill warning">Open</span>{% endif %}</td>
-                            <td>{{ lecture.get_link_status }}</td>
+                        <tr class="border-b border-base-100 dark:border-base-800 last:border-b-0 hover:bg-base-50 dark:hover:bg-base-800/30">
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ lecture.title }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ lecture.group.name }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ lecture.live_link_date|date:"M d, Y H:i"|default:"-" }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ lecture.duration }} min</td>
+                            <td class="px-4 py-3">{% if lecture.is_finished %}<span class="inline-flex px-2 py-0.5 rounded-full text-xs font-bold bg-success-50 text-success-700 dark:bg-success-500/20 dark:text-success-400">Finished</span>{% else %}<span class="inline-flex px-2 py-0.5 rounded-full text-xs font-bold bg-warning-50 text-warning-700 dark:bg-warning-500/20 dark:text-warning-400">Open</span>{% endif %}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ lecture.get_link_status }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 {% else %}
-                <p class="empty-state">No lectures were found for this student's groups.</p>
+                <p class="m-0 px-4 py-4 text-base-500 dark:text-base-400 italic">No lectures were found for this student's groups.</p>
                 {% endif %}
             </div>
         </section>
 
-        <section class="analysis-card full">
-            <h2>Teacher Notes And Attendance Signals</h2>
-            <div class="analysis-body">
+        {% comment %}Teacher Notes{% endcomment %}
+        <section class="bg-white border border-base-200 rounded-default shadow-xs overflow-hidden dark:bg-base-900 dark:border-base-800">
+            <h2 class="m-0 px-4 py-3.5 border-b border-base-200 text-sm font-bold text-base-700 bg-base-50 dark:bg-base-800 dark:text-base-200 dark:border-base-800">Teacher Notes And Attendance Signals</h2>
+            <div class="p-0 overflow-x-auto">
                 {% if recent_teacher_notes %}
-                <table class="analysis-table">
+                <table class="w-full border-collapse">
                     <thead>
-                        <tr>
-                            <th>Lecture</th>
-                            <th>Teacher</th>
-                            <th>Status</th>
-                            <th>Delay reason</th>
-                            <th>Note</th>
-                            <th>Created</th>
+                        <tr class="text-xs font-bold uppercase tracking-wider text-base-500 bg-base-50 dark:bg-base-800 dark:text-base-400">
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Lecture</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Teacher</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Status</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Delay reason</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Note</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Created</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for note in recent_teacher_notes %}
-                        <tr>
-                            <td>{{ note.lecture.title }}</td>
-                            <td>{{ note.user.get_name }}</td>
-                            <td>{{ note.get_lecture_status_display }}</td>
-                            <td>{{ note.delay_reason|default:"-"|linebreaksbr }}</td>
-                            <td>{{ note.note|default:"-"|linebreaksbr }}</td>
-                            <td>{{ note.created_at|date:"M d, Y H:i" }}</td>
+                        <tr class="border-b border-base-100 dark:border-base-800 last:border-b-0 hover:bg-base-50 dark:hover:bg-base-800/30">
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ note.lecture.title }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ note.user.get_name }}</td>
+                            <td class="px-4 py-3"><span class="inline-flex px-2 py-0.5 rounded-full text-xs font-bold
+                                {% if note.lecture_status == 'completed' %}bg-success-50 text-success-700 dark:bg-success-500/20 dark:text-success-400
+                                {% elif note.lecture_status == 'student_delayed' %}bg-warning-50 text-warning-700 dark:bg-warning-500/20 dark:text-warning-400
+                                {% else %}bg-danger-50 text-danger-700 dark:bg-danger-500/20 dark:text-danger-400{% endif %}">{{ note.get_lecture_status_display }}</span></td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ note.delay_reason|default:"-"|linebreaksbr }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200 max-w-[250px]">{{ note.note|default:"-"|linebreaksbr }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ note.created_at|date:"M d, Y H:i" }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 {% else %}
-                <p class="empty-state">No teacher notes were found for this student's lectures.</p>
+                <p class="m-0 px-4 py-4 text-base-500 dark:text-base-400 italic">No teacher notes were found for this student's lectures.</p>
                 {% endif %}
             </div>
         </section>
+    </div>
 
-        <section class="analysis-card">
-            <h2>Student Notes And Ratings</h2>
-            <div class="analysis-body">
+    {% comment %}Two-column bottom section{% endcomment %}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {% comment %}Student Notes{% endcomment %}
+        <section class="bg-white border border-base-200 rounded-default shadow-xs overflow-hidden dark:bg-base-900 dark:border-base-800">
+            <h2 class="m-0 px-4 py-3.5 border-b border-base-200 text-sm font-bold text-base-700 bg-base-50 dark:bg-base-800 dark:text-base-200 dark:border-base-800">Student Notes And Ratings</h2>
+            <div class="p-0 overflow-x-auto">
                 {% if recent_student_notes %}
-                <table class="analysis-table">
+                <table class="w-full border-collapse">
                     <thead>
-                        <tr>
-                            <th>Lecture</th>
-                            <th>Rating</th>
-                            <th>Note</th>
+                        <tr class="text-xs font-bold uppercase tracking-wider text-base-500 bg-base-50 dark:bg-base-800 dark:text-base-400">
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Lecture</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Rating</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Note</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for note in recent_student_notes %}
-                        <tr>
-                            <td>{{ note.lecture.title }}</td>
-                            <td>{{ note.rating|default:"-" }}</td>
-                            <td>{{ note.note|default:"-"|linebreaksbr }}</td>
+                        <tr class="border-b border-base-100 dark:border-base-800 last:border-b-0 hover:bg-base-50 dark:hover:bg-base-800/30">
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ note.lecture.title }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ note.rating|default:"-" }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200 max-w-[250px]">{{ note.note|default:"-"|linebreaksbr }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 {% else %}
-                <p class="empty-state">No student-submitted lecture notes were found.</p>
+                <p class="m-0 px-4 py-4 text-base-500 dark:text-base-400 italic">No student-submitted lecture notes were found.</p>
                 {% endif %}
             </div>
         </section>
 
-        <section class="analysis-card">
-            <h2>Join Requests</h2>
-            <div class="analysis-body">
+        {% comment %}Join Requests{% endcomment %}
+        <section class="bg-white border border-base-200 rounded-default shadow-xs overflow-hidden dark:bg-base-900 dark:border-base-800">
+            <h2 class="m-0 px-4 py-3.5 border-b border-base-200 text-sm font-bold text-base-700 bg-base-50 dark:bg-base-800 dark:text-base-200 dark:border-base-800">Join Requests</h2>
+            <div class="p-0 overflow-x-auto">
                 {% if join_requests %}
-                <table class="analysis-table">
+                <table class="w-full border-collapse">
                     <thead>
-                        <tr>
-                            <th>Course</th>
-                            <th>Group</th>
+                        <tr class="text-xs font-bold uppercase tracking-wider text-base-500 bg-base-50 dark:bg-base-800 dark:text-base-400">
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Course</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Group</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for join_request in join_requests %}
-                        <tr>
-                            <td>{{ join_request.course }}</td>
-                            <td>{{ join_request.group|default:"-" }}</td>
+                        <tr class="border-b border-base-100 dark:border-base-800 last:border-b-0 hover:bg-base-50 dark:hover:bg-base-800/30">
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ join_request.course }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ join_request.group|default:"-" }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 {% else %}
-                <p class="empty-state">No join requests were found.</p>
+                <p class="m-0 px-4 py-4 text-base-500 dark:text-base-400 italic">No join requests were found.</p>
                 {% endif %}
             </div>
         </section>
+    </div>
 
-        <section class="analysis-card full">
-            <h2>Assignment Submissions And Grades</h2>
-            <div class="analysis-body">
+    {% comment %}Full-width bottom sections{% endcomment %}
+    <div class="grid grid-cols-1 gap-4">
+        {% comment %}Assignments{% endcomment %}
+        <section class="bg-white border border-base-200 rounded-default shadow-xs overflow-hidden dark:bg-base-900 dark:border-base-800">
+            <h2 class="m-0 px-4 py-3.5 border-b border-base-200 text-sm font-bold text-base-700 bg-base-50 dark:bg-base-800 dark:text-base-200 dark:border-base-800">Assignment Submissions And Grades</h2>
+            <div class="p-0 overflow-x-auto">
                 {% if recent_answers %}
-                <table class="analysis-table">
+                <table class="w-full border-collapse">
                     <thead>
-                        <tr>
-                            <th>Assignment</th>
-                            <th>Lecture</th>
-                            <th>Submitted</th>
-                            <th>Grade</th>
-                            <th>Feedback</th>
+                        <tr class="text-xs font-bold uppercase tracking-wider text-base-500 bg-base-50 dark:bg-base-800 dark:text-base-400">
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Assignment</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Lecture</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Submitted</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Grade</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Feedback</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for answer in recent_answers %}
-                        <tr>
-                            <td>{{ answer.assignment.title }}</td>
-                            <td>{{ answer.assignment.lecture.title }}</td>
-                            <td>{{ answer.submitted_at|date:"M d, Y H:i" }}</td>
-                            <td>
+                        <tr class="border-b border-base-100 dark:border-base-800 last:border-b-0 hover:bg-base-50 dark:hover:bg-base-800/30">
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ answer.assignment.title }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ answer.assignment.lecture.title }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ answer.submitted_at|date:"M d, Y H:i" }}</td>
+                            <td class="px-4 py-3">
                                 {% if answer.grade != None %}
-                                    {{ answer.grade }}/{{ answer.assignment.max_grade }}
+                                    <span class="text-base-700 dark:text-base-200">{{ answer.grade }}/{{ answer.assignment.max_grade }}</span>
                                 {% else %}
-                                    <span class="status-pill warning">Ungraded</span>
+                                    <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-bold bg-warning-50 text-warning-700 dark:bg-warning-500/20 dark:text-warning-400">Ungraded</span>
                                 {% endif %}
                             </td>
-                            <td>{{ answer.teacher_feedback|default:"-"|linebreaksbr }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200 max-w-[200px]">{{ answer.teacher_feedback|default:"-"|linebreaksbr }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 {% else %}
-                <p class="empty-state">No assignment submissions were found.</p>
+                <p class="m-0 px-4 py-4 text-base-500 dark:text-base-400 italic">No assignment submissions were found.</p>
                 {% endif %}
             </div>
         </section>
 
-        <section class="analysis-card full">
-            <h2>Pending Assignments</h2>
-            <div class="analysis-body">
+        {% comment %}Pending Assignments{% endcomment %}
+        <section class="bg-white border border-base-200 rounded-default shadow-xs overflow-hidden dark:bg-base-900 dark:border-base-800">
+            <h2 class="m-0 px-4 py-3.5 border-b border-base-200 text-sm font-bold text-base-700 bg-base-50 dark:bg-base-800 dark:text-base-200 dark:border-base-800">Pending Assignments</h2>
+            <div class="p-0 overflow-x-auto">
                 {% if pending_assignments %}
-                <table class="analysis-table">
+                <table class="w-full border-collapse">
                     <thead>
-                        <tr>
-                            <th>Assignment</th>
-                            <th>Lecture</th>
-                            <th>Due</th>
-                            <th>Max grade</th>
-                            <th>Status</th>
+                        <tr class="text-xs font-bold uppercase tracking-wider text-base-500 bg-base-50 dark:bg-base-800 dark:text-base-400">
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Assignment</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Lecture</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Due</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Max grade</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for assignment in pending_assignments %}
-                        <tr>
-                            <td>{{ assignment.title }}</td>
-                            <td>{{ assignment.lecture.title }}</td>
-                            <td>{{ assignment.due_at|date:"M d, Y H:i" }}</td>
-                            <td>{{ assignment.max_grade }}</td>
-                            <td>{% if assignment.is_past_due %}<span class="status-pill danger">Overdue</span>{% else %}<span class="status-pill warning">Pending</span>{% endif %}</td>
+                        <tr class="border-b border-base-100 dark:border-base-800 last:border-b-0 hover:bg-base-50 dark:hover:bg-base-800/30">
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ assignment.title }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ assignment.lecture.title }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ assignment.due_at|date:"M d, Y H:i" }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ assignment.max_grade }}</td>
+                            <td class="px-4 py-3">{% if assignment.is_past_due %}<span class="inline-flex px-2 py-0.5 rounded-full text-xs font-bold bg-danger-50 text-danger-700 dark:bg-danger-500/20 dark:text-danger-400">Overdue</span>{% else %}<span class="inline-flex px-2 py-0.5 rounded-full text-xs font-bold bg-warning-50 text-warning-700 dark:bg-warning-500/20 dark:text-warning-400">Pending</span>{% endif %}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 {% else %}
-                <p class="empty-state">No pending assignments were found.</p>
+                <p class="m-0 px-4 py-4 text-base-500 dark:text-base-400 italic">No pending assignments were found.</p>
                 {% endif %}
             </div>
         </section>
 
-        <section class="analysis-card full">
-            <h2>Shared Learning Resources</h2>
-            <div class="analysis-body">
+        {% comment %}Shared Resources{% endcomment %}
+        <section class="bg-white border border-base-200 rounded-default shadow-xs overflow-hidden dark:bg-base-900 dark:border-base-800">
+            <h2 class="m-0 px-4 py-3.5 border-b border-base-200 text-sm font-bold text-base-700 bg-base-50 dark:bg-base-800 dark:text-base-200 dark:border-base-800">Shared Learning Resources</h2>
+            <div class="p-0 overflow-x-auto">
                 {% if shared_resources %}
-                <table class="analysis-table">
+                <table class="w-full border-collapse">
                     <thead>
-                        <tr>
-                            <th>Resource</th>
-                            <th>Course</th>
-                            <th>Group</th>
-                            <th>Shared by</th>
-                            <th>Shared at</th>
+                        <tr class="text-xs font-bold uppercase tracking-wider text-base-500 bg-base-50 dark:bg-base-800 dark:text-base-400">
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Resource</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Course</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Group</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Shared by</th>
+                            <th class="text-left px-4 py-3 border-b border-base-200 dark:border-base-800">Shared at</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for item in shared_resources %}
-                        <tr>
-                            <td>{{ item.resource.file.name }}</td>
-                            <td>{{ item.resource.course }}</td>
-                            <td>{{ item.studygroup.name }}</td>
-                            <td>{{ item.shared_by.get_name }}</td>
-                            <td>{{ item.shared_at|date:"M d, Y H:i" }}</td>
+                        <tr class="border-b border-base-100 dark:border-base-800 last:border-b-0 hover:bg-base-50 dark:hover:bg-base-800/30">
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ item.resource.file.name }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ item.resource.course }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ item.studygroup.name }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ item.shared_by.get_name }}</td>
+                            <td class="px-4 py-3 text-base-700 dark:text-base-200">{{ item.shared_at|date:"M d, Y H:i" }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 {% else %}
-                <p class="empty-state">No shared resources were found for this student's groups.</p>
+                <p class="m-0 px-4 py-4 text-base-500 dark:text-base-400 italic">No shared resources were found for this student's groups.</p>
                 {% endif %}
             </div>
         </section>

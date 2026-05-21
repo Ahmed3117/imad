@@ -489,7 +489,6 @@ def send_email(request):
                 name=contact_data["name"],
                 email=user_email,
                 phone=contact_data.get("phone", "") or "",
-                telegram_username=contact_data.get("telegram_username", "") or "",
                 message=contact_data["message"],
             )
             try:
@@ -553,18 +552,13 @@ def book_free_session(request):
         normalize_phone(data.get("phone", ""), data.get("phone_country_code"))
         or normalize_phone(request.user.phone)
     )
-    telegram_username = data.get("telegram_username", "") or getattr(request.user, "telegram_username", "") or ""
     message = data.get("message", "")
 
     FreeSession.objects.create(
         user=request.user,
         phone=phone,
-        telegram_username=telegram_username,
         message=message,
     )
-    if telegram_username and not getattr(request.user, "telegram_username", None):
-        request.user.telegram_username = telegram_username
-        request.user.save(update_fields=["telegram_username"])
 
     # Fire server-side Lead event via Meta Conversions API
     # (best-effort; must never break the booking flow)
@@ -596,7 +590,7 @@ DEFAULT_LEGAL_CONTENT = {
 <p>Welcome to Nabbiuwny. We respect your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, use, store, and safeguard your information when you use our website and mobile application.</p>
 
 <h2>2. Information We Collect</h2>
-<p><strong>Personal Information:</strong> When you register, we collect your name, email address, phone number, and Telegram username. This information is necessary to create your account and match you with the right teacher.</p>
+<p><strong>Personal Information:</strong> When you register, we collect your name, email address, and phone number. This information is necessary to create your account and match you with the right teacher.</p>
 <p><strong>Payment Information:</strong> We collect billing details and payment method information through our secure payment processors. We do not store full credit card numbers on our servers.</p>
 <p><strong>Usage Data:</strong> We collect information about how you interact with our platform, including class attendance, lecture progress, and assignment submissions.</p>
 <p><strong>Device Information:</strong> We may collect device type, operating system, and IP address to improve our services and ensure security.</p>
@@ -784,7 +778,7 @@ DEFAULT_LEGAL_CONTENT = {
 <p>مرحبًا بك في نبـيـونـي. نحن نحترم خصوصيتك وملتزمون بحماية بياناتك الشخصية. توضح سياسة الخصوصية هذه كيفية جمعنا واستخدامنا وتخزيننا وحماية معلوماتك عند استخدامك لموقعنا وتطبيقنا.</p>
 
 <h2>2. المعلومات التي نجمعها</h2>
-<p><strong>المعلومات الشخصية:</strong> عند التسجيل، نجمع اسمك وعنوان بريدك الإلكتروني ورقم هاتفك واسم مستخدم تيليجرام. هذه المعلومات ضرورية لإنشاء حسابك ومطابقته مع المعلم المناسب.</p>
+<p><strong>المعلومات الشخصية:</strong> عند التسجيل، نجمع اسمك وعنوان بريدك الإلكتروني ورقم هاتفك. هذه المعلومات ضرورية لإنشاء حسابك ومطابقته مع المعلم المناسب.</p>
 <p><strong>معلومات الدفع:</strong> نجمع تفاصيل الفوترة ومعلومات طريقة الدفع من خلال معالجات الدفع الآمنة لدينا. لا نقوم بتخزين أرقام بطاقات الائتمان الكاملة على خوادمنا.</p>
 <p><strong>بيانات الاستخدام:</strong> نجمع معلومات حول كيفية تفاعلك مع منصتنا، بما في ذلك حضور الحصص وتقدم المحاضرات وتسليم الواجبات.</p>
 <p><strong>معلومات الجهاز:</strong> قد نجمع نوع الجهاز ونظام التشغيل وعنوان IP لتحسين خدماتنا وضمان الأمان.</p>

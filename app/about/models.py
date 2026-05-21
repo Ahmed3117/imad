@@ -322,7 +322,6 @@ class FreeSession(models.Model):
         related_name="free_session",
     )
     phone = models.CharField(max_length=30, blank=True, null=True)
-    telegram_username = models.CharField(max_length=32, blank=True, null=True)
     message = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
     handled = models.BooleanField(default=False)
@@ -352,7 +351,6 @@ class ContactMessage(models.Model):
     name = models.CharField(max_length=200)
     email = models.EmailField()
     phone = models.CharField(max_length=30, blank=True, null=True)
-    telegram_username = models.CharField(max_length=32, blank=True, null=True)
     message = models.TextField()
     handled = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -16,7 +16,6 @@ class User(AbstractUser):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='admin')
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=20, blank=True, null=True)
-    telegram_username = models.CharField(max_length=32, blank=True, null=True)
     image = models.ImageField(upload_to='profiles/', blank=True, null=True)
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

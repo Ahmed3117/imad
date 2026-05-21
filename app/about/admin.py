@@ -6,7 +6,8 @@ from django.dispatch import receiver
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
-from unfold.admin import ModelAdmin, StackedInline, TabularInline
+from project.admin_base import ModelAdmin
+from unfold.admin import StackedInline, TabularInline
 from unfold.sites import UnfoldAdminSite
 
 from project.admin_helpers import UnhandledChangelistMixin, contact_link_icons
@@ -31,6 +32,7 @@ from .models import (
 class CompanyInfoTranslationInline(TabularInline):
     model = CompanyInfoTranslation
     extra = 1
+    tab = True
 
 
 @admin.register(CompanyInfo)
@@ -52,6 +54,7 @@ class CompanyInfoAdmin(ModelAdmin):
 class HomePageContentTranslationInline(StackedInline):
     model = HomePageContentTranslation
     extra = 1
+    tab = True
     fieldsets = (
         (
             "Hero",
@@ -193,12 +196,14 @@ class HomePageContentTranslationInline(StackedInline):
 class HomePageFeatureTranslationInline(TabularInline):
     model = HomePageFeatureTranslation
     extra = 1
+    tab = True
     fields = ("language", "title", "subtitle", "meta", "description")
 
 
 class HomePageFeatureInline(StackedInline):
     model = HomePageFeature
     extra = 1
+    tab = True
     fields = ("section", "icon_class", "image", "order", "is_active")
     show_change_link = True
 
@@ -206,11 +211,13 @@ class HomePageFeatureInline(StackedInline):
 class HomePageVideoPointTranslationInline(TabularInline):
     model = HomePageVideoPointTranslation
     extra = 1
+    tab = True
 
 
 class HomePageVideoPointInline(StackedInline):
     model = HomePageVideoPoint
     extra = 1
+    tab = True
     fields = ("icon_class", "order", "is_active")
     show_change_link = True
 
@@ -337,9 +344,7 @@ class FreeSessionAdmin(UnhandledChangelistMixin, ModelAdmin):
         "user__username",
         "user__email",
         "user__phone",
-        "user__telegram_username",
         "phone",
-        "telegram_username",
     )
     ordering = ("handled", "-requested_at")
     readonly_fields = ("user", "phone", "message", "requested_at", "marked_done_at")
@@ -351,11 +356,9 @@ class FreeSessionAdmin(UnhandledChangelistMixin, ModelAdmin):
 
     def contact_links(self, obj):
         phone = obj.phone or obj.user.phone
-        telegram = obj.telegram_username or getattr(obj.user, "telegram_username", "")
         return contact_link_icons(
             phone=phone,
             email=getattr(obj.user, "email", ""),
-            telegram_username=telegram,
         )
 
     contact_links.short_description = "Contact"
@@ -365,12 +368,6 @@ class FreeSessionAdmin(UnhandledChangelistMixin, ModelAdmin):
             "User Info",
             {
                 "fields": ("user", "phone", "message"),
-            },
-        ),
-        (
-            "Contact",
-            {
-                "fields": ("telegram_username",),
             },
         ),
         (
@@ -394,16 +391,15 @@ class ContactMessageAdmin(UnhandledChangelistMixin, ModelAdmin):
     )
     list_filter = ("handled",)
     list_editable = ("handled",)
-    search_fields = ("name", "email", "phone", "telegram_username", "message")
+    search_fields = ("name", "email", "phone", "message")
     ordering = ("handled", "-created_at")
-    readonly_fields = ("name", "email", "phone", "telegram_username", "message", "created_at")
+    readonly_fields = ("name", "email", "phone", "message", "created_at")
     actions = ["mark_as_handled", "mark_as_unhandled"]
 
     def contact_links(self, obj):
         return contact_link_icons(
             phone=obj.phone,
             email=obj.email,
-            telegram_username=obj.telegram_username,
         )
 
     contact_links.short_description = "Contact"
@@ -428,7 +424,7 @@ class ContactMessageAdmin(UnhandledChangelistMixin, ModelAdmin):
         (
             "Message",
             {
-                "fields": ("name", "email", "phone", "telegram_username", "message"),
+                "fields": ("name", "email", "phone", "message"),
             },
         ),
         (
@@ -551,6 +547,7 @@ def get_fixture_model_map():
 class LegalPageTranslationInline(TabularInline):
     model = LegalPageTranslation
     extra = 1
+    tab = True
 
 
 @admin.register(LegalPage)
@@ -562,7 +559,7 @@ class LegalPageAdmin(ModelAdmin):
 
 
 @admin.register(AccountDeletionRequest)
-class AccountDeletionRequestAdmin(UnhandledChangelistMixin, ModelAdmin):
+class AccountDeletionRequestAdmin(ModelAdmin):
     list_display = (
         "user",
         "user_email",

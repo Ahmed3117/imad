@@ -6,7 +6,6 @@ class ContactForm(forms.Form):
     email = forms.EmailField(required=True)
     phone = forms.CharField(max_length=30, required=False)
     phone_country_code = forms.CharField(max_length=8, required=False)
-    telegram_username = forms.CharField(max_length=32, required=False)
     message = forms.CharField(widget=forms.Textarea, required=True)
     website = forms.CharField(required=False)
 

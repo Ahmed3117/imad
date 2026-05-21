@@ -4,7 +4,8 @@ from django.contrib.auth import get_user_model
 from django.db.models import Avg, Count, Q
 from django.urls import reverse
 from django.utils.html import format_html
-from unfold.admin import ModelAdmin, TabularInline
+from project.admin_base import ModelAdmin
+from unfold.admin import TabularInline
 
 from project.admin_helpers import UnhandledChangelistMixin, contact_link_icons
 from .models import (
@@ -27,11 +28,13 @@ class GroupTimeInline(TabularInline):
     extra = 1
     fields = ("day", "time")
     ordering = ("day", "time")
+    tab = True
 
 
 class LectureInline(TabularInline):
     model = Lecture
     extra = 0
+    tab = True
     fields = (
         "title",
         "live_link_date",
@@ -50,6 +53,7 @@ class LectureInline(TabularInline):
 class StudyGroupResourceInline(TabularInline):
     model = StudyGroupResource
     extra = 0
+    tab = True
     fields = ("resource", "shared_by", "shared_at")
     readonly_fields = ("shared_at",)
     autocomplete_fields = ("resource", "shared_by")
@@ -249,7 +253,6 @@ class JoinRequestAdmin(UnhandledChangelistMixin, ModelAdmin):
         "student__name",
         "student__email",
         "student__phone",
-        "student__telegram_username",
         "course__name",
         "group__name",
     )
@@ -282,8 +285,7 @@ class JoinRequestAdmin(UnhandledChangelistMixin, ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def student_link(self, obj):
-        url = reverse("admin:accounts_user_change", args=[obj.student_id])
-        return format_html('<a href="{}">{}</a>', url, obj.student.get_name() or obj.student.username)
+        return obj.student.get_name() or obj.student.username
 
     student_link.short_description = "Student"
     student_link.admin_order_field = "student__name"
@@ -292,7 +294,6 @@ class JoinRequestAdmin(UnhandledChangelistMixin, ModelAdmin):
         return contact_link_icons(
             phone=obj.student.phone,
             email=obj.student.email,
-            telegram_username=getattr(obj.student, "telegram_username", ""),
         )
 
     contact_links.short_description = "Contact"
@@ -352,12 +353,14 @@ class JoinRequestAdmin(UnhandledChangelistMixin, ModelAdmin):
 class LectureFileInline(TabularInline):
     model = LectureFile
     extra = 0
+    tab = True
     fields = ("file",)
 
 
 class LectureNoteInline(TabularInline):
     model = LectureNote
     extra = 0
+    tab = True
     fields = ("user", "note", "rating", "lecture_status", "delay_reason", "created_at")
     readonly_fields = ("created_at",)
     autocomplete_fields = ("user",)
@@ -367,6 +370,7 @@ class LectureNoteInline(TabularInline):
 class LectureVisitHistoryInline(TabularInline):
     model = LectureVisitHistory
     extra = 0
+    tab = True
     fields = ("user", "visited_at")
     readonly_fields = ("user", "visited_at")
     can_delete = False
