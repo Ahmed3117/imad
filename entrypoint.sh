@@ -20,10 +20,11 @@ while True:
         time.sleep(2)
 PY
 
-# Copy static files to volume
-cp -r /static_source/* /app/static/
+# Copy custom static files to a separate dir for collectstatic discovery
+mkdir -p /app/static_src
+cp -r /static_source/* /app/static_src/
 
-# Collect all static files (Django admin, UNFOLD, etc.) into the nginx-served directory
+# Collect all static files into the shared volume
 python /app/manage.py collectstatic --noinput
 
 # Run Django migrations
