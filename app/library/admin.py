@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from unfold.admin import ModelAdmin, TabularInline
+from project.admin_base import ModelAdmin
+from unfold.admin import TabularInline
 
 from .models import CourseLibrary, LibraryCategory, MyLibrary
 

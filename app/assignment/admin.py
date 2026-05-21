@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.admin.filters import RelatedOnlyFieldListFilter
 from django.contrib.auth import get_user_model
-from unfold.admin import ModelAdmin, TabularInline
+from project.admin_base import ModelAdmin
+from unfold.admin import TabularInline
 
 from .models import Assignment, StudentAnswer
 
@@ -11,6 +12,7 @@ User = get_user_model()
 class StudentAnswerInline(TabularInline):
     model = StudentAnswer
     extra = 0
+    tab = True
     fields = (
         "student",
         "submitted_at",

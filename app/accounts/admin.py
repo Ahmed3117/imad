@@ -7,7 +7,8 @@ from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.html import format_html
-from unfold.admin import ModelAdmin, StackedInline, TabularInline
+from project.admin_base import ModelAdmin
+from unfold.admin import StackedInline, TabularInline
 
 from about.models import FreeSession
 from assignment.models import Assignment, StudentAnswer
@@ -33,6 +34,7 @@ class StudentProfileInline(StackedInline):
     can_delete = True
     verbose_name_plural = 'Student profile'
     extra = 0
+    tab = True
 
 
 class TeacherInfoInline(StackedInline):
@@ -40,6 +42,7 @@ class TeacherInfoInline(StackedInline):
     can_delete = True
     verbose_name_plural = "Teacher public profile"
     extra = 0
+    tab = True
     fields = ("bio", "specialization", "profile_link", "is_active_to_be_shown_in_home")
 
 
@@ -48,6 +51,7 @@ class TeacheroomAccountInline(StackedInline):
     can_delete = True
     verbose_name_plural = "Teacher Zoom account"
     extra = 0
+    tab = True
     fields = (
         "account_id",
         "client_id",
@@ -61,6 +65,7 @@ class TeacheroomAccountInline(StackedInline):
 class TeacherInfoTranslationInline(TabularInline):
     model = TeacherInfoTranslation
     extra = 1
+    tab = True
 
 
 @admin.register(User)
@@ -71,7 +76,6 @@ class CustomUserAdmin(ModelAdmin, BaseUserAdmin):
         'email',
         'role',
         'phone',
-        'telegram_username',
         'is_active',
         'is_staff',
         'student_analysis_link',
@@ -80,7 +84,7 @@ class CustomUserAdmin(ModelAdmin, BaseUserAdmin):
     list_display_links = ('username', 'name')
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Profile', {'fields': ('role', 'name', 'email', 'phone', 'telegram_username', 'image')}),
+        ('Profile', {'fields': ('role', 'name', 'email', 'phone', 'image')}),
         ('Permissions', {
             'classes': ('collapse',),
             'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
@@ -90,11 +94,11 @@ class CustomUserAdmin(ModelAdmin, BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'name', 'email', 'phone', 'telegram_username', 'role', 'password1', 'password2'),
+            'fields': ('username', 'name', 'email', 'phone', 'role', 'password1', 'password2'),
         }),
     )
 
-    search_fields = ('username', 'email', 'name', 'phone', 'telegram_username')
+    search_fields = ('username', 'email', 'name', 'phone')
     ordering = ('role', 'name', 'username')
     readonly_fields = ('last_login', 'date_joined')
 

@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import dotenv
+from django.templatetags.static import static
 from django.urls import reverse_lazy
 
 # ─────────────────────────────────────────────
@@ -199,105 +200,131 @@ META_CAPI_ACCESS_TOKEN = os.environ.get('META_CAPI_ACCESS_TOKEN', 'EAAUeTTiaNvoB
 UNFOLD = {
     "SITE_TITLE": "Nabbiuwny Admin",
     "SITE_HEADER": "Nabbiuwny",
-    "SITE_SYMBOL": "school",
+    "SITE_LOGO": {
+        "light": lambda request: static("imgs/hero/logo.png"),
+        "dark": lambda request: static("imgs/hero/logo.png"),
+    },
     "SIDEBAR": {
         "show_search": True,
         "navigation": [
             {
                 "title": "Requests",
+                "collapsible": True,
                 "items": [
                     {
                         "title": "Free Session Requests",
+                        "icon": "mail",
                         "link": reverse_lazy("admin:about_freesession_changelist"),
                     },
                     {
                         "title": "Contact Messages",
+                        "icon": "chat",
                         "link": reverse_lazy("admin:about_contactmessage_changelist"),
                     },
                     {
                         "title": "Join Requests",
+                        "icon": "person_add",
                         "link": reverse_lazy("admin:subscriptions_joinrequest_changelist"),
                     },
                 ],
             },
             {
                 "title": "Users & Accounts",
+                "collapsible": True,
                 "items": [
                     {
                         "title": "Users",
+                        "icon": "group",
                         "link": reverse_lazy("admin:accounts_user_changelist"),
                     },
                     {
                         "title": "Zoom Accounts",
+                        "icon": "videocam",
                         "link": reverse_lazy("admin:accounts_zoomaccount_changelist"),
                     },
                     {
                         "title": "Account Deletion Requests",
+                        "icon": "delete_forever",
                         "link": reverse_lazy("admin:about_accountdeletionrequest_changelist"),
                     },
                 ],
             },
             {
                 "title": "Courses",
+                "collapsible": True,
                 "items": [
                     {
                         "title": "Levels",
+                        "icon": "signal_cellular_alt",
                         "link": reverse_lazy("admin:courses_level_changelist"),
                     },
                     {
                         "title": "Tracks",
+                        "icon": "route",
                         "link": reverse_lazy("admin:courses_track_changelist"),
                     },
                     {
                         "title": "Courses",
+                        "icon": "menu_book",
                         "link": reverse_lazy("admin:courses_course_changelist"),
                     },
                 ],
             },
             {
                 "title": "Study Groups",
+                "collapsible": True,
                 "items": [
                     {
                         "title": "Study Groups",
+                        "icon": "groups",
                         "link": reverse_lazy("admin:subscriptions_studygroup_changelist"),
                     },
                 ],
             },
             {
                 "title": "Library",
+                "collapsible": True,
                 "items": [
                     {
                         "title": "Library Categories",
+                        "icon": "category",
                         "link": reverse_lazy("admin:library_librarycategory_changelist"),
                     },
                     {
                         "title": "Course Libraries",
+                        "icon": "folder",
                         "link": reverse_lazy("admin:library_courselibrary_changelist"),
                     },
                 ],
             },
             {
                 "title": "Home Page",
+                "collapsible": True,
                 "items": [
                     {
                         "title": "Company Info",
+                        "icon": "business",
                         "link": reverse_lazy("admin:about_companyinfo_changelist"),
                     },
                     {
                         "title": "Home Page Content",
+                        "icon": "home",
                         "link": reverse_lazy("admin:about_homepagecontent_changelist"),
                     },
                     {
                         "title": "Legal Pages",
+                        "icon": "gavel",
                         "link": reverse_lazy("admin:about_legalpage_changelist"),
                     },
                 ],
             },
             {
                 "title": "System",
+                "collapsible": True,
                 "items": [
                     {
                         "title": "Groups",
+                        "icon": "settings",
                         "link": reverse_lazy("admin:auth_group_changelist"),
                     },
                 ],

@@ -114,7 +114,6 @@ def register_user(request):
                         registration_data.get('phone'),
                         registration_data.get('phone_country_code'),
                     ),
-                    telegram_username=registration_data.get('telegram_username') or None,
                     image=request.FILES.get('image'),
                     role=registration_data['role']
                 )
@@ -243,7 +242,6 @@ def edit_profile(request):
             request.POST.get('phone'),
             request.POST.get('phone_country_code'),
         ) or user.phone
-        user.telegram_username = request.POST.get('telegram_username', user.telegram_username)
         if 'image' in request.FILES:
             user.image = request.FILES['image']
         user.save()
