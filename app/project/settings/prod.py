@@ -28,7 +28,7 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 # Static files – collectstatic writes here;
 # Nginx serves from this directory.
 # ─────────────────────────────────────────────
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # ─────────────────────────────────────────────
 # Channels – Redis channel layer for production
