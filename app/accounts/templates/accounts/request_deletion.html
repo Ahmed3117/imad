@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block translationFolder %}data-translation-folder="profile"{% endblock %}
+{% block title %}Request Account Deletion{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white text-center">
+                    <h4 class="mb-0" data-translate="delete_account_title">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Delete Your Account
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if existing_request %}
+                        <div class="alert alert-info" role="alert">
+                            <h5 class="alert-heading" data-translate="existing_request_title">Request Already Submitted</h5>
+                            <p data-translate="existing_request_body">
+                                You have already submitted an account deletion request on {{ existing_request.requested_at|date:"F j, Y" }}.
+                                Current status: <strong>{{ existing_request.get_status_display }}</strong>.
+                            </p>
+                            <hr>
+                            <p class="mb-0" data-translate="existing_request_note">
+                                If you have questions, please contact our support team.
+                            </p>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning" role="alert">
+                            <h5 class="alert-heading" data-translate="warning_title">Warning: This action is irreversible</h5>
+                            <p data-translate="warning_body">
+                                Requesting account deletion will initiate the permanent removal of your account and all associated data, including:
+                            </p>
+                            <ul>
+                                <li data-translate="delete_item_profile">Your profile and personal information</li>
+                                <li data-translate="delete_item_classes">Your class history and attendance records</li>
+                                <li data-translate="delete_item_payments">Your payment and subscription history</li>
+                                <li data-translate="delete_item_messages">Your chat messages and communications</li>
+                                <li data-translate="delete_item_assignments">Your assignments and grades</li>
+                            </ul>
+                            <hr>
+                            <p class="mb-0" data-translate="warning_note">
+                                Some data may be retained for legal or regulatory compliance purposes. Once processed, this action cannot be undone.
+                            </p>
+                        </div>
+
+                        <form method="post" action="{% url 'accounts:request_account_deletion' %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="reason" class="form-label" data-translate="deletion_reason_label">
+                                    Reason for deletion (optional)
+                                </label>
+                                <textarea
+                                    class="form-control"
+                                    id="reason"
+                                    name="reason"
+                                    rows="3"
+                                    placeholder="Tell us why you are leaving..."
+                                ></textarea>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" value="" id="confirmDeletion" required>
+                                <label class="form-check-label" for="confirmDeletion" data-translate="confirm_deletion_label">
+                                    I understand that this will permanently delete my account and associated data.
+                                </label>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-danger" data-translate="confirm_delete_button">
+                                    Confirm & Request Deletion
+                                </button>
+                                <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary" data-translate="cancel_button">
+                                    Cancel
+                                </a>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

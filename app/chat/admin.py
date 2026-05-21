@@ -1,9 +1,10 @@
 from django.contrib import admin
+from unfold.admin import ModelAdmin, TabularInline
 
 from chat.models import Message, Room
 
 
-class MessageInline(admin.TabularInline):
+class MessageInline(TabularInline):
     model = Message
     extra = 0
     fields = ("sender", "is_agent", "text", "timestamp")
@@ -13,7 +14,7 @@ class MessageInline(admin.TabularInline):
 
 
 @admin.register(Room)
-class RoomAdmin(admin.ModelAdmin):
+class RoomAdmin(ModelAdmin):
     list_display = (
         "code",
         "status",

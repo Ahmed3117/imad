@@ -1022,3 +1022,42 @@ def mark_lecture_visited(request, lecture_id):
             return JsonResponse({"error": "Lecture not found"}, status=404)
     
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+# ─────────────────────────────────────────────
+# Account Deletion
+# ─────────────────────────────────────────────
+
+@login_required
+def request_account_deletion(request):
+    """Render the account deletion confirmation page."""
+    from about.models import AccountDeletionRequest
+
+    existing = AccountDeletionRequest.objects.filter(
+        user=request.user
+    ).first()
+
+    if request.method == "POST":
+        if existing:
+            if existing.status == "pending":
+                messages.warning(request, "You already have a pending deletion request.")
+            else:
+                messages.info(request, "Your previous request has already been processed.")
+            return redirect("accounts:profile")
+
+        reason = request.POST.get("reason", "").strip()
+        AccountDeletionRequest.objects.create(
+            user=request.user,
+            reason=reason if reason else None,
+        )
+        messages.success(
+            request,
+            "Your account deletion request has been submitted. Our team will review it within 7 business days. "
+            "You will be notified once it is processed."
+        )
+        return redirect("accounts:profile")
+
+    context = {
+        "existing_request": existing,
+    }
+    return render(request, "accounts/request_deletion.html", context)

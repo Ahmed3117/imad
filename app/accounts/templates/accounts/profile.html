@@ -270,6 +270,19 @@
         <p class="text-muted text-center" data-translate="no_study_groups">No study groups found.</p>
     {% endif %}
 
+    <!-- Account Deletion Section -->
+    <div class="card mt-5 border-danger">
+        <div class="card-body text-center">
+            <h5 class="card-title text-danger" data-translate="account_deletion_title">Delete Account</h5>
+            <p class="card-text text-muted" data-translate="account_deletion_description">
+                You can request the deletion of your account and all associated data. This action is irreversible once processed.
+            </p>
+            <a href="{% url 'accounts:request_account_deletion' %}" class="btn btn-outline-danger" data-translate="request_deletion">
+                Request Account Deletion
+            </a>
+        </div>
+    </div>
+
 </div>
 
 <script>

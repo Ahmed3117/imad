@@ -19,5 +19,11 @@
     "my_schedule": "My Schedule",
     "all_timetables": "All Timetables",
     "track_lectures": "Track Lectures",
-    "general_library": "General Library"
+    "general_library": "General Library",
+    "footer_privacy": "Privacy Policy",
+    "footer_terms": "Terms & Conditions",
+    "footer_refund": "Refund Policy",
+    "footer_cookie": "Cookie Policy",
+    "footer_payment": "Payment Terms",
+    "footer_copyright": "All rights reserved."
 }

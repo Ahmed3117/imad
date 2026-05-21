@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="nabbiuwny institution">
     <meta property="og:description" content="">
-    <meta property="og:image" content="https://nabbiuwny.com/static/imgs/hero/hero.png">
+    <meta property="og:image" content="https://nabbiuwny.com/static/imgs/hero/logo.png">
     <meta property="og:url" content="https://nabbiuwny.com/">
     <meta property="og:type" content="website">
     <meta name="csrf-token" content="{{ csrf_token }}">
@@ -342,6 +342,26 @@
     });
   }
 </script>
+
+<!-- Footer (visible on non-home pages) -->
+{% if request.path != '/' %}
+<footer class="bg-light text-center py-3 mt-auto border-top">
+    <div class="container">
+        <ul class="list-inline mb-2 small">
+            <li class="list-inline-item"><a href="{% url 'about:privacy_policy' %}" class="text-decoration-none text-muted" data-translate="footer_privacy"><span>Privacy Policy</span></a></li>
+            <li class="list-inline-item mx-1 text-muted">|</li>
+            <li class="list-inline-item"><a href="{% url 'about:terms_conditions' %}" class="text-decoration-none text-muted" data-translate="footer_terms"><span>Terms & Conditions</span></a></li>
+            <li class="list-inline-item mx-1 text-muted">|</li>
+            <li class="list-inline-item"><a href="{% url 'about:refund_policy' %}" class="text-decoration-none text-muted" data-translate="footer_refund"><span>Refund Policy</span></a></li>
+            <li class="list-inline-item mx-1 text-muted">|</li>
+            <li class="list-inline-item"><a href="{% url 'about:cookie_policy' %}" class="text-decoration-none text-muted" data-translate="footer_cookie"><span>Cookie Policy</span></a></li>
+            <li class="list-inline-item mx-1 text-muted">|</li>
+            <li class="list-inline-item"><a href="{% url 'about:payment_terms' %}" class="text-decoration-none text-muted" data-translate="footer_payment"><span>Payment Terms</span></a></li>
+        </ul>
+        <p class="small text-muted mb-0">&copy; {% now 'Y' %} Nabbiuwny. <span data-translate="footer_copyright"><span>All rights reserved.</span></span></p>
+    </div>
+</footer>
+{% endif %}
 
 <!-- Additional JS -->
 {% block extra_js %}{% endblock %}

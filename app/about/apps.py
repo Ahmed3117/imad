@@ -7,7 +7,10 @@ class AboutConfig(AppConfig):
     name = 'about'
 
     def ready(self):
-        """Patch admin.site.get_app_list after all apps are loaded."""
+        """Patch admin.site.get_app_list after all apps are loaded.
+        This preserves the exact sidebar grouping and model visibility
+        from before the UNFOLD migration, while UNFOLD provides the styling.
+        """
         from django.contrib import admin
 
         ADMIN_SIDEBAR_GROUPS = settings.ADMIN_SIDEBAR_GROUPS

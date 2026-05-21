@@ -32,6 +32,7 @@ urlpatterns = [
     path('check-link-valid/<int:lecture_id>/', views.check_link_valid, name='check_link_valid'),
     path('lecture/<int:lecture_id>/visit/', views.visit_lecture_link, name='visit_lecture_link'),
 
+    path('request-account-deletion/', views.request_account_deletion, name='request_account_deletion'),
 
 
 ]
