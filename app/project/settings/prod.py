@@ -7,7 +7,7 @@ from .base import *
 # ─────────────────────────────────────────────
 # Security
 # ─────────────────────────────────────────────
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     'nabbiuwny.com',
