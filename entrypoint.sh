@@ -23,6 +23,9 @@ PY
 # Copy static files to volume
 cp -r /static_source/* /app/static/
 
+# Collect all static files (Django admin, UNFOLD, etc.) into the nginx-served directory
+python /app/manage.py collectstatic --noinput
+
 # Run Django migrations
 python /app/manage.py migrate
 
