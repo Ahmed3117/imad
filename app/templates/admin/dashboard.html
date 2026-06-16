@@ -1,0 +1,309 @@
+{% load i18n %}
+{% if dashboard_data %}
+    {% with d=dashboard_data %}
+    <!-- Summary Cards Row -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white dark:bg-base-900 rounded-default p-4 shadow-xs border border-base-200/50 dark:border-base-700">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-blue-600 dark:text-blue-400">group</span>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-base-900 dark:text-base-100">{{ d.total_users }}</div>
+                    <div class="text-xs text-base-500">Users</div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-base-900 rounded-default p-4 shadow-xs border border-base-200/50 dark:border-base-700">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-500/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-green-600 dark:text-green-400">groups</span>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-base-900 dark:text-base-100">{{ d.total_study_groups }}</div>
+                    <div class="text-xs text-base-500">Study Groups</div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-base-900 rounded-default p-4 shadow-xs border border-base-200/50 dark:border-base-700">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-500/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-purple-600 dark:text-purple-400">video_library</span>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-base-900 dark:text-base-100">{{ d.total_lectures }}</div>
+                    <div class="text-xs text-base-500">Lectures</div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-base-900 rounded-default p-4 shadow-xs border border-base-200/50 dark:border-base-700">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-amber-600 dark:text-amber-400">chat</span>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-base-900 dark:text-base-100">{{ d.total_messages }}</div>
+                    <div class="text-xs text-base-500">Messages</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
+        <!-- Requests Column -->
+        <div class="bg-base-50 rounded-default p-4 dark:bg-base-800 col-span-1">
+            <h3 class="font-semibold text-base-900 dark:text-base-100 mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-lg">notifications</span> Requests
+            </h3>
+            <div class="space-y-3">
+                {% with label="Free Session Requests" unhandled=d.unhandled_freesessions total=d.total_freesessions %}
+                <div class="bg-white dark:bg-base-900 rounded-default p-3 shadow-xs">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-sm font-medium">{{ label }}</span>
+                        <span class="text-xs text-base-500">Total: {{ total }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-base-500">Unhandled:</span>
+                        <span class="text-sm font-semibold {% if unhandled > 0 %}text-red-600 dark:text-red-400{% else %}text-green-600 dark:text-green-400{% endif %}">{{ unhandled }}</span>
+                    </div>
+                </div>
+                {% endwith %}
+                {% with label="Contact Messages" unhandled=d.unhandled_contacts total=d.total_contacts %}
+                <div class="bg-white dark:bg-base-900 rounded-default p-3 shadow-xs">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-sm font-medium">{{ label }}</span>
+                        <span class="text-xs text-base-500">Total: {{ total }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-base-500">Unhandled:</span>
+                        <span class="text-sm font-semibold {% if unhandled > 0 %}text-red-600 dark:text-red-400{% else %}text-green-600 dark:text-green-400{% endif %}">{{ unhandled }}</span>
+                    </div>
+                </div>
+                {% endwith %}
+                {% with label="Join Requests" unhandled=d.unhandled_joinrequests total=d.total_joinrequests %}
+                <div class="bg-white dark:bg-base-900 rounded-default p-3 shadow-xs">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-sm font-medium">{{ label }}</span>
+                        <span class="text-xs text-base-500">Total: {{ total }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-base-500">Unhandled:</span>
+                        <span class="text-sm font-semibold {% if unhandled > 0 %}text-red-600 dark:text-red-400{% else %}text-green-600 dark:text-green-400{% endif %}">{{ unhandled }}</span>
+                    </div>
+                </div>
+                {% endwith %}
+                {% with label="Account Deletions" unhandled=d.pending_deletions total=d.total_deletions %}
+                <div class="bg-white dark:bg-base-900 rounded-default p-3 shadow-xs">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-sm font-medium">{{ label }}</span>
+                        <span class="text-xs text-base-500">Total: {{ total }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-base-500">Pending:</span>
+                        <span class="text-sm font-semibold {% if unhandled > 0 %}text-red-600 dark:text-red-400{% else %}text-green-600 dark:text-green-400{% endif %}">{{ unhandled }}</span>
+                    </div>
+                </div>
+                {% endwith %}
+            </div>
+        </div>
+
+        <!-- Users Column -->
+        <div class="bg-base-50 rounded-default p-4 dark:bg-base-800 col-span-1">
+            <h3 class="font-semibold text-base-900 dark:text-base-100 mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-lg">person</span> Users
+            </h3>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between py-1.5 border-b border-base-200 dark:border-base-700">
+                    <span>Total Users</span>
+                    <span class="font-semibold">{{ d.total_users }}</span>
+                </div>
+                <div class="flex justify-between py-1.5 border-b border-base-200 dark:border-base-700">
+                    <span>Active</span>
+                    <span class="font-semibold text-green-600 dark:text-green-400">{{ d.active_users }}</span>
+                </div>
+                <div class="flex justify-between py-1.5 border-b border-base-200 dark:border-base-700">
+                    <span>Students</span>
+                    <span class="font-semibold">{{ d.total_students }}</span>
+                </div>
+                <div class="flex justify-between py-1.5 border-b border-base-200 dark:border-base-700">
+                    <span>Teachers</span>
+                    <span class="font-semibold">{{ d.total_teachers }}</span>
+                </div>
+                <div class="flex justify-between py-1.5 border-b border-base-200 dark:border-base-700">
+                    <span>New this week</span>
+                    <span class="font-semibold text-primary-600 dark:text-primary-400">{{ d.new_users_this_week }}</span>
+                </div>
+                <div class="flex justify-between py-1.5">
+                    <span>New this month</span>
+                    <span class="font-semibold text-primary-600 dark:text-primary-400">{{ d.new_users_this_month }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lectures Column -->
+        <div class="bg-base-50 rounded-default p-4 dark:bg-base-800 col-span-1">
+            <h3 class="font-semibold text-base-900 dark:text-base-100 mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-lg">school</span> Lectures
+            </h3>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between py-1.5 border-b border-base-200 dark:border-base-700">
+                    <span>Total Lectures</span>
+                    <span class="font-semibold">{{ d.total_lectures }}</span>
+                </div>
+                <div class="flex justify-between py-1.5 border-b border-base-200 dark:border-base-700">
+                    <span>Today</span>
+                    <span class="font-semibold {% if d.lectures_today > 0 %}text-green-600 dark:text-green-400{% endif %}">{{ d.lectures_today }}</span>
+                </div>
+                <div class="flex justify-between py-1.5 border-b border-base-200 dark:border-base-700">
+                    <span>Upcoming</span>
+                    <span class="font-semibold text-primary-600 dark:text-primary-400">{{ d.upcoming_lectures }}</span>
+                </div>
+                <div class="flex justify-between py-1.5 border-b border-base-200 dark:border-base-700">
+                    <span>Finished</span>
+                    <span class="font-semibold text-green-600 dark:text-green-400">{{ d.finished_lectures }}</span>
+                </div>
+                <div class="flex justify-between py-1.5">
+                    <span>Enrolled Students</span>
+                    <span class="font-semibold">{{ d.total_students_enrolled }}</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+        <!-- Courses & Content -->
+        <div class="bg-base-50 rounded-default p-4 dark:bg-base-800">
+            <h3 class="font-semibold text-base-900 dark:text-base-100 mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-lg">menu_book</span> Courses &amp; Content
+            </h3>
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-white dark:bg-base-900 rounded-default p-3 text-center shadow-xs">
+                    <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">{{ d.total_levels }}</div>
+                    <div class="text-xs text-base-500 mt-1">Levels</div>
+                </div>
+                <div class="bg-white dark:bg-base-900 rounded-default p-3 text-center shadow-xs">
+                    <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ d.total_tracks }}</div>
+                    <div class="text-xs text-base-500 mt-1">Tracks</div>
+                </div>
+                <div class="bg-white dark:bg-base-900 rounded-default p-3 text-center shadow-xs">
+                    <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ d.total_courses }}</div>
+                    <div class="text-xs text-base-500 mt-1">Courses</div>
+                </div>
+            </div>
+            <div class="mt-4 space-y-2 text-sm">
+                <div class="flex justify-between py-1.5 border-b border-base-200 dark:border-base-700">
+                    <span>Library Categories</span>
+                    <span class="font-semibold">{{ d.total_library_categories }}</span>
+                </div>
+                <div class="flex justify-between py-1.5 border-b border-base-200 dark:border-base-700">
+                    <span>Library Resources</span>
+                    <span class="font-semibold">{{ d.total_library_resources }}</span>
+                </div>
+                <div class="flex justify-between py-1.5 border-b border-base-200 dark:border-base-700">
+                    <span>Legal Pages</span>
+                    <span class="font-semibold">{{ d.total_legal_pages }}</span>
+                </div>
+                <div class="flex justify-between py-1.5">
+                    <span>Active Features / Video Points</span>
+                    <span class="font-semibold">{{ d.active_features }} / {{ d.active_video_points }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat & Assignments -->
+        <div class="bg-base-50 rounded-default p-4 dark:bg-base-800">
+            <h3 class="font-semibold text-base-900 dark:text-base-100 mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-lg">support</span> Support &amp; Assignments
+            </h3>
+
+            <h4 class="text-xs uppercase tracking-wider text-base-500 mb-2 mt-1">Chat Rooms</h4>
+            <div class="grid grid-cols-3 gap-3 mb-4">
+                <div class="bg-white dark:bg-base-900 rounded-default p-2.5 text-center shadow-xs">
+                    <div class="text-xl font-bold text-green-600 dark:text-green-400">{{ d.active_chat_rooms }}</div>
+                    <div class="text-xs text-base-500 mt-0.5">Active</div>
+                </div>
+                <div class="bg-white dark:bg-base-900 rounded-default p-2.5 text-center shadow-xs">
+                    <div class="text-xl font-bold text-amber-600 dark:text-amber-400">{{ d.opened_chat_rooms }}</div>
+                    <div class="text-xs text-base-500 mt-0.5">Opened</div>
+                </div>
+                <div class="bg-white dark:bg-base-900 rounded-default p-2.5 text-center shadow-xs">
+                    <div class="text-xl font-bold text-base-600 dark:text-base-400">{{ d.total_chat_rooms }}</div>
+                    <div class="text-xs text-base-500 mt-0.5">Total</div>
+                </div>
+            </div>
+
+            <h4 class="text-xs uppercase tracking-wider text-base-500 mb-2 mt-4">Assignments</h4>
+            <div class="grid grid-cols-3 gap-3 mb-2">
+                <div class="bg-white dark:bg-base-900 rounded-default p-2.5 text-center shadow-xs">
+                    <div class="text-xl font-bold text-primary-600 dark:text-primary-400">{{ d.total_assignments }}</div>
+                    <div class="text-xs text-base-500 mt-0.5">Total</div>
+                </div>
+                <div class="bg-white dark:bg-base-900 rounded-default p-2.5 text-center shadow-xs">
+                    <div class="text-xl font-bold text-amber-600 dark:text-amber-400">{{ d.assignments_due_this_week }}</div>
+                    <div class="text-xs text-base-500 mt-0.5">Due This Week</div>
+                </div>
+                <div class="bg-white dark:bg-base-900 rounded-default p-2.5 text-center shadow-xs">
+                    <div class="text-xl font-bold text-green-600 dark:text-green-400">{{ d.total_submissions }}</div>
+                    <div class="text-xs text-base-500 mt-0.5">Submissions</div>
+                </div>
+            </div>
+            <div class="text-xs text-base-500 mt-1">
+                {{ d.graded_submissions }} submissions graded
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-base-50 rounded-default p-4 dark:bg-base-800">
+        <h3 class="font-semibold text-base-900 dark:text-base-100 mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">quickreply</span> Quick Actions
+        </h3>
+        <div class="flex flex-wrap gap-2">
+            <a href="{% url 'admin:about_freesession_changelist' %}" class="inline-flex items-center gap-1.5 bg-white dark:bg-base-900 rounded-default px-3 py-2 text-sm shadow-xs hover:bg-base-100 dark:hover:bg-base-800 transition-colors">
+                <span class="material-symbols-outlined text-base-500" style="font-size:16px">mail</span>
+                Free Sessions
+                {% if d.unhandled_freesessions %}
+                    <span class="bg-red-500 text-white text-xs rounded-sm px-1 py-0.5 font-semibold">{{ d.unhandled_freesessions }}</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'admin:about_contactmessage_changelist' %}" class="inline-flex items-center gap-1.5 bg-white dark:bg-base-900 rounded-default px-3 py-2 text-sm shadow-xs hover:bg-base-100 dark:hover:bg-base-800 transition-colors">
+                <span class="material-symbols-outlined text-base-500" style="font-size:16px">chat</span>
+                Contacts
+                {% if d.unhandled_contacts %}
+                    <span class="bg-red-500 text-white text-xs rounded-sm px-1 py-0.5 font-semibold">{{ d.unhandled_contacts }}</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'admin:subscriptions_joinrequest_changelist' %}" class="inline-flex items-center gap-1.5 bg-white dark:bg-base-900 rounded-default px-3 py-2 text-sm shadow-xs hover:bg-base-100 dark:hover:bg-base-800 transition-colors">
+                <span class="material-symbols-outlined text-base-500" style="font-size:16px">person_add</span>
+                Join Requests
+                {% if d.unhandled_joinrequests %}
+                    <span class="bg-red-500 text-white text-xs rounded-sm px-1 py-0.5 font-semibold">{{ d.unhandled_joinrequests }}</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'admin:about_accountdeletionrequest_changelist' %}" class="inline-flex items-center gap-1.5 bg-white dark:bg-base-900 rounded-default px-3 py-2 text-sm shadow-xs hover:bg-base-100 dark:hover:bg-base-800 transition-colors">
+                <span class="material-symbols-outlined text-base-500" style="font-size:16px">delete_forever</span>
+                Deletions
+                {% if d.pending_deletions %}
+                    <span class="bg-red-500 text-white text-xs rounded-sm px-1 py-0.5 font-semibold">{{ d.pending_deletions }}</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'admin:subscriptions_studygroup_changelist' %}" class="inline-flex items-center gap-1.5 bg-white dark:bg-base-900 rounded-default px-3 py-2 text-sm shadow-xs hover:bg-base-100 dark:hover:bg-base-800 transition-colors">
+                <span class="material-symbols-outlined text-base-500" style="font-size:16px">groups</span>
+                Study Groups
+            </a>
+            <a href="{% url 'admin:courses_course_changelist' %}" class="inline-flex items-center gap-1.5 bg-white dark:bg-base-900 rounded-default px-3 py-2 text-sm shadow-xs hover:bg-base-100 dark:hover:bg-base-800 transition-colors">
+                <span class="material-symbols-outlined text-base-500" style="font-size:16px">menu_book</span>
+                Courses
+            </a>
+        </div>
+    </div>
+    {% endwith %}
+{% else %}
+    {% include "unfold/helpers/app_list_default.html" %}
+{% endif %}

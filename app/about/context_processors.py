@@ -14,11 +14,12 @@ def get_meta_pixel_id(request):
 
 
 def get_logo_url(request):
-    # Logo was previously managed by django-admin-interface Theme.
-    # After migrating to UNFOLD, templates fall back to the static
-    # logo (static/imgs/bg/l2.png) when logo_url is None.
+    company = CompanyInfo.objects.last()
+    url = None
+    if company and company.logo:
+        url = company.logo.url
     return {
-        'logo_url': None
+        'logo_url': url
     }
 
 

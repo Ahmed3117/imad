@@ -3,6 +3,7 @@ import os
 import dotenv
 from django.templatetags.static import static
 from django.urls import reverse_lazy
+from project.admin_badges import get_dynamic_logo_url
 
 # ─────────────────────────────────────────────
 # Base directory & environment
@@ -201,9 +202,10 @@ UNFOLD = {
     "SITE_TITLE": "Nabbiuwny Admin",
     "SITE_HEADER": "Nabbiuwny",
     "SITE_LOGO": {
-        "light": lambda request: static("imgs/hero/logo.png"),
-        "dark": lambda request: static("imgs/hero/logo.png"),
+        "light": lambda request: get_dynamic_logo_url(),
+        "dark": lambda request: get_dynamic_logo_url(),
     },
+    "DASHBOARD_CALLBACK": "project.admin_dashboard.get_dashboard_data",
     "SIDEBAR": {
         "show_search": True,
         "navigation": [
@@ -215,16 +217,19 @@ UNFOLD = {
                         "title": "Free Session Requests",
                         "icon": "mail",
                         "link": reverse_lazy("admin:about_freesession_changelist"),
+                        "badge": "project.admin_badges.unhandled_freesession_count",
                     },
                     {
                         "title": "Contact Messages",
                         "icon": "chat",
                         "link": reverse_lazy("admin:about_contactmessage_changelist"),
+                        "badge": "project.admin_badges.unhandled_contact_count",
                     },
                     {
                         "title": "Join Requests",
                         "icon": "person_add",
                         "link": reverse_lazy("admin:subscriptions_joinrequest_changelist"),
+                        "badge": "project.admin_badges.unhandled_joinrequest_count",
                     },
                 ],
             },

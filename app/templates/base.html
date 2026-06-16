@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="nabbiuwny institution">
     <meta property="og:description" content="">
-    <meta property="og:image" content="https://nabbiuwny.com/static/imgs/hero/logo.png">
+    <meta property="og:image" content="{% if logo_url %}https://nabbiuwny.com{{ logo_url }}{% else %}https://nabbiuwny.com/static/imgs/hero/logo.png{% endif %}">
     <meta property="og:url" content="https://nabbiuwny.com/">
     <meta property="og:type" content="website">
     <meta name="csrf-token" content="{{ csrf_token }}">
