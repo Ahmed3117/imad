@@ -12,6 +12,7 @@ class CompanyInfo(models.Model):
     email = models.EmailField(blank=True, null=True)
     whatsapp_number = models.CharField(max_length=30, blank=True, null=True)
     telegram_number = models.CharField(max_length=30, blank=True, null=True)
+    logo = models.ImageField(upload_to="logos/", blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -81,7 +82,7 @@ class HomePageContent(models.Model):
         upload_to="home/contact/", blank=True, null=True
     )
 
-    hero_primary_button_url = models.CharField(max_length=255, default="/courses/")
+    hero_primary_button_url = models.CharField(max_length=255, default="#free-session")
     who_we_are_button_url = models.CharField(max_length=255, default="/courses/")
     footer_cta_url = models.CharField(max_length=255, blank=True, null=True)
     facebook_url = models.URLField(max_length=500, blank=True, null=True)

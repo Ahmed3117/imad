@@ -6,6 +6,7 @@ from django.dispatch import receiver
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
+from django.utils.html import format_html
 from project.admin_base import ModelAdmin
 from unfold.admin import StackedInline, TabularInline
 from unfold.sites import UnfoldAdminSite
@@ -38,7 +39,13 @@ class CompanyInfoTranslationInline(TabularInline):
 @admin.register(CompanyInfo)
 class CompanyInfoAdmin(ModelAdmin):
     inlines = [CompanyInfoTranslationInline]
-    list_display = ["name", "email", "phone", "whatsapp_number", "telegram_number"]
+    list_display = ["name", "email", "phone", "whatsapp_number", "telegram_number", "logo_preview"]
+
+    def logo_preview(self, obj):
+        if obj.logo:
+            return format_html('<img src="{}" style="max-height:40px" />', obj.logo.url)
+        return ""
+    logo_preview.short_description = "Logo"
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         formfield = super().formfield_for_dbfield(db_field, request, **kwargs)

@@ -437,9 +437,7 @@ def home(request):
 
     teachers = _get_teachers(language)
 
-    # Logo URL previously came from admin_interface Theme.
-    # After UNFOLD migration, templates fall back to static logo.
-    logo_url = None
+    logo_url = company_info.logo.url if company_info and company_info.logo else None
 
     context = {
         "logo_url": logo_url,

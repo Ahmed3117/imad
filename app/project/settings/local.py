@@ -30,12 +30,12 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 # ─────────────────────────────────────────────
 # Database – SQLite for local dev (no MySQL needed)
 # ─────────────────────────────────────────────
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 # ─────────────────────────────────────────────
 # Zoom / BASE_URL – point to local server
@@ -46,6 +46,9 @@ BASE_URL = 'http://127.0.0.1:8000'
 # Static files (no collectstatic needed locally)
 # ─────────────────────────────────────────────
 # STATIC_ROOT is intentionally not set in local — runserver serves from STATICFILES_DIRS
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # ─────────────────────────────────────────────
 # Channels – in-memory layer for local dev

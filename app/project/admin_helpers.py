@@ -11,16 +11,17 @@ CONTACT_ICON_BASE_STYLE = (
 )
 
 
-def contact_link_icons(phone=None, email=None):
+def contact_link_icons(phone=None, email=None, telegram=None):
     links = []
 
-    whatsapp_phone = phone_digits_for_url(phone)
-    if whatsapp_phone:
+    digits = phone_digits_for_url(phone)
+
+    if digits:
         links.append(
             format_html(
                 '<a href="https://wa.me/{}" target="_blank" rel="noopener noreferrer" '
                 'title="WhatsApp" aria-label="WhatsApp" style="{}background:#25d366;color:#fff;">W</a>',
-                whatsapp_phone,
+                digits,
                 CONTACT_ICON_BASE_STYLE,
             )
         )
@@ -31,6 +32,18 @@ def contact_link_icons(phone=None, email=None):
                 '<a href="mailto:{}" title="Email" aria-label="Email" '
                 'style="{}background:#4b5563;color:#fff;">@</a>',
                 email,
+                CONTACT_ICON_BASE_STYLE,
+            )
+        )
+
+    telegram_digits = phone_digits_for_url(telegram or phone)
+    if telegram_digits:
+        links.append(
+            format_html(
+                '<a href="https://t.me/+{}" target="_blank" rel="noopener noreferrer" '
+                'title="Telegram" aria-label="Telegram" '
+                'style="{}background:#0088cc;color:#fff;">T</a>',
+                telegram_digits,
                 CONTACT_ICON_BASE_STYLE,
             )
         )
