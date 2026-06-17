@@ -310,6 +310,9 @@ class HomePageContentAdmin(ModelAdmin):
             ),
     )
 
+    def get_object(self, request, object_id, from_field=None):
+        return HomePageContent.get_solo()
+
     def has_add_permission(self, request):
         if HomePageContent.objects.exists():
             return False
@@ -337,7 +340,7 @@ class HomePageVideoPointAdmin(ModelAdmin):
 @admin.register(FreeSession)
 class FreeSessionAdmin(UnhandledChangelistMixin, ModelAdmin):
     list_display = (
-        "user",
+        "user_or_name",
         "user_phone",
         "contact_links",
         "handled",
@@ -351,30 +354,34 @@ class FreeSessionAdmin(UnhandledChangelistMixin, ModelAdmin):
         "user__username",
         "user__email",
         "user__phone",
+        "name",
+        "email",
         "phone",
     )
     ordering = ("handled", "-requested_at")
-    readonly_fields = ("user", "phone", "message", "requested_at", "marked_done_at")
+    readonly_fields = ("user", "name", "email", "phone", "message", "requested_at", "marked_done_at")
+
+    def user_or_name(self, obj):
+        if obj.user:
+            return str(obj.user)
+        return obj.name or "Anonymous"
+    user_or_name.short_description = "User / Name"
 
     def user_phone(self, obj):
-        return normalize_phone(obj.phone or obj.user.phone) or "\u2014"
-
+        return normalize_phone(obj.phone or (obj.user.phone if obj.user else "")) or "\u2014"
     user_phone.short_description = "Phone"
 
     def contact_links(self, obj):
-        phone = obj.phone or obj.user.phone
-        return contact_link_icons(
-            phone=phone,
-            email=getattr(obj.user, "email", ""),
-        )
-
+        phone = obj.phone or (obj.user.phone if obj.user else "")
+        email = obj.email or (obj.user.email if obj.user else "")
+        return contact_link_icons(phone=phone, email=email)
     contact_links.short_description = "Contact"
 
     fieldsets = (
         (
             "User Info",
             {
-                "fields": ("user", "phone", "message"),
+                "fields": ("user", "name", "email", "phone", "message"),
             },
         ),
         (

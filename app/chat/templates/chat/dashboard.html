@@ -112,14 +112,9 @@
                 row.setAttribute('data-agent-id', room.agent_id);
             }
 
-            if (room.first_opener) {
-                row.setAttribute('data-first-opener', room.first_opener);
-                row.setAttribute('data-first-opener-id', room.first_opener_id);
-            }
-
             const createdAt = new Date(room.created_at);
             const formattedDate = createdAt.toLocaleString();
-            let displayName = room.first_opener || room.agent || '-';
+            let displayName = room.agent || '-';
 
             row.innerHTML = `
                 <td>
@@ -149,7 +144,7 @@
             }
         }
 
-        function updateRoomStatus(roomCode, status, agent, firstOpener) {
+        function updateRoomStatus(roomCode, status, agent) {
             const row = document.getElementById(`room-${roomCode}`);
             if (row) {
                 row.setAttribute('data-status', status);
@@ -169,25 +164,6 @@
                     
                     row.setAttribute('data-agent', agentName);
                     if (agentId) row.setAttribute('data-agent-id', agentId);
-                }
-
-                if (firstOpener) {
-                    let openerName = firstOpener;
-                    let openerId = null;
-
-                    if (typeof firstOpener === 'object' && firstOpener.username) {
-                        openerName = firstOpener.username;
-                        openerId = firstOpener.id;
-                    }
-                    
-                    row.setAttribute('data-first-opener', openerName);
-                    if (openerId) row.setAttribute('data-first-opener-id', openerId);
-                    agentCell.textContent = openerName;
-                } else if (agent) {
-                    let agentName = agent;
-                    if (typeof agent === 'object' && agent.username) {
-                        agentName = agent.username;
-                    }
                     agentCell.textContent = agentName;
                 }
 
@@ -225,8 +201,6 @@
                 const status = row.getAttribute('data-status');
                 const agent = row.getAttribute('data-agent');
                 const agentId = row.getAttribute('data-agent-id');
-                const firstOpener = row.getAttribute('data-first-opener');
-                const firstOpenerId = row.getAttribute('data-first-opener-id');
                 
                 if (filter === 'all') {
                     row.style.display = '';
@@ -235,8 +209,7 @@
                 } else if (filter === 'opened' && status === 'opened') {
                     row.style.display = '';
                 } else if (filter === 'my-rooms' && 
-                          (agent === currentUsername || agentId === currentUserId || 
-                           firstOpener === currentUsername || firstOpenerId === currentUserId)) {
+                          (agent === currentUsername || agentId === currentUserId)) {
                     row.style.display = '';
                 } else {
                     row.style.display = 'none';
@@ -287,17 +260,6 @@
                 roomsTableBody.innerHTML = '';
 
                 data.forEach(room => {
-                    let firstOpenerUsername = null;
-                    let firstOpenerId = null;
-
-                    if (room.first_opener) {
-                        firstOpenerUsername = room.first_opener.username;
-                        firstOpenerId = room.first_opener.id;
-                    } else if (room.agent && (room.agent.role === 'cs' || room.agent.is_superuser)) {
-                        firstOpenerUsername = room.agent.username;
-                        firstOpenerId = room.agent.id;
-                    }
-
                     let agentUsername = null;
                     let agentId = null;
 
@@ -312,8 +274,6 @@
                         created_at: room.created_at,
                         agent: agentUsername,
                         agent_id: agentId,
-                        first_opener: firstOpenerUsername,
-                        first_opener_id: firstOpenerId,
                         admin_unread_count: room.admin_unread_count || 0,
                     });
                 });
@@ -335,7 +295,7 @@
                 if (data.type === 'room_created') {
                     fetchRooms();
                 } else if (data.type === 'room_status') {
-                    updateRoomStatus(data.room_code, data.status, data.agent, data.first_opener);
+                    updateRoomStatus(data.room_code, data.status, data.agent);
                     applyFilter(currentFilter);
                 } else if (data.type === 'room_deleted') {
                     removeRoom(data.room_code);

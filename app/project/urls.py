@@ -33,8 +33,16 @@ urlpatterns = [
     # path('freemeet/', include('freemeet.urls',namespace='freemeet')),
     path("chat/", include("chat.urls", namespace="chat")),
 ]
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+elif getattr(settings, 'STATIC_ROOT', None):
+    # Serve static/media when DEBUG=False (e.g. DJANGO_ENV=prod locally with prod DB)
+    from django.views.static import serve
+    urlpatterns += [
+        path('static/<path:path>', serve, {'document_root': settings.STATIC_ROOT}),
+        path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
+    ]
 
 urlpatterns += i18n_patterns(
     path("i18n/", include("django.conf.urls.i18n")),

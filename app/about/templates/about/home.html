@@ -783,10 +783,9 @@
                 </button>
                 {% endif %}
             {% else %}
-            <a href="{% url 'accounts:login' %}?next={{ request.path }}#free-session"
-               class="btn btn-primary btn-lg btn-rounded" data-translate="login_to_book">
-                <i class="fas fa-sign-in-alt me-2"></i> Login to Book Your Free Session
-            </a>
+            <button class="btn btn-primary btn-lg btn-rounded" id="openFreeSessionModal" data-translate="book_free_session_btn">
+                <i class="fas fa-calendar-plus me-2"></i> Book My Free Session
+            </button>
             {% endif %}
             {% if home_page_text.free_session_privacy_note %}
             <p class="small text-muted mt-4 mb-0">{{ home_page_text.free_session_privacy_note }}</p>
@@ -797,7 +796,7 @@
 {% endif %}
 
 <!-- Free Session Modal -->
-{% if request.user.is_authenticated and not request.user.free_session %}
+{% if not request.user.is_authenticated or not request.user.free_session %}
 <div class="modal fade" id="freeSessionModal" tabindex="-1" aria-labelledby="freeSessionModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -814,6 +813,18 @@
                 </p>
                 <form id="freeSessionForm">
                     {% csrf_token %}
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="freeSessionName" name="name"
+                               placeholder="Your Name"
+                               value="{{ request.user.get_full_name|default:'' }}">
+                        <label for="freeSessionName" data-translate="your_name">Your Name</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" id="freeSessionEmail" name="email"
+                               placeholder="Your Email"
+                               value="{{ request.user.email|default:'' }}">
+                        <label for="freeSessionEmail" data-translate="your_email">Your Email</label>
+                    </div>
                     <label class="form-label" for="freeSessionPhone" data-translate="your_phone">Your Phone Number</label>
                     <div class="input-group mb-3">
                         <select class="form-select country-code-select" id="freeSessionPhoneCountryCode"
@@ -1556,16 +1567,33 @@
     const confirmFreeSessionBtn = document.getElementById('confirmFreeSession');
     if (confirmFreeSessionBtn) {
         confirmFreeSessionBtn.addEventListener('click', async function () {
+            const nameInput = document.getElementById('freeSessionName');
+            const emailInput = document.getElementById('freeSessionEmail');
             const phoneInput = document.getElementById('freeSessionPhone');
             const phoneCountryCodeInput = document.getElementById('freeSessionPhoneCountryCode');
             const messageInput = document.getElementById('freeSessionMessage');
             const alertBox = document.getElementById('freeSessionAlert');
             const spinner = document.getElementById('confirmFreeSessionSpinner');
             const csrfInput = document.querySelector('#freeSessionForm [name=csrfmiddlewaretoken]');
+            const name = nameInput ? nameInput.value.trim() : '';
+            const email = emailInput ? emailInput.value.trim() : '';
             const phone = phoneInput ? phoneInput.value.trim() : '';
             const phoneCountryCode = phoneCountryCodeInput ? phoneCountryCodeInput.value : '+20';
             const message = messageInput ? messageInput.value.trim() : '';
             const csrfToken = csrfInput ? csrfInput.value : '';
+
+            if (!name) {
+                alertBox.className = 'alert alert-warning';
+                alertBox.textContent = 'Please enter your name.';
+                alertBox.classList.remove('d-none');
+                return;
+            }
+            if (!email && !phone) {
+                alertBox.className = 'alert alert-warning';
+                alertBox.textContent = 'Please enter your email or phone number.';
+                alertBox.classList.remove('d-none');
+                return;
+            }
 
             // Show loading state
             confirmFreeSessionBtn.disabled = true;
@@ -1580,6 +1608,8 @@
                         'X-CSRFToken': csrfToken,
                     },
                     body: JSON.stringify({
+                        name,
+                        email,
                         phone,
                         phone_country_code: phoneCountryCode,
                         message
