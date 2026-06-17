@@ -31,26 +31,14 @@ class RoomListCreate(generics.ListCreateAPIView):
                     'is_superuser': room.agent.is_superuser,
                 }
 
-            first_opener_data = None
-            if getattr(room, 'first_opener', None):
-                first_opener_data = {
-                    'id': room.first_opener.id,
-                    'username': room.first_opener.username,
-                    'role': getattr(room.first_opener, 'role', None),
-                    'is_superuser': room.first_opener.is_superuser,
-                }
-
             rooms_data.append({
                 'id': room.id,
                 'code': room.code,
                 'status': room.status,
                 'created_at': room.created_at.isoformat(),
                 'agent': agent_data,
-                'first_opener': first_opener_data,
                 'admin_unread_count': room.admin_unread_count,
                 'user_unread_count': room.user_unread_count,
-                'last_cs_join_time': room.last_cs_join_time.isoformat() if room.last_cs_join_time else None,
-                'last_user_join_time': room.last_user_join_time.isoformat() if room.last_user_join_time else None,
             })
 
         return Response(rooms_data)
@@ -138,19 +126,9 @@ def open_room(request, room_code):
         room.status = 'opened'
         room.agent = user
         
-        # If this is a CS user or superuser and no first_opener is set, set it
-        if (user.is_superuser or user.role == 'cs') and not room.first_opener:
-            room.first_opener = user
-        
-        # Update last join time based on user type
+        # Reset admin unread count when a CS/superuser joins
         if user.is_superuser or user.role == 'cs':
-            room.last_cs_join_time = timezone.now()
-            # Reset admin unread count when a CS/superuser joins
             room.admin_unread_count = 0
-        else:
-            room.last_user_join_time = timezone.now()
-            # Reset user unread count when a regular user joins
-            room.user_unread_count = 0
             
         room.save()
 
@@ -164,7 +142,6 @@ def open_room(request, room_code):
                     'room_code': room.code,
                     'status': room.status,
                     'agent': room.agent.username if room.agent else None,
-                    'first_opener': room.first_opener.username if room.first_opener else None
                 }
             )
         except Exception:
@@ -180,14 +157,10 @@ def join_room(request, room_code):
         room = Room.objects.get(code=room_code)
         user = request.user
         
-        # Update last join time based on user type
+        # Reset admin unread count when a CS/superuser joins
         if user.is_superuser or user.role == 'cs':
-            room.last_cs_join_time = timezone.now()
-            # Reset admin unread count when a CS/superuser joins
             room.admin_unread_count = 0
         else:
-            room.last_user_join_time = timezone.now()
-            # Reset user unread count when a regular user joins
             room.user_unread_count = 0
             
         room.save()
@@ -230,26 +203,13 @@ def room_list(request):
                     'role': room.agent.role
                 }
             
-            # Properly serialize the first opener with username
-            first_opener_data = None
-            if room.first_opener:
-                first_opener_data = {
-                    'id': room.first_opener.id,
-                    'username': room.first_opener.username,
-                    'role': room.first_opener.role
-                }
-            
-            # Include unread counts in the response
             rooms_data.append({
                 'code': room.code,
                 'status': room.status,
                 'created_at': room.created_at.isoformat(),
                 'agent': agent_data,
-                'first_opener': first_opener_data,
                 'admin_unread_count': room.admin_unread_count,
                 'user_unread_count': room.user_unread_count,
-                'last_cs_join_time': room.last_cs_join_time.isoformat() if room.last_cs_join_time else None,
-                'last_user_join_time': room.last_user_join_time.isoformat() if room.last_user_join_time else None
             })
         
         return JsonResponse(rooms_data, safe=False)
@@ -272,23 +232,11 @@ def room_status(request, room_code):
                 'role': room.agent.role
             }
         
-        # Properly serialize the first opener with username
-        first_opener_data = None
-        if room.first_opener:
-            first_opener_data = {
-                'id': room.first_opener.id,
-                'username': room.first_opener.username,
-                'role': room.first_opener.role
-            }
-        
         data = {
             'status': room.status,
             'agent': agent_data,
-            'first_opener': first_opener_data,
             'admin_unread_count': room.admin_unread_count,
             'user_unread_count': room.user_unread_count,
-            'last_cs_join_time': room.last_cs_join_time.isoformat() if room.last_cs_join_time else None,
-            'last_user_join_time': room.last_user_join_time.isoformat() if room.last_user_join_time else None
         }
         
         return JsonResponse(data)
@@ -317,15 +265,11 @@ def chat_room(request, room_code):
         room = Room.objects.get(code=room_code)
         user = request.user
         
-        # Update last join time based on user type
+        # Reset unread counts when entering the chat room
         if user.is_authenticated:
             if user.is_superuser or user.role == 'cs':
-                room.last_cs_join_time = timezone.now()
-                # Reset admin unread count when a CS/superuser joins
                 room.admin_unread_count = 0
             else:
-                room.last_user_join_time = timezone.now()
-                # Reset user unread count when a regular user joins
                 room.user_unread_count = 0
                 
             room.save()

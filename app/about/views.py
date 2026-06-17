@@ -514,15 +514,12 @@ def send_email(request):
 
 
 def book_free_session(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({"error": "Authentication required."}, status=401)
-
     if request.method != "POST":
         return JsonResponse({"error": "Invalid request method."}, status=405)
 
     from about.models import FreeSession
 
-    if hasattr(request.user, "free_session"):
+    if request.user.is_authenticated and hasattr(request.user, "free_session"):
         session = request.user.free_session
         if session.status == "done":
             return JsonResponse(
@@ -546,24 +543,39 @@ def book_free_session(request):
     except (json.JSONDecodeError, ValueError):
         data = {}
 
+    name = data.get("name", "").strip()
+    email = data.get("email", "").strip()
+
     phone = (
         normalize_phone(data.get("phone", ""), data.get("phone_country_code"))
-        or normalize_phone(request.user.phone)
+        or normalize_phone(getattr(request.user, "phone", ""))
     )
     message = data.get("message", "")
 
-    FreeSession.objects.create(
-        user=request.user,
-        phone=phone,
-        message=message,
-    )
+    if request.user.is_authenticated:
+        FreeSession.objects.create(
+            user=request.user,
+            name=name or getattr(request.user, "full_name", "") or request.user.get_full_name(),
+            email=email or request.user.email,
+            phone=phone,
+            message=message,
+        )
+        user_email = request.user.email
+    else:
+        FreeSession.objects.create(
+            name=name,
+            email=email,
+            phone=phone,
+            message=message,
+        )
+        user_email = email
 
     # Fire server-side Lead event via Meta Conversions API
     # (best-effort; must never break the booking flow)
     try:
         send_lead_event(
             request,
-            email=getattr(request.user, "email", ""),
+            email=user_email,
             phone=phone,
         )
     except Exception:

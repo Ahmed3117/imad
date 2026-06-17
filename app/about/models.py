@@ -321,7 +321,11 @@ class FreeSession(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="free_session",
+        null=True,
+        blank=True,
     )
+    name = models.CharField(max_length=255, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
     phone = models.CharField(max_length=30, blank=True, null=True)
     message = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
@@ -335,7 +339,9 @@ class FreeSession(models.Model):
         ordering = ["-requested_at"]
 
     def __str__(self):
-        return f"{self.user} – {self.get_status_display()}"
+        if self.user:
+            return f"{self.user} – {self.get_status_display()}"
+        return f"{self.name or 'Anonymous'} – {self.get_status_display()}"
 
     def save(self, *args, **kwargs):
         if self.handled:
