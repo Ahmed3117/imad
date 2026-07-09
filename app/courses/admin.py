@@ -11,21 +11,21 @@ from .models import (
 
 class LevelTranslationInline(TabularInline):
     model = LevelTranslation
-    extra = 1
+    extra = 0
     tab = True
     fields = ('language', 'translated_name')
 
 
 class TrackTranslationInline(TabularInline):
     model = TrackTranslation
-    extra = 1
+    extra = 0
     tab = True
     fields = ('language', 'translated_name')
 
 
 class CourseTranslationInline(TabularInline):
     model = CourseTranslation
-    extra = 1
+    extra = 0
     tab = True
     fields = ('language', 'translated_name', 'translated_description')
 

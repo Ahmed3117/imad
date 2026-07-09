@@ -32,7 +32,7 @@ from .models import (
 
 class CompanyInfoTranslationInline(TabularInline):
     model = CompanyInfoTranslation
-    extra = 1
+    extra = 0
     tab = True
 
 
@@ -60,7 +60,7 @@ class CompanyInfoAdmin(ModelAdmin):
 
 class HomePageContentTranslationInline(StackedInline):
     model = HomePageContentTranslation
-    extra = 1
+    extra = 0
     tab = True
     fieldsets = (
         (
@@ -202,14 +202,14 @@ class HomePageContentTranslationInline(StackedInline):
 
 class HomePageFeatureTranslationInline(TabularInline):
     model = HomePageFeatureTranslation
-    extra = 1
+    extra = 0
     tab = True
     fields = ("language", "title", "subtitle", "meta", "description")
 
 
 class HomePageFeatureInline(StackedInline):
     model = HomePageFeature
-    extra = 1
+    extra = 0
     tab = True
     fields = ("section", "icon_class", "image", "order", "is_active")
     show_change_link = True
@@ -217,13 +217,13 @@ class HomePageFeatureInline(StackedInline):
 
 class HomePageVideoPointTranslationInline(TabularInline):
     model = HomePageVideoPointTranslation
-    extra = 1
+    extra = 0
     tab = True
 
 
 class HomePageVideoPointInline(StackedInline):
     model = HomePageVideoPoint
-    extra = 1
+    extra = 0
     tab = True
     fields = ("icon_class", "order", "is_active")
     show_change_link = True
@@ -234,6 +234,7 @@ class HomePageContentAdmin(ModelAdmin):
     list_display = (
         "id",
         "show_primary_features",
+        "show_view_courses_button",
         "show_who_we_are_section",
         "show_video_section",
         "show_chat_section",
@@ -290,6 +291,7 @@ class HomePageContentAdmin(ModelAdmin):
                 {
                     "fields": (
                         "show_primary_features",
+                        "show_view_courses_button",
                         "show_who_we_are_section",
                         "show_video_section",
                         "show_chat_section",
@@ -560,7 +562,7 @@ def get_fixture_model_map():
 
 class LegalPageTranslationInline(TabularInline):
     model = LegalPageTranslation
-    extra = 1
+    extra = 0
     tab = True
 
 

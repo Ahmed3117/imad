@@ -25,7 +25,7 @@ User = get_user_model()
 
 class GroupTimeInline(TabularInline):
     model = GroupTime
-    extra = 1
+    extra = 0
     fields = ("day", "time")
     ordering = ("day", "time")
     tab = True

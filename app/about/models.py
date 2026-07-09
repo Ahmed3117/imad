@@ -88,6 +88,7 @@ class HomePageContent(models.Model):
     facebook_url = models.URLField(max_length=500, blank=True, null=True)
 
     show_primary_features = models.BooleanField(default=True)
+    show_view_courses_button = models.BooleanField(default=True)
     show_who_we_are_section = models.BooleanField(default=True)
     show_video_section = models.BooleanField(default=True)
     show_chat_section = models.BooleanField(default=True)

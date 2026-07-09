@@ -103,6 +103,9 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD', 'django_password'),
         'HOST': os.getenv('DB_HOST', 'db'),
         'PORT': os.getenv('DB_PORT', '3306'),
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
     }
 }
 
@@ -162,7 +165,7 @@ CONTACT_EMAIL_TO = os.environ.get('CONTACT_EMAIL_TO', 'contact@nabbiuwny.com')
 CONTACT_EMAIL_RATE_LIMIT = int(os.environ.get('CONTACT_EMAIL_RATE_LIMIT', '5'))
 CONTACT_EMAIL_RATE_WINDOW_SECONDS = int(os.environ.get('CONTACT_EMAIL_RATE_WINDOW_SECONDS', '600'))
 
-RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY', 're_JHiorRNC_Q2EMLqsiBifDqYBmU2tB1svC')
 TRANSACTIONAL_FROM_EMAIL = os.environ.get(
     'TRANSACTIONAL_FROM_EMAIL',
     'Nabbiuwny <noreply@nabbiuwny.com>',
@@ -315,6 +318,16 @@ UNFOLD = {
                         "title": "Home Page Content",
                         "icon": "home",
                         "link": reverse_lazy("admin:about_homepagecontent_changelist"),
+                    },
+                    {
+                        "title": "Home Page Features",
+                        "icon": "star",
+                        "link": reverse_lazy("admin:about_homepagefeature_changelist"),
+                    },
+                    {
+                        "title": "Home Page Video Points",
+                        "icon": "play_circle",
+                        "link": reverse_lazy("admin:about_homepagevideopoint_changelist"),
                     },
                     {
                         "title": "Legal Pages",
