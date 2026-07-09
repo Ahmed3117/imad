@@ -30,12 +30,12 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 # ─────────────────────────────────────────────
 # Database – SQLite for local dev (no MySQL needed)
 # ─────────────────────────────────────────────
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 # ─────────────────────────────────────────────
 # Zoom / BASE_URL – point to local server

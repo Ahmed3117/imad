@@ -64,7 +64,7 @@ class TeacheroomAccountInline(StackedInline):
 
 class TeacherInfoTranslationInline(TabularInline):
     model = TeacherInfoTranslation
-    extra = 1
+    extra = 0
     tab = True
 
 
@@ -86,7 +86,6 @@ class CustomUserAdmin(ModelAdmin, BaseUserAdmin):
         (None, {'fields': ('username', 'password')}),
         ('Profile', {'fields': ('role', 'name', 'email', 'phone', 'image')}),
         ('Permissions', {
-            'classes': ('collapse',),
             'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
         }),
         ('Important dates', {'classes': ('collapse',), 'fields': ('last_login', 'date_joined')}),
@@ -101,6 +100,12 @@ class CustomUserAdmin(ModelAdmin, BaseUserAdmin):
     search_fields = ('username', 'email', 'name', 'phone')
     ordering = ('role', 'name', 'username')
     readonly_fields = ('last_login', 'date_joined')
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly = list(super().get_readonly_fields(request, obj))
+        if obj and obj.role == 'admin':
+            readonly += ['is_staff', 'is_superuser', 'groups', 'user_permissions']
+        return readonly
 
     def get_urls(self):
         urls = super().get_urls()

@@ -31,3 +31,4 @@ subscriptions/token.json
 
 # Ignore migrations folders
 **/migrations/
+backups/
