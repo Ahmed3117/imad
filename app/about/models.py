@@ -465,3 +465,237 @@ class AccountDeletionRequest(models.Model):
 
     def __str__(self):
         return f"{self.user} – {self.get_status_display()}"
+
+
+# ─────────────────────────────────────────────
+# Proxy Models for Homepage Restructuring
+# ─────────────────────────────────────────────
+
+class HeroSection(HomePageContent):
+    class Meta:
+        proxy = True
+        verbose_name = "1. Hero Section"
+        verbose_name_plural = "1. Hero Section"
+
+
+class PrimaryFeaturesSection(HomePageContent):
+    class Meta:
+        proxy = True
+        verbose_name = "2. Primary Features"
+        verbose_name_plural = "2. Primary Features"
+
+
+class WhoWeAreSection(HomePageContent):
+    class Meta:
+        proxy = True
+        verbose_name = "3. Who We Are"
+        verbose_name_plural = "3. Who We Are"
+
+
+class VideoSection(HomePageContent):
+    class Meta:
+        proxy = True
+        verbose_name = "4. Video Section"
+        verbose_name_plural = "4. Video Section"
+
+
+class ChatSection(HomePageContent):
+    class Meta:
+        proxy = True
+        verbose_name = "5. Chat Section"
+        verbose_name_plural = "5. Chat Section"
+
+
+class SecondaryFeaturesSection(HomePageContent):
+    class Meta:
+        proxy = True
+        verbose_name = "6. Secondary Features"
+        verbose_name_plural = "6. Secondary Features"
+
+
+class TeachersSection(HomePageContent):
+    class Meta:
+        proxy = True
+        verbose_name = "7. Teachers Section"
+        verbose_name_plural = "7. Teachers Section"
+
+
+class TestimonialsSection(HomePageContent):
+    class Meta:
+        proxy = True
+        verbose_name = "8. Testimonials Section"
+        verbose_name_plural = "8. Testimonials Section"
+
+
+class FamilyBundleSection(HomePageContent):
+    class Meta:
+        proxy = True
+        verbose_name = "9. Family Bundle"
+        verbose_name_plural = "9. Family Bundle"
+
+
+class ProcessSection(HomePageContent):
+    class Meta:
+        proxy = True
+        verbose_name = "10. Process Section"
+        verbose_name_plural = "10. Process Section"
+
+
+class FreeSessionSection(HomePageContent):
+    class Meta:
+        proxy = True
+        verbose_name = "11. Free Session Section"
+        verbose_name_plural = "11. Free Session Section"
+
+
+class ContactFooterSection(HomePageContent):
+    class Meta:
+        proxy = True
+        verbose_name = "12. Contact & Footer"
+        verbose_name_plural = "12. Contact & Footer"
+
+
+# Feature Section Proxy Managers and Models
+
+class PrimaryFeatureManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(section="primary")
+
+
+class PrimaryFeature(HomePageFeature):
+    objects = PrimaryFeatureManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = "Primary Feature"
+        verbose_name_plural = "Primary Features"
+
+    def save(self, *args, **kwargs):
+        self.section = "primary"
+        super().save(*args, **kwargs)
+
+
+class SecondaryFeatureManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(section="secondary")
+
+
+class SecondaryFeature(HomePageFeature):
+    objects = SecondaryFeatureManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = "Secondary Feature"
+        verbose_name_plural = "Secondary Features"
+
+    def save(self, *args, **kwargs):
+        self.section = "secondary"
+        super().save(*args, **kwargs)
+
+
+class TestimonialFeatureManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(section="testimonials")
+
+
+class TestimonialFeature(HomePageFeature):
+    objects = TestimonialFeatureManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = "Testimonial"
+        verbose_name_plural = "Testimonials"
+
+    def save(self, *args, **kwargs):
+        self.section = "testimonials"
+        super().save(*args, **kwargs)
+
+
+class ProcessStepFeatureManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(section="process")
+
+
+class ProcessStepFeature(HomePageFeature):
+    objects = ProcessStepFeatureManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = "Process Step"
+        verbose_name_plural = "Process Steps"
+
+    def save(self, *args, **kwargs):
+        self.section = "process"
+        super().save(*args, **kwargs)
+
+
+class FamilyBundlePlanFeatureManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(section="family_bundle_plans")
+
+
+class FamilyBundlePlanFeature(HomePageFeature):
+    objects = FamilyBundlePlanFeatureManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = "Family Bundle Plan"
+        verbose_name_plural = "Family Bundle Plans"
+
+    def save(self, *args, **kwargs):
+        self.section = "family_bundle_plans"
+        super().save(*args, **kwargs)
+
+
+class FamilyBundleComparisonFeatureManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(section="family_bundle_comparison")
+
+
+class FamilyBundleComparisonFeature(HomePageFeature):
+    objects = FamilyBundleComparisonFeatureManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = "Family Bundle Comparison Row"
+        verbose_name_plural = "Family Bundle Comparison Rows"
+
+    def save(self, *args, **kwargs):
+        self.section = "family_bundle_comparison"
+        super().save(*args, **kwargs)
+
+
+class FamilyBundleTestimonialFeatureManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(section="family_bundle_testimonials")
+
+
+class FamilyBundleTestimonialFeature(HomePageFeature):
+    objects = FamilyBundleTestimonialFeatureManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = "Family Bundle Testimonial"
+        verbose_name_plural = "Family Bundle Testimonials"
+
+    def save(self, *args, **kwargs):
+        self.section = "family_bundle_testimonials"
+        super().save(*args, **kwargs)
+
+
+class FamilyBundleFAQFeatureManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(section="family_bundle_faq")
+
+
+class FamilyBundleFAQFeature(HomePageFeature):
+    objects = FamilyBundleFAQFeatureManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = "Family Bundle FAQ Item"
+        verbose_name_plural = "Family Bundle FAQ Items"
+
+    def save(self, *args, **kwargs):
+        self.section = "family_bundle_faq"
+        super().save(*args, **kwargs)
