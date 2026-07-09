@@ -315,19 +315,69 @@ UNFOLD = {
                         "link": reverse_lazy("admin:about_companyinfo_changelist"),
                     },
                     {
-                        "title": "Home Page Content",
-                        "icon": "home",
+                        "title": "General Settings & Visibility",
+                        "icon": "settings",
                         "link": reverse_lazy("admin:about_homepagecontent_changelist"),
                     },
                     {
-                        "title": "Home Page Features",
-                        "icon": "star",
-                        "link": reverse_lazy("admin:about_homepagefeature_changelist"),
+                        "title": "1. Hero Section",
+                        "icon": "home",
+                        "link": reverse_lazy("admin:about_herosection_changelist"),
                     },
                     {
-                        "title": "Home Page Video Points",
+                        "title": "2. Primary Features",
+                        "icon": "star",
+                        "link": reverse_lazy("admin:about_primaryfeaturessection_changelist"),
+                    },
+                    {
+                        "title": "3. Who We Are",
+                        "icon": "info",
+                        "link": reverse_lazy("admin:about_whowearesection_changelist"),
+                    },
+                    {
+                        "title": "4. Video Section",
                         "icon": "play_circle",
-                        "link": reverse_lazy("admin:about_homepagevideopoint_changelist"),
+                        "link": reverse_lazy("admin:about_videosection_changelist"),
+                    },
+                    {
+                        "title": "5. Chat Section",
+                        "icon": "chat",
+                        "link": reverse_lazy("admin:about_chatsection_changelist"),
+                    },
+                    {
+                        "title": "6. Secondary Features",
+                        "icon": "reviews",
+                        "link": reverse_lazy("admin:about_secondaryfeaturessection_changelist"),
+                    },
+                    {
+                        "title": "7. Teachers Section",
+                        "icon": "school",
+                        "link": reverse_lazy("admin:about_teacherssection_changelist"),
+                    },
+                    {
+                        "title": "8. Testimonials Section",
+                        "icon": "thumbs_up_down",
+                        "link": reverse_lazy("admin:about_testimonialssection_changelist"),
+                    },
+                    {
+                        "title": "9. Family Bundle",
+                        "icon": "people",
+                        "link": reverse_lazy("admin:about_familybundlesection_changelist"),
+                    },
+                    {
+                        "title": "10. Process Section",
+                        "icon": "alt_route",
+                        "link": reverse_lazy("admin:about_processsection_changelist"),
+                    },
+                    {
+                        "title": "11. Free Session Section",
+                        "icon": "calendar_month",
+                        "link": reverse_lazy("admin:about_freesessionsection_changelist"),
+                    },
+                    {
+                        "title": "12. Contact & Footer",
+                        "icon": "mail",
+                        "link": reverse_lazy("admin:about_contactfootersection_changelist"),
                     },
                     {
                         "title": "Legal Pages",

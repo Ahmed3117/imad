@@ -4,7 +4,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from project.admin_base import ModelAdmin
@@ -27,6 +28,26 @@ from .models import (
     HomePageVideoPointTranslation,
     LegalPage,
     LegalPageTranslation,
+    HeroSection,
+    PrimaryFeaturesSection,
+    WhoWeAreSection,
+    VideoSection,
+    ChatSection,
+    SecondaryFeaturesSection,
+    TeachersSection,
+    TestimonialsSection,
+    FamilyBundleSection,
+    ProcessSection,
+    FreeSessionSection,
+    ContactFooterSection,
+    PrimaryFeature,
+    SecondaryFeature,
+    TestimonialFeature,
+    ProcessStepFeature,
+    FamilyBundlePlanFeature,
+    FamilyBundleComparisonFeature,
+    FamilyBundleTestimonialFeature,
+    FamilyBundleFAQFeature,
 )
 
 
@@ -207,12 +228,286 @@ class HomePageFeatureTranslationInline(TabularInline):
     fields = ("language", "title", "subtitle", "meta", "description")
 
 
-class HomePageFeatureInline(StackedInline):
-    model = HomePageFeature
+# -------------------------------------------------------------
+# Section-Specific Translation Inlines
+# -------------------------------------------------------------
+
+class HeroTranslationInline(StackedInline):
+    model = HomePageContentTranslation
     extra = 0
     tab = True
-    fields = ("section", "icon_class", "image", "order", "is_active")
+    verbose_name = "Translation"
+    verbose_name_plural = "Translations"
+    fields = (
+        "language",
+        "hero_badge",
+        "hero_title",
+        "hero_description",
+        "hero_primary_button_text",
+        "hero_side_title",
+        "hero_side_description",
+        "hero_trust_badge_1",
+        "hero_trust_badge_2",
+        "hero_trust_badge_3",
+        "hero_trust_badge_4",
+        "hero_pricing_note",
+    )
+
+
+class PrimaryFeaturesTranslationInline(StackedInline):
+    model = HomePageContentTranslation
+    extra = 0
+    tab = True
+    verbose_name = "Translation"
+    verbose_name_plural = "Translations"
+    fields = (
+        "language",
+        "primary_features_title",
+        "primary_features_description",
+        "primary_features_empty_text",
+    )
+
+
+class WhoWeAreTranslationInline(StackedInline):
+    model = HomePageContentTranslation
+    extra = 0
+    tab = True
+    verbose_name = "Translation"
+    verbose_name_plural = "Translations"
+    fields = (
+        "language",
+        "who_we_are_title",
+        "who_we_are_lead",
+        "who_we_are_description",
+        "who_we_are_button_text",
+    )
+
+
+class VideoTranslationInline(StackedInline):
+    model = HomePageContentTranslation
+    extra = 0
+    tab = True
+    verbose_name = "Translation"
+    verbose_name_plural = "Translations"
+    fields = (
+        "language",
+        "video_section_title",
+        "video_section_description",
+        "video_point_fallback",
+    )
+
+
+class ChatTranslationInline(StackedInline):
+    model = HomePageContentTranslation
+    extra = 0
+    tab = True
+    verbose_name = "Translation"
+    verbose_name_plural = "Translations"
+    fields = (
+        "language",
+        "chat_section_title",
+        "chat_section_description_1",
+        "chat_section_description_2",
+        "chat_button_text",
+    )
+
+
+class SecondaryFeaturesTranslationInline(StackedInline):
+    model = HomePageContentTranslation
+    extra = 0
+    tab = True
+    verbose_name = "Translation"
+    verbose_name_plural = "Translations"
+    fields = (
+        "language",
+        "secondary_features_title",
+        "secondary_features_description",
+        "secondary_features_empty_text",
+    )
+
+
+class TeachersTranslationInline(StackedInline):
+    model = HomePageContentTranslation
+    extra = 0
+    tab = True
+    verbose_name = "Translation"
+    verbose_name_plural = "Translations"
+    fields = (
+        "language",
+        "teachers_section_title",
+        "teachers_section_subtitle",
+    )
+
+
+class TestimonialsTranslationInline(StackedInline):
+    model = HomePageContentTranslation
+    extra = 0
+    tab = True
+    verbose_name = "Translation"
+    verbose_name_plural = "Translations"
+    fields = (
+        "language",
+        "testimonials_section_title",
+        "testimonials_section_subtitle",
+    )
+
+
+class FamilyBundleTranslationInline(StackedInline):
+    model = HomePageContentTranslation
+    extra = 0
+    tab = True
+    verbose_name = "Translation"
+    verbose_name_plural = "Translations"
+    fields = (
+        "language",
+        "family_bundle_section_badge",
+        "family_bundle_section_title",
+        "family_bundle_section_description",
+        "family_bundle_section_pricing_note_1",
+        "family_bundle_section_pricing_note_2",
+        "family_bundle_section_pricing_note_3",
+        "family_bundle_section_pricing_note_4",
+        "family_bundle_plans_title",
+        "family_bundle_plans_description",
+        "family_bundle_comparison_title",
+        "family_bundle_comparison_description",
+        "family_bundle_faq_title",
+        "family_bundle_faq_description",
+        "family_bundle_cta_title",
+        "family_bundle_cta_description",
+        "family_bundle_cta_button_text",
+    )
+
+
+class ProcessTranslationInline(StackedInline):
+    model = HomePageContentTranslation
+    extra = 0
+    tab = True
+    verbose_name = "Translation"
+    verbose_name_plural = "Translations"
+    fields = (
+        "language",
+        "process_section_title",
+        "process_section_description",
+    )
+
+
+class FreeSessionTranslationInline(StackedInline):
+    model = HomePageContentTranslation
+    extra = 0
+    tab = True
+    verbose_name = "Translation"
+    verbose_name_plural = "Translations"
+    fields = (
+        "language",
+        "free_session_section_badge",
+        "free_session_section_title",
+        "free_session_section_description",
+        "free_session_privacy_note",
+    )
+
+
+class ContactFooterTranslationInline(StackedInline):
+    model = HomePageContentTranslation
+    extra = 0
+    tab = True
+    verbose_name = "Translation"
+    verbose_name_plural = "Translations"
+    fields = (
+        "language",
+        "contact_section_title",
+        "contact_section_description",
+        "contact_info_title",
+        "contact_info_description",
+        "facebook_label",
+        "footer_description",
+        "footer_cta_text",
+        "footer_created_by_text",
+        "footer_copyright_text",
+    )
+
+# -------------------------------------------------------------
+# Section-Specific Feature Inlines
+# -------------------------------------------------------------
+
+class PrimaryFeatureInline(StackedInline):
+    model = PrimaryFeature
+    extra = 0
+    tab = True
+    fields = ("icon_class", "image", "order", "is_active")
     show_change_link = True
+    verbose_name = "Primary Feature"
+    verbose_name_plural = "Primary Features"
+
+
+class SecondaryFeatureInline(StackedInline):
+    model = SecondaryFeature
+    extra = 0
+    tab = True
+    fields = ("icon_class", "image", "order", "is_active")
+    show_change_link = True
+    verbose_name = "Secondary Feature"
+    verbose_name_plural = "Secondary Features"
+
+
+class TestimonialFeatureInline(StackedInline):
+    model = TestimonialFeature
+    extra = 0
+    tab = True
+    fields = ("icon_class", "order", "is_active")
+    show_change_link = True
+    verbose_name = "Testimonial"
+    verbose_name_plural = "Testimonials"
+
+
+class FamilyBundlePlanInline(StackedInline):
+    model = FamilyBundlePlanFeature
+    extra = 0
+    tab = True
+    fields = ("icon_class", "order", "is_active")
+    show_change_link = True
+    verbose_name = "Family Bundle Plan"
+    verbose_name_plural = "Family Bundle Plans"
+
+
+class FamilyBundleComparisonInline(StackedInline):
+    model = FamilyBundleComparisonFeature
+    extra = 0
+    tab = True
+    fields = ("icon_class", "order", "is_active")
+    show_change_link = True
+    verbose_name = "Family Bundle Comparison Row"
+    verbose_name_plural = "Family Bundle Comparison Rows"
+
+
+class FamilyBundleTestimonialInline(StackedInline):
+    model = FamilyBundleTestimonialFeature
+    extra = 0
+    tab = True
+    fields = ("icon_class", "order", "is_active")
+    show_change_link = True
+    verbose_name = "Family Bundle Testimonial"
+    verbose_name_plural = "Family Bundle Testimonials"
+
+
+class FamilyBundleFAQInline(StackedInline):
+    model = FamilyBundleFAQFeature
+    extra = 0
+    tab = True
+    fields = ("icon_class", "order", "is_active")
+    show_change_link = True
+    verbose_name = "Family Bundle FAQ Item"
+    verbose_name_plural = "Family Bundle FAQ Items"
+
+
+class ProcessStepInline(StackedInline):
+    model = ProcessStepFeature
+    extra = 0
+    tab = True
+    fields = ("icon_class", "order", "is_active")
+    show_change_link = True
+    verbose_name = "Process Step"
+    verbose_name_plural = "Process Steps"
 
 
 class HomePageVideoPointTranslationInline(TabularInline):
@@ -228,9 +523,29 @@ class HomePageVideoPointInline(StackedInline):
     fields = ("icon_class", "order", "is_active")
     show_change_link = True
 
+# -------------------------------------------------------------
+# Base Redirection Class for Singletons
+# -------------------------------------------------------------
+
+class SingletonAdminRedirectMixin:
+    def changelist_view(self, request, extra_context=None):
+        obj = self.model.get_solo()
+        if not obj:
+            obj = self.model.objects.create()
+        return redirect(reverse(f"admin:about_{self.model._meta.model_name}_change", args=[obj.pk]))
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+# -------------------------------------------------------------
+# HomePageContent Admin (Media, Links, Section Visibility only)
+# -------------------------------------------------------------
 
 @admin.register(HomePageContent)
-class HomePageContentAdmin(ModelAdmin):
+class HomePageContentAdmin(SingletonAdminRedirectMixin, ModelAdmin):
     list_display = (
         "id",
         "show_primary_features",
@@ -256,11 +571,7 @@ class HomePageContentAdmin(ModelAdmin):
         "translations__hero_title",
         "translations__family_bundle_section_title",
     )
-    inlines = [
-        HomePageContentTranslationInline,
-        HomePageFeatureInline,
-        HomePageVideoPointInline,
-    ]
+    inlines = []
     fieldsets = (
         (
             "Media",
@@ -286,40 +597,178 @@ class HomePageContentAdmin(ModelAdmin):
                 )
             },
         ),
-            (
-                "Section Visibility",
-                {
-                    "fields": (
-                        "show_primary_features",
-                        "show_view_courses_button",
-                        "show_who_we_are_section",
-                        "show_video_section",
-                        "show_chat_section",
-                        "show_secondary_features",
-                        "show_teachers_section",
-                        "show_testimonials_section",
-                        "show_family_bundle_section",
-                        "show_family_bundle_comparison_section",
-                        "show_family_bundle_faq_section",
-                        "show_process_section",
-                        "show_free_session_section",
-                        "show_contact_section",
-                        "show_company_info_phone",
-                        "show_whatsapp_number",
-                        "show_telegram_number",
-                    )
-                },
-            ),
+        (
+            "Section Visibility",
+            {
+                "fields": (
+                    "show_primary_features",
+                    "show_view_courses_button",
+                    "show_who_we_are_section",
+                    "show_video_section",
+                    "show_chat_section",
+                    "show_secondary_features",
+                    "show_teachers_section",
+                    "show_testimonials_section",
+                    "show_family_bundle_section",
+                    "show_family_bundle_comparison_section",
+                    "show_family_bundle_faq_section",
+                    "show_process_section",
+                    "show_free_session_section",
+                    "show_contact_section",
+                    "show_company_info_phone",
+                    "show_whatsapp_number",
+                    "show_telegram_number",
+                )
+            },
+        ),
     )
 
     def get_object(self, request, object_id, from_field=None):
         return HomePageContent.get_solo()
 
-    def has_add_permission(self, request):
-        if HomePageContent.objects.exists():
-            return False
-        return super().has_add_permission(request)
+# -------------------------------------------------------------
+# Proxy Model Admins
+# -------------------------------------------------------------
 
+@admin.register(HeroSection)
+class HeroSectionAdmin(SingletonAdminRedirectMixin, ModelAdmin):
+    inlines = [HeroTranslationInline]
+    fieldsets = (
+        ("Media", {"fields": ("hero_background_image",)}),
+        ("Links", {"fields": ("hero_primary_button_url",)}),
+    )
+
+
+@admin.register(PrimaryFeaturesSection)
+class PrimaryFeaturesSectionAdmin(SingletonAdminRedirectMixin, ModelAdmin):
+    inlines = [PrimaryFeaturesTranslationInline, PrimaryFeatureInline]
+
+
+@admin.register(WhoWeAreSection)
+class WhoWeAreSectionAdmin(SingletonAdminRedirectMixin, ModelAdmin):
+    inlines = [WhoWeAreTranslationInline]
+    fieldsets = (
+        ("Media", {"fields": ("who_we_are_image",)}),
+        ("Links", {"fields": ("who_we_are_button_url",)}),
+    )
+
+
+@admin.register(VideoSection)
+class VideoSectionAdmin(SingletonAdminRedirectMixin, ModelAdmin):
+    inlines = [VideoTranslationInline, HomePageVideoPointInline]
+    fieldsets = (
+        ("Media", {"fields": ("video_cover_image", "intro_video")}),
+    )
+
+
+@admin.register(ChatSection)
+class ChatSectionAdmin(SingletonAdminRedirectMixin, ModelAdmin):
+    inlines = [ChatTranslationInline]
+    fieldsets = (
+        ("Media", {"fields": ("chat_image",)}),
+    )
+
+
+@admin.register(SecondaryFeaturesSection)
+class SecondaryFeaturesSectionAdmin(SingletonAdminRedirectMixin, ModelAdmin):
+    inlines = [SecondaryFeaturesTranslationInline, SecondaryFeatureInline]
+
+
+@admin.register(TeachersSection)
+class TeachersSectionAdmin(SingletonAdminRedirectMixin, ModelAdmin):
+    inlines = [TeachersTranslationInline]
+
+
+@admin.register(TestimonialsSection)
+class TestimonialsSectionAdmin(SingletonAdminRedirectMixin, ModelAdmin):
+    inlines = [TestimonialsTranslationInline, TestimonialFeatureInline]
+
+
+@admin.register(FamilyBundleSection)
+class FamilyBundleSectionAdmin(SingletonAdminRedirectMixin, ModelAdmin):
+    inlines = [
+        FamilyBundleTranslationInline,
+        FamilyBundlePlanInline,
+        FamilyBundleComparisonInline,
+        FamilyBundleTestimonialInline,
+        FamilyBundleFAQInline,
+    ]
+
+
+@admin.register(ProcessSection)
+class ProcessSectionAdmin(SingletonAdminRedirectMixin, ModelAdmin):
+    inlines = [ProcessTranslationInline, ProcessStepInline]
+
+
+@admin.register(FreeSessionSection)
+class FreeSessionSectionAdmin(SingletonAdminRedirectMixin, ModelAdmin):
+    inlines = [FreeSessionTranslationInline]
+
+
+@admin.register(ContactFooterSection)
+class ContactFooterSectionAdmin(SingletonAdminRedirectMixin, ModelAdmin):
+    inlines = [ContactFooterTranslationInline]
+    fieldsets = (
+        ("Media", {"fields": ("contact_illustration",)}),
+        ("Links", {"fields": ("footer_cta_url", "facebook_url")}),
+    )
+
+# Hide sub-features from modules but keep registered for links
+@admin.register(PrimaryFeature)
+class PrimaryFeatureAdmin(ModelAdmin):
+    inlines = [HomePageFeatureTranslationInline]
+    list_display = ("id", "icon_class", "order", "is_active")
+    def has_module_permission(self, request):
+        return False
+
+@admin.register(SecondaryFeature)
+class SecondaryFeatureAdmin(ModelAdmin):
+    inlines = [HomePageFeatureTranslationInline]
+    list_display = ("id", "icon_class", "order", "is_active")
+    def has_module_permission(self, request):
+        return False
+
+@admin.register(TestimonialFeature)
+class TestimonialFeatureAdmin(ModelAdmin):
+    inlines = [HomePageFeatureTranslationInline]
+    list_display = ("id", "icon_class", "order", "is_active")
+    def has_module_permission(self, request):
+        return False
+
+@admin.register(ProcessStepFeature)
+class ProcessStepFeatureAdmin(ModelAdmin):
+    inlines = [HomePageFeatureTranslationInline]
+    list_display = ("id", "icon_class", "order", "is_active")
+    def has_module_permission(self, request):
+        return False
+
+@admin.register(FamilyBundlePlanFeature)
+class FamilyBundlePlanFeatureAdmin(ModelAdmin):
+    inlines = [HomePageFeatureTranslationInline]
+    list_display = ("id", "icon_class", "order", "is_active")
+    def has_module_permission(self, request):
+        return False
+
+@admin.register(FamilyBundleComparisonFeature)
+class FamilyBundleComparisonFeatureAdmin(ModelAdmin):
+    inlines = [HomePageFeatureTranslationInline]
+    list_display = ("id", "icon_class", "order", "is_active")
+    def has_module_permission(self, request):
+        return False
+
+@admin.register(FamilyBundleTestimonialFeature)
+class FamilyBundleTestimonialFeatureAdmin(ModelAdmin):
+    inlines = [HomePageFeatureTranslationInline]
+    list_display = ("id", "icon_class", "order", "is_active")
+    def has_module_permission(self, request):
+        return False
+
+@admin.register(FamilyBundleFAQFeature)
+class FamilyBundleFAQFeatureAdmin(ModelAdmin):
+    inlines = [HomePageFeatureTranslationInline]
+    list_display = ("id", "icon_class", "order", "is_active")
+    def has_module_permission(self, request):
+        return False
 
 @admin.register(HomePageFeature)
 class HomePageFeatureAdmin(ModelAdmin):
@@ -328,7 +777,8 @@ class HomePageFeatureAdmin(ModelAdmin):
     search_fields = ("icon_class",)
     ordering = ("section", "order", "id")
     inlines = [HomePageFeatureTranslationInline]
-
+    def has_module_permission(self, request):
+        return False
 
 @admin.register(HomePageVideoPoint)
 class HomePageVideoPointAdmin(ModelAdmin):
@@ -337,6 +787,8 @@ class HomePageVideoPointAdmin(ModelAdmin):
     search_fields = ("icon_class",)
     ordering = ("order", "id")
     inlines = [HomePageVideoPointTranslationInline]
+    def has_module_permission(self, request):
+        return False
 
 
 @admin.register(FreeSession)
