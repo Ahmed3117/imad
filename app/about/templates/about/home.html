@@ -898,31 +898,31 @@
 
 /* ── Hero Free Trial Button ───────────────────────────── */
 .btn-free-trial {
-    background: linear-gradient(135deg, #fca311 0%, #ff6f61 100%) !important;
+    background: linear-gradient(135deg, var(--sub-color) 0%, var(--main-color) 100%) !important;
     color: #fff !important;
     border: none !important;
     font-weight: 700;
     letter-spacing: 0.02em;
-    box-shadow: 0 4px 20px rgba(252, 163, 17, 0.45) !important;
+    box-shadow: 0 4px 20px rgba(var(--sub-color-rgb), 0.45) !important;
     transition: box-shadow 0.3s, transform 0.3s !important;
 }
 .btn-free-trial:hover {
-    box-shadow: 0 8px 28px rgba(252, 163, 17, 0.65) !important;
-    background: linear-gradient(135deg, #ff6f61 0%, #fca311 100%) !important;
+    box-shadow: 0 8px 28px rgba(var(--sub-color-rgb), 0.65) !important;
+    background: linear-gradient(135deg, var(--main-color) 0%, var(--sub-color) 100%) !important;
     transform: translateY(-4px) !important;
 }
 .free-trial-badge {
     position: absolute;
     top: -9px;
     right: -9px;
-    background: #253b8d;
+    background: var(--second-main-color);
     color: #fff;
     font-size: 0.58rem;
     font-weight: 800;
     padding: 2px 6px;
     border-radius: 20px;
     letter-spacing: 0.08em;
-    box-shadow: 0 2px 6px rgba(37, 59, 141, 0.4);
+    box-shadow: 0 2px 6px rgba(var(--second-main-color-rgb, 0, 33, 87), 0.4);
     pointer-events: none;
     white-space: nowrap;
 }
@@ -963,7 +963,7 @@
     box-shadow: -4px 4px 24px rgba(0, 0, 0, 0.13);
     text-decoration: none !important;
     color: inherit;
-    border-left: 4px solid #fca311;
+    border-left: 4px solid var(--sub-color);
     min-width: 210px;
     transition: background 0.2s;
 }
@@ -977,7 +977,7 @@
     width: 42px;
     height: 42px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #fca311, #ff6f61);
+    background: linear-gradient(135deg, var(--sub-color), var(--main-color));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -996,7 +996,7 @@
     animation: fss-pulse 1.6s ease-in-out infinite;
 }
 .fss-dot.pending {
-    background: #fca311;
+    background: var(--sub-color);
     animation: none;
 }
 @keyframes fss-pulse {
@@ -1011,7 +1011,7 @@
 .fss-eyebrow {
     font-size: 0.68rem;
     font-weight: 700;
-    color: #fca311;
+    color: var(--sub-color);
     text-transform: uppercase;
     letter-spacing: 0.07em;
 }
@@ -1028,7 +1028,7 @@
     transition: color 0.2s, transform 0.2s;
 }
 .fss-inner:hover .fss-arrow {
-    color: #fca311;
+    color: var(--sub-color);
     transform: translateX(3px);
 }
 </style>

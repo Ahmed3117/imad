@@ -32,3 +32,4 @@ subscriptions/token.json
 # Ignore migrations folders
 **/migrations/
 backups/
+../imadProd_backup_20260709_133621.sql

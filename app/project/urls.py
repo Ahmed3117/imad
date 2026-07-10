@@ -1,5 +1,3 @@
-import debug_toolbar
-import django
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
@@ -11,7 +9,6 @@ from django.views.generic.base import RedirectView
 from about.admin import fixture_upload_site
 
 urlpatterns = [
-    path("__debug__/", include(debug_toolbar.urls)),
     path("accounts/", include("accounts.urls", namespace="accounts")),
     path("a_d_m_i_n/", admin.site.urls),
     path("fixture-upload/", fixture_upload_site.urls),
@@ -33,7 +30,12 @@ urlpatterns = [
     # path('freemeet/', include('freemeet.urls',namespace='freemeet')),
     path("chat/", include("chat.urls", namespace="chat")),
 ]
+
 if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        path("__debug__/", include(debug_toolbar.urls)),
+    ] + urlpatterns
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 elif getattr(settings, 'STATIC_ROOT', None):
