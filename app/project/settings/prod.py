@@ -15,11 +15,15 @@ ALLOWED_HOSTS = [
     '50.19.183.215',
     '127.0.0.1',
     'localhost',
+    '127.0.0.1:7777',
+    'localhost:7777',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://nabbiuwny.com',
     'https://www.nabbiuwny.com',
+    'http://127.0.0.1:7777',
+    'http://localhost:7777',
 ]
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'

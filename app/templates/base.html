@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="nabbiuwny institution">
     <meta property="og:description" content="">
-    <meta property="og:image" content="{% if logo_url %}https://nabbiuwny.com{{ logo_url }}{% else %}https://nabbiuwny.com/static/imgs/hero/logo.png{% endif %}">
+    <meta property="og:image" content="https://nabbiuwny.com/static/new_logo.jpg">
     <meta property="og:url" content="https://nabbiuwny.com/">
     <meta property="og:type" content="website">
     <meta name="csrf-token" content="{{ csrf_token }}">
@@ -48,14 +48,14 @@
     <!-- CSS Libraries with versioning -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700&display=swap" rel="stylesheet" />
-    <!-- fav icon -->
-    <link rel="icon" type="image/x-icon" href="{% static 'imgs/bg/l2.png' %}?v=1.0.0">
+    <!-- fav icon2-->
+    <link rel="icon" type="image/x-icon" href="{% static 'new_logo.jpg' %}?v=2.0.0">
 
-    <link id="rtl-css" href="{% static 'css/mdb.rtl.min.css' %}?v=1.0.0" rel="stylesheet" disabled />
-    <link id="ltr-css" href="{% static 'css/mdb.min.css' %}?v=1.0.0" rel="stylesheet" />
+    <link id="rtl-css" href="{% static 'css/mdb.rtl.min.css' %}?v=2.0.0" rel="stylesheet" disabled />
+    <link id="ltr-css" href="{% static 'css/mdb.min.css' %}?v=2.0.0" rel="stylesheet" />
 
     <!-- Bootstrap CSS with versioning -->
-    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.0.4">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=2.0.0">
 
     <!-- Additional CSS -->
     {% block extra_css %}{% endblock %}
@@ -115,7 +115,7 @@
 {% endif %}
 
 <!-- JavaScript Libraries with versioning -->
-<script type="text/javascript" src="{% static 'js/mdb.min.js' %}?v=1.0.0"></script>
+<script type="text/javascript" src="{% static 'js/mdb.min.js' %}?v=2.0.0"></script>
 
 <!-- Translations -->
 <script>
