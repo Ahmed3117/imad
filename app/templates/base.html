@@ -42,7 +42,7 @@
 
     <!-- Define a version constant for cache busting -->
     <script>
-        const APP_VERSION = '1.0.0';  // Update this when you make frontend changes
+        const APP_VERSION = '1.0.1';  // Update this when you make frontend changes
     </script>
 
     <!-- CSS Libraries with versioning -->
@@ -177,10 +177,14 @@
             document.querySelectorAll('[data-translate]').forEach(el => {
                 const key = el.getAttribute('data-translate');
                 if (translations[key]) {
-                    // Use a child span if it exists, otherwise set textContent
-                    const textNode = el.querySelector('span') || el;
-                    if (textNode.textContent.trim() !== translations[key]) {
-                       textNode.textContent = translations[key];
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.setAttribute('placeholder', translations[key]);
+                    } else {
+                        // Use a child span if it exists, otherwise set textContent
+                        const textNode = el.querySelector('span') || el;
+                        if (textNode.textContent.trim() !== translations[key]) {
+                           textNode.textContent = translations[key];
+                        }
                     }
                 }
             });
@@ -218,6 +222,22 @@
 
         // Initial setup
         const translationFolder = getTranslationFolder();
+
+        // Clean up URL parameters if 'lang' query param is present
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('lang')) {
+            const cleanLang = urlParams.get('lang');
+            if (cleanLang === 'en' || cleanLang === 'ar') {
+                currentLanguage = cleanLang;
+                localStorage.setItem('selectedLanguage', currentLanguage);
+                document.cookie = "django_language=" + currentLanguage + "; path=/; max-age=31536000";
+            }
+            urlParams.delete('lang');
+            const newSearch = urlParams.toString();
+            const cleanURL = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash;
+            window.history.replaceState({}, '', cleanURL);
+        }
+
         switchStylesheet(currentLanguage);
         setActiveButton(currentLanguage);
         loadTranslations(currentLanguage, translationFolder);
@@ -232,9 +252,10 @@
 
         currentLanguage = newLanguage;
         localStorage.setItem('selectedLanguage', currentLanguage);
+        document.cookie = "django_language=" + newLanguage + "; path=/; max-age=31536000";
 
         const url = new URL(window.location.href);
-        url.searchParams.set('lang', newLanguage);
+        url.searchParams.delete('lang');
         window.location.href = url.toString();
       });
     });

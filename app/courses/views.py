@@ -14,7 +14,9 @@ from .models import  Course
 
 
 def levels(request):
-    language = request.GET.get('lang', 'en')  # Default to 'en' if no language is specified
+    language = request.GET.get('lang')
+    if not language:
+        language = request.COOKIES.get('django_language') or 'en'  # Default to 'en' if no language is specified
 
     # Get all levels with their related data
     levels = Level.objects.prefetch_related(

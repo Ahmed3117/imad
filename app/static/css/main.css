@@ -255,12 +255,12 @@ svg {
 /* Navbar */
 .navbar {
     box-shadow: 0 2px 4px rgb(180 32 32 / 0%);
-    padding: 1.2rem 1.5rem;
+    padding: 1.1rem 1.5rem;
     transition: padding 0.3s ease, background-color 0.3s ease;
 }
 
 .navbar-brand img {
-    height: 80px;
+    height: 72px;
     transition: height 0.3s ease;
 }
 
@@ -319,11 +319,11 @@ svg {
 
 /* ── Light / Scrolled Navbar State ─────────────────────── */
 .navbar-light {
-    padding: 0.7rem 1.5rem;
+    padding: 0.6rem 1.5rem;
 }
 
 .navbar-light .navbar-brand img {
-    height: 62px;
+    height: 56px;
 }
 
 .navbar-light .navbar-nav .nav-link {
@@ -356,16 +356,14 @@ svg {
 /* Hero Section */
 .hero-section {
     position: relative;
-    min-height: 100vh; /* Use min-height for flexibility */
+    min-height: 100vh;
     display: flex;
     align-items: center;
-    justify-content: center;
-    text-align: center;
     color: var(--white-color);
     overflow: hidden;
     box-sizing: border-box;
-    padding: 96px 0 48px;
-    background-color: #f8ead7;
+    padding: 110px 0 60px;
+    background-color: var(--second-main-color);
     z-index: 0;
 }
 .hero-section::before {
@@ -376,123 +374,336 @@ svg {
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--home-hero-bg, url("../imgs/hero/quran-learning-hero-default-v2.png")) no-repeat center
-        center/cover; /* Check path */
-    filter: brightness(0.45); /* Darker */
+    background: var(--home-hero-bg, url("../imgs/hero/quran-learning-hero-default-v2.png")) no-repeat center center/cover;
+    filter: brightness(0.25) saturate(1.1); /* Darker & slightly saturated for colors */
     z-index: 0;
 }
-.hero-content {
-    position: relative;
-    z-index: 2;
-    max-width: 850px;
-    padding: 2.5rem;
-    background: rgb(31 36 34 / 18%); /* Slightly more opaque */
-    border-radius: var(--border-radius);
-    backdrop-filter: blur(6px);
-    animation: fadeInUp 1s ease-out forwards; /* Ensure it stays visible */
-    opacity: 0; /* Start hidden for animation */
+
+/* Subtle background glowing radial light */
+.hero-section::after {
+    content: "";
+    position: absolute;
+    bottom: -15%;
+    right: -10%;
+    width: 50vw;
+    height: 50vw;
+    background: radial-gradient(circle, rgba(var(--main-color-rgb), 0.2) 0%, rgba(var(--sub-color-rgb), 0.1) 50%, transparent 100%);
+    filter: blur(80px);
+    z-index: 0;
+    pointer-events: none;
 }
+
+.hero-container {
+    z-index: 2;
+    position: relative;
+}
+
+/* Enrollment Badge */
+.hero-enroll-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--white-color);
+    backdrop-filter: blur(10px);
+    margin-bottom: 1.5rem;
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+.hero-enroll-badge .pulse-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--sub-color); /* Green pulse dot */
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(60, 207, 78, 0.7);
+    animation: pulseGlow 2s infinite;
+}
+
+.hero-text-col {
+    animation: fadeInUp 1s ease-out forwards;
+}
+
 .hero-title {
-    font-size: 3.5rem;
-    font-weight: 700;
+    font-size: 3.8rem;
+    font-weight: 800;
     margin-bottom: 1.5rem;
     color: var(--white-color);
-    line-height: 1.2;
+    line-height: 1.15;
 }
+.hero-title .text-gradient-highlight {
+    background: linear-gradient(135deg, var(--main-color) 0%, var(--sub-color) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
 .hero-description {
     font-size: 1.25rem;
-    margin-bottom: 2.5rem;
-    color: rgba(255, 255, 255, 0.9);
-    max-width: 700px;
-    margin-left: auto;
-    margin-right: auto;
+    margin-bottom: 2rem;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.6;
 }
+
+/* Bullet list of key features */
+.hero-benefits-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+.hero-benefits-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.95);
+}
+.hero-benefits-list li i {
+    color: var(--sub-color); /* green check */
+    background: rgba(var(--sub-color-rgb), 0.15);
+    padding: 0.25rem;
+    border-radius: 50%;
+    font-size: 0.95rem;
+}
+
 .hero-actions {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     gap: 1rem;
+    margin-bottom: 2.5rem;
 }
-.hero-button,
-.profile-button {
-    min-width: 180px; /* Give buttons some minimum width */
+
+/* Glowing Primary Button */
+.hero-btn-primary {
+    background: linear-gradient(135deg, var(--main-color) 0%, var(--sub-color) 100%) !important;
+    border: none !important;
+    box-shadow: 0 4px 20px rgba(var(--main-color-rgb), 0.4) !important;
+    color: white !important;
+    font-weight: 700;
+    padding: 0.9rem 2.2rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
 }
-.hero-content .row.g-3 .feature-card,
-.hero-content .row.g-3 .feature-card:hover,
-.hero-content .row.g-3 .feature-card:focus,
-.hero-content .row.g-3 .feature-card:active,
-.hero-content .row.g-3 .feature-card:focus-within {
-    animation: none !important;
-    transform: none !important;
-    transition: none !important;
+.hero-btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(var(--main-color-rgb), 0.6) !important;
+    background: linear-gradient(135deg, var(--sub-color) 0%, var(--main-color) 100%) !important;
 }
-.hero-content .row.g-3 .feature-card .ripple-wave {
-    display: none !important;
-    animation: none !important;
-    transform: none !important;
-    transition: none !important;
+
+/* Secondary Button */
+.hero-btn-secondary {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    backdrop-filter: blur(10px);
+    color: white !important;
+    font-weight: 600;
+    padding: 0.9rem 2.2rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
 }
-@media (min-width: 992px) and (max-height: 820px) {
-    .hero-section {
-        align-items: flex-start;
-        padding-top: 88px;
-        padding-bottom: 32px;
-    }
-
-    .hero-content {
-        max-width: 820px;
-        padding: 1.25rem 1.75rem;
-    }
-
-    .hero-content .mb-3 {
-        margin-bottom: 0.75rem !important;
-    }
-
-    .hero-title {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        line-height: 1.15;
-    }
-
-    .hero-description {
-        font-size: 1.1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .hero-button,
-    .profile-button {
-        margin: 0.35rem;
-        padding: 0.75rem 1.5rem;
-    }
-
-    .hero-content .row.g-3 {
-        --bs-gutter-y: 0.75rem;
-        margin-top: 1.25rem !important;
-    }
-
-    .hero-content .card-body {
-        padding: 0.75rem !important;
-    }
+.hero-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    transform: translateY(-3px);
 }
-@media (max-width: 768px) {
-    .hero-title {
-        font-size: 2.8rem;
-    }
-    .hero-description {
-        font-size: 1.1rem;
-    }
-    .hero-content {
-        padding: 1.5rem;
-    }
+
+/* Rating Proof Widget */
+.hero-rating-proof {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: fadeInUp 1.2s ease-out forwards;
 }
+.hero-rating-proof .rating-stars {
+    color: #ffb800; /* gold */
+    font-size: 1.1rem;
+    display: flex;
+    gap: 0.2rem;
+}
+.hero-rating-proof .rating-text {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Right Side Visual Column */
+.hero-visual-col {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    animation: fadeInUp 1s ease-out 0.3s forwards;
+    opacity: 0;
+}
+
+/* Interactive Classroom Mockup Frame */
+.classroom-mockup-frame {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 24px;
+    padding: 1.25rem;
+    width: 100%;
+    max-width: 520px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+    position: relative;
+    animation: floatFrame 6s ease-in-out infinite;
+}
+
+/* Mock Video Stream Area */
+.mockup-video-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.5rem;
+    border-radius: 16px;
+    margin-bottom: 0.75rem;
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16/10;
+}
+
+.video-stream-item {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #111;
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+}
+.video-stream-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.video-stream-item .stream-label {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+}
+
+/* Floating Badges */
+.floating-badge {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--second-main-color);
+    padding: 0.75rem 1.25rem;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.floating-badge i {
+    color: var(--main-color);
+    font-size: 1.1rem;
+}
+.floating-badge.badge-top-left {
+    top: -20px;
+    left: -30px;
+    animation: floatBadge1 5s ease-in-out infinite;
+}
+.floating-badge.badge-bottom-right {
+    bottom: -15px;
+    right: -25px;
+    animation: floatBadge2 5.5s ease-in-out infinite;
+}
+
+/* Keyframe Animations */
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(40px);
     }
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+@keyframes pulseGlow {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(60, 207, 78, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(60, 207, 78, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(60, 207, 78, 0);
+    }
+}
+@keyframes floatFrame {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-12px) rotate(0.5deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+@keyframes floatBadge1 {
+    0% { transform: translate(0, 0); }
+    50% { transform: translate(-5px, -8px); }
+    100% { transform: translate(0, 0); }
+}
+@keyframes floatBadge2 {
+    0% { transform: translate(0, 0); }
+    50% { transform: translate(6px, 8px); }
+    100% { transform: translate(0, 0); }
+}
+
+/* Responsive Media Queries */
+@media (max-width: 1200px) {
+    .hero-title {
+        font-size: 3.2rem;
+    }
+}
+@media (max-width: 991px) {
+    .hero-section {
+        padding: 120px 0 60px;
+        text-align: center;
+    }
+    .hero-enroll-badge {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .hero-title {
+        font-size: 2.8rem;
+    }
+    .hero-description {
+        font-size: 1.15rem;
+    }
+    .hero-benefits-list {
+        align-items: center;
+    }
+    .hero-actions {
+        justify-content: center;
+    }
+    .hero-rating-proof {
+        justify-content: center;
+    }
+}
+@media (max-width: 576px) {
+    .hero-title {
+        font-size: 2.3rem;
+    }
+    .hero-btn-primary, .hero-btn-secondary {
+        width: 100%;
+        text-align: center;
     }
 }
 

@@ -132,83 +132,118 @@
     </nav>
 
     <!-- Hero Content -->
-    <div class="hero-content container">
-        {% if home_page_text.hero_badge %}
-        <div class="mb-3">
-            <span class="badge bg-light text-dark px-3 py-2 rounded-pill">{{ home_page_text.hero_badge }}</span>
-        </div>
-        {% endif %}
-        <h1 class="hero-title">{{ home_page_text.hero_title }}</h1>
-        <p class="hero-description">{{ home_page_text.hero_description }}</p>
-        <div class="hero-actions">
-            <a href="{{ home_page.hero_primary_button_url|default:'#free-session'|local_internal_url }}" class="btn btn-primary btn-lg hero-button">{{ home_page_text.hero_primary_button_text }}</a>
-            {% if request.user.is_authenticated %}
-            <a href="{% url 'accounts:profile' %}" class="btn btn-accent btn-lg profile-button" data-translate="profile">My Profile</a>
-            {% if request.user.role == "teacher" %}
-            <a href="{% url 'subscriptions:teacher_timetable' %}" class="btn btn-success btn-lg hero-button" data-translate="view_my_timetable">
-                <i class="fas fa-calendar-alt"></i> View My Timetable
-            </a>
-            {% elif request.user.role == "admin" or request.user.is_superuser %}
-            <a href="{% url 'subscriptions:admin_timetable' %}" class="btn btn-success btn-lg hero-button" data-translate="view_all_timetables">
-                <i class="fas fa-calendar-alt"></i> View All Timetables
-            </a>
-            {% endif %}
-            {% endif %}
-            {% if home_page.show_chat_section and not request.user.is_superuser %}
-            <a href="{% url 'chat:contact' %}" class="btn btn-info btn-lg hero-button" data-translate="chat_with_us">Chat with Us</a>
-            {% endif %}
-            {% if home_page.show_view_courses_button and not request.user.is_superuser %}
-                {% if not request.user.is_authenticated or request.user.role == 'student' or request.user.role == 'parent' or request.user.role == 'cs' %}
-                <a href="{% url 'courses:levels' %}" class="btn btn-free-trial btn-lg hero-button position-relative overflow-hidden" data-translate="book_free_session_btn">
-                    <i class="fas fa-graduation-cap me-2"></i>
-                    <span>View Courses</span>
-                </a>
+    <div class="hero-container container">
+        <div class="row align-items-center min-vh-85 py-5 g-5">
+            <!-- Left Column: Content -->
+            <div class="col-lg-6 text-start hero-text-col">
+                {% if home_page_text.hero_badge %}
+                <div class="hero-enroll-badge">
+                    <span class="pulse-dot"></span>
+                    <span>{{ home_page_text.hero_badge }}</span>
+                </div>
                 {% endif %}
-            {% endif %}
+                
+                <h1 class="hero-title">
+                    {{ home_page_text.hero_title|safe }}
+                </h1>
+                
+                <p class="hero-description">{{ home_page_text.hero_description }}</p>
+                
+                <!-- Custom bullet benefits list for premium EdTech look -->
+                <ul class="hero-benefits-list">
+                    {% if home_page_text.hero_trust_badge_1 %}
+                    <li><i class="fas fa-check"></i> <span>{{ home_page_text.hero_trust_badge_1 }}</span></li>
+                    {% endif %}
+                    {% if home_page_text.hero_trust_badge_2 %}
+                    <li><i class="fas fa-check"></i> <span>{{ home_page_text.hero_trust_badge_2 }}</span></li>
+                    {% endif %}
+                    {% if home_page_text.hero_trust_badge_3 %}
+                    <li><i class="fas fa-check"></i> <span>{{ home_page_text.hero_trust_badge_3 }}</span></li>
+                    {% endif %}
+                </ul>
+                
+                <div class="hero-actions">
+                    <a href="{{ home_page.hero_primary_button_url|default:'#free-session'|local_internal_url }}" class="btn hero-btn-primary btn-lg">{{ home_page_text.hero_primary_button_text }}</a>
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'accounts:profile' %}" class="btn hero-btn-secondary btn-lg" data-translate="profile">My Profile</a>
+                        {% if request.user.role == "teacher" %}
+                        <a href="{% url 'subscriptions:teacher_timetable' %}" class="btn hero-btn-secondary btn-lg" data-translate="view_my_timetable">
+                            <i class="fas fa-calendar-alt me-2"></i> View My Timetable
+                        </a>
+                        {% elif request.user.role == "admin" or request.user.is_superuser %}
+                        <a href="{% url 'subscriptions:admin_timetable' %}" class="btn hero-btn-secondary btn-lg" data-translate="view_all_timetables">
+                            <i class="fas fa-calendar-alt me-2"></i> View All Timetables
+                        </a>
+                        {% endif %}
+                    {% else %}
+                        {% if home_page.show_view_courses_button %}
+                        <a href="{% url 'courses:levels' %}" class="btn hero-btn-secondary btn-lg" data-translate="book_free_session_btn">
+                            <i class="fas fa-graduation-cap me-2"></i> View Courses
+                        </a>
+                        {% endif %}
+                    {% endif %}
+                    {% if home_page.show_chat_section and not request.user.is_superuser %}
+                    <a href="{% url 'chat:contact' %}" class="btn hero-btn-secondary btn-lg" data-translate="chat_with_us">Chat with Us</a>
+                    {% endif %}
+                </div>
+                
+                {% if home_page_text.hero_pricing_note %}
+                <p class="mt-1 mb-4 text-white" style="font-size: 1.05rem; font-weight: 700; opacity: 0.95;">{{ home_page_text.hero_pricing_note }}</p>
+                {% endif %}
+                
+                <!-- Stars Rating Social Proof -->
+                <div class="hero-rating-proof">
+                    <div class="rating-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    {% if home_page_text.hero_trust_badge_4 %}
+                    <span class="rating-text">{{ home_page_text.hero_trust_badge_4 }}</span>
+                    {% else %}
+                    <span class="rating-text">5.0 Star Rating by 500+ Happy Parents</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Right Column: Visual Video Lesson Mockup -->
+            <div class="col-lg-6 hero-visual-col d-none d-lg-flex">
+                <div class="classroom-mockup-frame">
+                    <!-- Top window bar decorations -->
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="bg-danger rounded-circle" style="width: 10px; height: 10px; display: inline-block;"></span>
+                        <span class="bg-warning rounded-circle" style="width: 10px; height: 10px; display: inline-block;"></span>
+                        <span class="bg-success rounded-circle" style="width: 10px; height: 10px; display: inline-block;"></span>
+                        <span class="text-white-50 ms-2 small" style="font-size: 0.75rem;">Live Quran Class - Nabbiuwny</span>
+                    </div>
+                    
+                    <div class="mockup-video-grid">
+                        <!-- Tutor Stream -->
+                        <div class="video-stream-item">
+                            <img src="{% static 'imgs/hero/tutor_mock.png' %}" alt="Sheikh Imad">
+                            <span class="stream-label"><i class="fas fa-user-tie me-1"></i> Sheikh Imad (Tutor)</span>
+                        </div>
+                        <!-- Student Stream -->
+                        <div class="video-stream-item">
+                            <img src="{% static 'imgs/hero/student_mock.png' %}" alt="Student Learning">
+                            <span class="stream-label"><i class="fas fa-graduation-cap me-1"></i> Student</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Decorative floating widgets -->
+                    <div class="floating-badge badge-top-left">
+                        <i class="fas fa-video"></i>
+                        <span data-translate="fss_live_session">Live Session 🟢</span>
+                    </div>
+                    <div class="floating-badge badge-bottom-right">
+                        <i class="fas fa-award"></i>
+                        <span data-translate="hero_badge_award">1-on-1 Focus</span>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="row g-3 mt-4">
-            {% if home_page_text.hero_trust_badge_1 %}
-            <div class="col-sm-6 col-lg-3">
-                <div class="feature-card card h-100 border-0">
-                    <div class="card-body text-center p-3">
-                        <p class="mb-0 fw-semibold">{{ home_page_text.hero_trust_badge_1 }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            {% if home_page_text.hero_trust_badge_2 %}
-            <div class="col-sm-6 col-lg-3">
-                <div class="feature-card card h-100 border-0">
-                    <div class="card-body text-center p-3">
-                        <p class="mb-0 fw-semibold">{{ home_page_text.hero_trust_badge_2 }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            {% if home_page_text.hero_trust_badge_3 %}
-            <div class="col-sm-6 col-lg-3">
-                <div class="feature-card card h-100 border-0">
-                    <div class="card-body text-center p-3">
-                        <p class="mb-0 fw-semibold">{{ home_page_text.hero_trust_badge_3 }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            {% if home_page_text.hero_trust_badge_4 %}
-            <div class="col-sm-6 col-lg-3">
-                <div class="feature-card card h-100 border-0">
-                    <div class="card-body text-center p-3">
-                        <p class="mb-0 fw-semibold">{{ home_page_text.hero_trust_badge_4 }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-
-        {% if home_page_text.hero_pricing_note %}
-        <p class="mt-4 mb-0 lead">{{ home_page_text.hero_pricing_note }}</p>
-        {% endif %}
     </div>
 </div>
 
@@ -817,13 +852,13 @@
                     {% csrf_token %}
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="freeSessionName" name="name"
-                               placeholder="Your Name"
+                               placeholder="Your Name" data-translate="your_name"
                                value="{{ request.user.get_full_name|default:'' }}">
                         <label for="freeSessionName" data-translate="your_name">Your Name</label>
                     </div>
                     <div class="form-floating mb-3">
                         <input type="email" class="form-control" id="freeSessionEmail" name="email"
-                               placeholder="Your Email"
+                               placeholder="Your Email" data-translate="your_email"
                                value="{{ request.user.email|default:'' }}">
                         <label for="freeSessionEmail" data-translate="your_email">Your Email</label>
                     </div>
@@ -851,12 +886,12 @@
                             <option value="+60">Malaysia (+60)</option>
                         </select>
                         <input type="tel" class="form-control" id="freeSessionPhone"
-                               name="phone" placeholder="Phone Number"
+                               name="phone" placeholder="Phone Number" data-translate="phone_placeholder"
                                value="{{ request.user.phone|default:'' }}">
                     </div>
                     <div class="form-floating mb-3">
                         <textarea class="form-control" id="freeSessionMessage" name="message"
-                                  placeholder="Any message..." style="height: 100px;"></textarea>
+                                  placeholder="Any message or topic you'd like to discuss? (optional)" data-translate="free_session_message" style="height: 100px;"></textarea>
                         <label for="freeSessionMessage" data-translate="free_session_message">Any message or topic you'd like to discuss? (optional)</label>
                     </div>
                     <div id="freeSessionAlert" class="alert d-none" role="alert"></div>
@@ -1049,11 +1084,11 @@
                 </div>
                 <div class="fss-body">
                     {% if request.user.is_authenticated and request.user.free_session %}
-                    <span class="fss-eyebrow">Your session</span>
-                    <strong class="fss-title">Pending — We'll call you</strong>
+                    <span class="fss-eyebrow" data-translate="fss_your_session">Your session</span>
+                    <strong class="fss-title" data-translate="fss_pending_call">Pending — We'll call you</strong>
                     {% else %}
-                    <span class="fss-eyebrow">It's FREE ✨</span>
-                    <strong class="fss-title">Book a Session</strong>
+                    <span class="fss-eyebrow" data-translate="fss_its_free">It's FREE ✨</span>
+                    <strong class="fss-title" data-translate="fss_book_session">Book a Session</strong>
                     {% endif %}
                 </div>
                 <i class="fas fa-chevron-right fss-arrow"></i>
@@ -1079,13 +1114,13 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-floating">
-                                <input type="text" id="name" class="form-control" name="name" placeholder="Your Name" required>
+                                <input type="text" id="name" class="form-control" name="name" placeholder="Your Name" data-translate="your_name" required>
                                 <label class="form-label" for="name" data-translate="your_name">Your Name</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating">
-                                <input type="email" id="email" class="form-control" name="email" placeholder="Your Email" required>
+                                <input type="email" id="email" class="form-control" name="email" placeholder="Your Email" data-translate="your_email" required>
                                 <label class="form-label" for="email" data-translate="your_email">Your Email</label>
                             </div>
                         </div>
@@ -1112,12 +1147,12 @@
                                     <option value="+62">Indonesia (+62)</option>
                                     <option value="+60">Malaysia (+60)</option>
                                 </select>
-                                <input type="tel" id="phone" class="form-control" name="phone" placeholder="Your Phone Number">
+                                <input type="tel" id="phone" class="form-control" name="phone" placeholder="Your Phone Number" data-translate="phone_placeholder">
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-floating">
-                                <textarea class="form-control" id="message" name="message" rows="5" placeholder="How can we help?" required style="height: 150px;"></textarea>
+                                <textarea class="form-control" id="message" name="message" rows="5" placeholder="How can we help?" data-translate="how_can_we_help" required style="height: 150px;"></textarea>
                                 <label class="form-label" for="message" data-translate="how_can_we_help">How can we help?</label>
                             </div>
                         </div>

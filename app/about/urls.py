@@ -6,6 +6,7 @@ from .views import (
     book_free_session,
     cookie_policy,
     home,
+    family_bundle_page,
     payment_terms,
     privacy_policy,
     refund_policy,
@@ -15,6 +16,7 @@ from .views import (
 
 urlpatterns = [
     path("", home, name="home"),
+    path("family-bundle/", family_bundle_page, name="family_bundle_page"),
     path("about-us/", about_us, name="about_us"),
     path("send-email/", send_email, name="send_email"),
     path("book-free-session/", book_free_session, name="book_free_session"),
