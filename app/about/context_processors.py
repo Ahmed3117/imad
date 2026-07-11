@@ -24,7 +24,9 @@ def get_logo_url(request):
 
 
 def get_company_info(request):
-    language = request.GET.get('lang', 'en')
+    language = request.GET.get('lang')
+    if not language:
+        language = request.COOKIES.get('django_language') or 'en'
     company_info = CompanyInfo.objects.last()
 
     if not company_info:

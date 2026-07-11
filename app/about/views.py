@@ -96,7 +96,10 @@ DEFAULT_HOME_PAGE_TEXT = {
 
 
 def _get_current_language(request):
-    return request.GET.get("lang", "en")
+    lang = request.GET.get("lang")
+    if not lang:
+        lang = request.COOKIES.get("django_language") or "en"
+    return lang
 
 
 def _get_company_info(language):
@@ -1048,3 +1051,37 @@ def payment_terms(request):
         "page_type": "payment",
         "translation_folder": "legal",
     })
+
+def family_bundle_page(request):
+    language = _get_current_language(request)
+    current_year = timezone.now().year
+
+    company_info = _get_company_info(language)
+    home_page = _get_home_page_content()
+    home_page_text = _apply_home_translation(home_page, language)
+    home_page_translations = _get_home_page_translations(home_page)
+
+    logo_url = company_info.logo.url if company_info and company_info.logo else None
+
+    context = {
+        "logo_url": logo_url,
+        "company_info": company_info,
+        "current_year": current_year,
+        "home_page": home_page,
+        "home_page_text": home_page_text,
+        "home_page_family_bundle_plans": _get_features(
+            home_page, language, "family_bundle_plans"
+        ),
+        "home_page_family_bundle_comparison": _get_features(
+            home_page, language, "family_bundle_comparison"
+        ),
+        "home_page_family_bundle_testimonials": _get_features(
+            home_page, language, "family_bundle_testimonials"
+        ),
+        "home_page_family_bundle_faq": _get_features(
+            home_page, language, "family_bundle_faq"
+        ),
+        "home_page_translations": home_page_translations,
+    }
+    return render(request, "about/family_bundle_page.html", context)
+

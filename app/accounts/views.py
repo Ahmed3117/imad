@@ -341,7 +341,9 @@ def login_student(request):
 
 
 def profile(request):
-    language = request.GET.get('lang', 'en')  # Default to 'en' if no language is specified
+    language = request.GET.get('lang')
+    if not language:
+        language = request.COOKIES.get('django_language') or 'en'  # Default to 'en' if no language is specified
 
     if not request.user.is_authenticated:
         return redirect('accounts:login')
