@@ -135,7 +135,7 @@
     <div class="hero-container container">
         <div class="row align-items-center min-vh-85 py-5 g-5">
             <!-- Left Column: Content -->
-            <div class="col-lg-6 text-start hero-text-col">
+            <div class="col-lg-6 text-center text-lg-start hero-text-col">
                 {% if home_page_text.hero_badge %}
                 <div class="hero-enroll-badge">
                     <span class="pulse-dot"></span>
@@ -148,6 +148,42 @@
                 </h1>
                 
                 <p class="hero-description">{{ home_page_text.hero_description }}</p>
+
+                <!-- Mobile Mockup Frame (visible only on mobile/tablet) -->
+                <div class="hero-visual-col d-flex d-lg-none my-4">
+                    <div class="classroom-mockup-frame">
+                        <!-- Top window bar decorations -->
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="bg-danger rounded-circle" style="width: 10px; height: 10px; display: inline-block;"></span>
+                            <span class="bg-warning rounded-circle" style="width: 10px; height: 10px; display: inline-block;"></span>
+                            <span class="bg-success rounded-circle" style="width: 10px; height: 10px; display: inline-block;"></span>
+                            <span class="text-white-50 ms-2 small" style="font-size: 0.75rem;">Live Quran Class - Nabbiuwny</span>
+                        </div>
+                        
+                        <div class="mockup-video-grid">
+                            <!-- Tutor Stream -->
+                            <div class="video-stream-item">
+                                <img src="{% static 'imgs/hero/tutor_mock.png' %}" alt="Sheikh Imad">
+                                <span class="stream-label"><i class="fas fa-user-tie me-1"></i> Sheikh Imad (Tutor)</span>
+                            </div>
+                            <!-- Student Stream -->
+                            <div class="video-stream-item">
+                                <img src="{% static 'imgs/hero/student_mock.png' %}" alt="Student Learning">
+                                <span class="stream-label"><i class="fas fa-graduation-cap me-1"></i> Student</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Decorative floating widgets -->
+                        <div class="floating-badge badge-top-left">
+                            <i class="fas fa-video"></i>
+                            <span data-translate="fss_live_session">Live Session 🟢</span>
+                        </div>
+                        <div class="floating-badge badge-bottom-right">
+                            <i class="fas fa-award"></i>
+                            <span data-translate="hero_badge_award">1-on-1 Focus</span>
+                        </div>
+                    </div>
+                </div>
                 
                 <!-- Custom bullet benefits list for premium EdTech look -->
                 <ul class="hero-benefits-list">
@@ -208,7 +244,7 @@
                 </div>
             </div>
             
-            <!-- Right Column: Visual Video Lesson Mockup -->
+            <!-- Right Column: Visual Video Lesson Mockup (visible only on desktop) -->
             <div class="col-lg-6 hero-visual-col d-none d-lg-flex">
                 <div class="classroom-mockup-frame">
                     <!-- Top window bar decorations -->
