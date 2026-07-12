@@ -270,6 +270,10 @@
             const links = document.getElementsByTagName('a');
             for (let link of links) {
                 try {
+                    const rawHref = link.getAttribute('href');
+                    if (rawHref && (rawHref.startsWith('#') || rawHref.startsWith('javascript:'))) {
+                        continue;
+                    }
                     if (link.href && link.href.startsWith(window.location.origin) && !link.href.includes('javascript:')) {
                         const url = new URL(link.href);
                         if (!url.searchParams.has('lang')) {
