@@ -72,7 +72,7 @@
                 </div>
                 <div class="col-md-4 mb-3 mb-md-0">
                     <p><strong><i class="fas fa-users me-2 text-primary"></i><span data-translate="students"></span>:</strong> <span class="badge bg-primary rounded-pill">{{ group.students.count }}</span></p>
-                    <p class="mb-0"><strong><i class="fas fa-dollar-sign me-2 text-primary"></i><span data-translate="joinPrice"></span>:</strong> ${{ group.join_price }}</p>
+                    <p class="mb-0"><strong><i class="fas fa-dollar-sign me-2 text-primary"></i><span data-translate="joinPrice"></span>:</strong> {% if group.join_price %}${{ group.join_price }}{% else %}$0{% endif %}</p>
                 </div>
                 <div class="col-md-4">
                     <div class="card shadow-0 border h-100">
@@ -84,7 +84,7 @@
                                 <ul class="list-group list-group-flush">
                                     {% for time in group.group_times.all %}
                                         <li class="list-group-item d-flex justify-content-between align-items-center px-3 py-2">
-                                           <span><i class="far fa-calendar-day me-2"></i>{{ time.get_day_display }}</span>
+                                           <span><i class="fas fa-calendar-day me-2"></i>{{ time.get_day_display }}</span>
                                            <span class="fw-bold text-primary">{{ time.time|time:"g:i A" }}</span>
                                         </li>
                                     {% endfor %}
@@ -405,7 +405,7 @@
                     <i class="far fa-file-alt me-2 text-primary"></i>
                     <a href="{{ file.file.url }}" target="_blank" class="text-decoration-none text-dark">{{ file.file.name|cut:"courseslibraries/" }}</a>
                   </div>
-                  <span class="badge bg-light text-dark rounded-pill">{{ file.file.size|filesizeformat }}</span>
+                  <span class="badge bg-light text-dark rounded-pill">{{ file.safe_size|filesizeformat }}</span>
                 </li>
                 {% endfor %}
               </ul>

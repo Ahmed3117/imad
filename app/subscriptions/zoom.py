@@ -210,16 +210,41 @@ def create_zoom_meeting(request):
 
 
 
+def _get_zoom_credentials_for_meeting(meeting_id):
+    from subscriptions.models import Lecture
+    from accounts.models import TeacheroomAccount, ZoomAccount
+
+    # Look up the lecture containing this meeting ID in its live_link
+    lecture = Lecture.objects.filter(live_link__contains=f"/{meeting_id}").first()
+    if not lecture:
+        raise Exception(f"Lecture not found for meeting ID {meeting_id}")
+
+    if lecture.is_owner_link:
+        teacher = lecture.group.teacher
+        try:
+            zoom_account = TeacheroomAccount.objects.get(user=teacher)
+        except TeacheroomAccount.DoesNotExist:
+            raise Exception(f"Teacher Zoom account not found for teacher {teacher}")
+    else:
+        zoom_account = lecture.zoom_account
+        if not zoom_account:
+            # Fallback to the first Zoom account in the system
+            zoom_account = ZoomAccount.objects.first()
+            if not zoom_account:
+                raise Exception("No Zoom account found in the system")
+    
+    return zoom_account
+
 def get_meeting_status(request, meeting_id):
     try:
-        teacher_zoom_account = TeacheroomAccount.objects.get(user=request.user)
+        zoom_account = _get_zoom_credentials_for_meeting(meeting_id)
         access_token = get_access_token(
-            teacher_zoom_account.client_id,
-            teacher_zoom_account.client_secret,
-            teacher_zoom_account.account_id
+            zoom_account.client_id,
+            zoom_account.client_secret,
+            zoom_account.account_id
         )
-    except TeacheroomAccount.DoesNotExist:
-        return JsonResponse({"error": "Teacher Zoom account not found"}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=404)
 
     headers = {"Authorization": f"Bearer {access_token}"}
     url = f"https://api.zoom.us/v2/meetings/{meeting_id}"
@@ -235,14 +260,14 @@ def get_meeting_status(request, meeting_id):
 
 def get_meeting_participants(meeting_id):
     try:
-        teacher_zoom_account = TeacheroomAccount.objects.get(user=request.user)
+        zoom_account = _get_zoom_credentials_for_meeting(meeting_id)
         access_token = get_access_token(
-            teacher_zoom_account.client_id,
-            teacher_zoom_account.client_secret,
-            teacher_zoom_account.account_id
+            zoom_account.client_id,
+            zoom_account.client_secret,
+            zoom_account.account_id
         )
-    except TeacheroomAccount.DoesNotExist:
-        raise Exception("Teacher Zoom account not found")
+    except Exception as e:
+        raise Exception(f"Error getting Zoom credentials: {str(e)}")
 
     headers = {"Authorization": f"Bearer {access_token}"}
     url = f"https://api.zoom.us/v2/past_meetings/{meeting_id}/participants"

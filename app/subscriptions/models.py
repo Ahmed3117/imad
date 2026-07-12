@@ -205,6 +205,13 @@ class LectureFile(models.Model):
     lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE, related_name='files')
     file = models.FileField(upload_to='lecture_files/')
 
+    @property
+    def safe_size(self):
+        try:
+            return self.file.size
+        except Exception:
+            return 0
+
     def __str__(self):
         return f"File for Lecture: {self.lecture.title}"
 

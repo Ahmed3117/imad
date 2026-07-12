@@ -921,7 +921,7 @@ def add_lecture_files(request, lecture_id):
                 'id': lecture_file.id,  # <-- This is what was missing!
                 'name': lecture_file.file.name.split('/')[-1],  # Just the filename
                 'url': lecture_file.file.url,
-                'size': lecture_file.file.size,
+                'size': lecture_file.safe_size,
             })
 
         return JsonResponse({
@@ -995,7 +995,7 @@ def meeting_participants(request, meeting_id):
             print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
             print(response)
             print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-            if response:
+            if isinstance(response, list):
                 print("200000000000000000000000")
                 participants = response
                 print(participants)
