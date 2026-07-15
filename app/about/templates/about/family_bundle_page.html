@@ -4,7 +4,7 @@
 {% block translationFolder %}data-translation-folder="home"{% endblock %}
 
 {% block title %}
-    {% if home_page_text.family_bundle_section_title %}{{ home_page_text.family_bundle_section_title }}{% else %}Family Bundle & Free Trial Class{% endif %}
+    {% if home_page_text.free_session_section_title %}{{ home_page_text.free_session_section_title }}{% else %}Book Your Child's Free Trial Class{% endif %}
 {% endblock %}
 
 {% block extra_css %}
@@ -15,374 +15,176 @@
         -webkit-text-fill-color: transparent;
     }
 
-    .feature-card {
-        background: white;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        transition: all 0.3s ease;
-    }
-
-    .feature-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 35px rgba(var(--main-color-rgb), 0.1);
-    }
-
-    .feature-icon-wrapper {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
+    .free-session-container {
+        min-height: 80vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(45deg, rgba(var(--main-color-rgb), 0.1), rgba(var(--sub-color-rgb), 0.1));
+        padding: 3rem 0;
     }
 
-    .free-session-section {
-        background: linear-gradient(135deg, rgba(var(--main-color-rgb), 0.08) 0%, rgba(var(--sub-color-rgb), 0.12) 100%);
-    }
     .free-session-card {
         background: white;
-        border-radius: 20px;
-        padding: 3rem 2rem;
-        box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-        max-width: 700px;
-        margin: 0 auto;
-    }
-    .free-session-icon {
-        color: var(--main-color);
-    }
-    .free-session-desc {
-        color: #6c757d;
-        max-width: 500px;
-        margin: 0 auto 1.5rem;
+        border-radius: 24px;
+        padding: 3.5rem 3rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+        max-width: 650px;
+        width: 100%;
+        border-top: 5px solid var(--main-color);
+        transition: all 0.3s ease;
     }
 
-    /* ── Hero Free Trial Button ───────────────────────────── */
-    .btn-free-trial {
-        background: linear-gradient(135deg, var(--sub-color) 0%, var(--main-color) 100%) !important;
-        color: #fff !important;
-        border: none !important;
-        font-weight: 700;
-        letter-spacing: 0.02em;
-        box-shadow: 0 4px 20px rgba(var(--sub-color-rgb), 0.45) !important;
-        transition: box-shadow 0.3s, transform 0.3s !important;
+    .free-session-icon-wrap {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, rgba(var(--main-color-rgb), 0.1), rgba(var(--sub-color-rgb), 0.1));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        color: var(--main-color);
     }
-    .btn-free-trial:hover {
-        box-shadow: 0 8px 28px rgba(var(--sub-color-rgb), 0.65) !important;
-        background: linear-gradient(135deg, var(--main-color) 0%, var(--sub-color) 100%) !important;
-        transform: translateY(-4px) !important;
+
+    .free-session-desc {
+        color: #6c757d;
+        font-size: 1.05rem;
+    }
+
+    .form-floating > .form-control:focus ~ label {
+        color: var(--main-color);
+    }
+
+    .country-code-select {
+        border-top-left-radius: 0.25rem;
+        border-bottom-left-radius: 0.25rem;
+        max-width: 150px;
+    }
+
+    .form-label-phone {
+        font-weight: 500;
+        color: #4f4f4f;
+        margin-bottom: 0.5rem;
+    }
+
+    /* RTL specific overrides if any */
+    html[lang="ar"] .free-session-card {
+        border-top: 5px solid var(--main-color);
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container my-5 py-4">
-    <!-- Family Bundle Section -->
-    <section class="my-5" id="family-bundle">
-        <div class="text-center mb-5">
-            {% if home_page_text.family_bundle_section_badge %}
-            <p class="fw-bold text-primary mb-2">{{ home_page_text.family_bundle_section_badge }}</p>
-            {% endif %}
-            <h2 class="display-5 fw-bold mb-3 text-gradient">{{ home_page_text.family_bundle_section_title }}</h2>
-            {% if home_page_text.family_bundle_section_description %}
-            <p class="lead text-muted">{{ home_page_text.family_bundle_section_description }}</p>
-            {% endif %}
-        </div>
-
-        <div class="row g-4 mb-5">
-            {% if home_page_text.family_bundle_section_pricing_note_1 %}
-            <div class="col-sm-6 col-lg-3">
-                <div class="feature-card card h-100 border-0">
-                    <div class="card-body text-center p-4">
-                        <p class="fw-bold text-primary mb-2">{{ home_page_text.family_bundle_section_pricing_note_1 }}</p>
-                    </div>
-                </div>
+<div class="free-session-container">
+    <div class="container d-flex justify-content-center">
+        <div class="free-session-card">
+            <div class="free-session-icon-wrap">
+                <i class="fas fa-calendar-check fa-3x"></i>
             </div>
-            {% endif %}
-            {% if home_page_text.family_bundle_section_pricing_note_2 %}
-            <div class="col-sm-6 col-lg-3">
-                <div class="feature-card card h-100 border-0">
-                    <div class="card-body text-center p-4">
-                        <p class="fw-bold text-primary mb-2">{{ home_page_text.family_bundle_section_pricing_note_2 }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            {% if home_page_text.family_bundle_section_pricing_note_3 %}
-            <div class="col-sm-6 col-lg-3">
-                <div class="feature-card card h-100 border-0">
-                    <div class="card-body text-center p-4">
-                        <p class="fw-bold text-primary mb-2">{{ home_page_text.family_bundle_section_pricing_note_3 }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            {% if home_page_text.family_bundle_section_pricing_note_4 %}
-            <div class="col-sm-6 col-lg-3">
-                <div class="feature-card card h-100 border-0">
-                    <div class="card-body text-center p-4">
-                        <p class="fw-bold text-primary mb-2">{{ home_page_text.family_bundle_section_pricing_note_4 }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-
-        {% if home_page_family_bundle_plans %}
-        <div class="text-center mb-4">
-            <h3 class="fw-bold mb-3">{{ home_page_text.family_bundle_plans_title }}</h3>
-            {% if home_page_text.family_bundle_plans_description %}
-            <p class="text-muted lead">{{ home_page_text.family_bundle_plans_description }}</p>
-            {% endif %}
-        </div>
-        <div class="row mb-5">
-            {% for feature in home_page_family_bundle_plans %}
-            <div class="col-lg-4 mb-4">
-                <div class="feature-card card h-100 border-0">
-                    <div class="card-body p-4 text-center">
-                        <div class="feature-icon-wrapper mb-3 mx-auto">
-                            <i class="{{ feature.icon_class }} fa-2x text-primary"></i>
-                        </div>
-                        {% if feature.meta %}
-                        <p class="fw-bold text-primary mb-2">{{ feature.meta }}</p>
-                        {% endif %}
-                        <h4 class="fw-bold mb-2">{{ feature.title }}</h4>
-                        {% if feature.subtitle %}
-                        <p class="text-primary mb-3">{{ feature.subtitle }}</p>
-                        {% endif %}
-                        <p class="text-muted mb-0">{{ feature.description }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        {% if home_page.show_family_bundle_comparison_section and home_page_family_bundle_comparison %}
-        <div class="text-center mb-4">
-            <h3 class="fw-bold mb-3">{{ home_page_text.family_bundle_comparison_title }}</h3>
-            {% if home_page_text.family_bundle_comparison_description %}
-            <p class="text-muted lead">{{ home_page_text.family_bundle_comparison_description }}</p>
-            {% endif %}
-        </div>
-        <div class="row mb-5">
-            {% for feature in home_page_family_bundle_comparison %}
-            <div class="col-lg-6 mb-4">
-                <div class="feature-card card h-100 border-0">
-                    <div class="card-body p-4">
-                        <div class="d-flex align-items-start">
-                            <div class="feature-icon-wrapper me-3 flex-shrink-0" style="width: 60px; height: 60px;">
-                                <i class="{{ feature.icon_class }} fa-lg text-primary"></i>
-                            </div>
-                            <div>
-                                <h5 class="fw-bold mb-2">{{ feature.title }}</h5>
-                                <p class="text-muted mb-0">{{ feature.description }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        {% if home_page_family_bundle_testimonials %}
-        <div class="row mb-5">
-            {% for feature in home_page_family_bundle_testimonials %}
-            <div class="col-lg-4 mb-4">
-                <div class="feature-card card h-100 border-0">
-                    <div class="card-body p-4">
-                        <div class="mb-3 text-warning">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <p class="mb-4">"{{ feature.description }}"</p>
-                        <div>
-                            <h5 class="fw-bold mb-1">{{ feature.title }}</h5>
-                            {% if feature.subtitle %}
-                            <p class="text-primary mb-1">{{ feature.subtitle }}</p>
-                            {% endif %}
-                            {% if feature.meta %}
-                            <p class="text-muted small mb-0">{{ feature.meta }}</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        {% if home_page.show_family_bundle_faq_section and home_page_family_bundle_faq %}
-        <div class="text-center mb-4">
-            <h3 class="fw-bold mb-3">{{ home_page_text.family_bundle_faq_title }}</h3>
-            {% if home_page_text.family_bundle_faq_description %}
-            <p class="text-muted lead">{{ home_page_text.family_bundle_faq_description }}</p>
-            {% endif %}
-        </div>
-        <div class="row mb-4">
-            {% for feature in home_page_family_bundle_faq %}
-            <div class="col-lg-6 mb-4">
-                <div class="feature-card card h-100 border-0">
-                    <div class="card-body p-4">
-                        <div class="d-flex align-items-start">
-                            <div class="feature-icon-wrapper me-3 flex-shrink-0" style="width: 60px; height: 60px;">
-                                <i class="{{ feature.icon_class }} fa-lg text-primary"></i>
-                            </div>
-                            <div>
-                                <h5 class="fw-bold mb-2">{{ feature.title }}</h5>
-                                <p class="text-muted mb-0">{{ feature.description }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-    </section>
-
-    <!-- Free Session CTA Section -->
-    <section class="free-session-section py-5 my-5 rounded-5" id="free-session">
-        <div class="container">
-            <div class="free-session-card text-center">
-                <div class="free-session-icon mb-3">
-                    <i class="fas fa-calendar-check fa-3x"></i>
-                </div>
+            
+            <div class="text-center mb-4">
                 {% if home_page_text.free_session_section_badge %}
-                <p class="fw-bold text-primary mb-2">{{ home_page_text.free_session_section_badge }}</p>
+                <p class="fw-bold text-primary mb-2 text-uppercase" style="letter-spacing: 0.05em;">{{ home_page_text.free_session_section_badge }}</p>
                 {% endif %}
-                <h2 class="fw-bold mb-3" data-translate="free_session_title">
-                    {% if home_page_text.free_session_section_title %}{{ home_page_text.free_session_section_title }}{% else %}Book a Free Session{% endif %}
+                <h2 class="fw-bold mb-3 text-gradient" data-translate="free_session_title">
+                    {% if home_page_text.free_session_section_title %}{{ home_page_text.free_session_section_title }}{% else %}Book Your Child's Free Trial Class{% endif %}
                 </h2>
-                <p class="lead mb-4 free-session-desc" data-translate="free_session_desc">
+                <p class="free-session-desc" data-translate="free_session_desc">
                     {% if home_page_text.free_session_section_description %}{{ home_page_text.free_session_section_description }}{% else %}Not sure where to start? Book a free one-on-one session with our team and we'll guide you to the right path.{% endif %}
                 </p>
-                {% if request.user.is_authenticated %}
-                    {% if request.user.free_session %}
-                        {% if request.user.free_session.status == 'done' %}
-                        <button class="btn btn-success btn-lg btn-rounded" disabled>
-                            <i class="fas fa-check-circle me-2"></i>
-                            <span data-translate="free_session_completed">Session Completed ✓</span>
-                        </button>
-                        {% else %}
-                        <button class="btn btn-warning btn-lg btn-rounded" disabled>
-                            <i class="fas fa-clock me-2"></i>
-                            <span data-translate="free_session_pending">Already Booked – We'll Contact You Soon</span>
-                        </button>
-                        {% endif %}
-                    {% else %}
-                    <button class="btn btn-primary btn-lg btn-rounded" id="openFreeSessionModal" data-translate="book_free_session_btn">
-                        <i class="fas fa-calendar-plus me-2"></i> Book My Free Session
-                    </button>
-                    {% endif %}
-                {% else %}
-                <button class="btn btn-primary btn-lg btn-rounded" id="openFreeSessionModal" data-translate="book_free_session_btn">
-                    <i class="fas fa-calendar-plus me-2"></i> Book My Free Session
-                </button>
-                {% endif %}
-                {% if home_page_text.free_session_privacy_note %}
-                <p class="small text-muted mt-4 mb-0">{{ home_page_text.free_session_privacy_note }}</p>
-                {% endif %}
             </div>
-        </div>
-    </section>
-</div>
 
-<!-- Free Session Modal -->
-{% if not request.user.is_authenticated or not request.user.free_session %}
-<div class="modal fade" id="freeSessionModal" tabindex="-1" aria-labelledby="freeSessionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold" id="freeSessionModalLabel">
-                    <i class="fas fa-calendar-check text-primary me-2"></i>
-                    <span data-translate="free_session_modal_title">Book a Free Session</span>
-                </h5>
-                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body pt-2">
-                <p class="text-muted mb-4" data-translate="free_session_modal_desc">
-                    Fill in your details and we'll reach out to schedule your free session.
-                </p>
-                <form id="freeSessionForm">
+            {% if request.user.is_authenticated and request.user.free_session %}
+                <div class="text-center py-4">
+                    {% if request.user.free_session.status == 'done' %}
+                        <div class="mb-4 text-success">
+                            <i class="fas fa-check-circle fa-4x"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3" data-translate="free_session_completed_title">Trial Session Completed</h4>
+                        <p class="text-muted" data-translate="free_session_completed_desc">You have already completed your free trial class. Thank you for learning with us!</p>
+                    {% else %}
+                        <div class="mb-4 text-warning">
+                            <i class="fas fa-clock fa-4x"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3" data-translate="free_session_pending_title">Trial Session Pending</h4>
+                        <p class="text-muted" data-translate="free_session_pending_desc">You have booked a free session. Our team will contact you shortly to schedule it.</p>
+                    {% endif %}
+                </div>
+            {% else %}
+                <form id="freeSessionForm" class="text-start mt-4">
                     {% csrf_token %}
-                    <div class="form-floating mb-3">
+                    
+                    <div class="form-floating mb-4">
                         <input type="text" class="form-control" id="freeSessionName" name="name"
                                placeholder="Your Name" data-translate="your_name"
                                value="{{ request.user.get_full_name|default:'' }}">
                         <label for="freeSessionName" data-translate="your_name">Your Name</label>
                     </div>
-                    <div class="form-floating mb-3">
+
+                    <div class="form-floating mb-4">
                         <input type="email" class="form-control" id="freeSessionEmail" name="email"
                                placeholder="Your Email" data-translate="your_email"
                                value="{{ request.user.email|default:'' }}">
                         <label for="freeSessionEmail" data-translate="your_email">Your Email</label>
                     </div>
-                    <label class="form-label" for="freeSessionPhone" data-translate="your_phone">Your Phone Number</label>
-                    <div class="input-group mb-3">
-                        <select class="form-select country-code-select" id="freeSessionPhoneCountryCode"
-                                name="phone_country_code">
-                            <option value="+20" selected>Egypt (+20)</option>
-                            <option value="+966">Saudi Arabia (+966)</option>
-                            <option value="+971">UAE (+971)</option>
-                            <option value="+974">Qatar (+974)</option>
-                            <option value="+965">Kuwait (+965)</option>
-                            <option value="+973">Bahrain (+973)</option>
-                            <option value="+968">Oman (+968)</option>
-                            <option value="+962">Jordan (+962)</option>
-                            <option value="+1">US / Canada (+1)</option>
-                            <option value="+44">UK (+44)</option>
-                            <option value="+61">Australia (+61)</option>
-                            <option value="+49">Germany (+49)</option>
-                            <option value="+33">France (+33)</option>
-                            <option value="+90">Turkey (+90)</option>
-                            <option value="+92">Pakistan (+92)</option>
-                            <option value="+91">India (+91)</option>
-                            <option value="+62">Indonesia (+62)</option>
-                            <option value="+60">Malaysia (+60)</option>
-                        </select>
-                        <input type="tel" class="form-control" id="freeSessionPhone"
-                               name="phone" placeholder="Phone Number" data-translate="phone_placeholder"
-                               value="{{ request.user.phone|default:'' }}">
+
+                    <div class="mb-4">
+                        <label class="form-label form-label-phone" for="freeSessionPhone" data-translate="your_phone">Your Phone Number</label>
+                        <div class="input-group">
+                            <select class="form-select country-code-select" id="freeSessionPhoneCountryCode" name="phone_country_code">
+                                <option value="+20" selected>Egypt (+20)</option>
+                                <option value="+966">Saudi Arabia (+966)</option>
+                                <option value="+971">UAE (+971)</option>
+                                <option value="+974">Qatar (+974)</option>
+                                <option value="+965">Kuwait (+965)</option>
+                                <option value="+973">Bahrain (+973)</option>
+                                <option value="+968">Oman (+968)</option>
+                                <option value="+962">Jordan (+962)</option>
+                                <option value="+1">US / Canada (+1)</option>
+                                <option value="+44">UK (+44)</option>
+                                <option value="+61">Australia (+61)</option>
+                                <option value="+49">Germany (+49)</option>
+                                <option value="+33">France (+33)</option>
+                                <option value="+90">Turkey (+90)</option>
+                                <option value="+92">Pakistan (+92)</option>
+                                <option value="+91">India (+91)</option>
+                                <option value="+62">Indonesia (+62)</option>
+                                <option value="+60">Malaysia (+60)</option>
+                            </select>
+                            <input type="tel" class="form-control" id="freeSessionPhone"
+                                   name="phone" placeholder="Phone Number" data-translate="phone_placeholder"
+                                   value="{{ request.user.phone|default:'' }}">
+                        </div>
                     </div>
-                    <div class="form-floating mb-3">
+
+                    <div class="form-floating mb-4">
                         <textarea class="form-control" id="freeSessionMessage" name="message"
-                                  placeholder="Any message or topic you'd like to discuss? (optional)" data-translate="free_session_message" style="height: 100px;"></textarea>
+                                  placeholder="Any message or topic you'd like to discuss? (optional)" 
+                                  data-translate="free_session_message" style="height: 120px;"></textarea>
                         <label for="freeSessionMessage" data-translate="free_session_message">Any message or topic you'd like to discuss? (optional)</label>
                     </div>
-                    <div id="freeSessionAlert" class="alert d-none" role="alert"></div>
+
+                    <div id="freeSessionAlert" class="alert d-none mb-4" role="alert"></div>
+
+                    <div class="text-center mt-4">
+                        <button type="button" class="btn btn-primary btn-lg btn-rounded w-100 py-3" id="confirmFreeSession">
+                            <span id="confirmFreeSessionText" data-translate="confirm_booking">Confirm Booking</span>
+                            <span id="confirmFreeSessionSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
+                        </button>
+                    </div>
                 </form>
-            </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-outline-secondary btn-rounded"
-                        data-mdb-dismiss="modal" data-translate="cancel">Cancel</button>
-                <button type="button" class="btn btn-primary btn-rounded" id="confirmFreeSession">
-                    <span id="confirmFreeSessionText" data-translate="confirm_booking">Confirm Booking</span>
-                    <span id="confirmFreeSessionSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
-                </button>
-            </div>
+            {% endif %}
+
+            {% if home_page_text.free_session_privacy_note %}
+            <p class="small text-muted text-center mt-4 mb-0">{{ home_page_text.free_session_privacy_note }}</p>
+            {% endif %}
         </div>
     </div>
 </div>
-{% endif %}
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Free Session Modal
-    const openFreeSessionModalBtn = document.getElementById('openFreeSessionModal');
-    const freeSessionModal = document.getElementById('freeSessionModal');
-
-    if (openFreeSessionModalBtn && freeSessionModal) {
-        openFreeSessionModalBtn.addEventListener('click', function () {
-            const modal = new mdb.Modal(freeSessionModal);
-            modal.show();
-        });
-    }
-
     const confirmFreeSessionBtn = document.getElementById('confirmFreeSession');
     if (confirmFreeSessionBtn) {
         confirmFreeSessionBtn.addEventListener('click', async function () {
@@ -470,7 +272,5 @@
             }
         });
     }
-
-
 </script>
 {% endblock %}

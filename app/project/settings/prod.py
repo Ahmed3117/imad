@@ -7,7 +7,7 @@ from .base import *
 # ─────────────────────────────────────────────
 # Security
 # ─────────────────────────────────────────────
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     'nabbiuwny.com',
@@ -49,3 +49,10 @@ CHANNEL_LAYERS = {
 }
 
 REDIS_URL = os.environ.get("REDIS_URL", "redis://redis:6379/0")
+
+# If DEBUG is True, serve static files locally via runserver
+if DEBUG:
+    STATICFILES_DIRS = [
+        os.path.join(BASE_DIR, 'static'),
+    ]
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_collected_dummy')
