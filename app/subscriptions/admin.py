@@ -76,14 +76,14 @@ class StudyGroupAdmin(ModelAdmin):
         "capacity",
         ("teacher", RelatedOnlyFieldListFilter),
         ("course__level", RelatedOnlyFieldListFilter),
-        ("course__track", RelatedOnlyFieldListFilter),
+        ("course__tracks", RelatedOnlyFieldListFilter),
         ("course", RelatedOnlyFieldListFilter),
     )
     search_fields = (
         "name",
         "course__name",
         "course__level__name",
-        "course__track__name",
+        "course__tracks__name",
         "teacher__username",
         "teacher__name",
         "students__username",
@@ -141,8 +141,8 @@ class StudyGroupAdmin(ModelAdmin):
         return (
             super()
             .get_queryset(request)
-            .select_related("course__level", "course__track", "teacher")
-            .prefetch_related("students", "group_times")
+            .select_related("course__level", "teacher")
+            .prefetch_related("course__tracks", "students", "group_times")
             .annotate(
                 enrolled_students=Count("students", distinct=True),
                 total_lectures=Count("lectures", distinct=True),
@@ -173,7 +173,11 @@ class StudyGroupAdmin(ModelAdmin):
 
     def course_path(self, obj):
         level = obj.course.level.name if obj.course and obj.course.level else "No level"
-        track = obj.course.track.name if obj.course and obj.course.track else "No track"
+        if obj.course:
+            track_list = list(obj.course.tracks.all())
+            track = ", ".join([t.name for t in track_list]) if track_list else "No track"
+        else:
+            track = "No track"
         return f"{level} / {track} / {obj.course.name}"
 
     course_path.short_description = "Course"
@@ -277,7 +281,7 @@ class JoinRequestAdmin(UnhandledChangelistMixin, ModelAdmin):
     )
 
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related("student", "course__level", "course__track", "group")
+        return super().get_queryset(request).select_related("student", "course__level", "group").prefetch_related("course__tracks")
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "student":
@@ -300,7 +304,11 @@ class JoinRequestAdmin(UnhandledChangelistMixin, ModelAdmin):
 
     def course_path(self, obj):
         level = obj.course.level.name if obj.course and obj.course.level else "No level"
-        track = obj.course.track.name if obj.course and obj.course.track else "No track"
+        if obj.course:
+            track_list = list(obj.course.tracks.all())
+            track = ", ".join([t.name for t in track_list]) if track_list else "No track"
+        else:
+            track = "No track"
         return f"{level} / {track} / {obj.course.name}"
 
     course_path.short_description = "Requested course"

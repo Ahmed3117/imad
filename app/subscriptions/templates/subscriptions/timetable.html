@@ -522,14 +522,14 @@
                                                                 / {{ group_time.group.capacity }}
                                                             {% endif %}
                                                         </div>
-                                                        {% if group_time.group.course.track %}
-                                                            <span class="badge badge-primary model-translatable" 
-                                                                  data-model-type="track" 
-                                                                  data-model-id="{{ group_time.group.course.track.id }}"
-                                                                  data-translations='{{ group_time.group.course.track|model_translations }}'>
-                                                                {{ group_time.group.course.track.name }}
-                                                            </span>
-                                                        {% endif %}
+                                                         {% for track in group_time.group.course.tracks.all %}
+                                                             <span class="badge badge-primary model-translatable" 
+                                                                   data-model-type="track" 
+                                                                   data-model-id="{{ track.id }}"
+                                                                   data-translations='{{ track|model_translations }}'>
+                                                                 {{ track.name }}
+                                                             </span>
+                                                         {% endfor %}
                                                     </div>
                                                 </a>
                                             {% endfor %}

@@ -296,7 +296,7 @@ def teacher_timetable(request):
     selected_day = request.GET.get('day', 'MON')  # Default to Monday for day view
     
     # Get teacher's groups
-    groups = StudyGroup.objects.filter(teacher=request.user).select_related('course', 'course__level', 'course__track')
+    groups = StudyGroup.objects.filter(teacher=request.user).select_related('course', 'course__level').prefetch_related('course__tracks')
     
     # Filter by course if selected
     if course_id:
@@ -349,7 +349,7 @@ def student_timetable(request):
     selected_day = request.GET.get('day', 'MON')
     
     # Get student's enrolled groups
-    groups = request.user.study_groups.all().select_related('course', 'course__level', 'course__track', 'teacher')
+    groups = request.user.study_groups.all().select_related('course', 'course__level', 'teacher').prefetch_related('course__tracks')
     
     # Filter by course if selected
     if course_id:
@@ -407,7 +407,7 @@ def admin_timetable(request):
     selected_day = request.GET.get('day', 'MON')
     
     # Get all groups
-    groups = StudyGroup.objects.all().select_related('course', 'course__level', 'course__track', 'teacher')
+    groups = StudyGroup.objects.all().select_related('course', 'course__level', 'teacher').prefetch_related('course__tracks')
     
     # Filter by course if selected
     if course_id:

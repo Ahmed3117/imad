@@ -154,15 +154,16 @@ class CustomUserAdmin(ModelAdmin, BaseUserAdmin):
         groups = (
             StudyGroup.objects.filter(students=student)
             .distinct()
-            .select_related('course__level', 'course__track', 'teacher')
-            .prefetch_related('group_times')
+            .select_related('course__level', 'teacher')
+            .prefetch_related('course__tracks', 'group_times')
         )
         group_ids = list(groups.values_list('id', flat=True))
 
         lectures = Lecture.objects.filter(group_id__in=group_ids).select_related(
             'group__course__level',
-            'group__course__track',
             'group__teacher',
+        ).prefetch_related(
+            'group__course__tracks',
         )
         lecture_ids = list(lectures.values_list('id', flat=True))
         lecture_stats = lectures.aggregate(
@@ -222,8 +223,9 @@ class CustomUserAdmin(ModelAdmin, BaseUserAdmin):
         ).order_by('-shared_at')[:12]
         join_requests = JoinRequest.objects.filter(student=student).select_related(
             'course__level',
-            'course__track',
             'group',
+        ).prefetch_related(
+            'course__tracks',
         ).order_by('-id')
 
         group_summaries = []

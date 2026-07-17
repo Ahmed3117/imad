@@ -23,6 +23,12 @@ def levels(request):
         'courses',
         'tracks',
         'tracks__courses',
+        'tracks__courses__tracks',
+        'tracks__courses__tracks__translations',
+        'tracks__courses__translations',
+        'courses__translations',
+        'tracks__translations',
+        'translations',
     ).all()
 
     # Process each level's data
@@ -34,7 +40,7 @@ def levels(request):
 
         # Translate individual courses
         individual_courses = []
-        for course in level.courses.filter(track__isnull=True):
+        for course in level.courses.filter(tracks__isnull=True):
             course_translation = CourseTranslation.objects.filter(course=course, language=language).first()
             course_name = course_translation.translated_name if course_translation else course.name
             course_description = course_translation.translated_description if course_translation else course.description
@@ -48,6 +54,7 @@ def levels(request):
                 'image': course.image,
                 'preview_video': course.preview_video,
                 'join_request_exists': join_request_exists,
+                'tracks': [],
             })
 
         # Translate tracks and their courses
@@ -65,6 +72,15 @@ def levels(request):
                 join_request_exists = None
                 if request.user.is_authenticated:
                     join_request_exists = JoinRequest.objects.filter(student=request.user, course=course).exists()
+                
+                course_tracks = []
+                for t in course.tracks.all():
+                    t_trans = TrackTranslation.objects.filter(track=t, language=language).first()
+                    course_tracks.append({
+                        'id': t.id,
+                        'name': t_trans.translated_name if t_trans else t.name,
+                    })
+
                 courses.append({
                     'id': course.id,
                     'name': course_name,
@@ -72,6 +88,7 @@ def levels(request):
                     'image': course.image,
                     'preview_video': course.preview_video,
                     'join_request_exists': join_request_exists,
+                    'tracks': course_tracks,
                 })
 
             tracks.append({

@@ -85,18 +85,18 @@ class TrackAdmin(ModelAdmin):
 @admin.register(Course)
 class CourseAdmin(ModelAdmin):
     inlines = [CourseTranslationInline, CourseLibraryInline]
-    list_display = ('name', 'level', 'track', 'study_groups_count')
+    list_display = ('name', 'level', 'display_tracks', 'study_groups_count')
     search_fields = ('name', 'description')
-    list_filter = ('level', 'track')
+    list_filter = ('level', 'tracks')
     ordering = ('name',)
-    autocomplete_fields = ('level', 'track')
+    autocomplete_fields = ('level', 'tracks')
     fieldsets = (
-        ('Course Identity', {'fields': ('name', 'level', 'track')}),
+        ('Course Identity', {'fields': ('name', 'level', 'tracks')}),
         ('Content', {'fields': ('description', 'image', 'preview_video')}),
     )
 
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('level', 'track').annotate(
+        return super().get_queryset(request).select_related('level').prefetch_related('tracks').annotate(
             groups_total=Count('study_groups', distinct=True),
         )
 
@@ -104,3 +104,8 @@ class CourseAdmin(ModelAdmin):
         return obj.groups_total
 
     study_groups_count.short_description = 'Groups'
+
+    def display_tracks(self, obj):
+        return ", ".join([t.name for t in obj.tracks.all()])
+
+    display_tracks.short_description = 'Tracks'

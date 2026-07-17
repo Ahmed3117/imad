@@ -374,7 +374,7 @@ def profile(request):
     if level_id:
         study_groups = study_groups.filter(course__level__id=level_id)
     if track_id:
-        study_groups = study_groups.filter(course__track__id=track_id)
+        study_groups = study_groups.filter(course__tracks__id=track_id)
     if day:
         study_groups = study_groups.filter(group_times__day=day)
 

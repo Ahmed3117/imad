@@ -1,195 +1,331 @@
 {% load custom_filters %}
 
-<div class="card card-bg mt-4 course-card shadow-sm hover-shadow transition-all position-relative" data-course-id="{{ course.id }}">
+<div class="card premium-course-card mt-4 position-relative border-0 shadow-lg" data-course-id="{{ course.id }}">
+    <!-- Floating Video Preview (Luxury Glass Play Button) -->
     {% if course.preview_video %}
         <a href="#"
-           title="Show Details"
+           title="Watch Preview"
            data-mdb-toggle="modal"
            data-mdb-target="#course-details-modal-{{ course.id }}"
            onclick="event.stopPropagation();"
-           class="btn btn-sm btn-link text-primary position-absolute"
-           style="top: 10px; right: 10px; z-index: 1;">
-            <i class="fas fa-video"></i>
+           class="glass-play-btn position-absolute d-flex align-items-center justify-content-center">
+            <i class="fas fa-play text-primary"></i>
         </a>
     {% endif %}
 
-    <div class="d-flex flex-column align-items-center p-1">
-        <!-- Course Image -->
-        <div class="text-center">
-            <img src="{{ course.image.url }}" alt="{{ course.name }} Icon" class="img-fluid rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+    <div class="d-flex flex-column align-items-center p-4 card-body-container">
+        <!-- Circular Image Frame with Luxury Gradient Ring -->
+        <div class="course-image-wrapper mb-3 position-relative">
+            <div class="gradient-ring"></div>
+            <img src="{{ course.image.url }}" alt="{{ course.name }} Icon" class="course-card-img rounded-circle img-fluid">
         </div>
 
         <!-- Course Title -->
-        <h5 class="card-title text-primary text-center mb-3 fw-bold">{{ course.name }}</h5>
+        <h5 class="course-card-title text-center mb-2 fw-bold text-gradient">{{ course.name }}</h5>
 
-        <!-- Course Description -->
-        <div class="description-container card card-bg px-3 mb-3 w-100 text-center">
-            <div class="short-desc">{{ course.description|truncatechars:100 }}</div>
-            <div class="full-desc" style="display:none;">
-                {{ course.description }}
+        <!-- Related Tracks (Displaying tracks the course is related to) -->
+        {% if course.tracks %}
+            <div class="course-tracks-container d-flex flex-wrap justify-content-center gap-1 mb-3">
+                {% for t in course.tracks %}
+                    <span class="premium-track-badge">
+                        <i class="fas fa-layer-group me-1"></i> {{ t.name }}
+                    </span>
+                {% endfor %}
             </div>
+        {% endif %}
+
+        <!-- Course Description Box (Glassmorphic) -->
+        <div class="premium-desc-box px-3 py-2.5 mb-3 w-100 text-center">
+            <div class="short-desc">{{ course.description|truncatechars:100 }}</div>
             
-            <!-- Toggle Button -->
+            <!-- Sleek Toggle Link to Modal -->
             <div class="text-center mt-2">
-                <a href="javascript:void(0)" class="toggle-desc-link" onclick="
-                    var dc = this.closest('.description-container');
-                    var fd = dc.querySelector('.full-desc');
-                    var sd = dc.querySelector('.short-desc');
-                    var sm = dc.querySelector('.show-more');
-                    var sl = dc.querySelector('.show-less');
-                    if (fd.style.display === 'none') {
-                        fd.style.display = 'block';
-                        sd.style.display = 'none';
-                        sm.style.display = 'none';
-                        sl.style.display = 'inline';
-                    } else {
-                        fd.style.display = 'none';
-                        sd.style.display = 'block';
-                        sm.style.display = 'inline';
-                        sl.style.display = 'none';
-                    }
-                    return false;
-                ">
-                    <span class="show-more" data-translate="show_more" style="font-size:0.875rem;color:#1976d2;font-weight:bold;">Show More <i class="fas fa-chevron-down ms-1"></i></span>
-                    <span class="show-less" style="display:none;font-size:0.875rem;color:#1976d2;font-weight:bold;">Show Less <i class="fas fa-chevron-up ms-1"></i></span>
+                <a href="#" class="toggle-desc-link d-inline-flex align-items-center" 
+                   data-mdb-toggle="modal" 
+                   data-mdb-target="#course-details-modal-{{ course.id }}">
+                    <span class="show-more d-flex align-items-center" data-translate="show_more">Show More <i class="fas fa-chevron-right ms-1"></i></span>
                 </a>
             </div>
         </div>
 
-        <!-- Add to Cart / Login Button -->
-        <div class="w-100 text-center">
+        <!-- Add to Cart / Action Button -->
+        <div class="w-100 text-center mt-auto">
             {% if request.user.is_authenticated %}
                 {% if course.join_request_exists %}
-                    <button class="btn btn-outline-primary btn-sm w-100" disabled>
-                        <span data-translate="request_sent">Request Sent</span>
+                    <button class="btn premium-action-btn btn-sent w-100 py-2.5 shadow-sm" disabled>
+                        <i class="fas fa-check-circle me-2"></i> <span data-translate="request_sent">Request Sent</span>
                     </button>
                 {% else %}
-                    <button class="btn btn-outline-primary btn-sm w-100 add-to-cart" data-course-id="{{ course.id }}">
-                        <i class="fas fa-cart-plus me-2"></i> <span data-translate="send_join_request">Send Join Request</span>
+                    <button class="btn premium-action-btn btn-action w-100 py-2.5 shadow-sm add-to-cart" data-course-id="{{ course.id }}">
+                        <i class="fas fa-plus me-2"></i> <span data-translate="send_join_request">Send Join Request</span>
                     </button>
                 {% endif %}
             {% else %}
-                <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-outline-primary btn-sm w-100">
-                    <i class="fas fa-sign-in-alt me-2"></i> <span data-translate="login_to_add">Login to Add</span>
+                <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn premium-action-btn btn-login w-100 py-2.5 shadow-sm">
+                    <i class="fas fa-lock-open me-2"></i> <span data-translate="login_to_add">Login to Add</span>
                 </a>
             {% endif %}
         </div>
     </div>
 </div>
 
-<style>
-    .toggle-desc-link {
-        text-decoration: none;
-    }
-    
-    .toggle-desc-link:hover {
-        text-decoration: underline;
-    }
-</style>
-
-
-
-
-
-
-
-{% if course.preview_video %}
-
+<!-- Premium Video & Details Modal -->
 <div class="modal fade" id="course-details-modal-{{ course.id }}" tabindex="-1" aria-labelledby="courseDetailsLabel-{{ course.id }}" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content bg-light shadow-lg rounded-4">
-            <!-- Modal Header -->
-            <div class="modal-header bg-primary text-white rounded-top">
-                <h3 class="modal-title fw-bold" id="courseDetailsLabel-{{ course.id }}">
-                    🌟 {{ course.name }} - Preview
-                </h3>
-                <button type="button" class="btn-close btn-close-white" data-mdb-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content premium-modal border-0 shadow-2xl rounded-4 text-start">
+            <div class="modal-header border-0 bg-transparent px-4 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                <h5 class="modal-title fw-bold text-white d-flex align-items-center" id="courseDetailsLabel-{{ course.id }}">
+                    <span class="me-2">📘</span> {{ course.name }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white ms-auto" data-mdb-dismiss="modal" aria-label="Close"></button>
             </div>
-
-            <!-- Modal Body -->
-            <div class="modal-body">
-
-
-                <div class="video-container my-3">
-                    <div class="ratio ratio-16x9">
-                        <iframe
-                            src="https://www.youtube.com/embed/{{ course.preview_video }}"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen
-                            class="rounded">
-                        </iframe>
-
-                    </div>
-                </div>
-
-
-                {% comment %} <!-- Course Image -->
-                <div class="text-center mb-4">
-                    <img src="{{ course.image.url }}" alt="{{ course.name }}" class="img-fluid rounded-circle shadow-sm" style="width: 150px; height: 150px;">
-                </div>
-
-                <!-- Course Info -->
-                <div class="px-3">
-                    <p class="text-info fw-bold">
-                        💡 Description: <span class="text-dark">{{ course.description }}</span>
-                    </p>
-                    <p class="text-warning fw-bold">
-                        💰 Price:
-                    </p>
-                    <p class='price-info mb-1'>
-                        {% if course.has_discount %}
-                        <span class='old-price'>EGP{{ course.price_without_any_discount }}</span>
-                        <span class='discount'>-{{ course.discount_percent }}%</span>
-                        <span class='final-price fw-bold'>
-                            EGP{{ course.final_price_after_discound }}
-                        </span>
-                        {% else %}
-                        <span class='final-price fw-bold'>EGP{{ course.price_without_any_discount }}</span>
-                        {% endif %}
-                    </p>
-                </div>
-
-                <!-- Sessions Section -->
-                <div class="mt-4">
-                    <h5 class="text-center text-primary fw-bold mb-3">🚀 Course Sessions</h5>
-                    <div class="list-group">
-                        {% for session in course.coursesessions.all %}
-                        <div class="list-group-item d-flex align-items-start rounded shadow-sm mb-2">
-                            <div class="px-2">
-                                <h6 class="text-primary fw-bold mb-1">
-                                    {{ session.order }}. {{ session.title }}
-                                </h6>
-                                <p class="text-muted small">{{ session.content }}</p>
+            <div class="modal-body p-4">
+                <div class="row align-items-start g-4">
+                    <!-- Left side: Image and Tracks -->
+                    <div class="col-md-4 text-center">
+                        <div class="course-image-wrapper mx-auto mb-3 position-relative" style="width: 150px; height: 150px;">
+                            <div class="gradient-ring"></div>
+                            <img src="{{ course.image.url }}" alt="{{ course.name }}" class="course-card-img rounded-circle img-fluid" style="width: 140px; height: 140px; border-width: 5px;">
+                        </div>
+                        
+                        {% if course.tracks %}
+                            <div class="mb-2 text-white-50 small text-center" data-translate="related_tracks">Tracks:</div>
+                            <div class="d-flex flex-wrap justify-content-center gap-1.5">
+                                {% for t in course.tracks %}
+                                    <span class="premium-track-badge" style="background: rgba(255, 255, 255, 0.08); color: #60a5fa; border-color: rgba(96, 165, 250, 0.2);">
+                                        <i class="fas fa-layer-group me-1"></i> {{ t.name }}
+                                    </span>
+                                {% endfor %}
                             </div>
-                        </div>
-                        {% empty %}
-                        <div class="alert alert-danger text-center">
-                            No sessions available for this course yet!
-                        </div>
-                        {% endfor %}
+                        {% endif %}
                     </div>
-                </div> {% endcomment %}
-            </div>
 
-            <!-- Modal Footer -->
-            <div class="modal-footer justify-content-between bg-light border-top rounded-bottom">
-                <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
-                {% comment %} {% if request.user.is_authenticated %}
-                    <a href="#"
-                    class="btn btn-primary btn-sm add-to-cart {% if course.id in cart_course_ids %}disabled{% endif %}"
-                    data-type="course"
-                    data-name="{{ course.name }}"
-                    data-id="{{ course.id }}">
-                    {% if course.id in cart_course_ids %}
-                        <i class="fas fa-check"></i> Added
+                    <!-- Right side: Description & Video -->
+                    <div class="col-md-8 text-white">
+                        <h6 class="fw-bold mb-2 text-primary" data-translate="description">Description</h6>
+                        <p class="text-light-gray lh-base mb-4" style="white-space: pre-line;">{{ course.description }}</p>
+
+                        <!-- Conditional Video Preview inside Modal -->
+                        {% if course.preview_video %}
+                            <h6 class="fw-bold mb-2 text-primary">🎥 Preview Video</h6>
+                            <div class="video-container-wrapper shadow-lg rounded-4 overflow-hidden mb-2">
+                                <div class="ratio ratio-16x9">
+                                    <iframe
+                                        src="https://www.youtube.com/embed/{{ course.preview_video }}?autoplay=0&rel=0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen
+                                        class="border-0">
+                                    </iframe>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Footer (with action buttons replicated for conversion) -->
+            <div class="modal-footer border-0 px-4 pb-4 pt-0 d-flex justify-content-between align-items-center w-100">
+                <button type="button" class="btn btn-secondary px-4 py-2" data-mdb-dismiss="modal" data-translate="cancel">Close</button>
+                <div style="min-width: 200px;">
+                    {% if request.user.is_authenticated %}
+                        {% if course.join_request_exists %}
+                            <button class="btn premium-action-btn btn-sent px-4 py-2 w-100" disabled>
+                                <i class="fas fa-check-circle me-2"></i> <span data-translate="request_sent">Request Sent</span>
+                            </button>
+                        {% else %}
+                            <button class="btn premium-action-btn btn-action px-4 py-2 w-100 add-to-cart" data-course-id="{{ course.id }}">
+                                <i class="fas fa-plus me-2"></i> <span data-translate="send_join_request">Send Join Request</span>
+                            </button>
+                        {% endif %}
                     {% else %}
-                        <i class="fas fa-cart-plus"></i> Add to Cart
+                        <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn premium-action-btn btn-login px-4 py-2 w-100">
+                            <i class="fas fa-lock-open me-2"></i> <span data-translate="login_to_add">Login to Add</span>
+                        </a>
                     {% endif %}
-                    </a>
-                {% endif %} {% endcomment %}
+                </div>
             </div>
         </div>
     </div>
 </div> 
 
-{% endif %}
+<style>
+    /* Premium Course Card */
+    .premium-course-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f9fbfd 100%);
+        border-radius: 20px;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .premium-course-card:hover {
+        transform: translateY(-8px) scale(1.01);
+        box-shadow: 0 20px 40px rgba(25, 118, 210, 0.12) !important;
+    }
+    
+    /* Text Gradient */
+    .text-gradient {
+        background: linear-gradient(135deg, #1565c0 0%, #1e88e5 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Glass Play Button */
+    .glass-play-btn {
+        width: 38px;
+        height: 38px;
+        background: rgba(25, 118, 210, 0.1);
+        border: 1px solid rgba(25, 118, 210, 0.2);
+        backdrop-filter: blur(8px);
+        border-radius: 50%;
+        top: 15px;
+        right: 15px;
+        z-index: 10;
+        transition: all 0.3s ease;
+    }
+    .glass-play-btn:hover {
+        background: #1976d2;
+        transform: scale(1.15);
+    }
+    .glass-play-btn:hover i {
+        color: #ffffff !important;
+    }
+
+    /* Circular Image & Gradient Ring */
+    .course-image-wrapper {
+        width: 130px;
+        height: 130px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+    .gradient-ring {
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        right: -5px;
+        bottom: -5px;
+        background: linear-gradient(135deg, rgba(21, 101, 192, 0.4) 0%, rgba(30, 136, 229, 0.1) 100%);
+        border-radius: 50%;
+        z-index: 1;
+        animation: spin 8s linear infinite;
+    }
+    .course-card-img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        z-index: 2;
+        border: 4px solid #ffffff;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+
+    @keyframes spin {
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Course Tracks Badges */
+    .premium-track-badge {
+        background: rgba(21, 101, 192, 0.06);
+        color: #1565c0;
+        border: 1px solid rgba(21, 101, 192, 0.12);
+        border-radius: 30px;
+        padding: 5px 12px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+    .premium-track-badge:hover {
+        background: rgba(21, 101, 192, 0.1);
+        transform: translateY(-1px);
+    }
+
+    /* Glassmorphic Description Box */
+    .premium-desc-box {
+        background: rgba(240, 244, 248, 0.5);
+        border: 1px solid rgba(225, 230, 235, 0.8);
+        border-radius: 14px;
+        font-size: 0.88rem;
+        color: #4a5568;
+        line-height: 1.5;
+        width: 100%;
+    }
+
+    /* Toggle Desc Link */
+    .toggle-desc-link {
+        font-size: 0.82rem;
+        color: #1e88e5;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    .toggle-desc-link:hover {
+        color: #1565c0;
+        letter-spacing: 0.2px;
+    }
+
+    /* Action Buttons (Luxury Style) */
+    .premium-action-btn {
+        border-radius: 12px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        border: none;
+    }
+    .btn-action {
+        background: linear-gradient(135deg, #1565c0 0%, #1e88e5 100%);
+        color: #ffffff;
+    }
+    .btn-action:hover {
+        background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%);
+        color: #ffffff;
+        box-shadow: 0 8px 20px rgba(25, 118, 210, 0.3) !important;
+        transform: translateY(-2px);
+    }
+    .btn-sent {
+        background: #e2e8f0;
+        color: #64748b;
+        cursor: not-allowed;
+    }
+    .btn-login {
+        background: #ffffff;
+        color: #1565c0;
+        border: 2px solid #1e88e5;
+    }
+    .btn-login:hover {
+        background: #1e88e5;
+        color: #ffffff;
+        box-shadow: 0 8px 20px rgba(30, 136, 229, 0.2) !important;
+        transform: translateY(-2px);
+    }
+
+    /* Premium Video Modal styling */
+    .premium-modal {
+        background: rgba(15, 23, 42, 0.9) !important;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    .video-container-wrapper {
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .text-light-gray {
+        color: #cbd5e1;
+    }
+
+    /* RTL Arabic Adjustments */
+    [dir="rtl"] .glass-play-btn {
+        left: 15px;
+        right: auto;
+    }
+    [dir="rtl"] .toggle-desc-link i {
+        transform: scaleX(-1);
+    }
+    [dir="rtl"] .modal-header .btn-close {
+        margin-left: 0;
+        margin-right: auto;
+    }
+</style>
