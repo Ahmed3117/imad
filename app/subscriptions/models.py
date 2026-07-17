@@ -61,8 +61,12 @@ class StudyGroup(models.Model):
         # Safely get level name (should always exist due to CASCADE)
         level_name = self.course.level.name if self.course and self.course.level else ""
         
-        # Safely get track name (could be null)
-        track_name = self.course.track.name if self.course and self.course.track else ""
+        # Safely get track names (could be null/multiple)
+        if self.course:
+            track_list = list(self.course.tracks.all())
+            track_name = ", ".join([t.name for t in track_list]) if track_list else ""
+        else:
+            track_name = ""
         
         # Construct the string with fallbacks 
         return f"{self.name} | {level_name} | {track_name} | {self.course.name} | {self.teacher.name or self.teacher.username }" 

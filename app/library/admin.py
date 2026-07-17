@@ -29,7 +29,7 @@ class CourseLibraryInline(TabularInline):
 @admin.register(CourseLibrary)
 class CourseLibraryAdmin(ModelAdmin):
     list_display = ('get_file_name', 'course', 'category')
-    list_filter = ('category', 'course__level', 'course__track', 'course')
+    list_filter = ('category', 'course__level', 'course__tracks', 'course')
     search_fields = ('course__name', 'file', 'category__name')
     autocomplete_fields = ('course', 'category')
     fieldsets = (
@@ -37,7 +37,7 @@ class CourseLibraryAdmin(ModelAdmin):
     )
 
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('course__level', 'course__track', 'category')
+        return super().get_queryset(request).select_related('course__level', 'category').prefetch_related('course__tracks')
 
     def get_file_name(self, obj):
         return obj.file.name.split('/')[-1]
@@ -48,7 +48,7 @@ class CourseLibraryAdmin(ModelAdmin):
 @admin.register(MyLibrary)
 class MyLibraryAdmin(ModelAdmin):
     list_display = ('get_file_name', 'user', 'course')
-    list_filter = ('course__level', 'course__track', 'course', 'user')
+    list_filter = ('course__level', 'course__tracks', 'course', 'user')
     search_fields = ('user__username', 'user__name', 'course__name', 'file')
     autocomplete_fields = ('user', 'course')
     fieldsets = (
@@ -56,7 +56,7 @@ class MyLibraryAdmin(ModelAdmin):
     )
 
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('user', 'course__level', 'course__track')
+        return super().get_queryset(request).select_related('user', 'course__level').prefetch_related('course__tracks')
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == 'user':

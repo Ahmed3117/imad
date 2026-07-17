@@ -43,17 +43,18 @@ class Course(models.Model):
     image = models.ImageField(upload_to='courses/', default='defaults/default.jpg')
     preview_video = models.CharField(max_length=50, blank=True, null=True)
     level = models.ForeignKey(Level, on_delete=models.CASCADE, related_name='courses')
-    track = models.ForeignKey(Track, on_delete=models.SET_NULL, null=True, blank=True, related_name='courses')
+    tracks = models.ManyToManyField(Track, blank=True, related_name='courses')
 
     def __str__(self):
         # Level is required, so it should always be accessible
         level_name = self.level.name if self.level else "No Level"
         
-        # Track is optional, so check if it exists
-        track_name = self.track.name if self.track else "No Track"
+        # Tracks is optional and can have multiple, so list all of them
+        track_list = list(self.tracks.all())
+        track_names = ", ".join([t.name for t in track_list]) if track_list else "No Track"
         
-        # Return a string with level, track, and name
-        return f"{level_name} | {track_name} | {self.name}"
+        # Return a string with level, tracks, and name
+        return f"{level_name} | {track_names} | {self.name}"
     
     def get_translated_name(self, language='en'):
         """Get translated name for this course"""
